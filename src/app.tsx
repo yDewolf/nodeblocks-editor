@@ -6,9 +6,9 @@ export default function App() {
   node_editor.node_controller.add_node("Teste", {x: 200, y: 200})
   
   // Testar se os nodes são renderizados mesmo depois do editor ser criado
-  setInterval(() => {
-    node_editor.node_controller.add_node("Teste", {x: Math.random() * 500, y: Math.random() * 500})
-  }, 1000)
+  // setInterval(() => {
+  //   node_editor.node_controller.add_node("Teste", {x: Math.random() * 500, y: Math.random() * 500})
+  // }, 1000)
 
   return (
     <main>

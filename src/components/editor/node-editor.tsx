@@ -8,22 +8,45 @@ export class NodeEditor {
     node_controller: NodeController
     editor_space: EditorSpace
 
+    _selectedNode: () => BaseNode | null;
+    _setSelectedNode: (node: BaseNode | null) => void;
+
+    get selectedNode() { return this._selectedNode() }
+    public updateSelectedNode(node: BaseNode | null) {
+        this._setSelectedNode(node);
+    }
+
     constructor () {
+        const [selectedNode, setSelectedNode] = createSignal<BaseNode | null>(null);
+        this._selectedNode = selectedNode
+        this._setSelectedNode = setSelectedNode
+
         this.node_controller = new NodeController()
         this.editor_space = new EditorSpace()
     }
 
     public View() {
+        let viewportRef: HTMLDivElement | undefined;
+        const onPointerMove = (e: PointerEvent) => {
+            const node = this.selectedNode;
+            if (!node) return;
+
+            node.updatePosition({
+                x: node.x + e.movementX / this.editor_space.camera.zoom, 
+                y: node.y + e.movementY / this.editor_space.camera.zoom
+            });
+        };
+
+        const onPointerUp = () => this.updateSelectedNode(null);
+
         return (
-            <div class="viewport">
+            <div class="viewport" ref={viewportRef} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={onPointerUp}>
                 <For each={this.node_controller.nodes()}>
                     {(node) => {
-                        console.log("Renderizando node:", node.node_name, "x:", node.x);
-
                         return (<NodeView 
-                            node={node} 
-                            cameraOffset={this.editor_space.camera.offset} 
-                            screenSize={{x: 1920, y: 1080}} 
+                            node={node}
+                            camera={this.editor_space.camera}
+                            onSelect={(node: BaseNode) => {this.updateSelectedNode(node)}}
                         />)
                     }}
                 </For>

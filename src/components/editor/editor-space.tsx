@@ -4,6 +4,8 @@ import { createSignal } from 'solid-js';
 
 export class EditorCamera {
     camera_rect: Rect
+    zoom: number = 1.0
+
     _offset: () => Vector2;
     _setOffset: (v: Vector2) => void;
 
