@@ -1,22 +1,18 @@
-import { createSignal } from "solid-js";
 import "./app.css";
+import { NodeEditor } from "./components/editor/node-editor";
 
 export default function App() {
-  const [count, setCount] = createSignal(0);
+  const node_editor = new NodeEditor();
+  node_editor.node_controller.add_node("Teste", {x: 200, y: 200})
+  
+  // Testar se os nodes são renderizados mesmo depois do editor ser criado
+  setInterval(() => {
+    node_editor.node_controller.add_node("Teste", {x: Math.random() * 500, y: Math.random() * 500})
+  }, 1000)
 
   return (
     <main>
-      <h1>Hello world!</h1>
-      <button class="increment" onClick={() => setCount(count() + 1)} type="button">
-        Clicks: {count()}
-      </button>
-      <p>
-        Visit{" "}
-        <a href="https://start.solidjs.com" target="_blank">
-          start.solidjs.com
-        </a>{" "}
-        to learn how to build SolidStart apps.
-      </p>
+      {node_editor.View()}
     </main>
   );
 }
