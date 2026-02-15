@@ -7,7 +7,7 @@ interface NodeProps {
     node: BaseNode;
     camera: EditorCamera;
     
-    onSelect: (node: BaseNode) => void;
+    onClick: (node: BaseNode) => void;
 }
 
 export const NodeView: Component<NodeProps> = (props) => {
@@ -22,7 +22,8 @@ export const NodeView: Component<NodeProps> = (props) => {
                 data-node-id={props.node.id}
                 onPointerDown={(e) => {
                     e.stopPropagation();
-                    props.onSelect(props.node);
+                    (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+                    props.onClick(props.node);
                 }}
                 style={{
                     position: "absolute",

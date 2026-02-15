@@ -1,16 +1,31 @@
+import { createSignal } from "solid-js"
+
 export type Vector2 = {
     x: number,
     y: number
 }
 
 export class Rect {
-    offset: Vector2
-    size: Vector2
+    _offset: () => Vector2
+    _setOffset: (v: Vector2) => void
+    _size: () => Vector2
+    _setSize: (v: Vector2) => void
 
     constructor (offset: Vector2, size: Vector2) {
-        this.offset = offset;
-        this.size = size;
+        const [offsetS, setOffset] = createSignal(offset);
+        this._offset = offsetS;
+        this._setOffset = setOffset;
+
+        const [sizeS, setSize] = createSignal(size);
+        this._size = sizeS;
+        this._setSize = setSize;
     }
+    
+    get offset() { return this._offset(); }
+    get size() { return this._size(); }
+
+    set offset(offset: Vector2) { this._setOffset(offset); }
+    set size(size: Vector2) { this._setSize(size); }
 
     public overlaps(rect: Rect) {
         return !(
@@ -28,13 +43,5 @@ export class Rect {
             point.y - this.offset.y > 0 && point.y - this.offset.y < this.size.y
         )
     }
-
     
-    public set_size(size: Vector2) {
-        this.size = size
-    }
-
-    public set_offset(offset: Vector2) {
-        this.offset = offset
-    }
 }
