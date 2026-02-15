@@ -5,9 +5,12 @@ import { BaseNode } from "../nodes/base-node";
 import { NodeView } from "../nodes/node-component";
 import { Grid } from "../misc/grid";
 import { SelectionController } from "./selection-controller";
+import { ToolController } from "./tool-controller";
 
 export class NodeEditor {
     node_controller: NodeController
+    tool_controller: ToolController
+
     selection_controller: SelectionController
     editor_space: EditorSpace
     editor_grid: Grid
@@ -19,6 +22,8 @@ export class NodeEditor {
         this.node_controller = new NodeController()
         this.editor_space = new EditorSpace()
         this.editor_grid = new Grid({x: 32, y: 32});
+
+        this.tool_controller = new ToolController(this.editor_space, this.editor_grid);
         this.selection_controller = new SelectionController(this.editor_space, this.editor_grid);
         
         const [space, setSpace] = createSignal(false);
@@ -52,8 +57,9 @@ export class NodeEditor {
 
         const onPointerDown = (e: PointerEvent) => {
             const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+            if (e.target !== e.currentTarget) return;
+
             if (e.button == 0) {
-                // if (e.target !== e.currentTarget) return;
                 if (this.selection_controller.has_selected) {
                     this.selection_controller.clearSelection();
                 }
@@ -95,38 +101,45 @@ export class NodeEditor {
 
         return (
             <div 
-                class="editor-view" 
-                classList={{
-                    'move-mode': this._isSpacePressed(),
-                    'moving-mode': this.selection_controller.moving
-                }}
-                oncontextmenu={(e) => {e.preventDefault()}}
-                tabindex="0"
-                onKeyDown={onKeyDown}
-                onKeyUp={onKeyUp}
-                onWheel={onWheel}
+                class="editor-view"
+            >   
+                <div 
+                    class="viewport"
+                    style={{
+                        position: "absolute", 
+                        height: "100%", 
+                        width: "100%"
+                    }}
+                    classList={{
+                        'move-mode': this._isSpacePressed(),
+                        'moving-mode': this.selection_controller.moving
+                    }}
 
-                onPointerMove={onPointerMove} 
-                onPointerDown={onPointerDown} 
-                onPointerUp={onPointerUp} 
-                onPointerLeave={onPointerUp}
-            >
-                <div style={{
-                    position: "absolute",
-                    inset: 0,
-                    "pointer-events": "none"
-                }}>
-                    {this.editor_grid.View(this.editor_space.camera)}
-                </div>
-                
-                <div class="viewport" style={{position: "absolute", height: "100%", width: "100%"}}>
+                    oncontextmenu={(e) => {e.preventDefault()}}
+                    tabindex="0"
+                    onKeyDown={onKeyDown}
+                    onKeyUp={onKeyUp}
+                    onWheel={onWheel}
+
+                    onPointerMove={onPointerMove} 
+                    onPointerDown={onPointerDown} 
+                    onPointerUp={onPointerUp} 
+                    onPointerLeave={onPointerUp}
+                >
+                    <div style={{
+                        position: "absolute",
+                        inset: 0,
+                        "pointer-events": "none"
+                    }}>
+                        {this.editor_grid.View(this.editor_space.camera)}
+                    </div>
+                    
                     <div 
-                        class="world-space" 
+                        class="world-space"
                         ref={viewportRef} 
                         style={{
                             transform: `scale(${this.editor_space.camera.zoom}) translate(${-this.editor_space.camera.offset.x}px, ${-this.editor_space.camera.offset.y}px)`,
                             position: "absolute",
-                            inset: 0,
                             "transform-origin": "0 0"
                         }}
                     >
@@ -144,6 +157,18 @@ export class NodeEditor {
                                 />)
                             }}
                         </For>
+                    </div>
+                </div>
+                
+                <div class="editor-ui">
+                    <div class="left-tab">
+
+                    </div>
+                    <div class="middle-tab">
+                        {this.tool_controller.View()}
+                    </div>
+                    <div class="right-tab">
+                         
                     </div>
                 </div>
             </div>
