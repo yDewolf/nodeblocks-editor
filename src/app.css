@@ -14,3 +14,23 @@ body {
   user-select: none;
   touch-action: none;
 }
+
+.node {
+  user-select: none;
+  touch-action: none;
+  border: 1px solid black;
+  background-color: white;
+}
+
+.selected-mode {
+  cursor: grab;
+  background-color: rgb(220, 235, 253);
+}
+
+.move-mode {
+  cursor: grab;
+}
+
+.moving-mode {
+  cursor: grabbing;
+}

@@ -29,19 +29,20 @@ export class Rect {
 
     public overlaps(rect: Rect) {
         return !(
-            this.offset.x <= rect.size.x ||
-            this.size.x >= rect.offset.x ||
-            this.offset.y <= rect.size.y ||
-            this.size.y >= rect.offset.y
+            (this.offset.x + this.size.x) < rect.offset.x ||
+            this.offset.x > (rect.offset.x + rect.size.x) ||
+            (this.offset.y + this.size.y) < rect.offset.y ||
+            this.offset.y > (rect.offset.y + rect.size.y)
         )
     }
 
     public has_point(point: Vector2) {
         return (
-            point.x - this.offset.x > 0 && point.x - this.offset.x < this.size.x
-        ) && (
-            point.y - this.offset.y > 0 && point.y - this.offset.y < this.size.y
-        )
+            point.x >= this.offset.x &&
+            point.x <= this.offset.x + this.size.x &&
+            point.y >= this.offset.y &&
+            point.y <= this.offset.y + this.size.y
+        );
     }
     
 }

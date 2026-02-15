@@ -39,7 +39,7 @@ export class SelectionRect {
     public get_overlapping_nodes(all_nodes: BaseNode[]): Array<BaseNode> {
         let selected_nodes: Array<BaseNode> = new Array<BaseNode>();
         all_nodes.forEach(node => {
-            if (this.rect.has_point(node.pos)) {
+            if (this.has_node(node)) {
                 selected_nodes.push(node);
             }
         });
@@ -47,16 +47,19 @@ export class SelectionRect {
         return selected_nodes;
     }
 
-    public View() {
-        const relativePos = createMemo(() => ({
-            x: this.pos.x - this.ref_cam.offset.x,
-            y: this.pos.y - this.ref_cam.offset.y,
-        }));
+    public has_node(node: BaseNode): boolean {
+        if (this.rect.overlaps(node.rect)) {
+            return true;
+        }
+        
+        return false;
+    }
 
+    public View() {
         return (<div
             class="selection-rect"
             style={{
-                transform: `translate(${relativePos().x}px, ${relativePos().y}px)`,
+                transform: `translate(${this.pos.x}px, ${this.pos.y}px)`,
                 width: `${this.size.x}px`,
                 height: `${this.size.y}px`,
                 "pointer-events": "none",

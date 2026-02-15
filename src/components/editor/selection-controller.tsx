@@ -15,7 +15,8 @@ export class SelectionController {
     
     multiple_selection: boolean = false;
     selecting: boolean = false;
-    moving: boolean = false;
+    _moving: () => boolean;
+    _setMoving: (value: boolean) => void;
     
     constructor(editor_space: EditorSpace, editor_grid: Grid) {
         this.editor_space = editor_space
@@ -25,10 +26,19 @@ export class SelectionController {
         this._selectedNodes = selectedNode
         this._setSelectedNodes = setSelectedNode
         
+        const [moving, setMoving] = createSignal(false);
+        this._moving = moving
+        this._setMoving = setMoving
+        
         this.selection_rect = new SelectionRect(this.editor_space.camera);
     }
     
+    get moving() { return this._moving(); }
+    set moving(value: boolean) { this._setMoving(value) }
+
     get selected_nodes() { return this._selectedNodes() }
+    private set selected_nodes(value: BaseNode[]) { this._setSelectedNodes(value) }
+
     get has_selected() { return this.selected_nodes.length > 0; }
 
     public onStartMultipleSelection(pos: Vector2) {
@@ -60,6 +70,7 @@ export class SelectionController {
         this.selecting = true;
         
         this._setSelectedNodes([node]);
+        node.selected = true;
         node.select()
     }
 
@@ -72,13 +83,18 @@ export class SelectionController {
     }
 
     public clearSelection() { 
+        this.selected_nodes.forEach(node => {
+            node.selected = false;
+        });
         this._setSelectedNodes([])
         // console.log("resetting")
     }
 
     public onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]) {
+        // pos.x = pos.x + this.editor_space.camera.offset.x
+        // pos.y = pos.y + this.editor_space.camera.offset.y
+
         if (this.moving) {
-            // console.log("moving")
             this.selected_nodes.forEach(node => {
                 node.move({
                     x: delta.x / this.editor_space.camera.zoom,
@@ -87,6 +103,10 @@ export class SelectionController {
             });
         }
 
+        if (Math.abs(delta.x) < 1 && Math.abs(delta.y) < 1) {
+            return;
+        }
+        
         if (this.multiple_selection && this.selecting) {
             const origin = this.selection_rect.origin;
 
@@ -104,12 +124,22 @@ export class SelectionController {
             this.selection_rect.size = new_size;
 
             const overlapping_nodes = this.selection_rect.get_overlapping_nodes(all_nodes);
+            let nodes_to_remove = new Array<BaseNode>()
+            this.selected_nodes.forEach(node => {
+                if (overlapping_nodes.includes(node)) { 
+                    return;
+                }
+                node.selected = false;
+                nodes_to_remove.push(node);
+            });
+            this.selected_nodes = this.selected_nodes.filter((node) => {!nodes_to_remove.includes(node)})
             overlapping_nodes.forEach(node => {
                 if (this.selected_nodes.includes(node)) {
                     return;
                 }
 
                 this._setSelectedNodes([...this.selected_nodes, node])
+                node.selected = true;
                 node.select();
             });
         }
