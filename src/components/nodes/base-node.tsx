@@ -1,11 +1,16 @@
-import { createSignal } from 'solid-js';
+import { createMemo, createSignal, For, onCleanup, Show } from 'solid-js';
 import { Rect, Vector2 } from '../../data_types/geometry';
+import { EditorCamera } from '../editor/editor-space';
+import { NodeSlot } from './node-slot';
 
 export class BaseNode {
     id: number;
     node_name: string;
     // Usamos signals para que a UI saiba quando atualizar
     private raw_pos: Vector2;
+
+    private inputs: NodeSlot[] = [new NodeSlot()];
+    private outputs: NodeSlot[] = [new NodeSlot()];
 
     private _pos: () => Vector2;
     private _setPos: (v: Vector2) => void;
@@ -76,5 +81,81 @@ export class BaseNode {
 
     public get_relative_pos(camera_offset: Vector2) {
         return { x: (this.x - camera_offset.x), y: (this.y - camera_offset.y) };
+    }
+
+    public View(camera: EditorCamera, onClick: (node: BaseNode) => void) {
+        let ro: ResizeObserver | undefined;
+        const handleRef = (el: HTMLDivElement) => {
+            const rect = el.getBoundingClientRect();
+            this.updateSize(rect.width / camera.zoom, rect.height / camera.zoom);
+
+            ro = new ResizeObserver((entries) => {
+                const entry = entries[0];
+                if (entry) {
+                    this.updateSize(
+                        entry.contentRect.width, 
+                        entry.contentRect.height
+                    );
+                }
+            });
+            ro.observe(el);
+        };
+
+        onCleanup(() => ro?.disconnect());
+
+        const isVisible = createMemo(() => {
+            return camera.camera_rect.overlaps(this.rect);
+        });
+
+        return (
+            <Show when={isVisible()}>
+                <div 
+                    ref={handleRef}
+                    style={{
+                        position: "absolute",
+                        transform: `translate(${this.x}px, ${this.y}px)`,
+                        // "pointer-events": "none"
+                    }}
+                >
+                    <div class="node-slots">
+                        <div class="slots-column inputs">
+                            <For each={this.inputs}>
+                                {(slot) => slot.View()}
+                            </For>
+                        </div>
+
+                        <div class="slots-column outputs">
+                            <For each={this.outputs}>
+                                {(slot) => slot.View()}
+                            </For>
+                        </div>
+                    </div>
+                     <div
+                        class="internal-node"
+                        data-node-id={this.id}
+                        onPointerDown={(e) => {
+                            e.stopPropagation();
+                            (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+                            onClick(this);
+                        }}
+                        classList={{
+                            "selected-mode": this.selected
+                        }}
+                    >
+                        <div class="node-body">
+                            <div class="node-header">{this.node_name}</div>
+                            
+                            <div class="node-content">
+                                <div style={{display: "flex"}}>
+                                    <label>test</label>
+                                    <input type="text" />
+                                </div>
+                                <div class="node-internal-data"> ... </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Show>
+        );
     }
 }

@@ -1,0 +1,32 @@
+{
+    "nodes": {
+        "node_0": {
+            "type": "NodeType",
+            "position": [0, 0],
+            "size": [100, 50],
+            "data": {}
+        },
+        "node_1": {
+            "type": "NodeType",
+            "position": [200, 0],
+            "size": [100, 50],
+            "data": {}
+        },
+        "node_2": {
+            "type": "NodeType",
+            "position": [350, 0],
+            "size": [100, 50],
+            "data": {}
+        }
+    },
+    "connections": {
+        "c1": {
+            "from": "nodes:node_0:outputs:out_0",
+            "to": "nodes:node_1:inputs:in_0"
+        },
+        "c2": {
+            "from": "nodes:node_0:outputs:out_0",
+            "to": "nodes:node_2:inputs:in_0"
+        }
+    }
+}

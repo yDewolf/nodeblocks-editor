@@ -75,14 +75,81 @@ body {
   touch-action: none;
 }
 
-.node {
+.internal-node {
+  pointer-events: auto;
   cursor: pointer;
-  padding: 5px;
 
   user-select: none;
   touch-action: none;
   border: 1px solid black;
+  
+  margin: 0 10px;
+  padding: 5px;
   background-color: white;
+}
+
+.node-header {
+  
+}
+
+.node-body {
+  margin: 5px 10px;
+}
+
+.node-slots {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  justify-content: space-between;
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.slots-column {
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.outputs .slots-column {
+    flex-direction: row-reverse;
+}
+
+.outputs {
+  .slot-dot {
+    margin-left: auto;
+  }
+}
+
+.inputs {
+  .slot-dot {
+    margin-right: auto;
+  }
+}
+
+.slot-dot {
+  pointer-events: auto;
+  width: 12px;
+  height: 12px;
+  background: #444;
+
+  border: 2px solid #888;
+  border-radius: 50%;
+}
+
+.slot-dot:hover {
+  transform: scale(1.3);
+  background: #fff; /* Feedback visual ao passar o mouse */
+  cursor: crosshair;
+}
+
+.slot-container {
+  display: flex;
+  flex-direction: column;
 }
 
 .selected-mode {

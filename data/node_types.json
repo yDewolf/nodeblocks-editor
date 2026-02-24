@@ -1,0 +1,11 @@
+{
+    "NodeType": {
+        "description": "Takes a float input and outputs it without any modifications",
+        "inputs": {
+            "in_0": {"type": "float", "tooltip": "Main input value"}
+        },
+        "outputs": {
+            "out_0": {"type": "float", "tooltip": "Takes the value from ${in_0}, and outputs it"}
+        }
+    }
+}

@@ -2,7 +2,6 @@ import { NodeController } from "../nodes/node-controller";
 import { EditorSpace } from "./editor-space";
 import { createSignal, For, Show } from "solid-js";
 import { BaseNode } from "../nodes/base-node";
-import { NodeView } from "../nodes/node-component";
 import { Grid } from "../misc/grid";
 import { SelectionController } from "./selection-controller";
 import { ToolController } from "./tool-controller";
@@ -23,8 +22,8 @@ export class NodeEditor {
         this.editor_space = new EditorSpace()
         this.editor_grid = new Grid({x: 32, y: 32});
 
-        this.tool_controller = new ToolController(this.editor_space, this.editor_grid);
         this.selection_controller = new SelectionController(this.editor_space, this.editor_grid);
+        this.tool_controller = new ToolController(this);
         
         const [space, setSpace] = createSignal(false);
         this._isSpacePressed = space;
@@ -59,18 +58,12 @@ export class NodeEditor {
             const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
             if (e.target !== e.currentTarget) return;
 
-            if (e.button == 0) {
-                if (this.selection_controller.has_selected) {
-                    this.selection_controller.clearSelection();
-                }
-    
-                (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-                this.selection_controller.onStartMultipleSelection({x: world_pos.x, y: world_pos.y});
-            }
 
             if (e.button == 2) {
                 this.node_controller.add_node("Teste", {x: world_pos.x, y: world_pos.y})
-            } 
+            }
+
+            this.tool_controller.current_tool?.onPointerDown(e);
         }
         
         const onPointerMove = (e: PointerEvent) => {
@@ -82,19 +75,11 @@ export class NodeEditor {
                 });
                 return;
             }
-
-            this.selection_controller.onMoveCursor(
-                {x: world_pos.x, y: world_pos.y}, 
-                {x: e.movementX, y: e.movementY},
-                this.node_controller.nodes
-            )
+            this.tool_controller.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, this.node_controller.nodes);
         };
 
         const onPointerUp = (e: PointerEvent) => {
-            this.selection_controller.moving = false;
-            if (this.selection_controller.selecting) {
-                this.selection_controller.stopSelection();
-            }
+            this.tool_controller.current_tool?.onPointerUp(e);
 
             (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
         };
@@ -148,13 +133,12 @@ export class NodeEditor {
                         </Show>
                         <For each={this.node_controller.nodes}>
                             {(node) => {
-                                return (<NodeView 
-                                    node={node}
-                                    camera={this.editor_space.camera}
-                                    onClick={(node: BaseNode) => {
-                                        this.selection_controller.onClickOnNode(node)
-                                    }}
-                                />)
+                                return (node.View(
+                                    this.editor_space.camera, 
+                                    (node: BaseNode) => {
+                                        this.tool_controller.current_tool?.onClickOnNode(node);
+                                    })
+                                )
                             }}
                         </For>
                     </div>
