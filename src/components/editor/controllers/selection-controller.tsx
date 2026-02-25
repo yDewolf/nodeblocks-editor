@@ -1,9 +1,9 @@
 import { createSignal } from "solid-js";
-import { SelectionRect } from "../misc/selection_rect";
-import { EditorCamera, EditorSpace } from "./editor-space";
-import { BaseNode } from "../nodes/base-node";
+import { SelectionRect } from "../../misc/selection_rect";
+import { EditorCamera, EditorSpace } from "../editor-space";
+import { BaseNode } from "../../nodes/base-node";
 import { Vector2 } from "~/data_types/geometry";
-import { Grid } from "../misc/grid";
+import { Grid } from "../../misc/grid";
 
 export class SelectionController {
     selection_rect: SelectionRect
@@ -13,7 +13,7 @@ export class SelectionController {
     _selectedNodes: () => BaseNode[];
     _setSelectedNodes: (nodes: BaseNode[]) => void;
     
-    multiple_selection: boolean = false;
+    area_selection: boolean = false;
     selecting: boolean = false;
     _moving: () => boolean;
     _setMoving: (value: boolean) => void;
@@ -41,8 +41,8 @@ export class SelectionController {
 
     get has_selected() { return this.selected_nodes.length > 0; }
 
-    public onStartMultipleSelection(pos: Vector2) {
-        this.multiple_selection = true;
+    public onStartAreaSelection(pos: Vector2) {
+        this.area_selection = true;
         this.selecting = true;
 
         this.selection_rect.pos = {x: pos.x, y: pos.y};
@@ -51,9 +51,9 @@ export class SelectionController {
         this.selection_rect.active = true;
     }
 
-    public stopMultipleSelection() {
+    public stopAreaSelection() {
         this.selection_rect.active = false;
-        this.multiple_selection = false;
+        this.area_selection = false;
         
         this.selecting = false;
     }
@@ -66,17 +66,20 @@ export class SelectionController {
             return;
         }
 
-        this.multiple_selection = false;
+        this.area_selection = false;
         this.selecting = true;
         
+        this.selected_nodes.forEach(node => {
+            node.selected = false;
+        });
+
         this._setSelectedNodes([node]);
         node.selected = true;
-        node.select()
     }
 
     public stopSelection() { 
-        if (this.multiple_selection) {
-            this.stopMultipleSelection();
+        if (this.area_selection) {
+            this.stopAreaSelection();
         }
 
         this.selecting = false;
@@ -107,7 +110,7 @@ export class SelectionController {
             return;
         }
         
-        if (this.multiple_selection && this.selecting) {
+        if (this.area_selection && this.selecting) {
             const origin = this.selection_rect.origin;
 
             const new_pos = {

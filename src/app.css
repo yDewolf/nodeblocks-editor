@@ -143,9 +143,26 @@ body {
 
 .slot-dot:hover {
   transform: scale(1.3);
-  background: #fff; /* Feedback visual ao passar o mouse */
+  background-color: #fff;
   cursor: crosshair;
 }
+
+.input-slot {
+  background: #fff;
+}
+
+.output-slot {
+  background: #444;
+}
+
+.connected-slot {
+  background: #91ff00;
+}
+
+.selected-slot {
+  background: #ff0000;
+}
+
 
 .slot-container {
   display: flex;

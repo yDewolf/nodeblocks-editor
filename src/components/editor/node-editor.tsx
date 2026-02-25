@@ -3,14 +3,18 @@ import { EditorSpace } from "./editor-space";
 import { createSignal, For, Show } from "solid-js";
 import { BaseNode } from "../nodes/base-node";
 import { Grid } from "../misc/grid";
-import { SelectionController } from "./selection-controller";
-import { ToolController } from "./tool-controller";
+import { SelectionController } from "./controllers/selection-controller";
+import { ToolController } from "./controllers/tool-controller";
+import { NodeSlot } from "../nodes/node-slot";
+import { ConnectionController } from './controllers/connection-controller';
 
 export class NodeEditor {
     node_controller: NodeController
     tool_controller: ToolController
 
     selection_controller: SelectionController
+    connection_controller: ConnectionController
+
     editor_space: EditorSpace
     editor_grid: Grid
 
@@ -23,6 +27,8 @@ export class NodeEditor {
         this.editor_grid = new Grid({x: 32, y: 32});
 
         this.selection_controller = new SelectionController(this.editor_space, this.editor_grid);
+        this.connection_controller = new ConnectionController();
+        
         this.tool_controller = new ToolController(this);
         
         const [space, setSpace] = createSignal(false);
@@ -137,6 +143,9 @@ export class NodeEditor {
                                     this.editor_space.camera, 
                                     (node: BaseNode) => {
                                         this.tool_controller.current_tool?.onClickOnNode(node);
+                                    },
+                                    (slot: NodeSlot) => {
+                                        this.tool_controller.current_tool?.onClickOnNodeSlot(slot);
                                     })
                                 )
                             }}

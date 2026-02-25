@@ -1,7 +1,7 @@
 import { createMemo, createSignal, For, onCleanup, Show } from 'solid-js';
 import { Rect, Vector2 } from '../../data_types/geometry';
 import { EditorCamera } from '../editor/editor-space';
-import { NodeSlot } from './node-slot';
+import { NodeSlot, SlotTypes } from './node-slot';
 
 export class BaseNode {
     id: number;
@@ -9,8 +9,8 @@ export class BaseNode {
     // Usamos signals para que a UI saiba quando atualizar
     private raw_pos: Vector2;
 
-    private inputs: NodeSlot[] = [new NodeSlot()];
-    private outputs: NodeSlot[] = [new NodeSlot()];
+    private inputs: NodeSlot[] = [new NodeSlot(this, SlotTypes.INPUT)];
+    private outputs: NodeSlot[] = [new NodeSlot(this, SlotTypes.OUTPUT)];
 
     private _pos: () => Vector2;
     private _setPos: (v: Vector2) => void;
@@ -83,7 +83,7 @@ export class BaseNode {
         return { x: (this.x - camera_offset.x), y: (this.y - camera_offset.y) };
     }
 
-    public View(camera: EditorCamera, onClick: (node: BaseNode) => void) {
+    public View(camera: EditorCamera, onClick: (node: BaseNode) => void, onClickOnSlot: (slot: NodeSlot) => void) {
         let ro: ResizeObserver | undefined;
         const handleRef = (el: HTMLDivElement) => {
             const rect = el.getBoundingClientRect();
@@ -120,13 +120,13 @@ export class BaseNode {
                     <div class="node-slots">
                         <div class="slots-column inputs">
                             <For each={this.inputs}>
-                                {(slot) => slot.View()}
+                                {(slot) => slot.View(onClickOnSlot)}
                             </For>
                         </div>
 
                         <div class="slots-column outputs">
                             <For each={this.outputs}>
-                                {(slot) => slot.View()}
+                                {(slot) => slot.View(onClickOnSlot)}
                             </For>
                         </div>
                     </div>

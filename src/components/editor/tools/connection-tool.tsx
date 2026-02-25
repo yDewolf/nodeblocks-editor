@@ -1,28 +1,23 @@
 import { BaseNode } from '~/components/nodes/base-node';
 import { Vector2 } from '~/data_types/geometry';
-import { EditorTool } from './base-tool';
+import { BaseEditorTool, EditorTool } from './base-tool';
+import { NodeSlot } from '~/components/nodes/node-slot';
+import { ConnectionController } from '../controllers/connection-controller';
+import { NodeEditor } from '../node-editor';
 
-export class ConnectionTool implements EditorTool {
-    onKeyDown(e: KeyboardEvent): void {
+export class ConnectionTool extends BaseEditorTool {
+    connection_controller: ConnectionController;
 
-    }
-    
-    onKeyUp(e: KeyboardEvent): void {
-    }
-
-    onWheel(e: WheelEvent): void {
-    }
-
-    onPointerDown(e: PointerEvent): void {
-    }
-
-    onPointerUp(e: PointerEvent): void {
+    constructor(node_editor: NodeEditor) {
+        super(node_editor);
+        this.connection_controller = node_editor.connection_controller;
     }
 
     onClickOnNode(node: BaseNode): void {
+    
     }
-
-    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void {
+    
+    onClickOnNodeSlot(slot: NodeSlot): void {
+        this.connection_controller.select_slot(slot);
     }
-
 }

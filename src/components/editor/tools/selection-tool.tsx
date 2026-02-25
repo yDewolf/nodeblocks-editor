@@ -1,23 +1,26 @@
-import { SelectionController } from "../selection-controller";
-import { EditorTool } from "./base-tool";
+import { SelectionController } from "../controllers/selection-controller";
+import { BaseEditorTool, EditorTool } from "./base-tool";
 import { BaseNode } from "~/components/nodes/base-node";
 import { Vector2 } from "~/data_types/geometry";
 import { NodeEditor } from "../node-editor";
+import { NodeSlot } from "~/components/nodes/node-slot";
+import { ConnectionController } from "../controllers/connection-controller";
 
-export class SelectionTool implements EditorTool {
+export class SelectionTool extends BaseEditorTool {
     selection_controller: SelectionController
+    connection_controller: ConnectionController;
     node_editor: NodeEditor
 
-    constructor(selection_controller: SelectionController, node_editor: NodeEditor) {
-        this.selection_controller = selection_controller;
+    constructor(node_editor: NodeEditor) {
+        super(node_editor);
+        this.selection_controller = node_editor.selection_controller;
+        this.connection_controller = node_editor.connection_controller;
         this.node_editor = node_editor;
     }
-
-    onKeyDown(e: KeyboardEvent): void {}
-
-    onKeyUp(e: KeyboardEvent): void {}
-
-    onWheel(e: WheelEvent): void {}
+    onClickOnNodeSlot(slot: NodeSlot): void {
+        this.connection_controller.select_slot(slot);
+        this.selection_controller.clearSelection();
+    }
 
     onPointerDown(e: PointerEvent): void {
         const [screen_pos, world_pos] = this.selection_controller.editor_space.get_cursor_pos(e)
@@ -26,9 +29,10 @@ export class SelectionTool implements EditorTool {
             if (this.selection_controller.has_selected) {
                 this.selection_controller.clearSelection();
             }
+            this.connection_controller.unselect_slot();
 
             (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-            this.selection_controller.onStartMultipleSelection({x: world_pos.x, y: world_pos.y});
+            this.selection_controller.onStartAreaSelection({x: world_pos.x, y: world_pos.y});
         }
 
         // if (e.button == 2) {
@@ -44,6 +48,7 @@ export class SelectionTool implements EditorTool {
     }
 
     onClickOnNode(node: BaseNode): void {
+        this.connection_controller.unselect_slot();
         this.selection_controller.onClickOnNode(node)
     }
 
