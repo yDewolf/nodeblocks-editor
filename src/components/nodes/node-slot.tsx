@@ -12,37 +12,46 @@ export class NodeSlot {
 
     type: SlotTypes
     _selected: () => boolean;
-    _set_selected: (v: boolean) => boolean;
+    _set_selected: (v: boolean) => void;
 
-    connections: NodeSlot[] = [];
+    _connected: () => boolean;
+    _set_connected: (v: boolean) => void;
+    // connections: NodeSlot[] = [];
 
     constructor(parent: BaseNode, slot_type: SlotTypes) {
         const [selected, setSelected] = createSignal(false);
         this._selected = selected;
         this._set_selected = setSelected
 
+        const [connection, setConnection] = createSignal(false);
+        this._connected = connection;
+        this._set_connected = setConnection;
+
         this.parent_node = parent;
         this.type = slot_type
     }
 
     get selected() { return this._selected() }
-    set selected(value: boolean) { this._set_selected(value); console.log(value) }
+    set selected(value: boolean) { this._set_selected(value); }
 
-    public connect(slot: NodeSlot): boolean {
-        if (slot.type == this.type) {
-            return false;
-        }
+    get connected() { return this._connected() }
+    set connected(value: boolean) { this._set_connected(value); }
 
-        this.connections = [...this.connections, slot];
-        // Check this later
-        slot.connections = [...slot.connections, this];
-        return true;
-    }
+    // public connect(slot: NodeSlot): boolean {
+    //     if (slot.type == this.type) {
+    //         return false;
+    //     }
+
+    //     this.connections = [...this.connections, slot];
+    //     // Check this later
+    //     slot.connections = [...slot.connections, this];
+    //     return true;
+    // }
 
     public View(onClickOnSlot: (slot: NodeSlot) => void) {
-        const isConnected = createMemo(() => {
-            return this.connections.length > 0;
-        });
+        // const isConnected = createMemo(() => {
+        //     return this.connections.length > 0;
+        // });
 
         return (
             <div 
@@ -58,7 +67,7 @@ export class NodeSlot {
                 <div 
                     class="slot-dot"
                     classList={{
-                        "connected-slot": isConnected(),
+                        "connected-slot": this.connected,
                         "selected-slot": this.selected,
                         "input-slot": this.type == SlotTypes.INPUT,
                         "output-slot": this.type == SlotTypes.OUTPUT,
