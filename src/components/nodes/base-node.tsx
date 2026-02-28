@@ -39,9 +39,9 @@ export class BaseNode {
         this._setSize = setSize;
     }
     
-    get x() { return this._pos().x }
-    get y() { return this._pos().y }
     get pos() { return this._pos() }
+    get x() { return this.pos.x }
+    get y() { return this.pos.y }
 
     get width() { return this._size().x; }
     get height() { return this._size().y; }

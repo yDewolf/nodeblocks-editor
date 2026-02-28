@@ -1,5 +1,5 @@
 import { NodeController } from "../nodes/node-controller";
-import { EditorSpace } from "./editor-space";
+import { EditorCamera, EditorSpace } from "./editor-space";
 import { createSignal, For, Show } from "solid-js";
 import { BaseNode } from "../nodes/base-node";
 import { Grid } from "../misc/grid";
@@ -7,6 +7,7 @@ import { SelectionController } from "./controllers/selection-controller";
 import { ToolController } from "./controllers/tool-controller";
 import { NodeSlot } from "../nodes/node-slot";
 import { ConnectionController } from './controllers/connection-controller';
+import { ConnectionLines } from "../misc/connection-lines";
 
 export class NodeEditor {
     node_controller: NodeController
@@ -90,6 +91,8 @@ export class NodeEditor {
             (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
         };
 
+        
+    
         return (
             <div 
                 class="editor-view"
@@ -137,6 +140,20 @@ export class NodeEditor {
                         <Show when={this.selection_controller.selection_rect.active}>
                             {this.selection_controller.selection_rect.View()}
                         </Show>
+                        <svg style={{
+                            position: "absolute",
+                            inset: 0,
+                            overflow: "visible",
+                            "pointer-events": "none",
+                        }}>
+                            <For each={this.connection_controller.connections}>
+                                {(conn) => <ConnectionLines connection={conn} />}
+                            </For>
+                            
+                            {/* <Show when={this.connection_controller.selected_slot}>
+                            </Show> */}
+                        </svg>
+
                         <For each={this.node_controller.nodes}>
                             {(node) => {
                                 return (node.View(

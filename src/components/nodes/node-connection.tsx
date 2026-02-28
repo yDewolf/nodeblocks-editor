@@ -22,4 +22,21 @@ export class NodeConnection {
 
     get data() { return this._data(); }
     set data(data: Map<string, unknown>) { this._set_data(data); }
+
+    public connect() {
+        this.slot_a.add_connection(this);
+        this.slot_b.add_connection(this);
+    }
+
+    public disconnect() {
+        this.slot_a.remove_connection(this);
+        this.slot_b.remove_connection(this);
+    }
+
+    public get_other_node(root_node: NodeSlot) { 
+        const other_node = this.slot_a == root_node ? this.slot_b : this.slot_a
+        // console.log(root_node, "other: ", other_node);
+
+        return other_node;
+    }
 }
