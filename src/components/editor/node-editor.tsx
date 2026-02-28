@@ -7,7 +7,9 @@ import { SelectionController } from "./controllers/selection-controller";
 import { ToolController } from "./controllers/tool-controller";
 import { NodeSlot } from "../nodes/node-slot";
 import { ConnectionController } from './controllers/connection-controller';
-import { ConnectionLines } from "../misc/connection-lines";
+import { ConnectionLines, ConnectionPreview } from '../misc/connection-lines';
+import { Vector2 } from '../../data_types/geometry';
+import { NodeConnection } from "../nodes/node-connection";
 
 export class NodeEditor {
     node_controller: NodeController
@@ -22,7 +24,14 @@ export class NodeEditor {
     _isSpacePressed: () => boolean;
     _setSpacePressed: (v: boolean) => void;
 
+    _cursor_world_pos: () => Vector2;
+    _set_cursor_world_pos: (v: Vector2) => void;
+
     constructor () {
+        const [cursorWorldPos, setCursorWorldPos] = createSignal({x: 0, y: 0});
+        this._cursor_world_pos = cursorWorldPos;
+        this._set_cursor_world_pos = setCursorWorldPos;
+
         this.node_controller = new NodeController()
         this.editor_space = new EditorSpace()
         this.editor_grid = new Grid({x: 32, y: 32});
@@ -37,7 +46,11 @@ export class NodeEditor {
         this._setSpacePressed = setSpace;
     }
 
+    get cursor_world_pos() { return this._cursor_world_pos(); }
+    set cursor_world_pos(v: Vector2) { this._set_cursor_world_pos(v); }
+
     public View() {
+        
         let viewportRef: HTMLDivElement | undefined;
         const onKeyDown = (e: KeyboardEvent) => {
             if (e.code === "Space") this._setSpacePressed(true);
@@ -75,6 +88,7 @@ export class NodeEditor {
         
         const onPointerMove = (e: PointerEvent) => {
             const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+            this.cursor_world_pos = world_pos;
             if (this._isSpacePressed()) {
                 this.editor_space.camera.move({
                     x: -e.movementX / this.editor_space.camera.zoom,
@@ -147,11 +161,15 @@ export class NodeEditor {
                             "pointer-events": "none",
                         }}>
                             <For each={this.connection_controller.connections}>
-                                {(conn) => <ConnectionLines connection={conn} />}
+                                {(conn) => <ConnectionLines 
+                                    connection={conn} 
+                                    onDisconnect={() => this.connection_controller.disconnect_nodes(conn)} 
+                                />}
                             </For>
                             
-                            {/* <Show when={this.connection_controller.selected_slot}>
-                            </Show> */}
+                            <Show when={this.connection_controller.selected_slot}>
+                                <ConnectionPreview start_node={this.connection_controller.selected_slot} cursor_pos={this.cursor_world_pos}/>
+                            </Show>
                         </svg>
 
                         <For each={this.node_controller.nodes}>

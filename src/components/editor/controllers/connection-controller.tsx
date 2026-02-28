@@ -37,10 +37,9 @@ export class ConnectionController {
             }
 
             const succesfull = this.connect_node_to(this.selected_slot, slot);
-            if (succesfull) {
-                this.unselect_slot();
-                return;
-            }
+            // TODO: Desselect slot only if shift is not pressed
+            this.unselect_slot();
+            return;
         }
 
         this.unselect_slot();

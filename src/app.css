@@ -1,3 +1,9 @@
+:root {
+  --selection-color: #7bb4ff;
+  --selection-color-alpha: #7bb4ff4d;
+  --node-selected-color: #dcebfd;
+}
+
 * {
   margin: 0;
 }
@@ -69,7 +75,7 @@ body {
 
 .selection-rect {
   position: absolute;
-  background-color: rgba(123, 180, 255, 0.3);
+  background-color: var(--selection-color-alpha);
   border: rgba(0, 0, 200, 0.4) solid 1px;
   user-select: none;
   touch-action: none;
@@ -160,7 +166,7 @@ body {
 }
 
 .selected-slot {
-  background: #ff0000;
+  background: var(--node-selected-color);
 }
 
 
@@ -171,7 +177,7 @@ body {
 
 .selected-mode {
   cursor: grab;
-  background-color: rgb(220, 235, 253);
+  background-color: var(--node-selected-color);
 }
 
 .move-mode {
@@ -180,4 +186,30 @@ body {
 
 .moving-mode {
   cursor: grabbing;
+}
+
+
+
+.connection-path, .connection-path-preview {
+  pointer-events: none;
+  stroke-width: 2;
+  fill: none;
+  stroke: black;
+}
+
+.clickable-path {
+  pointer-events: stroke;
+  cursor: pointer;
+  stroke: transparent;
+  stroke-width: 15;
+  fill: none;
+}
+
+.connection-group:hover path:last-child {
+  stroke: var(--selection-color);
+  stroke-width: 3;
+}
+
+.connection-path-preview {
+  stroke: rgba(0, 0, 0, 0.5);
 }
