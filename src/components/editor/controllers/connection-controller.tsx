@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 import { NodeConnection } from "~/components/nodes/node-connection";
-import { NodeSlot } from "~/components/nodes/node-slot";
+import { NodeSlot } from "~/components/nodes/slot/node-slot";
 
 export class ConnectionController {
     _connections: () => NodeConnection[];

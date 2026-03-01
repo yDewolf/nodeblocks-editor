@@ -1,87 +1,26 @@
 import { createSignal } from "solid-js";
-import { BaseNode } from "./base-node";
-import { NodeConnection } from "./node-connection";
+import { BaseNode } from "../base-node";
+import { NodeConnection } from "../node-connection";
 import { Vector2 } from "~/data_types/geometry";
-
-
-export enum SlotTypes {
-    INPUT,
-    OUTPUT
-}
-
-export class SlotType {
-    super_type: SlotTypes;
-    type_whitelist: SlotTypes[];
-
-    constructor(type: SlotTypes, type_whitelist: SlotTypes[]) {
-        this.super_type = type;
-        this.type_whitelist = type_whitelist;
-    }
-
-    public can_connect_to(other_type: SlotType): boolean {
-        if (this.type_whitelist.includes(other_type.super_type)) {
-            return true;
-        }
-
-        return false;
-    }
-}
-
-export const INPUT_SLOT = new SlotType(SlotTypes.INPUT, [SlotTypes.OUTPUT]);
-export const OUTPUT_SLOT = new SlotType(SlotTypes.OUTPUT, [SlotTypes.INPUT]);
-
-export class NodeSlotStyle {
-    default_anchor: Vector2;
-    _anchor: () => Vector2;
-    _set_anchor: (v: Vector2) => void;
-
-    _version: () => number;
-    _set_version: (v: number) => void;  
-
-    constructor(slot_type: SlotType) {
-        this.default_anchor = {x: slot_type.super_type == SlotTypes.INPUT ? -1 : 1, y: 0}
-
-        // Gambiarra
-        const [version, setVersion] = createSignal(0);
-        this._version = version;
-        this._set_version = setVersion;
-
-        const [anchor, setAnchor] = createSignal(this.default_anchor);
-        this._anchor = anchor;
-        this._set_anchor = setAnchor;
-    }
-    
-    get version() { return this._version(); }
-
-    get anchor() { return this._anchor(); }
-    set anchor(v: Vector2) { this._set_anchor(v); }
-
-    public update_anchor(new_anchor: Vector2) {
-        if (this.anchor.x === new_anchor.x && this.anchor.y === new_anchor.y) {
-            return;
-        };
-
-        this.anchor = new_anchor;
-        requestAnimationFrame(() => {
-            this._set_version(this.version + 1);
-        });
-    }
-}
+import { BaseSlotType, SuperSlotTypes } from "./slot-type";
+import { NodeSlotStyle } from "./slot-style";
 
 export class NodeSlot {
     private _element: HTMLDivElement | undefined;
     parent_node: BaseNode;
     style: NodeSlotStyle;
 
-    type: SlotType
+    slot_name: string;
+    type: BaseSlotType
     _selected: () => boolean;
     _set_selected: (v: boolean) => void;
 
     _connections: () => Map<NodeSlot, NodeConnection>;
     _set_connections: (v: Map<NodeSlot, NodeConnection>) => void;
 
-    constructor(parent: BaseNode, slot_type: SlotType) {
+    constructor(parent: BaseNode, slot_type: BaseSlotType, slot_name: string) {
         this.style = new NodeSlotStyle(slot_type);
+        this.slot_name = slot_name;
 
         const [selected, setSelected] = createSignal(false);
         this._selected = selected;
@@ -141,7 +80,7 @@ export class NodeSlot {
 
         if (!this._element) {
             return {
-                x: this.parent_node.x + (this.type.super_type === SlotTypes.OUTPUT ? this.parent_node.width : 0),
+                x: this.parent_node.x + (this.type.super_type === SuperSlotTypes.OUTPUT ? this.parent_node.width : 0),
                 y: this.parent_node.y + (this.parent_node.height / 2)
             };
         }
@@ -208,8 +147,8 @@ export class NodeSlot {
                     classList={{
                         "connected-slot": this.connections.size > 0,
                         "selected-slot": this.selected,
-                        "input-slot": this.type.super_type == SlotTypes.INPUT,
-                        "output-slot": this.type.super_type == SlotTypes.OUTPUT,
+                        "input-slot": this.type.super_type == SuperSlotTypes.INPUT,
+                        "output-slot": this.type.super_type == SuperSlotTypes.OUTPUT,
                     }}
                 >
                     {/* <div class="slot-label">bleh</div> */}

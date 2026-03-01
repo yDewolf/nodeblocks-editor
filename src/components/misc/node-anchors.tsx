@@ -1,5 +1,5 @@
 import { Vector2 } from "~/data_types/geometry";
-import { NodeSlot } from "../nodes/node-slot";
+import { NodeSlot } from "../nodes/slot/node-slot";
 import { For, createMemo } from 'solid-js';
 
 export const NodeAnchor = (props: { anchor_pos: Vector2, all_slots: NodeSlot[], onClickOnSlot: (slot: NodeSlot) => void, onHoverSlot: (slot: NodeSlot) => void}) => {

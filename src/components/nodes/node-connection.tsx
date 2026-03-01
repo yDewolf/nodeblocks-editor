@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { NodeSlot } from "./node-slot";
+import { NodeSlot } from "./slot/node-slot";
 
 
 // Representa uma conexão entre dois nodes

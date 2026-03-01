@@ -1,6 +1,6 @@
 import { createMemo } from "solid-js";
 import { NodeConnection } from "../nodes/node-connection";
-import { NodeSlot } from "../nodes/node-slot";
+import { NodeSlot } from "../nodes/slot/node-slot";
 import { Vector2 } from "~/data_types/geometry";
 
 export function make_simple_curved_path(start: Vector2, end: Vector2, anchor_a: Vector2, anchor_b: Vector2) {

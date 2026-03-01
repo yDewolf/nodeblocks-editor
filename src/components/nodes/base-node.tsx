@@ -1,9 +1,10 @@
 import { createMemo, createSignal, For, onCleanup, Show } from 'solid-js';
 import { Rect, Vector2 } from '../../data_types/geometry';
 import { EditorCamera } from '../editor/editor-space';
-import { INPUT_SLOT, NodeSlot, OUTPUT_SLOT, SlotTypes } from './node-slot';
+import { INPUT_SLOT, OUTPUT_SLOT, SuperSlotTypes } from './slot/slot-type';
 import { NodeAnchor } from '../misc/node-anchors';
 import { NodeConnection } from './node-connection';
+import { NodeSlot } from './slot/node-slot';
 
 export class BaseNode {
     id: number;
@@ -11,7 +12,7 @@ export class BaseNode {
     // Usamos signals para que a UI saiba quando atualizar
     private raw_pos: Vector2;
 
-    private _slots: Map<SlotTypes, NodeSlot[]> = new Map<SlotTypes, NodeSlot[]>;
+    private _slots: Map<SuperSlotTypes, NodeSlot[]> = new Map<SuperSlotTypes, NodeSlot[]>;
 
     private _pos: () => Vector2;
     private _setPos: (v: Vector2) => void;
@@ -39,8 +40,8 @@ export class BaseNode {
         this._size = size;
         this._setSize = setSize;
 
-        this._add_slot(new NodeSlot(this, INPUT_SLOT));
-        this._add_slot(new NodeSlot(this, OUTPUT_SLOT));
+        // this._add_slot(new NodeSlot(this, INPUT_SLOT));
+        // this._add_slot(new NodeSlot(this, OUTPUT_SLOT));
     }
     
     get pos() { return this._pos() }

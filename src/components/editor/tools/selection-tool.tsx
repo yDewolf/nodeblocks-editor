@@ -3,7 +3,7 @@ import { BaseEditorTool } from "./base-tool";
 import { BaseNode } from "~/components/nodes/base-node";
 import { Vector2 } from "~/data_types/geometry";
 import { NodeEditor } from "../node-editor";
-import { NodeSlot } from "~/components/nodes/node-slot";
+import { NodeSlot } from "~/components/nodes/slot/node-slot";
 import { ConnectionController } from "../controllers/connection-controller";
 
 export class SelectionTool extends BaseEditorTool {

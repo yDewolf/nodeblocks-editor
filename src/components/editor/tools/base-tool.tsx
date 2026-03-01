@@ -1,5 +1,5 @@
 import { BaseNode } from "~/components/nodes/base-node";
-import { NodeSlot } from "~/components/nodes/node-slot";
+import { NodeSlot } from "~/components/nodes/slot/node-slot";
 import { Vector2 } from "~/data_types/geometry";
 import { NodeEditor } from "../node-editor";
 

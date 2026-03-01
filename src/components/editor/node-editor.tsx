@@ -5,7 +5,7 @@ import { BaseNode } from "../nodes/base-node";
 import { Grid } from "../misc/grid";
 import { SelectionController } from "./controllers/selection-controller";
 import { ToolController } from "./controllers/tool-controller";
-import { NodeSlot } from '../nodes/node-slot';
+import { NodeSlot } from '../nodes/slot/node-slot';
 import { ConnectionController } from './controllers/connection-controller';
 import { ConnectionLines, ConnectionPreview } from '../misc/connection-lines';
 import { Vector2 } from '../../data_types/geometry';
