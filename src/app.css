@@ -121,6 +121,7 @@ body {
   pointer-events: none;
   align-items: center;
   display: flex;
+  gap: 10px;
 }
 
 .side-anchors {
@@ -180,6 +181,10 @@ body {
 
 .connected-slot {
   background: #91ff00;
+}
+
+.connected-slot.input-slot {
+  background: #e5ffc4;
 }
 
 .selected-slot {

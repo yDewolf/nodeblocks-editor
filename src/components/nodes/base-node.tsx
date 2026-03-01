@@ -1,7 +1,7 @@
 import { createMemo, createSignal, For, onCleanup, Show } from 'solid-js';
 import { Rect, Vector2 } from '../../data_types/geometry';
 import { EditorCamera } from '../editor/editor-space';
-import { NodeSlot, SlotTypes } from './node-slot';
+import { INPUT_SLOT, NodeSlot, OUTPUT_SLOT, SlotTypes } from './node-slot';
 import { NodeAnchor } from '../misc/node-anchors';
 import { NodeConnection } from './node-connection';
 
@@ -39,8 +39,8 @@ export class BaseNode {
         this._size = size;
         this._setSize = setSize;
 
-        this._add_slot(new NodeSlot(this, SlotTypes.INPUT));
-        this._add_slot(new NodeSlot(this, SlotTypes.OUTPUT));
+        this._add_slot(new NodeSlot(this, INPUT_SLOT));
+        this._add_slot(new NodeSlot(this, OUTPUT_SLOT));
     }
     
     get pos() { return this._pos() }
@@ -109,12 +109,12 @@ export class BaseNode {
     }
 
     public _add_slot(slot: NodeSlot) {
-        let target_slots = this.slots.get(slot.type);
+        let target_slots = this.slots.get(slot.type.super_type);
         if (target_slots == undefined) {
             target_slots = [];
         }
 
-        this._slots.set(slot.type, [...target_slots, slot]);
+        this._slots.set(slot.type.super_type, [...target_slots, slot]);
     }
 
     public View(

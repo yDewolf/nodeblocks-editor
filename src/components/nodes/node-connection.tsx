@@ -27,16 +27,21 @@ export class NodeConnection {
         this.slot_a.add_connection(this);
         this.slot_b.add_connection(this);
         
-        this.slot_a.parent_node.all_slots.forEach(slot => {
-            slot.update_anchor();
-        });
+        this._update_anchors();
     }
 
     public disconnect() {
         this.slot_a.remove_connection(this);
         this.slot_b.remove_connection(this);
-        
+        this._update_anchors();
+    }
+
+    private _update_anchors() {
         this.slot_a.parent_node.all_slots.forEach(slot => {
+            slot.update_anchor();
+        });
+
+        this.slot_b.parent_node.all_slots.forEach(slot => {
             slot.update_anchor();
         });
     }

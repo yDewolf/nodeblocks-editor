@@ -9,6 +9,27 @@ export enum SlotTypes {
     OUTPUT
 }
 
+export class SlotType {
+    super_type: SlotTypes;
+    type_whitelist: SlotTypes[];
+
+    constructor(type: SlotTypes, type_whitelist: SlotTypes[]) {
+        this.super_type = type;
+        this.type_whitelist = type_whitelist;
+    }
+
+    public can_connect_to(other_type: SlotType): boolean {
+        if (this.type_whitelist.includes(other_type.super_type)) {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+export const INPUT_SLOT = new SlotType(SlotTypes.INPUT, [SlotTypes.OUTPUT]);
+export const OUTPUT_SLOT = new SlotType(SlotTypes.OUTPUT, [SlotTypes.INPUT]);
+
 export class NodeSlotStyle {
     default_anchor: Vector2;
     _anchor: () => Vector2;
@@ -17,8 +38,8 @@ export class NodeSlotStyle {
     _version: () => number;
     _set_version: (v: number) => void;  
 
-    constructor(slot_type: SlotTypes) {
-        this.default_anchor = {x: slot_type == SlotTypes.INPUT ? -1 : 1, y: 0}
+    constructor(slot_type: SlotType) {
+        this.default_anchor = {x: slot_type.super_type == SlotTypes.INPUT ? -1 : 1, y: 0}
 
         // Gambiarra
         const [version, setVersion] = createSignal(0);
@@ -52,14 +73,14 @@ export class NodeSlot {
     parent_node: BaseNode;
     style: NodeSlotStyle;
 
-    type: SlotTypes
+    type: SlotType
     _selected: () => boolean;
     _set_selected: (v: boolean) => void;
 
     _connections: () => Map<NodeSlot, NodeConnection>;
     _set_connections: (v: Map<NodeSlot, NodeConnection>) => void;
 
-    constructor(parent: BaseNode, slot_type: SlotTypes) {
+    constructor(parent: BaseNode, slot_type: SlotType) {
         this.style = new NodeSlotStyle(slot_type);
 
         const [selected, setSelected] = createSignal(false);
@@ -99,6 +120,20 @@ export class NodeSlot {
         this.connections = newMap;
     }
 
+    public can_connect_to(slot: NodeSlot) {
+        if (slot == this) {
+            return false;
+        }
+
+        if (!this.type.can_connect_to(slot.type)) {
+            return false;
+        }
+
+        // TODO: Check recursion
+
+        return true;
+    }
+
     public get_world_position(): Vector2 {
         // Keep signal updates
         this.style.anchor;
@@ -106,7 +141,7 @@ export class NodeSlot {
 
         if (!this._element) {
             return {
-                x: this.parent_node.x + (this.type === SlotTypes.OUTPUT ? this.parent_node.width : 0),
+                x: this.parent_node.x + (this.type.super_type === SlotTypes.OUTPUT ? this.parent_node.width : 0),
                 y: this.parent_node.y + (this.parent_node.height / 2)
             };
         }
@@ -119,7 +154,11 @@ export class NodeSlot {
     
     public update_anchor() {
         this._update_best_anchor();
-            
+        if (this.raw_connections.length == 0) {
+            this.style.anchor = this.style.default_anchor;
+            return;
+        }
+
         this.raw_connections.forEach(conn => {
             conn.get_other_node(this)._update_best_anchor();
         });
@@ -169,8 +208,8 @@ export class NodeSlot {
                     classList={{
                         "connected-slot": this.connections.size > 0,
                         "selected-slot": this.selected,
-                        "input-slot": this.type == SlotTypes.INPUT,
-                        "output-slot": this.type == SlotTypes.OUTPUT,
+                        "input-slot": this.type.super_type == SlotTypes.INPUT,
+                        "output-slot": this.type.super_type == SlotTypes.OUTPUT,
                     }}
                 >
                     {/* <div class="slot-label">bleh</div> */}

@@ -171,7 +171,7 @@ export class NodeEditor {
                             </For>
                             
                             <Show when={this.connection_controller.selected_slot}>
-                                <ConnectionPreview start_node={this.connection_controller.selected_slot} hovered_slot={this.connection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
+                                <ConnectionPreview start_slot={this.connection_controller.selected_slot} hovered_slot={this.connection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
                             </Show>
                         </svg>
 

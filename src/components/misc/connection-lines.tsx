@@ -19,17 +19,17 @@ export function make_simple_curved_path(start: Vector2, end: Vector2, anchor_a: 
 }
 
 
-export const ConnectionPreview = (props: { start_node: NodeSlot | null, hovered_slot: NodeSlot | null, cursor_pos: Vector2 }) => {
+export const ConnectionPreview = (props: { start_slot: NodeSlot | null, hovered_slot: NodeSlot | null, cursor_pos: Vector2 }) => {
     const path = createMemo(() => {
-        if (props.start_node == null) {
+        if (props.start_slot == null) {
             return;
         }
-        const start = props.start_node.get_world_position();
-        const anchor_a = props.start_node.style.anchor
+        const start = props.start_slot.get_world_position();
+        const anchor_a = props.start_slot.style.anchor
         
         let end = props.cursor_pos;
         let anchor_b = anchor_a;
-        if (props.hovered_slot != null) {
+        if (props.hovered_slot != null && props.hovered_slot.can_connect_to(props.start_slot)) {
             end = props.hovered_slot.get_world_position();
             anchor_b = props.hovered_slot.style.anchor;
         }

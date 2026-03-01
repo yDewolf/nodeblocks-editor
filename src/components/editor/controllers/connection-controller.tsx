@@ -64,7 +64,7 @@ export class ConnectionController {
     }
 
     public connect_node_to(slot_a: NodeSlot, slot_b: NodeSlot): boolean {
-        if (slot_a.type == slot_b.type) {
+        if (!slot_a.can_connect_to(slot_b)) {
             return false;
         }
 
