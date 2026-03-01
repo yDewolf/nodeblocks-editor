@@ -13,6 +13,9 @@ export class SelectionController {
     _selectedNodes: () => BaseNode[];
     _setSelectedNodes: (nodes: BaseNode[]) => void;
     
+    _hovered_node: () => BaseNode | null;
+    _set_hovered_node: (node: BaseNode | null) => void;
+    
     area_selection: boolean = false;
     selecting: boolean = false;
     _moving: () => boolean;
@@ -25,7 +28,11 @@ export class SelectionController {
         const [selectedNode, setSelectedNode] = createSignal<BaseNode[]>([]);
         this._selectedNodes = selectedNode
         this._setSelectedNodes = setSelectedNode
-        
+
+        const [hoveredNode, sethoveredNode] = createSignal(null);
+        this._hovered_node = hoveredNode;
+        this._set_hovered_node = sethoveredNode;
+
         const [moving, setMoving] = createSignal(false);
         this._moving = moving
         this._setMoving = setMoving
@@ -35,6 +42,9 @@ export class SelectionController {
     
     get moving() { return this._moving(); }
     set moving(value: boolean) { this._setMoving(value) }
+
+    get hovered_node() { return this._hovered_node(); }
+    set hovered_node(node: BaseNode | null) { this._set_hovered_node(node); }
 
     get selected_nodes() { return this._selectedNodes() }
     private set selected_nodes(value: BaseNode[]) { this._setSelectedNodes(value) }

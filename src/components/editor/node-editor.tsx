@@ -1,15 +1,14 @@
 import { NodeController } from "../nodes/node-controller";
-import { EditorCamera, EditorSpace } from "./editor-space";
+import { EditorSpace } from "./editor-space";
 import { createSignal, For, Show } from "solid-js";
 import { BaseNode } from "../nodes/base-node";
 import { Grid } from "../misc/grid";
 import { SelectionController } from "./controllers/selection-controller";
 import { ToolController } from "./controllers/tool-controller";
-import { NodeSlot } from "../nodes/node-slot";
+import { NodeSlot } from '../nodes/node-slot';
 import { ConnectionController } from './controllers/connection-controller';
 import { ConnectionLines, ConnectionPreview } from '../misc/connection-lines';
 import { Vector2 } from '../../data_types/geometry';
-import { NodeConnection } from "../nodes/node-connection";
 
 export class NodeEditor {
     node_controller: NodeController
@@ -133,8 +132,12 @@ export class NodeEditor {
                     onPointerDown={onPointerDown} 
                     onPointerUp={onPointerUp} 
                     onPointerLeave={onPointerUp}
+                    onMouseOver={() => {
+                        this.tool_controller.current_tool?.onHoverBackground();
+                    }}
                 >
-                    <div style={{
+                    <div 
+                        style={{
                         position: "absolute",
                         inset: 0,
                         "pointer-events": "none"
@@ -168,7 +171,7 @@ export class NodeEditor {
                             </For>
                             
                             <Show when={this.connection_controller.selected_slot}>
-                                <ConnectionPreview start_node={this.connection_controller.selected_slot} cursor_pos={this.cursor_world_pos}/>
+                                <ConnectionPreview start_node={this.connection_controller.selected_slot} hovered_slot={this.connection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
                             </Show>
                         </svg>
 
@@ -181,6 +184,12 @@ export class NodeEditor {
                                     },
                                     (slot: NodeSlot) => {
                                         this.tool_controller.current_tool?.onClickOnNodeSlot(slot);
+                                    },
+                                    (node: BaseNode) => {
+                                        this.tool_controller.current_tool?.onHoverNode(node);
+                                    },
+                                    (slot: NodeSlot) => {
+                                        this.tool_controller.current_tool?.onHoverSlot(slot);
                                     })
                                 )
                             }}

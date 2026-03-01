@@ -1,5 +1,5 @@
 import { SelectionController } from "../controllers/selection-controller";
-import { BaseEditorTool, EditorTool } from "./base-tool";
+import { BaseEditorTool } from "./base-tool";
 import { BaseNode } from "~/components/nodes/base-node";
 import { Vector2 } from "~/data_types/geometry";
 import { NodeEditor } from "../node-editor";
@@ -17,6 +17,7 @@ export class SelectionTool extends BaseEditorTool {
         this.connection_controller = node_editor.connection_controller;
         this.node_editor = node_editor;
     }
+
     onClickOnNodeSlot(slot: NodeSlot): void {
         this.connection_controller.select_slot(slot);
         this.selection_controller.clearSelection();
@@ -58,5 +59,31 @@ export class SelectionTool extends BaseEditorTool {
             delta,
             all_nodes
         )
+
+        if (this.selection_controller.moving) {
+            this.selection_controller.selected_nodes.forEach(node => {
+                node.all_slots.forEach(slot => {
+                    slot.update_best_anchor();
+                    
+                    slot.raw_connections.forEach(conn => {
+                        conn.get_other_node(slot).update_best_anchor();
+                    });
+                });
+            });
+        }
+    }
+
+    onHoverSlot(slot: NodeSlot): void {
+        this.connection_controller.hovered_slot = slot;
+        this.selection_controller.hovered_node = slot.parent_node;
+    }
+
+    onHoverNode(node: BaseNode): void {
+        this.selection_controller.hovered_node = node;
+    }
+
+    onHoverBackground(): void {
+        this.selection_controller.hovered_node = null;
+        this.connection_controller.hovered_slot = null;
     }
 }

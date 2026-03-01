@@ -3,25 +3,39 @@ import { NodeConnection } from "../nodes/node-connection";
 import { NodeSlot } from "../nodes/node-slot";
 import { Vector2 } from "~/data_types/geometry";
 
-function make_simple_curved_path(start: Vector2, end: Vector2) {
-    const curvature = Math.abs(start.x - end.x) * 0.5;
-    
-    const curvature_start_x = start.x + curvature;
-    const curvature_end_x = end.x - curvature;
+export function make_simple_curved_path(start: Vector2, end: Vector2, anchor_a: Vector2, anchor_b: Vector2) {
+    const intensity = 50;
+    const curve_start = {
+        x: start.x + (anchor_a.x * intensity),
+        y: start.y + (anchor_a.y * intensity)
+    };
 
-    return `M ${start.x} ${start.y} C ${curvature_start_x} ${start.y} ${curvature_end_x} ${end.y} ${end.x} ${end.y}`;
+    const curve_end = {
+        x: end.x + (anchor_b.x * intensity),
+        y: end.y + (anchor_b.y * intensity)
+    };
+    
+    return `M ${start.x} ${start.y} C ${curve_start.x} ${curve_start.y} ${curve_end.x} ${curve_end.y} ${end.x} ${end.y}`;
 }
 
 
-export const ConnectionPreview = (props: { start_node: NodeSlot | null, cursor_pos: Vector2 }) => {
+export const ConnectionPreview = (props: { start_node: NodeSlot | null, hovered_slot: NodeSlot | null, cursor_pos: Vector2 }) => {
     const path = createMemo(() => {
         if (props.start_node == null) {
             return;
         }
         const start = props.start_node.get_world_position();
-        const end = props.cursor_pos;
+        const anchor_a = props.start_node.style.anchor
+        
+        let end = props.cursor_pos;
+        let anchor_b = anchor_a;
+        if (props.hovered_slot != null) {
+            end = props.hovered_slot.get_world_position();
+            anchor_b = props.hovered_slot.style.anchor;
+        }
 
-        return make_simple_curved_path(start, end);
+        // FIXME: anchor_b should be hovered node
+        return make_simple_curved_path(start, end, anchor_a, anchor_b);
     });
 
     return (
@@ -35,7 +49,10 @@ export const ConnectionLines = (props: { connection: NodeConnection, onDisconnec
     const path = createMemo(() => {
         const start = props.connection.slot_a.get_world_position();
         const end = props.connection.slot_b.get_world_position();
-        return make_simple_curved_path(start, end);
+        const anchor_a = props.connection.slot_a.style.anchor
+        const anchor_b = props.connection.slot_b.style.anchor
+
+        return make_simple_curved_path(start, end, anchor_a, anchor_b);
     });
 
     const handleContextMenu = (e: MouseEvent) => {

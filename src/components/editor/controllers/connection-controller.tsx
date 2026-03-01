@@ -9,6 +9,9 @@ export class ConnectionController {
     _selected_slot: () => NodeSlot | null;
     _set_selected_slot: (slot: NodeSlot | null) => void;
 
+    _hovered_slot: () => NodeSlot | null;
+    _set_hovered_slot: (slot: NodeSlot | null) => void;
+
     constructor() {
         const [connections, setConnections] = createSignal([]);
         this._connections = connections;
@@ -16,8 +19,11 @@ export class ConnectionController {
 
         const [selectedSlot, setSelectedSlot] = createSignal(null);
         this._selected_slot = selectedSlot;
-
         this._set_selected_slot = setSelectedSlot;
+
+        const [hoveredSlot, sethoveredSlot] = createSignal(null);
+        this._hovered_slot = hoveredSlot;
+        this._set_hovered_slot = sethoveredSlot;
     }
 
     get connections() { return this._connections(); }
@@ -26,8 +32,10 @@ export class ConnectionController {
     get selected_slot() { return this._selected_slot() }
     set selected_slot(slot: NodeSlot | null) { this._set_selected_slot(slot) }
 
+    get hovered_slot() { return this._hovered_slot() }
+    set hovered_slot(slot: NodeSlot | null) { this._set_hovered_slot(slot) }
+
     public select_slot(slot: NodeSlot) {
-        // FIXME: Testing purposes only:
         if (this.selected_slot != null) {
             const conn = this.are_connected(this.selected_slot, slot)
             if (conn != undefined) {
@@ -61,8 +69,11 @@ export class ConnectionController {
         }
 
         const connection = new NodeConnection(slot_a, slot_b);
+        if (connection.causes_recursion()) {
+            return false;
+        }
+
         this.connections = [...this.connections, connection];
-        console.log("connecting:")
         connection.connect();
         return true;
     }
@@ -74,5 +85,23 @@ export class ConnectionController {
 
     public are_connected(slot_a: NodeSlot, slot_b: NodeSlot): NodeConnection | undefined {
         return slot_a.connections.get(slot_b);    
+    }
+
+
+    public updateConnectionAnchors(conn: NodeConnection) {
+        const node_a = conn.slot_a.parent_node;
+        const node_b = conn.slot_b.parent_node;
+
+        const dx = (node_b.x + node_b.width / 2) - (node_a.x + node_a.width / 2);
+        const dy = (node_b.y + node_b.height / 2) - (node_a.y + node_a.height / 2);
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+            conn.slot_a.style.update_anchor(dx > 0 ? {x: 1, y: 0} : {x: -1, y: 0});
+            conn.slot_b.style.update_anchor(dx > 0 ? {x: -1, y: 0} : {x: 1, y: 0});
+            return;
+        }
+
+        conn.slot_a.style.update_anchor(dy > 0 ? {x: 0, y: 1} : {x: 0, y: -1});
+        conn.slot_b.style.update_anchor(dy > 0 ? {x: 0, y: -1} : {x: 0, y: 1});
     }
 }

@@ -2,6 +2,8 @@ import { createMemo, createSignal, For, onCleanup, Show } from 'solid-js';
 import { Rect, Vector2 } from '../../data_types/geometry';
 import { EditorCamera } from '../editor/editor-space';
 import { NodeSlot, SlotTypes } from './node-slot';
+import { NodeAnchor } from '../misc/node-anchors';
+import { NodeConnection } from './node-connection';
 
 export class BaseNode {
     id: number;
@@ -9,8 +11,7 @@ export class BaseNode {
     // Usamos signals para que a UI saiba quando atualizar
     private raw_pos: Vector2;
 
-    private inputs: NodeSlot[] = [new NodeSlot(this, SlotTypes.INPUT)];
-    private outputs: NodeSlot[] = [new NodeSlot(this, SlotTypes.OUTPUT)];
+    private _slots: Map<SlotTypes, NodeSlot[]> = new Map<SlotTypes, NodeSlot[]>;
 
     private _pos: () => Vector2;
     private _setPos: (v: Vector2) => void;
@@ -37,6 +38,9 @@ export class BaseNode {
         const [size, setSize] = createSignal({ x: 100, y: 150 });
         this._size = size;
         this._setSize = setSize;
+
+        this._add_slot(new NodeSlot(this, SlotTypes.INPUT));
+        this._add_slot(new NodeSlot(this, SlotTypes.OUTPUT));
     }
     
     get pos() { return this._pos() }
@@ -45,6 +49,23 @@ export class BaseNode {
 
     get width() { return this._size().x; }
     get height() { return this._size().y; }
+
+    get slots() { return this._slots; }
+    get all_slots() {
+        let combined: NodeSlot[] = [];
+        this._slots.values().forEach((slot_array) => {
+            combined = combined.concat(slot_array);
+        });
+
+        return combined;
+    }
+
+    get rect() {
+        return new Rect(this.pos, this._size());
+    }
+
+    get selected() { return this._selected() }
+    set selected(value: boolean) { this._setSelected(value) }
 
     public updateSize(width: number, height: number) {
         if (width == 0 && height == 0) {
@@ -55,13 +76,6 @@ export class BaseNode {
             this._setSize({ x: width, y: height });
         }
     }
-
-    get rect() {
-        return new Rect(this.pos, this._size());
-    }
-
-    get selected() { return this._selected() }
-    set selected(value: boolean) { this._setSelected(value) }
 
     public move(delta: Vector2, grid_size: Vector2) {
         this.raw_pos.x += delta.x;
@@ -83,7 +97,33 @@ export class BaseNode {
         return { x: (this.x - camera_offset.x), y: (this.y - camera_offset.y) };
     }
 
-    public View(camera: EditorCamera, onClick: (node: BaseNode) => void, onClickOnSlot: (slot: NodeSlot) => void) {
+    public get_connections() {
+        let combined: NodeConnection[] = [];
+        this.slots.values().forEach(slots => {
+            slots.forEach((slot) => {
+                combined = combined.concat(slot.raw_connections)
+            })
+        });
+
+        return combined;
+    }
+
+    public _add_slot(slot: NodeSlot) {
+        let target_slots = this.slots.get(slot.type);
+        if (target_slots == undefined) {
+            target_slots = [];
+        }
+
+        this._slots.set(slot.type, [...target_slots, slot]);
+    }
+
+    public View(
+        camera: EditorCamera, 
+        onClick: (node: BaseNode) => void, 
+        onClickOnSlot: (slot: NodeSlot) => void, 
+        onHoverNode: (node: BaseNode) => void, 
+        onHoverSlot: (slot: NodeSlot) => void
+    ) {
         let ro: ResizeObserver | undefined;
         const handleRef = (el: HTMLDivElement) => {
             const rect = el.getBoundingClientRect();
@@ -111,6 +151,12 @@ export class BaseNode {
             <Show when={isVisible()}>
                 <div 
                     ref={handleRef}
+                    onMouseOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        onHoverNode(this);
+                    }}
                     style={{
                         position: "absolute",
                         transform: `translate(${this.x}px, ${this.y}px)`,
@@ -118,17 +164,13 @@ export class BaseNode {
                     }}
                 >
                     <div class="node-slots">
-                        <div class="slots-column inputs">
-                            <For each={this.inputs}>
-                                {(slot) => slot.View(onClickOnSlot)}
-                            </For>
+                        <NodeAnchor anchor_pos={{x: 0, y: -1}} all_slots={this.all_slots} onClickOnSlot={onClickOnSlot} onHoverSlot={onHoverSlot}/>
+                        <div class="side-anchors">
+                            <NodeAnchor anchor_pos={{x: -1, y: 0}} all_slots={this.all_slots} onClickOnSlot={onClickOnSlot} onHoverSlot={onHoverSlot}/>
+                            <div></div>
+                            <NodeAnchor anchor_pos={{x: 1, y: 0}} all_slots={this.all_slots} onClickOnSlot={onClickOnSlot} onHoverSlot={onHoverSlot}/>
                         </div>
-
-                        <div class="slots-column outputs">
-                            <For each={this.outputs}>
-                                {(slot) => slot.View(onClickOnSlot)}
-                            </For>
-                        </div>
+                        <NodeAnchor anchor_pos={{x: 0, y: 1}} all_slots={this.all_slots} onClickOnSlot={onClickOnSlot} onHoverSlot={onHoverSlot}/>
                     </div>
                      <div
                         class="internal-node"

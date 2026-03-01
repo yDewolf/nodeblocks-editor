@@ -19,6 +19,12 @@ export interface EditorTool {
     onClickOnNodeSlot(slot: NodeSlot): void;
 
     onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void;
+
+    onHoverNode(node: BaseNode): void;
+
+    onHoverSlot(slot: NodeSlot): void;
+
+    onHoverBackground(): void;
 }
 
 export abstract class BaseEditorTool implements EditorTool {
@@ -38,6 +44,7 @@ export abstract class BaseEditorTool implements EditorTool {
     }
     onPointerUp(e: PointerEvent): void {
     }
+    
     onClickOnNode(node: BaseNode): void {
     }
     onClickOnNodeSlot(slot: NodeSlot): void {
@@ -45,4 +52,10 @@ export abstract class BaseEditorTool implements EditorTool {
     onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void {
     }
     
+    onHoverNode(node: BaseNode): void {
+    }
+    onHoverSlot(slot: NodeSlot): void {
+    }
+    onHoverBackground(): void {
+    }
 }

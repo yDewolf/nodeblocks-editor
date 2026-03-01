@@ -39,4 +39,15 @@ export class NodeConnection {
 
         return other_node;
     }
+
+    // FIXME: https://github.com/yDewolf/NodeEditor/issues/2
+    public causes_recursion(): boolean {
+        const node_a = this.slot_a.parent_node;
+        const node_b = this.slot_b.parent_node;
+
+        // node_a.inputs.forEach(slot => {
+        //     slot.connections.has(node_b.)
+        // });
+        return false;
+    }
 }
