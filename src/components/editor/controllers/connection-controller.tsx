@@ -86,22 +86,4 @@ export class ConnectionController {
     public are_connected(slot_a: NodeSlot, slot_b: NodeSlot): NodeConnection | undefined {
         return slot_a.connections.get(slot_b);    
     }
-
-
-    public updateConnectionAnchors(conn: NodeConnection) {
-        const node_a = conn.slot_a.parent_node;
-        const node_b = conn.slot_b.parent_node;
-
-        const dx = (node_b.x + node_b.width / 2) - (node_a.x + node_a.width / 2);
-        const dy = (node_b.y + node_b.height / 2) - (node_a.y + node_a.height / 2);
-
-        if (Math.abs(dx) > Math.abs(dy)) {
-            conn.slot_a.style.update_anchor(dx > 0 ? {x: 1, y: 0} : {x: -1, y: 0});
-            conn.slot_b.style.update_anchor(dx > 0 ? {x: -1, y: 0} : {x: 1, y: 0});
-            return;
-        }
-
-        conn.slot_a.style.update_anchor(dy > 0 ? {x: 0, y: 1} : {x: 0, y: -1});
-        conn.slot_b.style.update_anchor(dy > 0 ? {x: 0, y: -1} : {x: 0, y: 1});
-    }
 }

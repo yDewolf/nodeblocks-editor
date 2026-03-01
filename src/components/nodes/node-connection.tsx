@@ -26,11 +26,19 @@ export class NodeConnection {
     public connect() {
         this.slot_a.add_connection(this);
         this.slot_b.add_connection(this);
+        
+        this.slot_a.parent_node.all_slots.forEach(slot => {
+            slot.update_anchor();
+        });
     }
 
     public disconnect() {
         this.slot_a.remove_connection(this);
         this.slot_b.remove_connection(this);
+        
+        this.slot_a.parent_node.all_slots.forEach(slot => {
+            slot.update_anchor();
+        });
     }
 
     public get_other_node(root_node: NodeSlot) { 

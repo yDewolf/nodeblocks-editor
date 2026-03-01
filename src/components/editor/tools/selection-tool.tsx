@@ -63,11 +63,7 @@ export class SelectionTool extends BaseEditorTool {
         if (this.selection_controller.moving) {
             this.selection_controller.selected_nodes.forEach(node => {
                 node.all_slots.forEach(slot => {
-                    slot.update_best_anchor();
-                    
-                    slot.raw_connections.forEach(conn => {
-                        conn.get_other_node(slot).update_best_anchor();
-                    });
+                    slot.update_anchor();
                 });
             });
         }

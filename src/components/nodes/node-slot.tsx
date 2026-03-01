@@ -116,8 +116,16 @@ export class NodeSlot {
             y: this.parent_node.y + this._element.offsetTop + this._element.offsetHeight / 2
         };
     }
+    
+    public update_anchor() {
+        this._update_best_anchor();
+            
+        this.raw_connections.forEach(conn => {
+            conn.get_other_node(this)._update_best_anchor();
+        });
+    }
 
-    public update_best_anchor() {
+    private _update_best_anchor() {
         const connections = this.raw_connections;
         if (connections.length === 0) return;
 
