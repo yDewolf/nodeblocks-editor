@@ -3,17 +3,21 @@ import { SlotData } from "./node-type-file";
 import { BaseNode } from "~/components/nodes/base-node";
 import { NodeSlot } from "~/components/nodes/slot/node-slot";
 import { BaseSlotType, CustomSlotType, INPUT_SLOT, OUTPUT_SLOT, SuperSlotTypes } from "~/components/nodes/slot/slot-type";
+import { CustomNodeDataType, NodeData } from "~/components/nodes/data/node-data";
+import { UNKNOWN_TYPE } from "~/components/nodes/data/node-data-type";
 
 
 export class BaseNodeConstructor {
-    type_name: string
+    type_name: string;
 
+    _data: NodeData
     _slots: Map<string, SlotData>;
     _slot_types: Map<string, BaseSlotType>;
 
     constructor(type_name: string) {
         this.type_name = type_name
 
+        this._data = new NodeData(new Map());
         this._slots = new Map();
         this._slot_types = new Map();
 
@@ -36,7 +40,7 @@ export class BaseNodeConstructor {
 
     public make_node(node_name: string, position: Vector2, id: number = -1): BaseNode {
         const node = new BaseNode(
-            node_name, position, id
+            node_name, this._data, position, id
         );
 
         this._slots.forEach((slot_data, slot_name) => {
@@ -44,8 +48,14 @@ export class BaseNodeConstructor {
             if (!slot_type) {
                 return;
             }
+            const slot_data_type = CustomNodeDataType._match_data_type_str(slot_data.data_type == null ? "" : slot_data.data_type) 
             node._add_slot(
-                new NodeSlot(node, slot_type, slot_name)
+                new NodeSlot(
+                    node, 
+                    slot_type, 
+                    slot_name,
+                    slot_data_type === UNKNOWN_TYPE ? null : slot_data_type
+                )
             );
         });
 
@@ -54,8 +64,10 @@ export class BaseNodeConstructor {
 }
 
 export class CustomNodeConstructor extends BaseNodeConstructor {
-    constructor(type_name: string, slots: Map<string, SlotData>, slot_types: Map<string, CustomSlotType>) {
+    constructor(type_name: string, data: NodeData, slots: Map<string, SlotData>, slot_types: Map<string, CustomSlotType>) {
         super(type_name);
+        
+        this._data = data;
         this._slots = slots;
         this._slot_types = slot_types;
     }

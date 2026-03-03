@@ -1,14 +1,16 @@
 import { CustomSlotType } from "~/components/nodes/slot/slot-type";
 import { CustomNodeConstructor } from "./node-constructor";
+import { NodeData } from "~/components/nodes/data/node-data";
 
 async function load_json_file(path: string) {
     try {
         const response = await fetch(path);
         const data: TypeFile = await response.json();
-        data.slot_types = new Map<string, TypeData>(Object.entries(data.slot_types));
+        data.slot_types = new Map<string, SlotTypeData>(Object.entries(data.slot_types));
         data.node_types = new Map<string, NodeTypesData>(Object.entries(data.node_types));
         data.node_types.forEach(type_data => {
             type_data.slots = new Map<string, SlotData>(Object.entries(type_data.slots))
+            type_data.parameters = new Map<string, NodeParameterData>(Object.entries(type_data.parameters))
         });
 
         return data;
@@ -22,23 +24,30 @@ async function load_json_file(path: string) {
 
 interface TypeFile {
     version: number,
-    slot_types: Map<string, TypeData>,
+    slot_types: Map<string, SlotTypeData>,
     node_types: Map<string, NodeTypesData>
 }
 
-interface TypeData {
+interface SlotTypeData {
     extends: string,
-    conn_whitelist: string[]
+    conn_whitelist: string[],
+    default_data_type: string
 }
 
 export interface SlotData {
     type: string,
-    data_type: string,
+    data_type: string | null,
     tooltip: string
+}
+
+export interface NodeParameterData {
+    type: string,
+    range: any | null,
 }
 
 interface NodeTypesData {
     description: string,
+    parameters: Map<string, NodeParameterData>
     slots: Map<string, SlotData>
 }
 
@@ -67,17 +76,20 @@ export class NodeTypeFile {
         // Parse Slot Types
         json_data.slot_types.forEach((type_data, type_name) => {
             const custom_type = new CustomSlotType(
-                    type_data.extends,
-                    type_data.conn_whitelist,
-                    type_name
-                );
+                type_data.extends,
+                type_data.default_data_type,
+                type_data.conn_whitelist,
+                type_name
+            );
             this.slot_types.set(type_name, custom_type);
         });
 
         // Parse Node Types
         json_data.node_types.forEach((type_data, type_name) => {
+            const node_data: NodeData = new NodeData(type_data.parameters);
             const custom_type_constructor = new CustomNodeConstructor(
                 type_name,
+                node_data,
                 type_data.slots,
                 this.slot_types
             );

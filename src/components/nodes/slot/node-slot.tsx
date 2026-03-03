@@ -4,6 +4,7 @@ import { NodeConnection } from "../node-connection";
 import { Vector2 } from "~/data_types/geometry";
 import { BaseSlotType, SuperSlotTypes } from "./slot-type";
 import { NodeSlotStyle } from "./slot-style";
+import { NodeDataType } from "../data/node-data-type";
 
 export class NodeSlot {
     private _element: HTMLDivElement | undefined;
@@ -11,15 +12,19 @@ export class NodeSlot {
     style: NodeSlotStyle;
 
     slot_name: string;
-    type: BaseSlotType
+
+    data_type: NodeDataType;
+    type: BaseSlotType;
     _selected: () => boolean;
     _set_selected: (v: boolean) => void;
 
     _connections: () => Map<NodeSlot, NodeConnection>;
     _set_connections: (v: Map<NodeSlot, NodeConnection>) => void;
 
-    constructor(parent: BaseNode, slot_type: BaseSlotType, slot_name: string) {
+    constructor(parent: BaseNode, slot_type: BaseSlotType, slot_name: string, data_type: NodeDataType | null = null) {
         this.style = new NodeSlotStyle(slot_type);
+
+        this.data_type = data_type == null ? slot_type.data_type : data_type;
         this.slot_name = slot_name;
 
         const [selected, setSelected] = createSignal(false);
@@ -61,6 +66,10 @@ export class NodeSlot {
 
     public can_connect_to(slot: NodeSlot) {
         if (slot == this) {
+            return false;
+        }
+
+        if (!this.data_type.is_compatible_with(slot.data_type)) {
             return false;
         }
 

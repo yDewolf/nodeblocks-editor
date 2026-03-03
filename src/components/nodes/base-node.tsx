@@ -5,10 +5,15 @@ import { INPUT_SLOT, OUTPUT_SLOT, SuperSlotTypes } from './slot/slot-type';
 import { NodeAnchor } from '../misc/node-anchors';
 import { NodeConnection } from './node-connection';
 import { NodeSlot } from './slot/node-slot';
+import { NodeData } from './data/node-data';
 
 export class BaseNode {
     id: number;
     node_name: string;
+    // Used to set node parameters etc.
+    private _node_data: () => NodeData;
+    private _set_node_data:  (data: NodeData) => void;
+
     // Usamos signals para que a UI saiba quando atualizar
     private raw_pos: Vector2;
 
@@ -23,10 +28,15 @@ export class BaseNode {
     private _size: () => Vector2;
     private _setSize: (v: Vector2) => void;
 
-    constructor(node_name: string, position: Vector2, id: number = -1) {
+    constructor(node_name: string, node_data: NodeData, position: Vector2, id: number = -1) {
         this.id = id;
         this.node_name = node_name;
         this.raw_pos = position;
+
+        console.log(node_data)
+        const [nodeData, setNodeData] = createSignal(node_data);
+        this._node_data = nodeData;
+        this._set_node_data = setNodeData;
 
         const [pos, setPos] = createSignal(position);
         this._pos = pos;
@@ -43,6 +53,9 @@ export class BaseNode {
         // this._add_slot(new NodeSlot(this, INPUT_SLOT));
         // this._add_slot(new NodeSlot(this, OUTPUT_SLOT));
     }
+
+    get node_data() { return this._node_data(); }
+    set node_data(data: NodeData) { this._set_node_data(data); console.log(data); }
     
     get pos() { return this._pos() }
     get x() { return this.pos.x }

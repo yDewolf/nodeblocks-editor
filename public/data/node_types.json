@@ -3,24 +3,28 @@
     "slot_types": {
         "input": {
             "extends": "input_slot",
+            "default_data_type": "float",
             "conn_whitelist": ["#output_slot"]
         },
         "output": {
             "extends": "output_slot",
+            "default_data_type": "float",
             "conn_whitelist": ["#input_slot"]
         },
         "some_other_type": {
             "extends": "custom_type",
+            "default_data_type": "float",
             "conn_whitelist": ["#output_slot"]
         }
     },
     "node_types": {
         "NodeType": {
             "description": "Takes a float input and outputs it without any modifications",
+            "parameters": {"out_features": {"type": "uint", "range": [1, -1]}, "some_parameter": {"type": "float", "range": [1, 10]}},
             "slots": {
-                "in_0": {"type": "input", "data_type": "float", "tooltip": "Main input value"},
-                "in_1": {"type": "input", "data_type": "float", "tooltip": "Test"},
-                "out_0": {"type": "output", "data_type": "float", "tooltip": "Takes the value from ${in_0}, and outputs it"}
+                "in_0": {"type": "input", "tooltip": "Main input value"},
+                "in_1": {"type": "input", "data_type": "uint", "tooltip": "Test"},
+                "out_0": {"type": "output", "tooltip": "Takes the value from ${in_0}, and outputs it"}
             }
         }
     }
