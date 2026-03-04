@@ -3,7 +3,7 @@ import { NodeSlot } from "~/components/nodes/slot/node-slot";
 import { Vector2 } from "~/data_types/geometry";
 import { NodeEditor } from "../node-editor";
 
-export interface EditorTool {
+export interface ComponentEventHandler {
     onKeyDown(e: KeyboardEvent): void;
 
     onKeyUp(e: KeyboardEvent): void;
@@ -17,7 +17,9 @@ export interface EditorTool {
     onClickOnNode(node: BaseNode): void;
 
     onClickOnNodeSlot(slot: NodeSlot): void;
+}
 
+export interface EditorTool extends ComponentEventHandler {
     onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void;
 
     onHoverNode(node: BaseNode): void;

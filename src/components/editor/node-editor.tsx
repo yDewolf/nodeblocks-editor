@@ -9,6 +9,7 @@ import { NodeSlot } from '../nodes/slot/node-slot';
 import { ConnectionController } from './controllers/connection-controller';
 import { ConnectionLines, ConnectionPreview } from '../misc/connection-lines';
 import { Vector2 } from '../../data_types/geometry';
+import { Keybind, KeybindMap, KeyEventManager, MouseButtons } from "./controllers/input-manager";
 
 export class NodeEditor {
     node_controller: NodeController
@@ -16,6 +17,8 @@ export class NodeEditor {
 
     selection_controller: SelectionController
     connection_controller: ConnectionController
+
+    input_manager: KeyEventManager
 
     editor_space: EditorSpace
     editor_grid: Grid
@@ -30,6 +33,12 @@ export class NodeEditor {
         const [cursorWorldPos, setCursorWorldPos] = createSignal({x: 0, y: 0});
         this._cursor_world_pos = cursorWorldPos;
         this._set_cursor_world_pos = setCursorWorldPos;
+
+        this.input_manager = new KeyEventManager();
+        this.input_manager.set_keybind_handler(
+            new Keybind("Move", [new KeybindMap({keys: ["Space"]}), new KeybindMap({mouse_buttons: [MouseButtons.MIDDLE]})]),
+            (data) => {console.log(data, "move");}
+        )
 
         this.node_controller = new NodeController()
         this.editor_space = new EditorSpace()
@@ -124,14 +133,14 @@ export class NodeEditor {
 
                     oncontextmenu={(e) => {e.preventDefault()}}
                     tabindex="0"
-                    onKeyDown={onKeyDown}
-                    onKeyUp={onKeyUp}
-                    onWheel={onWheel}
+                    onKeyDown={(e) => this.input_manager.onKeyDown(e)}
+                    onKeyUp={(e) => this.input_manager.onKeyUp(e)}
+                    onWheel={(e) => this.input_manager.onWheel(e)}
 
                     onPointerMove={onPointerMove} 
-                    onPointerDown={onPointerDown} 
-                    onPointerUp={onPointerUp} 
-                    onPointerLeave={onPointerUp}
+                    onPointerDown={(e) => this.input_manager.onPointerDown(e)} 
+                    onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
+                    onPointerLeave={(e) => this.input_manager.onPointerUp(e)}
                     onMouseOver={() => {
                         this.tool_controller.current_tool?.onHoverBackground();
                     }}
