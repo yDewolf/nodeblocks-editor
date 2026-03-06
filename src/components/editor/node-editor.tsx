@@ -23,8 +23,8 @@ export class NodeEditor {
     editor_space: EditorSpace
     editor_grid: Grid
 
-    _isSpacePressed: () => boolean;
-    _setSpacePressed: (v: boolean) => void;
+    // _isSpacePressed: () => boolean;
+    // _setSpacePressed: (v: boolean) => void;
 
     _cursor_world_pos: () => Vector2;
     _set_cursor_world_pos: (v: Vector2) => void;
@@ -35,10 +35,6 @@ export class NodeEditor {
         this._set_cursor_world_pos = setCursorWorldPos;
 
         this.input_manager = new KeyEventManager();
-        this.input_manager.set_keybind_handler(
-            new Keybind("Move", [new KeybindMap({keys: ["Space"]}), new KeybindMap({mouse_buttons: [MouseButtons.MIDDLE]})]),
-            (data) => {console.log(data, "move");}
-        )
 
         this.node_controller = new NodeController()
         this.editor_space = new EditorSpace()
@@ -48,25 +44,31 @@ export class NodeEditor {
         this.connection_controller = new ConnectionController();
         
         this.tool_controller = new ToolController(this);
-        
-        const [space, setSpace] = createSignal(false);
-        this._isSpacePressed = space;
-        this._setSpacePressed = setSpace;
+        this.setup_keybinds();
     }
 
     get cursor_world_pos() { return this._cursor_world_pos(); }
     set cursor_world_pos(v: Vector2) { this._set_cursor_world_pos(v); }
 
+    public setup_keybinds() {
+        this.input_manager.set_keybind_handler(
+            new Keybind("Move", [new KeybindMap({keys: ["Space"]}), new KeybindMap({mouse_buttons: [MouseButtons.MIDDLE]})]),
+            (data) => {
+
+            }
+        )
+    }
+
     public View() {
         
         let viewportRef: HTMLDivElement | undefined;
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.code === "Space") this._setSpacePressed(true);
-        }
+        // const onKeyDown = (e: KeyboardEvent) => {
+        //     if (e.code === "Space") this._setSpacePressed(true);
+        // }
 
-        const onKeyUp = (e: KeyboardEvent) => {
-            if (e.code === "Space") this._setSpacePressed(false);
-        };
+        // const onKeyUp = (e: KeyboardEvent) => {
+        //     if (e.code === "Space") this._setSpacePressed(false);
+        // };
 
         const onWheel = (e: WheelEvent) => {
             e.preventDefault();
@@ -97,7 +99,7 @@ export class NodeEditor {
         const onPointerMove = (e: PointerEvent) => {
             const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
             this.cursor_world_pos = world_pos;
-            if (this._isSpacePressed()) {
+            if (this.input_manager.get_keybind_state("Move")) {
                 this.editor_space.camera.move({
                     x: -e.movementX / this.editor_space.camera.zoom,
                     y: -e.movementY / this.editor_space.camera.zoom
@@ -127,7 +129,7 @@ export class NodeEditor {
                         width: "100%"
                     }}
                     classList={{
-                        'move-mode': this._isSpacePressed(),
+                        'move-mode': this.input_manager.get_keybind_state("Move"),
                         'moving-mode': this.selection_controller.moving
                     }}
 
