@@ -10,6 +10,8 @@ export interface ComponentEventHandler {
 
     onWheel(e: WheelEvent): void;
 
+    onPointerMove(e: PointerEvent): void;
+
     onPointerDown(e: PointerEvent): void;
 
     onPointerUp(e: PointerEvent): void;
@@ -41,6 +43,9 @@ export abstract class BaseEditorTool implements EditorTool {
     onKeyUp(e: KeyboardEvent): void {
     }
     onWheel(e: WheelEvent): void {
+    }
+
+    onPointerMove(e: PointerEvent): void {
     }
     onPointerDown(e: PointerEvent): void {
     }

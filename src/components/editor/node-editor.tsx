@@ -9,7 +9,7 @@ import { NodeSlot } from '../nodes/slot/node-slot';
 import { ConnectionController } from './controllers/connection-controller';
 import { ConnectionLines, ConnectionPreview } from '../misc/connection-lines';
 import { Vector2 } from '../../data_types/geometry';
-import { Keybind, KeybindMap, KeyEventManager, MouseButtons } from "./controllers/input-manager";
+import { Keybind, KeybindMap, KeyEventManager, MouseButtons, OtherStates } from "./controllers/input-manager";
 
 export class NodeEditor {
     node_controller: NodeController
@@ -52,70 +52,83 @@ export class NodeEditor {
 
     public setup_keybinds() {
         this.input_manager.set_keybind_handler(
-            new Keybind("Move", [new KeybindMap({keys: ["Space"]}), new KeybindMap({mouse_buttons: [MouseButtons.MIDDLE]})]),
-            (data) => {
+            new Keybind("PanCamera", [new KeybindMap({keys: ["Space"]}), new KeybindMap({mouse_buttons: [MouseButtons.MIDDLE]})]),
+            {}
+        );
+        this.input_manager.set_keybind_handler(
+            new Keybind("Zoom", [new KeybindMap({mouse_buttons: [MouseButtons.SCROLL]})]),{
+            while_active: (data) => {
+                const e = data.event;
+                if (e instanceof WheelEvent) {
+                    const delta = -e.deltaY * 0.001;
+                    const new_zoom = Math.max(0.1, Math.min(5.0, this.editor_space.camera.zoom + delta));
+                    const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                    
+                    this.editor_space.camera.zoom = new_zoom;
+                    this.editor_space.camera.updateOffset({
+                        x: world_pos.x - (screen_pos.x / new_zoom),
+                        y: world_pos.y - (screen_pos.y / new_zoom)
+                    });
+                }
+            }}
+        );
+        this.input_manager.set_keybind_handler(
+            new Keybind("pointerMove", [new KeybindMap({other_states: [OtherStates.POINTER_MOVING]})]),{
+            while_active: (data) => {
+                const e = data.event;
+                if (e instanceof PointerEvent) {
+                    const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                    this.cursor_world_pos = world_pos;
+                    if (this.input_manager.get_keybind_state("PanCamera")) {
+                        this.editor_space.camera.move({
+                            x: -e.movementX / this.editor_space.camera.zoom,
+                            y: -e.movementY / this.editor_space.camera.zoom
+                        });
+                        return;
+                    }
 
-            }
-        )
+                    this.tool_controller.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, this.node_controller.nodes);
+                }
+            }}
+        );
+
+        this.input_manager.set_keybind_handler(
+            new Keybind("MainToolAction", [new KeybindMap({mouse_buttons: [MouseButtons.LEFT]})]),
+            {just_activated: (data) => {
+                const e = data.event;
+                if (e instanceof PointerEvent) {
+                    const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                    if (e.target !== e.currentTarget) return;
+    
+                    this.tool_controller.current_tool?.onPointerDown(e);
+                }
+            },
+            cleanup: (data) => {
+                const e = data.event;
+                if (e instanceof PointerEvent) {
+                    this.tool_controller.current_tool?.onPointerUp(e);
+                    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+                }
+            }}
+        );
+
+        this.input_manager.set_keybind_handler(
+            new Keybind("SecondaryToolAction", [new KeybindMap({mouse_buttons: [MouseButtons.RIGHT]})]),
+            {just_activated: (data) => {
+                const e = data.event;
+                if (e instanceof PointerEvent) {
+                    const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                    if (e.target !== e.currentTarget) return;
+
+                    this.node_controller.add_node("Teste", {x: world_pos.x, y: world_pos.y})
+                }
+            }}
+        );
+        
     }
 
     public View() {
-        
         let viewportRef: HTMLDivElement | undefined;
-        // const onKeyDown = (e: KeyboardEvent) => {
-        //     if (e.code === "Space") this._setSpacePressed(true);
-        // }
-
-        // const onKeyUp = (e: KeyboardEvent) => {
-        //     if (e.code === "Space") this._setSpacePressed(false);
-        // };
-
-        const onWheel = (e: WheelEvent) => {
-            e.preventDefault();
-
-            const delta = -e.deltaY * 0.001;
-            const new_zoom = Math.max(0.1, Math.min(5.0, this.editor_space.camera.zoom + delta));
-            const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
-            
-            this.editor_space.camera.zoom = new_zoom;
-            this.editor_space.camera.updateOffset({
-                x: world_pos.x - (screen_pos.x / new_zoom),
-                y: world_pos.y - (screen_pos.y / new_zoom)
-            });
-        };
-
-        const onPointerDown = (e: PointerEvent) => {
-            const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
-            if (e.target !== e.currentTarget) return;
-
-
-            if (e.button == 2) {
-                this.node_controller.add_node("Teste", {x: world_pos.x, y: world_pos.y})
-            }
-
-            this.tool_controller.current_tool?.onPointerDown(e);
-        }
-        
-        const onPointerMove = (e: PointerEvent) => {
-            const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
-            this.cursor_world_pos = world_pos;
-            if (this.input_manager.get_keybind_state("Move")) {
-                this.editor_space.camera.move({
-                    x: -e.movementX / this.editor_space.camera.zoom,
-                    y: -e.movementY / this.editor_space.camera.zoom
-                });
-                return;
-            }
-            this.tool_controller.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, this.node_controller.nodes);
-        };
-
-        const onPointerUp = (e: PointerEvent) => {
-            this.tool_controller.current_tool?.onPointerUp(e);
-
-            (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-        };
-
-        
     
         return (
             <div 
@@ -129,7 +142,7 @@ export class NodeEditor {
                         width: "100%"
                     }}
                     classList={{
-                        'move-mode': this.input_manager.get_keybind_state("Move"),
+                        'move-mode': this.input_manager.get_keybind_state("PanCamera"),
                         'moving-mode': this.selection_controller.moving
                     }}
 
@@ -139,7 +152,7 @@ export class NodeEditor {
                     onKeyUp={(e) => this.input_manager.onKeyUp(e)}
                     onWheel={(e) => this.input_manager.onWheel(e)}
 
-                    onPointerMove={onPointerMove} 
+                    onPointerMove={(e) => this.input_manager.onPointerMove(e)}
                     onPointerDown={(e) => this.input_manager.onPointerDown(e)} 
                     onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
                     onPointerLeave={(e) => this.input_manager.onPointerUp(e)}
@@ -190,6 +203,7 @@ export class NodeEditor {
                             {(node) => {
                                 return (node.View(
                                     this.editor_space.camera, 
+                                    // TODO: Implement these as EventHandlers on InputManager
                                     (node: BaseNode) => {
                                         this.tool_controller.current_tool?.onClickOnNode(node);
                                     },
@@ -208,7 +222,7 @@ export class NodeEditor {
                     </div>
                 </div>
                 
-                <div class="editor-ui">
+                <div class="editor-ui" onPointerMove={(e) => this.input_manager.onPointerMove(e)}>
                     <div class="left-tab">
 
                     </div>
