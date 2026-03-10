@@ -3,13 +3,13 @@ import { CustomNodeDataType, NodeDataType } from "./node-data-type";
 
 export class NodeParameter {
     type: NodeDataType
-    field_name: string
+    _field_name: string
 
-    raw_field_data: NodeParameterData
+    _raw_field_data: NodeParameterData
 
     constructor(field_data: NodeParameterData, field_name: string) {
-        this.field_name = field_name;
-        this.raw_field_data = field_data;
+        this._field_name = field_name;
+        this._raw_field_data = field_data;
 
         const field_type: NodeDataType = CustomNodeDataType._match_data_type_str(field_data.type);
         this.type = field_type;

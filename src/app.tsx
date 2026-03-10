@@ -4,15 +4,9 @@ import { NodeTypeFile } from "./helpers/node-type-file";
 
 export default function App() {
   const node_editor = new NodeEditor();
-  node_editor.node_controller.add_node("Teste", {x: 200, y: 200})
+  node_editor.scene_controller.node_controller.add_node("Teste", {x: 200, y: 200})
   
-  const node_type_reader = new NodeTypeFile();
-  node_type_reader.load_file("/data/node_types.json").then(
-    () => {
-      node_editor.node_controller.load_node_types(node_type_reader);
-      console.log("loaded file", node_type_reader.node_constructors)
-    }
-  );
+  node_editor.scene_controller.load_scene("/data/node_scene.json", "/data/node_types.json");
   // Testar se os nodes são renderizados mesmo depois do editor ser criado
   // setInterval(() => {
   //   node_editor.node_controller.add_node("Teste", {x: Math.random() * 500, y: Math.random() * 500})

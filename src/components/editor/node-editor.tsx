@@ -10,16 +10,16 @@ import { ConnectionController } from './controllers/connection-controller';
 import { ConnectionLines, ConnectionPreview } from '../misc/connection-lines';
 import { Vector2 } from '../../data_types/geometry';
 import { KeyEventManager as GeneralEventManager } from "./input_manager/input-manager";
-import { Keybind, KeybindMap, MouseButtons } from "./input_manager/keybind-events";
+import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./input_manager/keybind-events";
 import { EventHandler, InputEvents } from "./input_manager/event-handling";
+import { SceneController } from "./controllers/scene-controller";
+import { scene_data_to_json } from "~/helpers/node-scene-file";
 
 export class NodeEditor {
-    node_controller: NodeController
+    scene_controller: SceneController;
     tool_controller: ToolController
 
     selection_controller: SelectionController
-    connection_controller: ConnectionController
-
     input_manager: GeneralEventManager
 
     editor_space: EditorSpace
@@ -29,18 +29,18 @@ export class NodeEditor {
     _set_cursor_world_pos: (v: Vector2) => void;
 
     constructor () {
+        this.scene_controller = new SceneController();
+
         const [cursorWorldPos, setCursorWorldPos] = createSignal({x: 0, y: 0});
         this._cursor_world_pos = cursorWorldPos;
         this._set_cursor_world_pos = setCursorWorldPos;
 
         this.input_manager = new GeneralEventManager();
 
-        this.node_controller = new NodeController()
         this.editor_space = new EditorSpace()
         this.editor_grid = new Grid({x: 32, y: 32});
 
         this.selection_controller = new SelectionController(this.editor_space, this.editor_grid);
-        this.connection_controller = new ConnectionController();
         
         this.tool_controller = new ToolController(this);
         this.setup_event_handlers();
@@ -101,11 +101,19 @@ export class NodeEditor {
                     const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
 
-                    this.node_controller.add_node("Teste", {x: world_pos.x, y: world_pos.y})
+                    this.scene_controller.node_controller.add_node("Teste", {x: world_pos.x, y: world_pos.y})
                 }
             }}
         );
         
+        this.input_manager.set_keybind_handler(
+            new Keybind("SaveScene", [new KeybindMap({keys: ["KeyS"], modifiers: [KeyModifiers.ALT]})]),
+            {just_activated: (data) => {
+                const scene_data = this.scene_controller.save_scene();
+                // console.log(JSON.stringify(scene_data));
+                console.log(scene_data_to_json(scene_data));
+            }}
+        );
     }
 
     private setup_event_handlers() {
@@ -125,7 +133,7 @@ export class NodeEditor {
                             return;
                         }
     
-                        this.tool_controller.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, this.node_controller.nodes);
+                        this.tool_controller.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, this.scene_controller.node_controller.nodes);
                     }
                 }
         ));
@@ -151,7 +159,6 @@ export class NodeEditor {
             InputEvents.HOVER_NODE,
             new EventHandler("onHoverNode", (data) => {
                 if (data.node != null) {
-                    console.log("hi")
                     this.tool_controller.current_tool?.onHoverNode(data.node);
                 }
             })
@@ -234,19 +241,19 @@ export class NodeEditor {
                             overflow: "visible",
                             "pointer-events": "none",
                         }}>
-                            <For each={this.connection_controller.connections}>
+                            <For each={this.scene_controller.connection_controller.connections}>
                                 {(conn) => <ConnectionLines 
                                     connection={conn} 
-                                    onDisconnect={() => this.connection_controller.disconnect_nodes(conn)} 
+                                    onDisconnect={() => this.scene_controller.connection_controller.disconnect_nodes(conn)} 
                                 />}
                             </For>
                             
-                            <Show when={this.connection_controller.selected_slot}>
-                                <ConnectionPreview start_slot={this.connection_controller.selected_slot} hovered_slot={this.connection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
+                            <Show when={this.scene_controller.connection_controller.selected_slot}>
+                                <ConnectionPreview start_slot={this.scene_controller.connection_controller.selected_slot} hovered_slot={this.scene_controller.connection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
                             </Show>
                         </svg>
 
-                        <For each={this.node_controller.nodes}>
+                        <For each={this.scene_controller.node_controller.nodes}>
                             {(node) => {
                                 return (node.View(
                                     this.editor_space.camera, 

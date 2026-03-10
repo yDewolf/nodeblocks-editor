@@ -24,6 +24,7 @@ async function load_json_file(path: string) {
 
 interface TypeFile {
     version: number,
+    id: string,
     slot_types: Map<string, SlotTypeData>,
     node_types: Map<string, NodeTypesData>
 }
@@ -52,9 +53,12 @@ interface NodeTypesData {
 }
 
 export class NodeTypeFile {
-    version: number = -1;
+    
+    node_types_version: number = -1;
     file_path: string | null = null;
-
+    raw_data: Object | null = null;
+    node_types_id: string | null = null;
+    
     slot_types: Map<string, CustomSlotType>;
     node_constructors: Map<string, CustomNodeConstructor>;
 
@@ -65,13 +69,14 @@ export class NodeTypeFile {
 
     public async load_file(file_path: string) {
         this.file_path = file_path;
-
         const json_data = await load_json_file(this.file_path);
         if (!json_data) {
             return;
         }
-
-        this.version = json_data.version;
+        
+        this.raw_data = json_data;
+        this.node_types_version = json_data.version;
+        this.node_types_id = json_data.id;
         
         // Parse Slot Types
         json_data.slot_types.forEach((type_data, type_name) => {

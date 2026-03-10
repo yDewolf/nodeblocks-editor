@@ -14,7 +14,7 @@ export class SelectionTool extends BaseEditorTool {
     constructor(node_editor: NodeEditor) {
         super(node_editor);
         this.selection_controller = node_editor.selection_controller;
-        this.connection_controller = node_editor.connection_controller;
+        this.connection_controller = node_editor.scene_controller.connection_controller;
         this.node_editor = node_editor;
     }
 

@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { NodeSlot } from "./slot/node-slot";
+import { SuperSlotTypes } from "./slot/slot-type";
 
 
 // Representa uma conexão entre dois nodes
@@ -48,9 +49,24 @@ export class NodeConnection {
 
     public get_other_node(root_node: NodeSlot) { 
         const other_node = this.slot_a == root_node ? this.slot_b : this.slot_a
-        // console.log(root_node, "other: ", other_node);
 
         return other_node;
+    }
+
+    get input_slot() {
+        if (this.slot_a.type.super_type == SuperSlotTypes.INPUT) {
+            return this.slot_a;
+        }
+
+        return this.slot_b
+    }
+
+    get output_slot() {
+        if (this.slot_a.type.super_type == SuperSlotTypes.OUTPUT) {
+            return this.slot_a;
+        }
+
+        return this.slot_b
     }
 
     // FIXME: https://github.com/yDewolf/NodeEditor/issues/2

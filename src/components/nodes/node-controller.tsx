@@ -5,8 +5,8 @@ import { BaseNodeConstructor, CustomNodeConstructor } from "~/helpers/node-const
 import { NodeTypeFile } from "~/helpers/node-type-file";
 
 export class NodeController {
-    last_id: Accessor<number>;
-    _increment_last_id: () => number;
+    current_id: Accessor<number>;
+    _set_last_id: (v: number) => void;
 
     private _nodes: () => BaseNode[];
     private _setNodes: (val: BaseNode[]) => void;
@@ -22,13 +22,21 @@ export class NodeController {
         this.node_constructors.set("default", new BaseNodeConstructor("default"))
 
         const [last_id, setLastId] = createSignal(0)
-        const increment_last_id = () => setLastId((previous) => previous + 1);
-        this.last_id = last_id
-        this._increment_last_id = increment_last_id
+        this._set_last_id = setLastId;
+        this.current_id = last_id
         
         const [nodes, setNodes] = createSignal<BaseNode[]>([])
         this._nodes = nodes;
         this._setNodes = setNodes;
+    }
+        
+    protected _increment_last_id(): number {
+        this._set_last_id(this.current_id() + 1);
+        return this.current_id();
+    }
+
+    public reset_id_count() {
+        this._set_last_id(0);
     }
 
     public add_node(name: string, pos: Vector2) {
@@ -39,7 +47,8 @@ export class NodeController {
             console.error("Couldn't find constructor for", this.selected_constructor, "type");
             return;
         }
-        const new_node = construct.make_node(name, pos, this._increment_last_id());
+        const new_id = this._increment_last_id();
+        const new_node = construct.make_node(name, pos, new_id);
         this.nodes = [...this.nodes, new_node];
     }
 

@@ -6,7 +6,6 @@ export const NodeAnchor = (props: { anchor_pos: Vector2, all_slots: NodeSlot[], 
     const filtered_nodes = createMemo(() => {
         return props.all_slots.filter((slot) => slot.style.anchor.x == props.anchor_pos.x && slot.style.anchor.y == props.anchor_pos.y);
     })
-    // console.log(props.anchor_pos, filtered_nodes);
     
     return (
         <div class="node-anchor" classList={{

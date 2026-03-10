@@ -12,25 +12,25 @@ export enum DataTypes {
 export class NodeDataType {
     type_name: string;
     
-    super_type: DataTypes = DataTypes.UNKNOWN;
-    type_whitelist: DataTypes[] = [];
-    name_whitelist: string[] = [];
+    _super_type: DataTypes = DataTypes.UNKNOWN;
+    _type_whitelist: DataTypes[] = [];
+    _name_whitelist: string[] = [];
 
     constructor(type_name: string, super_type: DataTypes, type_whitelist: DataTypes[], name_whitelist: string[] = []) {
         this.type_name = type_name;
-        this.super_type = super_type;
+        this._super_type = super_type;
 
-        this.type_whitelist = type_whitelist;
-        this.name_whitelist = name_whitelist;
+        this._type_whitelist = type_whitelist;
+        this._name_whitelist = name_whitelist;
     }
 
 
     public is_compatible_with(type: NodeDataType): boolean {
-        if (this.type_whitelist.includes(type.super_type)) {
+        if (this._type_whitelist.includes(type._super_type)) {
             return true;
         }
 
-        if (this.name_whitelist.includes(type.type_name)) {
+        if (this._name_whitelist.includes(type.type_name)) {
             return true;
         }
 

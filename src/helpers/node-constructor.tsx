@@ -40,7 +40,7 @@ export class BaseNodeConstructor {
 
     public make_node(node_name: string, position: Vector2, id: number = -1): BaseNode {
         const node = new BaseNode(
-            node_name, this._data, position, id
+            node_name, this._data, position, id, this.type_name
         );
 
         this._slots.forEach((slot_data, slot_name) => {

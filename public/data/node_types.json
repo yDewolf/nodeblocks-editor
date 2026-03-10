@@ -1,5 +1,6 @@
 {
     "version": 0,
+    "id": "some_nodepack",
     "slot_types": {
         "input": {
             "extends": "input_slot",

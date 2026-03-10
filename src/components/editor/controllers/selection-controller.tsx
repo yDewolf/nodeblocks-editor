@@ -72,7 +72,6 @@ export class SelectionController {
         if (this.selected_nodes.includes(node)) {
             this.selecting = false;
             this.moving = true;
-            // console.log("move")
             return;
         }
 
@@ -100,7 +99,6 @@ export class SelectionController {
             node.selected = false;
         });
         this._setSelectedNodes([])
-        // console.log("resetting")
     }
 
     public onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]) {

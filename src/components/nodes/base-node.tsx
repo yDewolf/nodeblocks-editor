@@ -10,13 +10,13 @@ import { NodeData } from './data/node-data';
 export class BaseNode {
     id: number;
     node_name: string;
+    type_name: string;
+
     // Used to set node parameters etc.
     private _node_data: () => NodeData;
     private _set_node_data:  (data: NodeData) => void;
 
-    // Usamos signals para que a UI saiba quando atualizar
     private raw_pos: Vector2;
-
     private _slots: Map<SuperSlotTypes, NodeSlot[]> = new Map<SuperSlotTypes, NodeSlot[]>;
 
     private _pos: () => Vector2;
@@ -28,7 +28,8 @@ export class BaseNode {
     private _size: () => Vector2;
     private _setSize: (v: Vector2) => void;
 
-    constructor(node_name: string, node_data: NodeData, position: Vector2, id: number = -1) {
+    constructor(node_name: string, node_data: NodeData, position: Vector2, id: number = -1, type_name: string = "BaseNode") {
+        this.type_name = type_name;
         this.id = id;
         this.node_name = node_name;
         this.raw_pos = position;
