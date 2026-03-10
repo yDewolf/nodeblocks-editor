@@ -9,7 +9,9 @@ import { NodeSlot } from '../nodes/slot/node-slot';
 import { ConnectionController } from './controllers/connection-controller';
 import { ConnectionLines, ConnectionPreview } from '../misc/connection-lines';
 import { Vector2 } from '../../data_types/geometry';
-import { Keybind, KeybindMap, KeyEventManager, MouseButtons, InputEvents, EventHandler } from "./controllers/input-manager";
+import { KeyEventManager as GeneralEventManager } from "./input_manager/input-manager";
+import { Keybind, KeybindMap, MouseButtons } from "./input_manager/keybind-events";
+import { EventHandler, InputEvents } from "./input_manager/event-handling";
 
 export class NodeEditor {
     node_controller: NodeController
@@ -18,13 +20,10 @@ export class NodeEditor {
     selection_controller: SelectionController
     connection_controller: ConnectionController
 
-    input_manager: KeyEventManager
+    input_manager: GeneralEventManager
 
     editor_space: EditorSpace
     editor_grid: Grid
-
-    // _isSpacePressed: () => boolean;
-    // _setSpacePressed: (v: boolean) => void;
 
     _cursor_world_pos: () => Vector2;
     _set_cursor_world_pos: (v: Vector2) => void;
@@ -34,7 +33,7 @@ export class NodeEditor {
         this._cursor_world_pos = cursorWorldPos;
         this._set_cursor_world_pos = setCursorWorldPos;
 
-        this.input_manager = new KeyEventManager();
+        this.input_manager = new GeneralEventManager();
 
         this.node_controller = new NodeController()
         this.editor_space = new EditorSpace()
@@ -137,7 +136,7 @@ export class NodeEditor {
                     this.tool_controller.current_tool?.onClickOnNode(data.node);
                 }
             })
-        )
+        );
 
         this.input_manager.set_event_handler(
             InputEvents.CLICK_ON_NODE_SLOT,
@@ -146,25 +145,33 @@ export class NodeEditor {
                     this.tool_controller.current_tool?.onClickOnNodeSlot(data.slot);
                 }
             })
-        )
+        );
 
         this.input_manager.set_event_handler(
             InputEvents.HOVER_NODE,
             new EventHandler("onHoverNode", (data) => {
                 if (data.node != null) {
+                    console.log("hi")
                     this.tool_controller.current_tool?.onHoverNode(data.node);
                 }
             })
-        )
+        );
 
         this.input_manager.set_event_handler(
-            InputEvents.HOVER_NODE,
+            InputEvents.HOVER_SLOT,
             new EventHandler("onHoverSlot", (data) => {
                 if (data.slot != null) {
                     this.tool_controller.current_tool?.onHoverSlot(data.slot);
                 }
             })
-        )
+        );
+
+        this.input_manager.set_event_handler(
+            InputEvents.HOVER_BACKGROUND,
+            new EventHandler("onHoverBackground", (data) => {
+                this.tool_controller.current_tool?.onHoverBackground();
+            })
+        );
     }
 
     public View() {
@@ -197,7 +204,7 @@ export class NodeEditor {
                     onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
                     onPointerLeave={(e) => this.input_manager.onPointerUp(e)}
                     onMouseOver={() => {
-                        this.tool_controller.current_tool?.onHoverBackground();
+                        this.input_manager.onHoverBackground();
                     }}
                 >
                     <div 

@@ -19,17 +19,16 @@ export interface ComponentEventHandler {
     onClickOnNode(node: BaseNode): void;
 
     onClickOnNodeSlot(slot: NodeSlot): void;
-    
+
     onHoverNode(node: BaseNode): void;
     
     onHoverSlot(slot: NodeSlot): void;
+
+    onHoverBackground(): void;
 }
 
 export interface EditorTool extends ComponentEventHandler {
     onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void;
-
-
-    onHoverBackground(): void;
 }
 
 export abstract class BaseEditorTool implements EditorTool {
