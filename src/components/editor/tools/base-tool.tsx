@@ -27,17 +27,7 @@ export interface ComponentEventHandler {
     onHoverBackground(): void;
 }
 
-export interface EditorTool extends ComponentEventHandler {
-    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void;
-}
-
-export abstract class BaseEditorTool implements EditorTool {
-    node_editor: NodeEditor
-
-    constructor(node_editor: NodeEditor) {
-        this.node_editor = node_editor;
-    }
-
+export abstract class BaseEventHandler implements ComponentEventHandler {
     onKeyDown(e: KeyboardEvent): void {
     }
     onKeyUp(e: KeyboardEvent): void {
@@ -64,5 +54,18 @@ export abstract class BaseEditorTool implements EditorTool {
     onHoverSlot(slot: NodeSlot): void {
     }
     onHoverBackground(): void {
+    }
+}
+
+export interface EditorTool extends ComponentEventHandler {
+    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void;
+}
+
+export abstract class BaseEditorTool extends BaseEventHandler {
+    node_editor: NodeEditor
+
+    constructor(node_editor: NodeEditor) {
+        super();
+        this.node_editor = node_editor;
     }
 }

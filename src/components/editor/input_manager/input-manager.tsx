@@ -1,9 +1,9 @@
 import { BaseNode } from "~/components/nodes/base-node";
 import { NodeSlot } from "~/components/nodes/slot/node-slot";
-import { ComponentEventHandler } from "../tools/base-tool";
+import { BaseEventHandler, ComponentEventHandler } from "../tools/base-tool";
 import { createStore, SetStoreFunction } from "solid-js/store";
 import { Keybind, KeyEventData, KeyModifiers, MBUTTON_CODES, MouseButtons } from "./keybind-events";
-import { EventHandler, InputEvents } from "./event-handling";
+import { EventData, EventHandler, InputEvents } from "./event-handling";
 
 export interface KeyHandlersInterface {
     just_activated?: (data: KeyEventData) => void;
@@ -23,7 +23,7 @@ class KeyHandlers {
     }
 }
 
-export class KeyEventManager implements ComponentEventHandler {
+export class KeyEventManager extends BaseEventHandler {
     keybinds: Map<Keybind, KeyHandlers>;
     event_handlers: Map<InputEvents, Array<EventHandler>>;
     
@@ -37,6 +37,7 @@ export class KeyEventManager implements ComponentEventHandler {
     private _set_modifier: SetStoreFunction<{[key: number]: boolean}>;;
 
     constructor() {
+        super();
         const [keys, setKeys]  = createStore<Record<string, boolean>>({});
         this._key_state = keys;
         this._set_keys = setKeys;
@@ -149,13 +150,6 @@ export class KeyEventManager implements ComponentEventHandler {
         this.handle_keybinds({event: e})
     }
     
-    onPointerMove(e: PointerEvent): void {
-        const handlers = this.event_handlers.get(InputEvents.POINTER_MOVING)
-        handlers?.forEach(handler => {
-            handler.handler({event: e});
-        });
-    }
-
     onPointerDown(e: PointerEvent): void {
         this.update_modifier_states(e);
         MBUTTON_CODES.forEach(button_code => {
@@ -174,38 +168,10 @@ export class KeyEventManager implements ComponentEventHandler {
         this.handle_keybinds({event: e})
     }
 
-    onClickOnNode(node: BaseNode): void {
-        const handlers = this.event_handlers.get(InputEvents.CLICK_ON_NODE)
+    generalizedEventHandler(data: EventData, event_type: InputEvents) {
+        const handlers = this.event_handlers.get(event_type)
         handlers?.forEach(handler => {
-            handler.handler({node: node});
-        });
-    }
-
-    onClickOnNodeSlot(slot: NodeSlot): void {
-        const handlers = this.event_handlers.get(InputEvents.CLICK_ON_NODE_SLOT)
-        handlers?.forEach(handler => {
-            handler.handler({slot: slot});
-        });
-    }
-
-    onHoverNode(node: BaseNode): void {
-        const handlers = this.event_handlers.get(InputEvents.HOVER_NODE)
-        handlers?.forEach(handler => {
-            handler.handler({node: node});
-        });
-    }
-
-    onHoverSlot(slot: NodeSlot): void {
-        const handlers = this.event_handlers.get(InputEvents.HOVER_SLOT)
-        handlers?.forEach(handler => {
-            handler.handler({slot: slot});
-        });
-    }
-
-    onHoverBackground(): void {
-        const handlers = this.event_handlers.get(InputEvents.HOVER_BACKGROUND)
-        handlers?.forEach(handler => {
-            handler.handler({});
+            handler.handler(data);
         });
     }
 }

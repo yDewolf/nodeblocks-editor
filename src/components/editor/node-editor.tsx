@@ -199,12 +199,12 @@ export class NodeEditor {
                     onKeyUp={(e) => this.input_manager.onKeyUp(e)}
                     onWheel={(e) => this.input_manager.onWheel(e)}
 
-                    onPointerMove={(e) => this.input_manager.onPointerMove(e)}
+                    onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
                     onPointerDown={(e) => this.input_manager.onPointerDown(e)} 
                     onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
                     onPointerLeave={(e) => this.input_manager.onPointerUp(e)}
                     onMouseOver={() => {
-                        this.input_manager.onHoverBackground();
+                        this.input_manager.generalizedEventHandler({}, InputEvents.HOVER_BACKGROUND)
                     }}
                 >
                     <div 
@@ -252,16 +252,16 @@ export class NodeEditor {
                                     this.editor_space.camera, 
                                     // TODO: Implement these as EventHandlers on InputManager
                                     (node: BaseNode) => {
-                                        this.input_manager.onClickOnNode(node);
+                                        this.input_manager.generalizedEventHandler({node: node}, InputEvents.CLICK_ON_NODE)
                                     },
                                     (slot: NodeSlot) => {
-                                        this.input_manager.onClickOnNodeSlot(slot);
+                                        this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.CLICK_ON_NODE_SLOT)
                                     },
                                     (node: BaseNode) => {
-                                        this.input_manager.onHoverNode(node);
+                                        this.input_manager.generalizedEventHandler({node: node}, InputEvents.HOVER_NODE)
                                     },
                                     (slot: NodeSlot) => {
-                                        this.input_manager.onHoverSlot(slot);
+                                        this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.HOVER_SLOT)
                                     })
                                 )
                             }}
@@ -269,7 +269,7 @@ export class NodeEditor {
                     </div>
                 </div>
                 
-                <div class="editor-ui" onPointerMove={(e) => this.input_manager.onPointerMove(e)}>
+                <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
                     <div class="left-tab">
 
                     </div>
