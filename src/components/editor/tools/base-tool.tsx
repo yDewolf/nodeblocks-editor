@@ -3,12 +3,14 @@ import { NodeSlot } from "~/components/nodes/slot/node-slot";
 import { Vector2 } from "~/data_types/geometry";
 import { NodeEditor } from "../node-editor";
 
-export interface EditorTool {
+export interface ComponentEventHandler {
     onKeyDown(e: KeyboardEvent): void;
 
     onKeyUp(e: KeyboardEvent): void;
 
     onWheel(e: WheelEvent): void;
+
+    onPointerMove(e: PointerEvent): void;
 
     onPointerDown(e: PointerEvent): void;
 
@@ -18,27 +20,22 @@ export interface EditorTool {
 
     onClickOnNodeSlot(slot: NodeSlot): void;
 
-    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void;
-
     onHoverNode(node: BaseNode): void;
-
+    
     onHoverSlot(slot: NodeSlot): void;
 
     onHoverBackground(): void;
 }
 
-export abstract class BaseEditorTool implements EditorTool {
-    node_editor: NodeEditor
-
-    constructor(node_editor: NodeEditor) {
-        this.node_editor = node_editor;
-    }
-
+export abstract class BaseEventHandler implements ComponentEventHandler {
     onKeyDown(e: KeyboardEvent): void {
     }
     onKeyUp(e: KeyboardEvent): void {
     }
     onWheel(e: WheelEvent): void {
+    }
+
+    onPointerMove(e: PointerEvent): void {
     }
     onPointerDown(e: PointerEvent): void {
     }
@@ -57,5 +54,18 @@ export abstract class BaseEditorTool implements EditorTool {
     onHoverSlot(slot: NodeSlot): void {
     }
     onHoverBackground(): void {
+    }
+}
+
+export interface EditorTool extends ComponentEventHandler {
+    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void;
+}
+
+export abstract class BaseEditorTool extends BaseEventHandler {
+    node_editor: NodeEditor
+
+    constructor(node_editor: NodeEditor) {
+        super();
+        this.node_editor = node_editor;
     }
 }

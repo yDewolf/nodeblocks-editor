@@ -25,7 +25,6 @@ export class SelectionTool extends BaseEditorTool {
 
     onPointerDown(e: PointerEvent): void {
         const [screen_pos, world_pos] = this.selection_controller.editor_space.get_cursor_pos(e)
-
         if (e.button == 0) {
             if (this.selection_controller.has_selected) {
                 this.selection_controller.clearSelection();
@@ -35,10 +34,6 @@ export class SelectionTool extends BaseEditorTool {
             (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
             this.selection_controller.onStartAreaSelection({x: world_pos.x, y: world_pos.y});
         }
-
-        // if (e.button == 2) {
-        //     this.node_controller.add_node("Teste", {x: world_pos.x, y: world_pos.y})
-        // } 
     }
 
     onPointerUp(e: PointerEvent): void {

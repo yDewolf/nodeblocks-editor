@@ -33,7 +33,6 @@ export class BaseNode {
         this.node_name = node_name;
         this.raw_pos = position;
 
-        console.log(node_data)
         const [nodeData, setNodeData] = createSignal(node_data);
         this._node_data = nodeData;
         this._set_node_data = setNodeData;
@@ -55,7 +54,7 @@ export class BaseNode {
     }
 
     get node_data() { return this._node_data(); }
-    set node_data(data: NodeData) { this._set_node_data(data); console.log(data); }
+    set node_data(data: NodeData) { this._set_node_data(data); }
     
     get pos() { return this._pos() }
     get x() { return this.pos.x }
@@ -190,7 +189,8 @@ export class BaseNode {
                         class="internal-node"
                         data-node-id={this.id}
                         onPointerDown={(e) => {
-                            e.stopPropagation();
+                            // FIXME: Stop Propagation shouldn't break PointerDown Cleanup
+                            // e.stopPropagation();
                             (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
                             onClick(this);
                         }}

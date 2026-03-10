@@ -9,6 +9,9 @@ import { NodeSlot } from '../nodes/slot/node-slot';
 import { ConnectionController } from './controllers/connection-controller';
 import { ConnectionLines, ConnectionPreview } from '../misc/connection-lines';
 import { Vector2 } from '../../data_types/geometry';
+import { KeyEventManager as GeneralEventManager } from "./input_manager/input-manager";
+import { Keybind, KeybindMap, MouseButtons } from "./input_manager/keybind-events";
+import { EventHandler, InputEvents } from "./input_manager/event-handling";
 
 export class NodeEditor {
     node_controller: NodeController
@@ -17,11 +20,10 @@ export class NodeEditor {
     selection_controller: SelectionController
     connection_controller: ConnectionController
 
+    input_manager: GeneralEventManager
+
     editor_space: EditorSpace
     editor_grid: Grid
-
-    _isSpacePressed: () => boolean;
-    _setSpacePressed: (v: boolean) => void;
 
     _cursor_world_pos: () => Vector2;
     _set_cursor_world_pos: (v: Vector2) => void;
@@ -31,6 +33,8 @@ export class NodeEditor {
         this._cursor_world_pos = cursorWorldPos;
         this._set_cursor_world_pos = setCursorWorldPos;
 
+        this.input_manager = new GeneralEventManager();
+
         this.node_controller = new NodeController()
         this.editor_space = new EditorSpace()
         this.editor_grid = new Grid({x: 32, y: 32});
@@ -39,72 +43,139 @@ export class NodeEditor {
         this.connection_controller = new ConnectionController();
         
         this.tool_controller = new ToolController(this);
-        
-        const [space, setSpace] = createSignal(false);
-        this._isSpacePressed = space;
-        this._setSpacePressed = setSpace;
+        this.setup_event_handlers();
+        this.setup_keybinds();
     }
 
     get cursor_world_pos() { return this._cursor_world_pos(); }
     set cursor_world_pos(v: Vector2) { this._set_cursor_world_pos(v); }
 
+    private setup_keybinds() {
+        this.input_manager.set_keybind_handler(
+            new Keybind("PanCamera", [new KeybindMap({keys: ["Space"]}), new KeybindMap({mouse_buttons: [MouseButtons.MIDDLE]})]),
+            {}
+        );
+        this.input_manager.set_keybind_handler(
+            new Keybind("Zoom", [new KeybindMap({mouse_buttons: [MouseButtons.SCROLL]})]),{
+            while_active: (data) => {
+                const e = data.event;
+                if (e instanceof WheelEvent) {
+                    const delta = -e.deltaY * 0.001;
+                    const new_zoom = Math.max(0.1, Math.min(5.0, this.editor_space.camera.zoom + delta));
+                    const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                    
+                    this.editor_space.camera.zoom = new_zoom;
+                    this.editor_space.camera.updateOffset({
+                        x: world_pos.x - (screen_pos.x / new_zoom),
+                        y: world_pos.y - (screen_pos.y / new_zoom)
+                    });
+                }
+            }}
+        );
+
+        this.input_manager.set_keybind_handler(
+            new Keybind("MainToolAction", [new KeybindMap({mouse_buttons: [MouseButtons.LEFT]})]),
+            {just_activated: (data) => {
+                const e = data.event;
+                if (e instanceof PointerEvent) {
+                    const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                    if (e.target !== e.currentTarget) return;
+    
+                    this.tool_controller.current_tool?.onPointerDown(e);
+                }
+            },
+            cleanup: (data) => {
+                const e = data.event;
+                if (e instanceof PointerEvent) {
+                    this.tool_controller.current_tool?.onPointerUp(e);
+                    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+                }
+            }}
+        );
+
+        this.input_manager.set_keybind_handler(
+            new Keybind("SecondaryToolAction", [new KeybindMap({mouse_buttons: [MouseButtons.RIGHT]})]),
+            {just_activated: (data) => {
+                const e = data.event;
+                if (e instanceof PointerEvent) {
+                    const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                    if (e.target !== e.currentTarget) return;
+
+                    this.node_controller.add_node("Teste", {x: world_pos.x, y: world_pos.y})
+                }
+            }}
+        );
+        
+    }
+
+    private setup_event_handlers() {
+        this.input_manager.set_event_handler(
+            InputEvents.POINTER_MOVING,
+            new EventHandler("onPointerMove", 
+                (data) => {
+                    const e = data.event;
+                    if (e instanceof PointerEvent) {
+                        const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                        this.cursor_world_pos = world_pos;
+                        if (this.input_manager.get_keybind_state("PanCamera")) {
+                            this.editor_space.camera.move({
+                                x: -e.movementX / this.editor_space.camera.zoom,
+                                y: -e.movementY / this.editor_space.camera.zoom
+                            });
+                            return;
+                        }
+    
+                        this.tool_controller.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, this.node_controller.nodes);
+                    }
+                }
+        ));
+        this.input_manager.set_event_handler(
+            InputEvents.CLICK_ON_NODE,
+            new EventHandler("onClickOnNode", (data) => {
+                if (data.node != null) {
+                    this.tool_controller.current_tool?.onClickOnNode(data.node);
+                }
+            })
+        );
+
+        this.input_manager.set_event_handler(
+            InputEvents.CLICK_ON_NODE_SLOT,
+            new EventHandler("onClickOnSlot", (data) => {
+                if (data.slot != null) {
+                    this.tool_controller.current_tool?.onClickOnNodeSlot(data.slot);
+                }
+            })
+        );
+
+        this.input_manager.set_event_handler(
+            InputEvents.HOVER_NODE,
+            new EventHandler("onHoverNode", (data) => {
+                if (data.node != null) {
+                    console.log("hi")
+                    this.tool_controller.current_tool?.onHoverNode(data.node);
+                }
+            })
+        );
+
+        this.input_manager.set_event_handler(
+            InputEvents.HOVER_SLOT,
+            new EventHandler("onHoverSlot", (data) => {
+                if (data.slot != null) {
+                    this.tool_controller.current_tool?.onHoverSlot(data.slot);
+                }
+            })
+        );
+
+        this.input_manager.set_event_handler(
+            InputEvents.HOVER_BACKGROUND,
+            new EventHandler("onHoverBackground", (data) => {
+                this.tool_controller.current_tool?.onHoverBackground();
+            })
+        );
+    }
+
     public View() {
-        
         let viewportRef: HTMLDivElement | undefined;
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.code === "Space") this._setSpacePressed(true);
-        }
-
-        const onKeyUp = (e: KeyboardEvent) => {
-            if (e.code === "Space") this._setSpacePressed(false);
-        };
-
-        const onWheel = (e: WheelEvent) => {
-            e.preventDefault();
-
-            const delta = -e.deltaY * 0.001;
-            const new_zoom = Math.max(0.1, Math.min(5.0, this.editor_space.camera.zoom + delta));
-            const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
-            
-            this.editor_space.camera.zoom = new_zoom;
-            this.editor_space.camera.updateOffset({
-                x: world_pos.x - (screen_pos.x / new_zoom),
-                y: world_pos.y - (screen_pos.y / new_zoom)
-            });
-        };
-
-        const onPointerDown = (e: PointerEvent) => {
-            const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
-            if (e.target !== e.currentTarget) return;
-
-
-            if (e.button == 2) {
-                this.node_controller.add_node("Teste", {x: world_pos.x, y: world_pos.y})
-            }
-
-            this.tool_controller.current_tool?.onPointerDown(e);
-        }
-        
-        const onPointerMove = (e: PointerEvent) => {
-            const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
-            this.cursor_world_pos = world_pos;
-            if (this._isSpacePressed()) {
-                this.editor_space.camera.move({
-                    x: -e.movementX / this.editor_space.camera.zoom,
-                    y: -e.movementY / this.editor_space.camera.zoom
-                });
-                return;
-            }
-            this.tool_controller.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, this.node_controller.nodes);
-        };
-
-        const onPointerUp = (e: PointerEvent) => {
-            this.tool_controller.current_tool?.onPointerUp(e);
-
-            (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-        };
-
-        
     
         return (
             <div 
@@ -118,22 +189,22 @@ export class NodeEditor {
                         width: "100%"
                     }}
                     classList={{
-                        'move-mode': this._isSpacePressed(),
+                        'move-mode': this.input_manager.get_keybind_state("PanCamera"),
                         'moving-mode': this.selection_controller.moving
                     }}
 
                     oncontextmenu={(e) => {e.preventDefault()}}
                     tabindex="0"
-                    onKeyDown={onKeyDown}
-                    onKeyUp={onKeyUp}
-                    onWheel={onWheel}
+                    onKeyDown={(e) => this.input_manager.onKeyDown(e)}
+                    onKeyUp={(e) => this.input_manager.onKeyUp(e)}
+                    onWheel={(e) => this.input_manager.onWheel(e)}
 
-                    onPointerMove={onPointerMove} 
-                    onPointerDown={onPointerDown} 
-                    onPointerUp={onPointerUp} 
-                    onPointerLeave={onPointerUp}
+                    onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
+                    onPointerDown={(e) => this.input_manager.onPointerDown(e)} 
+                    onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
+                    onPointerLeave={(e) => this.input_manager.onPointerUp(e)}
                     onMouseOver={() => {
-                        this.tool_controller.current_tool?.onHoverBackground();
+                        this.input_manager.generalizedEventHandler({}, InputEvents.HOVER_BACKGROUND)
                     }}
                 >
                     <div 
@@ -179,17 +250,18 @@ export class NodeEditor {
                             {(node) => {
                                 return (node.View(
                                     this.editor_space.camera, 
+                                    // TODO: Implement these as EventHandlers on InputManager
                                     (node: BaseNode) => {
-                                        this.tool_controller.current_tool?.onClickOnNode(node);
+                                        this.input_manager.generalizedEventHandler({node: node}, InputEvents.CLICK_ON_NODE)
                                     },
                                     (slot: NodeSlot) => {
-                                        this.tool_controller.current_tool?.onClickOnNodeSlot(slot);
+                                        this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.CLICK_ON_NODE_SLOT)
                                     },
                                     (node: BaseNode) => {
-                                        this.tool_controller.current_tool?.onHoverNode(node);
+                                        this.input_manager.generalizedEventHandler({node: node}, InputEvents.HOVER_NODE)
                                     },
                                     (slot: NodeSlot) => {
-                                        this.tool_controller.current_tool?.onHoverSlot(slot);
+                                        this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.HOVER_SLOT)
                                     })
                                 )
                             }}
@@ -197,7 +269,7 @@ export class NodeEditor {
                     </div>
                 </div>
                 
-                <div class="editor-ui">
+                <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
                     <div class="left-tab">
 
                     </div>
