@@ -9,7 +9,7 @@ import { NodeSlot } from '../nodes/slot/node-slot';
 import { ConnectionController } from './controllers/connection-controller';
 import { ConnectionLines, ConnectionPreview } from '../misc/connection-lines';
 import { Vector2 } from '../../data_types/geometry';
-import { Keybind, KeybindMap, KeyEventManager, MouseButtons, OtherStates } from "./controllers/input-manager";
+import { Keybind, KeybindMap, KeyEventManager, MouseButtons, InputEvents, EventHandler } from "./controllers/input-manager";
 
 export class NodeEditor {
     node_controller: NodeController
@@ -44,13 +44,14 @@ export class NodeEditor {
         this.connection_controller = new ConnectionController();
         
         this.tool_controller = new ToolController(this);
+        this.setup_event_handlers();
         this.setup_keybinds();
     }
 
     get cursor_world_pos() { return this._cursor_world_pos(); }
     set cursor_world_pos(v: Vector2) { this._set_cursor_world_pos(v); }
 
-    public setup_keybinds() {
+    private setup_keybinds() {
         this.input_manager.set_keybind_handler(
             new Keybind("PanCamera", [new KeybindMap({keys: ["Space"]}), new KeybindMap({mouse_buttons: [MouseButtons.MIDDLE]})]),
             {}
@@ -69,25 +70,6 @@ export class NodeEditor {
                         x: world_pos.x - (screen_pos.x / new_zoom),
                         y: world_pos.y - (screen_pos.y / new_zoom)
                     });
-                }
-            }}
-        );
-        this.input_manager.set_keybind_handler(
-            new Keybind("pointerMove", [new KeybindMap({other_states: [OtherStates.POINTER_MOVING]})]),{
-            while_active: (data) => {
-                const e = data.event;
-                if (e instanceof PointerEvent) {
-                    const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
-                    this.cursor_world_pos = world_pos;
-                    if (this.input_manager.get_keybind_state("PanCamera")) {
-                        this.editor_space.camera.move({
-                            x: -e.movementX / this.editor_space.camera.zoom,
-                            y: -e.movementY / this.editor_space.camera.zoom
-                        });
-                        return;
-                    }
-
-                    this.tool_controller.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, this.node_controller.nodes);
                 }
             }}
         );
@@ -125,6 +107,64 @@ export class NodeEditor {
             }}
         );
         
+    }
+
+    private setup_event_handlers() {
+        this.input_manager.set_event_handler(
+            InputEvents.POINTER_MOVING,
+            new EventHandler("onPointerMove", 
+                (data) => {
+                    const e = data.event;
+                    if (e instanceof PointerEvent) {
+                        const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                        this.cursor_world_pos = world_pos;
+                        if (this.input_manager.get_keybind_state("PanCamera")) {
+                            this.editor_space.camera.move({
+                                x: -e.movementX / this.editor_space.camera.zoom,
+                                y: -e.movementY / this.editor_space.camera.zoom
+                            });
+                            return;
+                        }
+    
+                        this.tool_controller.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, this.node_controller.nodes);
+                    }
+                }
+        ));
+        this.input_manager.set_event_handler(
+            InputEvents.CLICK_ON_NODE,
+            new EventHandler("onClickOnNode", (data) => {
+                if (data.node != null) {
+                    this.tool_controller.current_tool?.onClickOnNode(data.node);
+                }
+            })
+        )
+
+        this.input_manager.set_event_handler(
+            InputEvents.CLICK_ON_NODE_SLOT,
+            new EventHandler("onClickOnSlot", (data) => {
+                if (data.slot != null) {
+                    this.tool_controller.current_tool?.onClickOnNodeSlot(data.slot);
+                }
+            })
+        )
+
+        this.input_manager.set_event_handler(
+            InputEvents.HOVER_NODE,
+            new EventHandler("onHoverNode", (data) => {
+                if (data.node != null) {
+                    this.tool_controller.current_tool?.onHoverNode(data.node);
+                }
+            })
+        )
+
+        this.input_manager.set_event_handler(
+            InputEvents.HOVER_NODE,
+            new EventHandler("onHoverSlot", (data) => {
+                if (data.slot != null) {
+                    this.tool_controller.current_tool?.onHoverSlot(data.slot);
+                }
+            })
+        )
     }
 
     public View() {
@@ -205,16 +245,16 @@ export class NodeEditor {
                                     this.editor_space.camera, 
                                     // TODO: Implement these as EventHandlers on InputManager
                                     (node: BaseNode) => {
-                                        this.tool_controller.current_tool?.onClickOnNode(node);
+                                        this.input_manager.onClickOnNode(node);
                                     },
                                     (slot: NodeSlot) => {
-                                        this.tool_controller.current_tool?.onClickOnNodeSlot(slot);
+                                        this.input_manager.onClickOnNodeSlot(slot);
                                     },
                                     (node: BaseNode) => {
-                                        this.tool_controller.current_tool?.onHoverNode(node);
+                                        this.input_manager.onHoverNode(node);
                                     },
                                     (slot: NodeSlot) => {
-                                        this.tool_controller.current_tool?.onHoverSlot(slot);
+                                        this.input_manager.onHoverSlot(slot);
                                     })
                                 )
                             }}

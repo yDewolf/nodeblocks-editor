@@ -6,8 +6,12 @@ import { createStore, SetStoreFunction } from "solid-js/store";
 
 // TODO: Change this to be an Events enum
 // then create a set_event_handler function on KeyEventManager
-export enum OtherStates {
-    POINTER_MOVING
+export enum InputEvents {
+    POINTER_MOVING,
+    CLICK_ON_NODE,
+    CLICK_ON_NODE_SLOT,
+    HOVER_NODE,
+    HOVER_SLOT
 }
 
 export enum MouseButtons {
@@ -26,14 +30,12 @@ export enum KeyModifiers {
 }
 
 export interface KeybindMapBinds {
-    other_states?: OtherStates[], 
     mouse_buttons?: MouseButtons[], 
     keys?: string[], 
     modifiers?: KeyModifiers[]
 }
 
 export class KeybindMap {
-    private _other_states: OtherStates[];
     private _mouse_buttons: MouseButtons[];
     private _keys: string[];
     private _modifiers: KeyModifiers[];
@@ -46,7 +48,6 @@ export class KeybindMap {
         this._set_active = setActive;
         
         this._mouse_buttons = binds.mouse_buttons == null ? [] : binds.mouse_buttons;
-        this._other_states = binds.other_states == null ? [] : binds.other_states;
         this._keys = binds.keys == null ? [] : binds.keys;
         this._modifiers = binds.modifiers == null ? [] : binds.modifiers;
     }
@@ -58,14 +59,13 @@ export class KeybindMap {
     get keys() { return this._keys; }
     get modifiers() { return this._modifiers; }
 
-    public update_active(keys: Record<string, boolean>, mouse_buttons: Record<number, boolean>, modifiers: Record<number, boolean>, other_states: Record<number, boolean>): boolean {
+    public update_active(keys: Record<string, boolean>, mouse_buttons: Record<number, boolean>, modifiers: Record<number, boolean>): boolean {
         const keys_active = this._keys.length > 0 ? this._keys.every(k => !!keys[k]) : true;
         const mb_active = this._mouse_buttons.length > 0 ? this._mouse_buttons.every(m => !!mouse_buttons[m]) : true;
         const mod_active = this._modifiers.length > 0 ? this._modifiers.every(mod => !!modifiers[mod]) : true;
-        const other_states_active = this._other_states.length > 0 ? this._other_states.every(state => !!other_states[state]) : true;
 
-        const has_any_bind = this._other_states.length > 0 || this._keys.length > 0 || this._mouse_buttons.length > 0 || this._modifiers.length > 0;
-        const is_now_active = has_any_bind && keys_active && mb_active && mod_active && other_states_active;
+        const has_any_bind = this._keys.length > 0 || this._mouse_buttons.length > 0 || this._modifiers.length > 0;
+        const is_now_active = has_any_bind && keys_active && mb_active && mod_active;
 
         if (this.active !== is_now_active) {
             this.active = is_now_active;
@@ -114,9 +114,26 @@ export class Keybind {
     }
 }
 
-
 export interface KeyEventData {
     event: UIEvent
+}
+
+export interface EventData {
+    event?: UIEvent
+    node?: BaseNode,
+    slot?: NodeSlot
+}
+
+export class EventHandler {
+    name: string;
+    private func: (event_data: EventData) => void;
+
+    constructor(handler_name: string, handler_func: (event_data: EventData) => void) {
+        this.name = handler_name;
+        this.func = handler_func;
+    }
+
+    get handler() { return this.func; }
 }
 
 export interface HandlersInterface {
@@ -139,12 +156,10 @@ class KeyHandlers {
 
 export class KeyEventManager implements ComponentEventHandler {
     keybinds: Map<Keybind, KeyHandlers>;
+    event_handlers: Map<InputEvents, Array<EventHandler>>;
     
     private _key_state: { [key: string]: boolean};
     private _set_keys: SetStoreFunction<{[key: string]: boolean}>;
-
-    private _other_states: { [key: string]: boolean};
-    private _set_other_states: SetStoreFunction<{[key: string]: boolean}>;
 
     private _mouse_button_state: { [mouse_button: number]: boolean};
     private _set_mouse_button: SetStoreFunction<{[key: number]: boolean}>;;
@@ -158,10 +173,8 @@ export class KeyEventManager implements ComponentEventHandler {
         this._set_keys = setKeys;
 
         const [otherStates, setOtherStates]  = createStore<Record<string, boolean>>({
-            [OtherStates.POINTER_MOVING]: false
+            [InputEvents.POINTER_MOVING]: false
         });
-        this._other_states = otherStates;
-        this._set_other_states = setOtherStates;
 
         const [mouse_button, setMouseButton] = createStore<Record<number, boolean>>({});
         this._mouse_button_state = mouse_button;
@@ -176,6 +189,21 @@ export class KeyEventManager implements ComponentEventHandler {
         this._set_modifier = setModifier;
 
         this.keybinds = new Map();
+        this.event_handlers = new Map();
+
+        const event_keys = Object.values(InputEvents).filter(value => typeof value === "number");
+        event_keys.forEach(key => {
+            this.event_handlers.set(key, []);
+        });
+    }
+    
+
+    public set_event_handler(target_event: InputEvents, handler: EventHandler) {
+        const event_handlers = this.event_handlers.get(target_event)
+        if (event_handlers == null) {
+            return;
+        }
+        event_handlers.push(handler);
     }
 
     public set_keybind_handler(keybind: Keybind, handlers: HandlersInterface) {
@@ -205,14 +233,6 @@ export class KeyEventManager implements ComponentEventHandler {
         });
     }
 
-    protected update_other_states(event: PointerEvent) {
-        if (event.movementX != 0 || event.movementY != 0) {
-            this._set_other_states(OtherStates.POINTER_MOVING, true)
-        } else {
-            this._set_other_states(OtherStates.POINTER_MOVING, false)
-        }
-    }
-
     protected handle_keybinds(data: KeyEventData) {
         this.keybinds.forEach((handler, keybind) => {
             const previous_state = keybind.is_active();
@@ -220,8 +240,7 @@ export class KeyEventManager implements ComponentEventHandler {
                 map.update_active(
                     this._key_state, 
                     this._mouse_button_state, 
-                    this._modifier_state,
-                    this._other_states
+                    this._modifier_state
                 );
             });
 
@@ -261,12 +280,17 @@ export class KeyEventManager implements ComponentEventHandler {
     }
     
     onPointerMove(e: PointerEvent): void {
-        this.update_modifier_states(e);
+        const handlers = this.event_handlers.get(InputEvents.POINTER_MOVING)
+        handlers?.forEach(handler => {
+            handler.handler({event: e});
+        });
+        // this.update_modifier_states(e);
+
         // this.update_other_states(e);
 
-        this._set_other_states(OtherStates.POINTER_MOVING, true)
-        this.handle_keybinds({event: e})
-        this._set_other_states(OtherStates.POINTER_MOVING, false)
+        // this._set_other_states(Events.POINTER_MOVING, true)
+        // this.handle_keybinds({event: e})
+        // this._set_other_states(Events.POINTER_MOVING, false)
     }
 
     onPointerDown(e: PointerEvent): void {
@@ -288,10 +312,23 @@ export class KeyEventManager implements ComponentEventHandler {
     }
 
     onClickOnNode(node: BaseNode): void {
-        throw new Error("Method not implemented.");
+        const handlers = this.event_handlers.get(InputEvents.CLICK_ON_NODE)
+        handlers?.forEach(handler => {
+            handler.handler({node: node});
+        });
     }
 
     onClickOnNodeSlot(slot: NodeSlot): void {
-        throw new Error("Method not implemented.");
+        const handlers = this.event_handlers.get(InputEvents.CLICK_ON_NODE_SLOT)
+        handlers?.forEach(handler => {
+            handler.handler({slot: slot});
+        });
+    }
+
+    onHoverNode(node: BaseNode): void {
+        
+    }
+    onHoverSlot(slot: NodeSlot): void {
+        
     }
 }
