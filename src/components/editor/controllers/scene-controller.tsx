@@ -1,12 +1,7 @@
 import { NodeController } from "~/components/nodes/node-controller";
 import { ConnectionController } from "./connection-controller";
-import { Vector2 } from "~/data_types/geometry";
 import { NodeTypeFile } from "~/helpers/node-type-file";
 import { ConnectionSceneData, NodeSceneData, SceneData } from "~/helpers/node-scene-file";
-
-
-
-
 
 export class SceneController {
     node_type_reader: NodeTypeFile;

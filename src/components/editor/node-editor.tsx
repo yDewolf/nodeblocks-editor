@@ -1,4 +1,3 @@
-import { NodeController } from "../nodes/node-controller";
 import { EditorSpace } from "./editor-space";
 import { createSignal, For, Show } from "solid-js";
 import { BaseNode } from "../nodes/base-node";
@@ -6,7 +5,6 @@ import { Grid } from "../misc/grid";
 import { SelectionController } from "./controllers/selection-controller";
 import { ToolController } from "./controllers/tool-controller";
 import { NodeSlot } from '../nodes/slot/node-slot';
-import { ConnectionController } from './controllers/connection-controller';
 import { ConnectionLines, ConnectionPreview } from '../misc/connection-lines';
 import { Vector2 } from '../../data_types/geometry';
 import { KeyEventManager as GeneralEventManager } from "./input_manager/input-manager";
@@ -14,6 +12,7 @@ import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./input_manager
 import { EventHandler, InputEvents } from "./input_manager/event-handling";
 import { SceneController } from "./controllers/scene-controller";
 import { scene_data_to_json } from "~/helpers/node-scene-file";
+import { NodeTypeSelector } from "../misc/node-type-selector";
 
 export class NodeEditor {
     scene_controller: SceneController;
@@ -183,7 +182,8 @@ export class NodeEditor {
 
     public View() {
         let viewportRef: HTMLDivElement | undefined;
-    
+        const selector = new NodeTypeSelector();
+
         return (
             <div 
                 class="editor-view"
@@ -278,7 +278,7 @@ export class NodeEditor {
                 
                 <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
                     <div class="left-tab">
-
+                        {selector.View(this.scene_controller)}
                     </div>
                     <div class="middle-tab">
                         {this.tool_controller.View()}

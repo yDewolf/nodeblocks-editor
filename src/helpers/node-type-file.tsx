@@ -53,7 +53,6 @@ interface NodeTypesData {
 }
 
 export class NodeTypeFile {
-    
     node_types_version: number = -1;
     file_path: string | null = null;
     raw_data: Object | null = null;
