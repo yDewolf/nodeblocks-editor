@@ -13,6 +13,7 @@ import { EventHandler, InputEvents } from "./input_manager/event-handling";
 import { SceneController } from "./controllers/scene-controller";
 import { scene_data_to_json } from "~/helpers/node-scene-file";
 import { NodeTypeSelector } from "../misc/node-type-selector";
+import { NodePreview } from "../misc/node-preview";
 
 export class NodeEditor {
     scene_controller: SceneController;
@@ -24,8 +25,8 @@ export class NodeEditor {
     editor_space: EditorSpace
     editor_grid: Grid
 
-    _cursor_world_pos: () => Vector2;
-    _set_cursor_world_pos: (v: Vector2) => void;
+    private _cursor_world_pos: () => Vector2;
+    private _set_cursor_world_pos: (v: Vector2) => void;
 
     constructor () {
         this.scene_controller = new SceneController();
@@ -53,23 +54,6 @@ export class NodeEditor {
         this.input_manager.set_keybind_handler(
             new Keybind("PanCamera", [new KeybindMap({keys: ["Space"]}), new KeybindMap({mouse_buttons: [MouseButtons.MIDDLE]})]),
             {}
-        );
-        this.input_manager.set_keybind_handler(
-            new Keybind("Zoom", [new KeybindMap({mouse_buttons: [MouseButtons.SCROLL]})]),{
-            while_active: (data) => {
-                const e = data.event;
-                if (e instanceof WheelEvent) {
-                    const delta = -e.deltaY * 0.001;
-                    const new_zoom = Math.max(0.1, Math.min(5.0, this.editor_space.camera.zoom + delta));
-                    const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
-                    
-                    this.editor_space.camera.zoom = new_zoom;
-                    this.editor_space.camera.updateOffset({
-                        x: world_pos.x - (screen_pos.x / new_zoom),
-                        y: world_pos.y - (screen_pos.y / new_zoom)
-                    });
-                }
-            }}
         );
 
         this.input_manager.set_keybind_handler(
@@ -110,12 +94,32 @@ export class NodeEditor {
             {just_activated: (data) => {
                 const scene_data = this.scene_controller.save_scene();
                 // console.log(JSON.stringify(scene_data));
-                console.log(scene_data_to_json(scene_data));
+                console.log("data to json", scene_data_to_json(scene_data));
             }}
         );
     }
 
     private setup_event_handlers() {
+        this.input_manager.set_event_handler(
+            InputEvents.SCROLLING,
+            new EventHandler("Zoom",
+                (data) => {
+                    const e = data.event;
+                    if (e instanceof WheelEvent) {
+                        const delta = -e.deltaY * 0.001;
+                        const new_zoom = Math.max(0.1, Math.min(5.0, this.editor_space.camera.zoom + delta));
+                        const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                        
+                        this.editor_space.camera.zoom = new_zoom;
+                        this.editor_space.camera.updateOffset({
+                            x: world_pos.x - (screen_pos.x / new_zoom),
+                            y: world_pos.y - (screen_pos.y / new_zoom)
+                        });
+                    }
+                }   
+            )
+        );
+
         this.input_manager.set_event_handler(
             InputEvents.POINTER_MOVING,
             new EventHandler("onPointerMove", 
@@ -204,7 +208,7 @@ export class NodeEditor {
                     tabindex="0"
                     onKeyDown={(e) => this.input_manager.onKeyDown(e)}
                     onKeyUp={(e) => this.input_manager.onKeyUp(e)}
-                    onWheel={(e) => this.input_manager.onWheel(e)}
+                    onWheel={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.SCROLLING)}
 
                     onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
                     onPointerDown={(e) => this.input_manager.onPointerDown(e)} 
@@ -278,7 +282,7 @@ export class NodeEditor {
                 
                 <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
                     <div class="left-tab">
-                        {selector.View(this.scene_controller)}
+                        {selector.View(this.scene_controller, (node_preview: NodePreview) => this.tool_controller.current_tool?.onClickOnNodePreview(node_preview))}
                     </div>
                     <div class="middle-tab">
                         {this.tool_controller.View()}

@@ -27,6 +27,14 @@
                 "in_1": {"type": "input", "data_type": "uint", "tooltip": "Test"},
                 "out_0": {"type": "output", "tooltip": "Takes the value from ${in_0}, and outputs it"}
             }
+        },
+        "OtherNodeType": {
+            "description": "Takes a float input and outputs it without any modifications",
+            "parameters": {"out_features": {"type": "uint", "range": [1, -1]}, "some_parameter": {"type": "float", "range": [1, 10]}},
+            "slots": {
+                "in_1": {"type": "input", "data_type": "uint", "tooltip": "Test"},
+                "out_0": {"type": "output", "data_type": "uint", "tooltip": "Takes the value from ${in_0}, and outputs it"}
+            }
         }
     }
 }

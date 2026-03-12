@@ -2,6 +2,8 @@ import { BaseNode } from "~/components/nodes/base-node";
 import { NodeSlot } from "~/components/nodes/slot/node-slot";
 import { Vector2 } from "~/data_types/geometry";
 import { NodeEditor } from "../node-editor";
+import { CustomNodeConstructor } from "~/helpers/node-constructor";
+import { NodePreview } from "~/components/misc/node-preview";
 
 export interface ComponentEventHandler {
     onKeyDown(e: KeyboardEvent): void;
@@ -23,11 +25,16 @@ export interface ComponentEventHandler {
     onHoverNode(node: BaseNode): void;
     
     onHoverSlot(slot: NodeSlot): void;
+    
+    onClickOnNodePreview(node_preview: NodePreview): void;
 
     onHoverBackground(): void;
+
 }
 
 export abstract class BaseEventHandler implements ComponentEventHandler {
+    onClickOnNodePreview(node_preview: NodePreview): void {
+    }
     onKeyDown(e: KeyboardEvent): void {
     }
     onKeyUp(e: KeyboardEvent): void {

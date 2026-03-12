@@ -190,6 +190,9 @@ export class BaseNode {
                         class="internal-node"
                         data-node-id={this.id}
                         onPointerDown={(e) => {
+                            if (e.button != 0) {
+                                return;
+                            }
                             // FIXME: Stop Propagation shouldn't break PointerDown Cleanup
                             // e.stopPropagation();
                             (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);

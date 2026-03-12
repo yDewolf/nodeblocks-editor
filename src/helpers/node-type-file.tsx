@@ -1,6 +1,7 @@
 import { CustomSlotType } from "~/components/nodes/slot/slot-type";
-import { CustomNodeConstructor } from "./node-constructor";
+import { BaseNodeConstructor, CustomNodeConstructor } from "./node-constructor";
 import { NodeData } from "~/components/nodes/data/node-data";
+import { batch, createSignal } from "solid-js";
 
 async function load_json_file(path: string) {
     try {
@@ -61,12 +62,36 @@ export class NodeTypeFile {
     slot_types: Map<string, CustomSlotType>;
     node_constructors: Map<string, CustomNodeConstructor>;
 
+    private _version: () => number;
+    private _set_version: (value: number) => undefined
+
     constructor() {
+        const [changedState, setChangedState] = createSignal(0);
+        this._version = changedState;
+        this._set_version = setChangedState;
+
         this.slot_types = new Map();
         this.node_constructors = new Map();
     }
 
-    public async load_file(file_path: string) {
+    protected set_constructor(type_name: string, constructor: BaseNodeConstructor) {
+        this.node_constructors.set(type_name, constructor);
+    }
+
+    public keep_track() { this._version() }
+    protected notify() {
+        this._set_version(this._version() + 1)
+    }
+
+
+    public load_file(file_path: string) {
+        this._load_file_async(file_path).then(() => {
+            this._version();
+            console.log("loaded file", this.node_constructors)
+        });
+    }
+
+    public async _load_file_async(file_path: string) {
         this.file_path = file_path;
         const json_data = await load_json_file(this.file_path);
         if (!json_data) {
@@ -89,15 +114,18 @@ export class NodeTypeFile {
         });
 
         // Parse Node Types
-        json_data.node_types.forEach((type_data, type_name) => {
-            const node_data: NodeData = new NodeData(type_data.parameters);
-            const custom_type_constructor = new CustomNodeConstructor(
-                type_name,
-                node_data,
-                type_data.slots,
-                this.slot_types
-            );
-            this.node_constructors.set(type_name, custom_type_constructor);
-        });
+        batch(() => {
+            json_data.node_types.forEach((type_data, type_name) => {
+                const node_data: NodeData = new NodeData(type_data.parameters);
+                const custom_type_constructor = new CustomNodeConstructor(
+                    type_name,
+                    node_data,
+                    type_data.slots,
+                    this.slot_types
+                );
+                this.set_constructor(type_name, custom_type_constructor);
+            });
+            this.notify()
+        })
     }
 }

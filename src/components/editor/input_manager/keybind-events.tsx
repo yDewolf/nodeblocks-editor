@@ -1,11 +1,10 @@
 import { createSignal } from "solid-js";
 
 export enum MouseButtons {
-    NONE = 0,
+    NONE = -1,
     LEFT = 1,
     RIGHT = 2,
     MIDDLE = 4,
-    SCROLL
 }
 export const MBUTTON_CODES = Object.values(MouseButtons).filter((item): item is number => typeof item === 'number');
 
@@ -47,12 +46,18 @@ export class KeybindMap {
     get modifiers() { return this._modifiers; }
 
     public update_active(keys: Record<string, boolean>, mouse_buttons: Record<number, boolean>, modifiers: Record<number, boolean>): boolean {
-        const keys_active = this._keys.length > 0 ? this._keys.every(k => !!keys[k]) : true;
-        const mb_active = this._mouse_buttons.length > 0 ? this._mouse_buttons.every(m => !!mouse_buttons[m]) : true;
-        const mod_active = this._modifiers.length > 0 ? this._modifiers.every(mod => !!modifiers[mod]) : true;
+        let is_now_active = true;
+        if (this._keys.length > 0 && this._keys.some(key => !(keys[key]))) {
+            is_now_active = false;
+        }
 
-        const has_any_bind = this._keys.length > 0 || this._mouse_buttons.length > 0 || this._modifiers.length > 0;
-        const is_now_active = has_any_bind && keys_active && mb_active && mod_active;
+        if (is_now_active && this._mouse_buttons.length > 0 && this._mouse_buttons.some(button => !(mouse_buttons[button]))) {
+            is_now_active = false;
+        }
+
+        if (is_now_active && this._modifiers.length > 0 && this._modifiers.some(mod => !(modifiers[mod]))) {
+            is_now_active = false;
+        }
 
         if (this.active !== is_now_active) {
             this.active = is_now_active;

@@ -1,6 +1,4 @@
-import { BaseNode } from "~/components/nodes/base-node";
-import { NodeSlot } from "~/components/nodes/slot/node-slot";
-import { BaseEventHandler, ComponentEventHandler } from "../tools/base-tool";
+import { BaseEventHandler } from "../tools/base-tool";
 import { createStore, SetStoreFunction } from "solid-js/store";
 import { Keybind, KeyEventData, KeyModifiers, MBUTTON_CODES, MouseButtons } from "./keybind-events";
 import { EventData, EventHandler, InputEvents } from "./event-handling";
@@ -143,19 +141,13 @@ export class KeyEventManager extends BaseEventHandler {
         this.handle_keybinds({event: e})
     }
     
-    onWheel(e: WheelEvent): void {
-        this.update_modifier_states(e);
-        this._set_mouse_button(MouseButtons.SCROLL, true);
-    
-        this.handle_keybinds({event: e})
-    }
-    
     onPointerDown(e: PointerEvent): void {
         this.update_modifier_states(e);
         MBUTTON_CODES.forEach(button_code => {
             this._set_mouse_button(button_code, (e.buttons & button_code) !== 0);
         })
-        
+        // this._set_mouse_button(e.button, true);
+
         this.handle_keybinds({event: e})
     }
 
@@ -164,6 +156,7 @@ export class KeyEventManager extends BaseEventHandler {
         MBUTTON_CODES.forEach(button_code => {
             this._set_mouse_button(button_code, (e.buttons & button_code) !== 0);
         })
+        // this._set_mouse_button(e.button, false);
 
         this.handle_keybinds({event: e})
     }

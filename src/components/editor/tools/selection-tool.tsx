@@ -5,16 +5,23 @@ import { Vector2 } from "~/data_types/geometry";
 import { NodeEditor } from "../node-editor";
 import { NodeSlot } from "~/components/nodes/slot/node-slot";
 import { ConnectionController } from "../controllers/connection-controller";
+import { NodeController } from "~/components/nodes/node-controller";
+import { NodePreview } from "~/components/misc/node-preview";
 
 export class SelectionTool extends BaseEditorTool {
     selection_controller: SelectionController
     connection_controller: ConnectionController;
+    node_controller: NodeController;
     node_editor: NodeEditor
+
+    _selected_preview: NodePreview | null = null;
 
     constructor(node_editor: NodeEditor) {
         super(node_editor);
         this.selection_controller = node_editor.selection_controller;
         this.connection_controller = node_editor.scene_controller.connection_controller;
+        this.node_controller = node_editor.scene_controller.node_controller;
+        
         this.node_editor = node_editor;
     }
 
@@ -62,6 +69,16 @@ export class SelectionTool extends BaseEditorTool {
                 });
             });
         }
+    }
+
+    onClickOnNodePreview(node_preview: NodePreview): void {
+        this.node_controller.selected_constructor = node_preview.node_constructor.type_name;
+        
+        if (this._selected_preview != null) {
+            this._selected_preview.selected = false
+        }
+        node_preview.selected = true;
+        this._selected_preview = node_preview
     }
 
     onHoverSlot(slot: NodeSlot): void {
