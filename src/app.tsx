@@ -4,7 +4,7 @@ import { NodeTypeFile } from "./helpers/node-type-file";
 
 export default function App() {
   const node_editor = new NodeEditor();
-  node_editor.scene_controller.node_controller.add_node("Teste", {x: 200, y: 200})
+  node_editor.scene_controller.node_controller.add_new_node("Teste", {x: 200, y: 200})
   
   node_editor.scene_controller.load_scene("/data/node_scene.json", "/data/node_types.json");
   // Testar se os nodes são renderizados mesmo depois do editor ser criado

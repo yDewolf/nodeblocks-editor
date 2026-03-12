@@ -11,9 +11,9 @@ import { KeyEventManager as GeneralEventManager } from "./input_manager/input-ma
 import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./input_manager/keybind-events";
 import { EventHandler, InputEvents } from "./input_manager/event-handling";
 import { SceneController } from "./controllers/scene-controller";
-import { scene_data_to_json } from "~/helpers/node-scene-file";
 import { NodeTypeSelector } from "../misc/node-type-selector";
 import { NodePreview } from "../misc/node-preview";
+import { NodeSceneFile } from "~/helpers/node-scene-file";
 
 export class NodeEditor {
     scene_controller: SceneController;
@@ -103,7 +103,7 @@ export class NodeEditor {
                     const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
 
-                    this.scene_controller.node_controller.add_node("Teste", {x: world_pos.x, y: world_pos.y})
+                    this.scene_controller.node_controller.add_new_node("Teste", {x: world_pos.x, y: world_pos.y})
                 }
             }}
         );
@@ -113,7 +113,7 @@ export class NodeEditor {
             {just_activated: (data) => {
                 const scene_data = this.scene_controller.save_scene();
                 // console.log(JSON.stringify(scene_data));
-                console.log("data to json", scene_data_to_json(scene_data));
+                console.log("data to json", NodeSceneFile.scene_data_to_json(scene_data));
             }}
         );
     }

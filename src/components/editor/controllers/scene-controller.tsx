@@ -1,16 +1,19 @@
 import { NodeController } from "~/components/nodes/node-controller";
 import { ConnectionController } from "./connection-controller";
 import { NodeTypeFile } from "~/helpers/node-type-file";
-import { ConnectionSceneData, NodeSceneData, SceneData } from "~/helpers/node-scene-file";
+import { ConnectionSceneData, NodeSceneData, NodeSceneFile, SceneData } from "~/helpers/node-scene-file";
 
 export class SceneController {
     node_type_reader: NodeTypeFile;
+    node_scene_reader: NodeSceneFile;
 
     node_controller: NodeController;
     connection_controller: ConnectionController;
     
     constructor() {
         this.node_type_reader = new NodeTypeFile();
+        this.node_scene_reader = new NodeSceneFile();
+        
         this.node_controller = new NodeController()
         this.connection_controller = new ConnectionController();
     }
@@ -59,6 +62,58 @@ export class SceneController {
 
     // TODO:
     protected _load_node_scene(file_path: string) {
+        this.node_scene_reader._load_file_async(file_path).then(
+            () => {
+                if (this.node_scene_reader.scene_data == null) {
+                    return;
+                }
+
+                this.node_scene_reader.scene_data.nodes.forEach((node_data: NodeSceneData, node_key: string) => {
+                    const constructor = this.node_type_reader.get_constructor(node_data.type);
+                    const splitted_name = node_key.split("_");
+                    if (splitted_name.length < 2) {
+                        return;
+                    }
+
+                    const node_id = Number.parseInt(splitted_name[1]);
+                    if (constructor) {
+                        const node = constructor.make_node(
+                            "TODO",
+                            node_data.position,
+                            node_id
+                        )
+                        this.node_controller.add_node(node);
+                    }
+                });
+
+                this.node_scene_reader.scene_data.connections.forEach((conn_data: ConnectionSceneData) => {
+                    const node_a_path = NodeSceneFile.parse_node_path(conn_data.from);
+                    const node_b_path = NodeSceneFile.parse_node_path(conn_data.to);
+                    if (node_a_path.slot_name == undefined || node_b_path.slot_name == undefined) {
+                        console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
+                        return;
+                    }
+
+                    const node_a = this.node_controller.get_node(node_a_path.node_id);
+                    const node_b = this.node_controller.get_node(node_b_path.node_id);
+                    if (!node_a || !node_b) {
+                        console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
+                        return;
+                    }
+
+                    const slot_a = node_a.get_slot(node_a_path.slot_name);
+                    const slot_b = node_b.get_slot(node_b_path.slot_name);
+                    if (slot_a == undefined || slot_b == undefined) {
+                        console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
+                        return;
+                    }
+                    console.log("connected slots");
+                    this.connection_controller.connect_node_to(
+                        slot_a, slot_b
+                    );
+                });
+            }
+        );
 
     }
 

@@ -6,7 +6,7 @@ import { NodeTypeFile } from "~/helpers/node-type-file";
 
 export class NodeController {
     current_id: Accessor<number>;
-    _set_last_id: (v: number) => void;
+    _set_current_id: (v: number) => void;
 
     private _nodes: () => BaseNode[];
     private _setNodes: (val: BaseNode[]) => void;
@@ -21,9 +21,9 @@ export class NodeController {
         this.node_constructors = new Map();
         this.node_constructors.set("default", new BaseNodeConstructor("default"))
 
-        const [last_id, setLastId] = createSignal(0)
-        this._set_last_id = setLastId;
-        this.current_id = last_id
+        const [current_id, setCurrentId] = createSignal(0)
+        this._set_current_id = setCurrentId;
+        this.current_id = current_id
         
         const [nodes, setNodes] = createSignal<BaseNode[]>([])
         this._nodes = nodes;
@@ -31,15 +31,21 @@ export class NodeController {
     }
         
     protected _increment_last_id(): number {
-        this._set_last_id(this.current_id() + 1);
+        this._set_current_id(this.current_id() + 1);
         return this.current_id();
     }
 
     public reset_id_count() {
-        this._set_last_id(0);
+        this._set_current_id(0);
     }
 
-    public add_node(name: string, pos: Vector2) {
+    public get_node(id: number): BaseNode {
+        const filtered = this.nodes.filter((node) => node.id == id);
+        console.log(filtered);
+        return filtered[0];
+    }
+
+    public add_new_node(name: string, pos: Vector2) {
         // const new_node = new BaseNode(name, pos, this._increment_last_id())
         // this._setNodes([...this._nodes(), new_node]);
         const construct = this.node_constructors.get(this.selected_constructor);
@@ -50,6 +56,12 @@ export class NodeController {
         const new_id = this._increment_last_id();
         const new_node = construct.make_node(name, pos, new_id);
         this.nodes = [...this.nodes, new_node];
+    }
+
+    public add_node(node: BaseNode) {
+        // FIXME: Nem sempre o id dos nodes vai ficar certo se você for "importar uma cena"
+        this._set_current_id(Math.max(node.id, this.current_id()))        
+        this.nodes = [...this.nodes, node];
     }
 
     public load_node_types(node_file: NodeTypeFile) {

@@ -55,6 +55,7 @@ export const ConnectionLines = (props: { connection: NodeConnection, onDisconnec
         return make_simple_curved_path(start, end, anchor_a, anchor_b);
     });
 
+    // TODO: Maybe change this to be a keybind idk or a tool function
     const handleContextMenu = (e: MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();

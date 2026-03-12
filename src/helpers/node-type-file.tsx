@@ -84,9 +84,18 @@ export class NodeTypeFile {
     }
 
 
+    public get_constructor(type_name: string) {
+        const constructor = this.node_constructors.get(type_name);
+        if (constructor == undefined) {
+            return null;
+        }
+        
+        return constructor;
+    }
+
     public load_file(file_path: string) {
         this._load_file_async(file_path).then(() => {
-            this._version();
+            this.notify();
             console.log("loaded file", this.node_constructors)
         });
     }

@@ -4,19 +4,19 @@
     "nodes": {
         "node_0": {
             "type": "NodeType",
-            "position": [0, 0],
+            "position": [500, 0],
             "size": [100, 50],
             "data": {}
         },
         "node_1": {
             "type": "NodeType",
-            "position": [200, 0],
+            "position": [700, 300],
             "size": [100, 50],
             "data": {}
         },
         "node_2": {
             "type": "NodeType",
-            "position": [350, 0],
+            "position": [900, 100],
             "size": [100, 50],
             "data": {}
         }

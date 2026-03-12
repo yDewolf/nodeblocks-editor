@@ -81,6 +81,21 @@ export class BaseNode {
     get selected() { return this._selected() }
     set selected(value: boolean) { this._setSelected(value) }
 
+    public get_slot(slot_name: string): NodeSlot | undefined {
+        let target_slot: NodeSlot | undefined = undefined;
+        this._slots.forEach((slots, slot_type) => {
+            if (target_slot != undefined) {
+                return;
+            }
+            const slot_found = slots.filter((slot) => slot.slot_name == slot_name);
+            if (slot_found.length > 0) {
+                target_slot = slot_found[0];
+            }
+        });
+
+        return target_slot
+    }
+
     public updateSize(width: number, height: number) {
         if (width == 0 && height == 0) {
             return;
