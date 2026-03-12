@@ -1,11 +1,13 @@
 import { createSignal } from "solid-js";
 
 export enum MouseButtons {
-    NONE = -1,
+    NONE,
     LEFT = 1,
     RIGHT = 2,
     MIDDLE = 4,
+    SCROLL
 }
+
 export const MBUTTON_CODES = Object.values(MouseButtons).filter((item): item is number => typeof item === 'number');
 
 export enum KeyModifiers {

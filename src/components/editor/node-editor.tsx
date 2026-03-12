@@ -57,6 +57,25 @@ export class NodeEditor {
         );
 
         this.input_manager.set_keybind_handler(
+            new Keybind("Zoom", [new KeybindMap({mouse_buttons: [MouseButtons.SCROLL]})]),
+            {while_active:
+                (data) => {
+                    const e = data.event;
+                    if (e instanceof WheelEvent) {
+                        const delta = -e.deltaY * 0.001;
+                        const new_zoom = Math.max(0.1, Math.min(5.0, this.editor_space.camera.zoom + delta));
+                        const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                        
+                        this.editor_space.camera.zoom = new_zoom;
+                        this.editor_space.camera.updateOffset({
+                            x: world_pos.x - (screen_pos.x / new_zoom),
+                            y: world_pos.y - (screen_pos.y / new_zoom)
+                        });
+                    }
+            }}
+        )
+
+        this.input_manager.set_keybind_handler(
             new Keybind("MainToolAction", [new KeybindMap({mouse_buttons: [MouseButtons.LEFT]})]),
             {just_activated: (data) => {
                 const e = data.event;
@@ -100,26 +119,6 @@ export class NodeEditor {
     }
 
     private setup_event_handlers() {
-        this.input_manager.set_event_handler(
-            InputEvents.SCROLLING,
-            new EventHandler("Zoom",
-                (data) => {
-                    const e = data.event;
-                    if (e instanceof WheelEvent) {
-                        const delta = -e.deltaY * 0.001;
-                        const new_zoom = Math.max(0.1, Math.min(5.0, this.editor_space.camera.zoom + delta));
-                        const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
-                        
-                        this.editor_space.camera.zoom = new_zoom;
-                        this.editor_space.camera.updateOffset({
-                            x: world_pos.x - (screen_pos.x / new_zoom),
-                            y: world_pos.y - (screen_pos.y / new_zoom)
-                        });
-                    }
-                }   
-            )
-        );
-
         this.input_manager.set_event_handler(
             InputEvents.POINTER_MOVING,
             new EventHandler("onPointerMove", 
@@ -208,7 +207,7 @@ export class NodeEditor {
                     tabindex="0"
                     onKeyDown={(e) => this.input_manager.onKeyDown(e)}
                     onKeyUp={(e) => this.input_manager.onKeyUp(e)}
-                    onWheel={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.SCROLLING)}
+                    onWheel={(e) => this.input_manager.onWheel(e)}
 
                     onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
                     onPointerDown={(e) => this.input_manager.onPointerDown(e)} 

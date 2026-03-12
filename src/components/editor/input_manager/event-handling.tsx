@@ -2,7 +2,6 @@ import { BaseNode } from "~/components/nodes/base-node";
 import { NodeSlot } from "~/components/nodes/slot/node-slot";
 
 export enum InputEvents {
-    SCROLLING,
     POINTER_MOVING,
     CLICK_ON_NODE,
     CLICK_ON_NODE_SLOT,

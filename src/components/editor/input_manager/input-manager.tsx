@@ -161,6 +161,13 @@ export class KeyEventManager extends BaseEventHandler {
         this.handle_keybinds({event: e})
     }
 
+    onWheel(e: WheelEvent): void {
+        this.update_modifier_states(e);
+        this._set_mouse_button(MouseButtons.SCROLL, true);
+
+        this.handle_keybinds({event: e});
+    }
+
     generalizedEventHandler(data: EventData, event_type: InputEvents) {
         const handlers = this.event_handlers.get(event_type)
         handlers?.forEach(handler => {
