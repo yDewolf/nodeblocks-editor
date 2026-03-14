@@ -280,11 +280,20 @@ export class NodeEditor {
                 </div>
                 
                 <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
-                    <input class="visually-hidden" type="file" id="scene-input"/>
                     <div class="left-tab">
                         <div class="button-tab column-row">
                             <ul class="tabs">
                                 <li class="tab-item">
+                                    <input class="visually-hidden" type="file" accept=".json" id="scene-input" onChange={
+                                        (e) => {
+                                            if (!e.target.files) {
+                                                return;
+                                            }
+
+                                            let selected_file: File = e.target.files[0];
+                                            this.scene_controller.change_scene_file(selected_file);
+                                        }
+                                    }/>
                                     <label for="scene-input">File</label>
                                 </li>
                             </ul>

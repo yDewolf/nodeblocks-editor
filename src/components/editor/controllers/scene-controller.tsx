@@ -17,6 +17,14 @@ export class SceneController {
         this.node_controller = new NodeController()
         this.connection_controller = new ConnectionController();
     }
+
+    public change_scene_file(new_file: File) {
+        // TODO: Load file data virtually then if it is compatible with loaded types, we actually use it
+        this.node_scene_reader._load_file_data(new_file).then(() => {
+            this._clear_scene();
+            this._parse_loaded_node_scene();
+        })
+    }
     
     public load_scene(scene_path: string, node_types_path: string) {
         this._load_node_types(node_types_path);
@@ -64,57 +72,67 @@ export class SceneController {
     protected _load_node_scene(file_path: string) {
         this.node_scene_reader._load_file_async(file_path).then(
             () => {
-                if (this.node_scene_reader.scene_data == null) {
-                    return;
-                }
-
-                this.node_scene_reader.scene_data.nodes.forEach((node_data: NodeSceneData, node_key: string) => {
-                    const constructor = this.node_type_reader.get_constructor(node_data.type);
-                    const splitted_name = node_key.split("_");
-                    if (splitted_name.length < 2) {
-                        return;
-                    }
-
-                    const node_id = Number.parseInt(splitted_name[1]);
-                    if (constructor) {
-                        const node = constructor.make_node(
-                            "TODO",
-                            node_data.position,
-                            node_id
-                        )
-                        this.node_controller.add_node(node);
-                    }
-                });
-
-                this.node_scene_reader.scene_data.connections.forEach((conn_data: ConnectionSceneData) => {
-                    const node_a_path = NodeSceneFile.parse_node_path(conn_data.from);
-                    const node_b_path = NodeSceneFile.parse_node_path(conn_data.to);
-                    if (node_a_path.slot_name == undefined || node_b_path.slot_name == undefined) {
-                        console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
-                        return;
-                    }
-
-                    const node_a = this.node_controller.get_node(node_a_path.node_id);
-                    const node_b = this.node_controller.get_node(node_b_path.node_id);
-                    if (!node_a || !node_b) {
-                        console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
-                        return;
-                    }
-
-                    const slot_a = node_a.get_slot(node_a_path.slot_name);
-                    const slot_b = node_b.get_slot(node_b_path.slot_name);
-                    if (slot_a == undefined || slot_b == undefined) {
-                        console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
-                        return;
-                    }
-                    console.log("connected slots");
-                    this.connection_controller.connect_node_to(
-                        slot_a, slot_b
-                    );
-                });
+                this._clear_scene();
+                this._parse_loaded_node_scene();
             }
         );
 
+    }
+
+    protected _clear_scene() {
+        this.node_controller.clear();
+        this.connection_controller.clear();
+    }
+
+    protected _parse_loaded_node_scene() {
+        if (this.node_scene_reader.scene_data == null) {
+            return;
+        }
+
+        this.node_scene_reader.scene_data.nodes.forEach((node_data: NodeSceneData, node_key: string) => {
+            const constructor = this.node_type_reader.get_constructor(node_data.type);
+            const splitted_name = node_key.split("_");
+            if (splitted_name.length < 2) {
+                return;
+            }
+
+            const node_id = Number.parseInt(splitted_name[1]);
+            if (constructor) {
+                const node = constructor.make_node(
+                    "TODO",
+                    node_data.position,
+                    node_id
+                )
+                this.node_controller.add_node(node);
+            }
+        });
+
+        this.node_scene_reader.scene_data.connections.forEach((conn_data: ConnectionSceneData) => {
+            const node_a_path = NodeSceneFile.parse_node_path(conn_data.from);
+            const node_b_path = NodeSceneFile.parse_node_path(conn_data.to);
+            if (node_a_path.slot_name == undefined || node_b_path.slot_name == undefined) {
+                console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
+                return;
+            }
+
+            const node_a = this.node_controller.get_node(node_a_path.node_id);
+            const node_b = this.node_controller.get_node(node_b_path.node_id);
+            if (!node_a || !node_b) {
+                console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
+                return;
+            }
+
+            const slot_a = node_a.get_slot(node_a_path.slot_name);
+            const slot_b = node_b.get_slot(node_b_path.slot_name);
+            if (slot_a == undefined || slot_b == undefined) {
+                console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
+                return;
+            }
+            console.log("connected slots");
+            this.connection_controller.connect_node_to(
+                slot_a, slot_b
+            );
+        });
     }
 
     protected _load_node_types(file_path: string) {

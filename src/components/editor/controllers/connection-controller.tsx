@@ -35,6 +35,12 @@ export class ConnectionController {
     get hovered_slot() { return this._hovered_slot() }
     set hovered_slot(slot: NodeSlot | null) { this._set_hovered_slot(slot) }
 
+    public clear() {
+        this._set_connections([]);
+        this._set_hovered_slot(null);
+        this._set_selected_slot(null);
+    }
+
     public select_slot(slot: NodeSlot) {
         if (this.selected_slot != null) {
             const conn = this.are_connected(this.selected_slot, slot)

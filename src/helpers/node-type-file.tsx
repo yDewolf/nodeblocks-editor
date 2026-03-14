@@ -6,13 +6,7 @@ import { batch, createSignal } from "solid-js";
 async function load_json_file(path: string) {
     try {
         const response = await fetch(path);
-        const data: TypeFile = await response.json();
-        data.slot_types = new Map<string, SlotTypeData>(Object.entries(data.slot_types));
-        data.node_types = new Map<string, NodeTypesData>(Object.entries(data.node_types));
-        data.node_types.forEach(type_data => {
-            type_data.slots = new Map<string, SlotData>(Object.entries(type_data.slots))
-            type_data.parameters = new Map<string, NodeParameterData>(Object.entries(type_data.parameters))
-        });
+        const data = parse_json_as_type_file(await response.json());
 
         return data;
 
@@ -21,6 +15,17 @@ async function load_json_file(path: string) {
     }
 
     return null;
+}
+
+function parse_json_as_type_file(data: TypeFile) {
+    data.slot_types = new Map<string, SlotTypeData>(Object.entries(data.slot_types));
+    data.node_types = new Map<string, NodeTypesData>(Object.entries(data.node_types));
+    data.node_types.forEach(type_data => {
+        type_data.slots = new Map<string, SlotData>(Object.entries(type_data.slots))
+        type_data.parameters = new Map<string, NodeParameterData>(Object.entries(type_data.parameters))
+    });
+
+    return data;
 }
 
 interface TypeFile {
@@ -100,6 +105,18 @@ export class NodeTypeFile {
         });
     }
 
+    public load_file_data(file: File) {
+        this._load_file_data_async(file).then(() => {
+            this.notify();
+            console.log("loaded file", this.node_constructors)
+        })
+    }
+
+    public async _load_file_data_async(file: File) {
+        const json_data = JSON.parse(await file.text());
+        this._parse_file_data(json_data);
+    }
+
     public async _load_file_async(file_path: string) {
         this.file_path = file_path;
         const json_data = await load_json_file(this.file_path);
@@ -107,6 +124,10 @@ export class NodeTypeFile {
             return;
         }
         
+        this._parse_file_data(json_data);
+    }
+
+    public async _parse_file_data(json_data: TypeFile) {
         this.raw_data = json_data;
         this.node_types_version = json_data.version;
         this.node_types_id = json_data.id;

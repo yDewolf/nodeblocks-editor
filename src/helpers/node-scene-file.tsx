@@ -58,8 +58,20 @@ export class NodeSceneFile {
         try {
             const response = await fetch(file_path);
             const json_data = await response.json();
+
             this.raw_data = json_data;
-            
+            const data = NodeSceneFile.json_to_scene_data(json_data)
+            this.scene_data = data;
+        } catch {
+
+        }
+    }
+
+    public async _load_file_data(file: File) {
+        try {
+            const json_data = JSON.parse(await file.text());
+
+            this.raw_data = json_data;
             const data = NodeSceneFile.json_to_scene_data(json_data)
             this.scene_data = data;
         } catch {

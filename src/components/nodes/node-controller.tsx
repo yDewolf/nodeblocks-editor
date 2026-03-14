@@ -35,6 +35,11 @@ export class NodeController {
         return this.current_id();
     }
 
+    public clear() {
+        this.reset_id_count();
+        this._setNodes([]);
+    }
+
     public reset_id_count() {
         this._set_current_id(0);
     }
