@@ -280,7 +280,16 @@ export class NodeEditor {
                 </div>
                 
                 <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
+                    <input class="visually-hidden" type="file" id="scene-input"/>
                     <div class="left-tab">
+                        <div class="button-tab column-row">
+                            <ul class="tabs">
+                                <li class="tab-item">
+                                    <label for="scene-input">File</label>
+                                </li>
+                            </ul>
+                        </div>
+                        
                         {selector.View(this.scene_controller, (node_preview: NodePreview) => this.tool_controller.current_tool?.onClickOnNodePreview(node_preview))}
                     </div>
                     <div class="middle-tab">

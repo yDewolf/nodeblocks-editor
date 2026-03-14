@@ -1,0 +1,26 @@
+
+.node-type-selector {
+  display: flex;
+  flex-direction: column;
+}
+
+.node-type-preview {
+  border-radius: 8px;
+  padding: 2px;
+
+  pointer-events: none;
+  transform: scale(0.75);
+  width: fit-content;
+}
+
+.node-type-preview:hover {
+  transform: scale(0.8);
+}
+
+.selected-node-type {
+  transform: scale(0.9);
+}
+
+.selected-node-type:hover {
+  transform: scale(1.0);
+}

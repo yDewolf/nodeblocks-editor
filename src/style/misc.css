@@ -1,0 +1,33 @@
+
+.selection-rect {
+  position: absolute;
+  background-color: var(--selection-color-alpha);
+  border: rgba(0, 0, 200, 0.4) solid 1px;
+  user-select: none;
+  touch-action: none;
+}
+
+
+.connection-path, .connection-path-preview {
+  pointer-events: none;
+  stroke-width: 2;
+  fill: none;
+  stroke: black;
+}
+
+.clickable-path {
+  pointer-events: stroke;
+  cursor: pointer;
+  stroke: transparent;
+  stroke-width: 15;
+  fill: none;
+}
+
+.connection-group:hover path:last-child {
+  stroke: var(--selection-color);
+  stroke-width: 3;
+}
+
+.connection-path-preview {
+  stroke: rgba(0, 0, 0, 0.5);
+}
