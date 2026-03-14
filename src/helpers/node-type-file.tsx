@@ -2,6 +2,9 @@ import { CustomSlotType } from "~/components/nodes/slot/slot-type";
 import { BaseNodeConstructor, CustomNodeConstructor } from "./node-constructor";
 import { NodeData } from "~/components/nodes/data/node-data";
 import { batch, createSignal } from "solid-js";
+import { NodeSceneData, SceneData } from "./node-scene-file";
+
+// TODO: Refactor all of this code to match with NodeSceneFile Standards
 
 async function load_json_file(path: string) {
     try {
@@ -78,6 +81,30 @@ export class NodeTypeFile {
         this.slot_types = new Map();
         this.node_constructors = new Map();
     }
+
+    public is_scene_compatible(scene_data: SceneData): boolean {
+        if (scene_data.node_types_id != this.node_types_id) {
+            return false;
+        }
+
+        // TODO: Add better version compatibility (> x.x.x or (x.x.x[, etc)
+        if (scene_data.node_types_version != this.node_types_version) {
+            return false;
+        }
+
+        const has_missing_constructor = scene_data.nodes.values().some((node_data) => {
+            if (!this.node_constructors.has(node_data.type)) {
+                return true;
+            }
+        })
+
+        if (has_missing_constructor) {
+            return false;
+        }
+        
+        return true;
+    }
+
 
     protected set_constructor(type_name: string, constructor: BaseNodeConstructor) {
         this.node_constructors.set(type_name, constructor);

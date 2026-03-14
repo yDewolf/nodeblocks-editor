@@ -18,12 +18,10 @@ export class SceneController {
         this.connection_controller = new ConnectionController();
     }
 
-    public change_scene_file(new_file: File) {
-        // TODO: Load file data virtually then if it is compatible with loaded types, we actually use it
-        this.node_scene_reader._load_file_data(new_file).then(() => {
-            this._clear_scene();
-            this._parse_loaded_node_scene();
-        })
+    public safe_change_scene_file(new_file: File) {
+        this.node_scene_reader._load_file_async(new_file).then(
+            () => this.safe_load_scene_contents() 
+        )
     }
     
     public load_scene(scene_path: string, node_types_path: string) {
@@ -68,15 +66,37 @@ export class SceneController {
         return scene_data;
     }
 
-    // TODO:
     protected _load_node_scene(file_path: string) {
-        this.node_scene_reader._load_file_async(file_path).then(
-            () => {
-                this._clear_scene();
-                this._parse_loaded_node_scene();
-            }
+        this.node_scene_reader._load_file_path_async(file_path).then(
+            () => this.safe_load_scene_contents()
         );
 
+    }
+
+    protected safe_load_scene_contents() {
+        if (!this.check_loading_scene()) {
+            return;
+        }
+
+        this.node_scene_reader.swap_virtual_data();
+        this._clear_scene();
+        this._parse_loaded_node_scene();
+    }
+
+    protected check_loading_scene(): boolean {
+        if (!this.node_scene_reader.is_virtual_data_compatible()) {
+            console.error("Loaded scene is not compatbile with currently loaded scene");
+            return false;
+        }
+
+        if (this.node_scene_reader._virtual_file?.scene_data) {
+            if (!this.node_type_reader.is_scene_compatible(this.node_scene_reader._virtual_file.scene_data)) {
+                console.error("Loaded scene is not compatbile with currently loaded types");
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected _clear_scene() {

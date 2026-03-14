@@ -291,7 +291,7 @@ export class NodeEditor {
                                             }
 
                                             let selected_file: File = e.target.files[0];
-                                            this.scene_controller.change_scene_file(selected_file);
+                                            this.scene_controller.safe_change_scene_file(selected_file);
                                         }
                                     }/>
                                     <label for="scene-input">File</label>

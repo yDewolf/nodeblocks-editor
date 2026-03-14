@@ -26,6 +26,8 @@ export interface NodePathData {
 }
 
 export class NodeSceneFile {
+    _virtual_file: NodeSceneFile | undefined = undefined;
+
     file_path: string | null = null;
     raw_data: Object | null = null;
 
@@ -34,7 +36,11 @@ export class NodeSceneFile {
     private _version: () => number;
     private _set_version: (value: number) => undefined
 
-    constructor() {
+    constructor(is_virtual: boolean = false) {
+        if (!is_virtual) {
+            this._virtual_file = new NodeSceneFile(true);
+        }
+
         const [changedState, setChangedState] = createSignal(0);
         this._version = changedState;
         this._set_version = setChangedState;
@@ -45,14 +51,50 @@ export class NodeSceneFile {
         this._set_version(this._version() + 1)
     }
 
+    public is_virtual_data_compatible(): boolean {
+        if (this.scene_data == null) {
+            return true;
+        }
 
-    public load_file(file_path: string) {
-        this._load_file_async(file_path).then(() => {
-            this.notify();
-        });
+        if (this._virtual_file == undefined) {
+            return false;
+        }
+
+        if (this._virtual_file.scene_data == null) {
+            return false;
+        }
+
+        const virtual_data = this._virtual_file.scene_data;
+        if (virtual_data.node_types_id != this.scene_data?.node_types_id) {
+            return false;
+        }
+
+        if (virtual_data.node_types_version != this.scene_data.node_types_version) {
+            return false;
+        }
+
+        return true;
     }
 
-    public async _load_file_async(file_path: string) {
+    public swap_virtual_data() {
+        if (this._virtual_file == undefined) {
+            return;
+        }
+        if (this._virtual_file.scene_data == null) {
+            return;
+        }
+
+        this.scene_data = this._virtual_file.scene_data;
+        this.raw_data = this._virtual_file.raw_data;
+        this.file_path = this._virtual_file.file_path;
+
+        this._virtual_file.file_path = null;
+        this._virtual_file.raw_data = null;
+        this._virtual_file.scene_data = null;
+        this.notify();
+    }
+
+    public async _load_file_path_async(file_path: string) {
         this.file_path = file_path;
 
         try {
@@ -61,18 +103,26 @@ export class NodeSceneFile {
 
             this.raw_data = json_data;
             const data = NodeSceneFile.json_to_scene_data(json_data)
+            if (this._virtual_file) {
+                this._virtual_file.scene_data = data;
+                return;
+            }
             this.scene_data = data;
         } catch {
 
         }
     }
 
-    public async _load_file_data(file: File) {
+    public async _load_file_async(file: File) {
         try {
             const json_data = JSON.parse(await file.text());
 
             this.raw_data = json_data;
             const data = NodeSceneFile.json_to_scene_data(json_data)
+            if (this._virtual_file) {
+                this._virtual_file.scene_data = data;
+                return;
+            }
             this.scene_data = data;
         } catch {
 
