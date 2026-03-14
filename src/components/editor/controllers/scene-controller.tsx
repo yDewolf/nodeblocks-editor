@@ -63,6 +63,7 @@ export class SceneController {
             connections: scene_connections
         }
 
+        this.node_scene_reader.save_data_to_file(scene_data);
         return scene_data;
     }
 

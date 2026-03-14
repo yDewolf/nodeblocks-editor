@@ -113,7 +113,7 @@ export class NodeEditor {
             {just_activated: (data) => {
                 const scene_data = this.scene_controller.save_scene();
                 // console.log(JSON.stringify(scene_data));
-                console.log("data to json", NodeSceneFile.scene_data_to_json(scene_data));
+                // console.log("data to json", NodeSceneFile.scene_data_to_json(scene_data));
             }}
         );
     }

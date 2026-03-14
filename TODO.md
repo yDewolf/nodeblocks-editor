@@ -1,8 +1,8 @@
 ## High Priority
-- [ ] Input Manager (doing)
-- [ ] Node Selector (UI for selecting node types)
-- [ ] Save Node Scene
-- [ ] Load Node Scene
+- [x] Input Manager (doing)
+- [x] Node Selector (UI for selecting node types)
+- [x] Save Node Scene
+- [x] Load Node Scene
 
 ## Medium Priority
 - [ ] Node Interpreter Server

@@ -1,5 +1,6 @@
 import { createSignal } from "solid-js";
 import { Vector2 } from "~/data_types/geometry";
+import { downloadToFile } from "./file-utils";
 
 export interface NodeSceneData {
     type: string,
@@ -28,6 +29,7 @@ export interface NodePathData {
 export class NodeSceneFile {
     _virtual_file: NodeSceneFile | undefined = undefined;
 
+    file: File | null = null;
     file_path: string | null = null;
     raw_data: Object | null = null;
 
@@ -50,6 +52,12 @@ export class NodeSceneFile {
     protected notify() {
         this._set_version(this._version() + 1)
     }
+
+    public save_data_to_file(data: SceneData) {
+        const json_string = NodeSceneFile.scene_data_to_json(data);
+        downloadToFile(json_string, "scene.json", "application/json");
+    }
+
 
     public is_virtual_data_compatible(): boolean {
         if (this.scene_data == null) {
@@ -87,7 +95,9 @@ export class NodeSceneFile {
         this.scene_data = this._virtual_file.scene_data;
         this.raw_data = this._virtual_file.raw_data;
         this.file_path = this._virtual_file.file_path;
+        this.file = this._virtual_file.file;
 
+        this._virtual_file.file = null;
         this._virtual_file.file_path = null;
         this._virtual_file.raw_data = null;
         this._virtual_file.scene_data = null;
@@ -116,10 +126,10 @@ export class NodeSceneFile {
     public async _load_file_async(file: File) {
         try {
             const json_data = JSON.parse(await file.text());
-
             this.raw_data = json_data;
             const data = NodeSceneFile.json_to_scene_data(json_data)
             if (this._virtual_file) {
+                this._virtual_file.file = file;
                 this._virtual_file.scene_data = data;
                 return;
             }
