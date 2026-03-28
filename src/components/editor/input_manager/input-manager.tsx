@@ -128,6 +128,7 @@ export class KeyEventManager extends BaseEventHandler {
     }
 
     onKeyDown(e: KeyboardEvent): void {
+        // console.log(e.code)
         this.update_modifier_states(e);
         this._set_keys(e.code, true);
 

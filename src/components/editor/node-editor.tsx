@@ -116,6 +116,20 @@ export class NodeEditor {
                 // console.log("data to json", NodeSceneFile.scene_data_to_json(scene_data));
             }}
         );
+
+        this.input_manager.set_keybind_handler(
+            new Keybind("DeleteNode", [new KeybindMap({keys: ["Delete"], modifiers: []})]),
+            {just_activated: (data) => {
+                this.tool_controller.selection_controller.selected_nodes.forEach((node) => {
+                    node.get_connections().forEach((conn) => {
+                        this.scene_controller.connection_controller.disconnect_nodes(conn);
+                    });
+                    this.scene_controller.node_controller.remove_node(node);
+                });
+                // console.log(JSON.stringify(scene_data));
+                // console.log("data to json", NodeSceneFile.scene_data_to_json(scene_data));
+            }}
+        );
     }
 
     private setup_event_handlers() {
@@ -260,7 +274,6 @@ export class NodeEditor {
                             {(node) => {
                                 return (node.View(
                                     this.editor_space.camera, 
-                                    // TODO: Implement these as EventHandlers on InputManager
                                     (node: BaseNode) => {
                                         this.input_manager.generalizedEventHandler({node: node}, InputEvents.CLICK_ON_NODE)
                                     },

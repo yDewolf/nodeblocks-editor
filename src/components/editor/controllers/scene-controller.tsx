@@ -105,6 +105,7 @@ export class SceneController {
         this.connection_controller.clear();
     }
 
+    // 
     protected _parse_loaded_node_scene() {
         if (this.node_scene_reader.scene_data == null) {
             return;

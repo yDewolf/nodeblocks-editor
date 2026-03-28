@@ -69,6 +69,11 @@ export class NodeController {
         this.nodes = [...this.nodes, node];
     }
 
+    public remove_node(node: BaseNode) {
+        // TODO: Make this signal based (node.free() emits a signal that removes the node everywhere)
+        this.nodes = this.nodes.filter((_node) => _node != node)
+    }
+
     public load_node_types(node_file: NodeTypeFile) {
         this.node_constructors = node_file.node_constructors;
         this.selected_constructor = node_file.node_constructors.keys().toArray()[0];
