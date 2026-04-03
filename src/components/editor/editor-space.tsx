@@ -47,6 +47,10 @@ export class EditorCamera {
     public updateOffset(new_offset: Vector2) {
         this.camera_rect.offset = new_offset;
     }
+
+    public addOffset(new_offset: Vector2) {
+        this.camera_rect.offset = {x: this.camera_rect.offset.x + new_offset.x, y: this.camera_rect.offset.y + new_offset.y}
+    }
 }
 
 

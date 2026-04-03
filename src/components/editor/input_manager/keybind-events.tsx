@@ -17,16 +17,16 @@ export enum KeyModifiers {
 }
 
 export interface KeybindMapBinds {
-    mouse_buttons?: MouseButtons[], 
-    keys?: string[], 
-    modifiers?: KeyModifiers[]
+    mouse_buttons?: Map<MouseButtons, boolean>;
+    keys?: Map<string, boolean>;
+    modifiers?: Map<KeyModifiers, boolean>;
 }
 
 
 export class KeybindMap {
-    private _mouse_buttons: MouseButtons[];
-    private _keys: string[];
-    private _modifiers: KeyModifiers[];
+    private _mouse_buttons: Map<MouseButtons, boolean>;
+    private _keys: Map<string, boolean>;
+    private _modifiers: Map<KeyModifiers, boolean>;
     private _active: () => boolean;
     private _set_active: (v: boolean) => void;
 
@@ -35,9 +35,9 @@ export class KeybindMap {
         this._active = active;
         this._set_active = setActive;
         
-        this._mouse_buttons = binds.mouse_buttons == null ? [] : binds.mouse_buttons;
-        this._keys = binds.keys == null ? [] : binds.keys;
-        this._modifiers = binds.modifiers == null ? [] : binds.modifiers;
+        this._mouse_buttons = binds.mouse_buttons == null ? new Map() : binds.mouse_buttons;
+        this._keys = binds.keys == null ? new Map() : binds.keys;
+        this._modifiers = binds.modifiers == null ? new Map() : binds.modifiers;
     }
 
     get active() { return this._active(); }
@@ -49,15 +49,15 @@ export class KeybindMap {
 
     public update_active(keys: Record<string, boolean>, mouse_buttons: Record<number, boolean>, modifiers: Record<number, boolean>): boolean {
         let is_now_active = true;
-        if (this._keys.length > 0 && this._keys.some(key => !(keys[key]))) {
+        if (this._keys.size > 0 && this._keys.entries().toArray().every(key => {if (!key[1]) {return keys[key[0]]} else {return !keys[key[0]]}})) {
             is_now_active = false;
         }
 
-        if (is_now_active && this._mouse_buttons.length > 0 && this._mouse_buttons.some(button => !(mouse_buttons[button]))) {
+        if (is_now_active && this._mouse_buttons.size > 0 && this._mouse_buttons.entries().toArray().every(key => {if (!key[1]) {return mouse_buttons[key[0]]} else {return !mouse_buttons[key[0]]}})) {
             is_now_active = false;
         }
 
-        if (is_now_active && this._modifiers.length > 0 && this._modifiers.some(mod => !(modifiers[mod]))) {
+        if (is_now_active && this.modifiers.size > 0 && this.modifiers.entries().toArray().every(key => {if (!key[1]) {return modifiers[key[0]]} else {return !modifiers[key[0]]}})) {
             is_now_active = false;
         }
 
@@ -67,15 +67,15 @@ export class KeybindMap {
         return is_now_active;
     }
 
-    public set_mouse_buttons(buttons: MouseButtons[]) {
+    public set_mouse_buttons(buttons: Map<MouseButtons, boolean>) {
         this._mouse_buttons = buttons;
     }
 
-    public set_keys(keys: string[]) {
+    public set_keys(keys: Map<string, boolean>) {
         this._keys = keys;
     }
 
-    public set_modifiers(modifiers: KeyModifiers[]) {
+    public set_modifiers(modifiers: Map<KeyModifiers, boolean>) {
         this._modifiers = modifiers;
     }
 }

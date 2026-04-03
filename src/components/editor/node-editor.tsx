@@ -13,7 +13,6 @@ import { EventHandler, InputEvents } from "./input_manager/event-handling";
 import { SceneController } from "./controllers/scene-controller";
 import { NodeTypeSelector } from "../misc/node-type-selector";
 import { NodePreview } from "../misc/node-preview";
-import { NodeSceneFile } from "~/helpers/node-scene-file";
 
 export class NodeEditor {
     scene_controller: SceneController;
@@ -52,12 +51,12 @@ export class NodeEditor {
 
     private setup_keybinds() {
         this.input_manager.set_keybind_handler(
-            new Keybind("PanCamera", [new KeybindMap({keys: ["Space"]}), new KeybindMap({mouse_buttons: [MouseButtons.MIDDLE]})]),
+            new Keybind("PanCamera", [new KeybindMap({keys: new Map([["Space", true]])}), new KeybindMap({mouse_buttons: new Map([[MouseButtons.MIDDLE, true]])})]),
             {}
         );
 
         this.input_manager.set_keybind_handler(
-            new Keybind("Zoom", [new KeybindMap({mouse_buttons: [MouseButtons.SCROLL]})]),
+            new Keybind("Zoom", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.SCROLL, true]]), modifiers: new Map([[KeyModifiers.SHIFT, false]])})]),
             {while_active:
                 (data) => {
                     const e = data.event;
@@ -76,7 +75,21 @@ export class NodeEditor {
         )
 
         this.input_manager.set_keybind_handler(
-            new Keybind("MainToolAction", [new KeybindMap({mouse_buttons: [MouseButtons.LEFT]})]),
+            new Keybind("SideScroll", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.SCROLL, true]]), modifiers: new Map([[KeyModifiers.SHIFT, true]])})]),
+            {while_active:
+                (data) => {
+                    const e = data.event;
+                    if (e instanceof WheelEvent) {
+                        this.editor_space.camera.addOffset({
+                            x: e.deltaY,
+                            y: 0
+                        });
+                    }
+            }}
+        )
+
+        this.input_manager.set_keybind_handler(
+            new Keybind("MainToolAction", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.LEFT, true]])})]),
             {just_activated: (data) => {
                 const e = data.event;
                 if (e instanceof PointerEvent) {
@@ -96,7 +109,7 @@ export class NodeEditor {
         );
 
         this.input_manager.set_keybind_handler(
-            new Keybind("SecondaryToolAction", [new KeybindMap({mouse_buttons: [MouseButtons.RIGHT]})]),
+            new Keybind("SecondaryToolAction", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.RIGHT, true]])})]),
             {just_activated: (data) => {
                 const e = data.event;
                 if (e instanceof PointerEvent) {
@@ -109,7 +122,7 @@ export class NodeEditor {
         );
         
         this.input_manager.set_keybind_handler(
-            new Keybind("SaveScene", [new KeybindMap({keys: ["KeyS"], modifiers: [KeyModifiers.ALT]})]),
+            new Keybind("SaveScene", [new KeybindMap({keys: new Map([["KeyS", true]]), modifiers: new Map([[KeyModifiers.ALT, true]])})]),
             {just_activated: (data) => {
                 const scene_data = this.scene_controller.save_scene();
                 // console.log(JSON.stringify(scene_data));
@@ -118,7 +131,7 @@ export class NodeEditor {
         );
 
         this.input_manager.set_keybind_handler(
-            new Keybind("DeleteNode", [new KeybindMap({keys: ["Delete"], modifiers: []})]),
+            new Keybind("DeleteNode", [new KeybindMap({keys: new Map([["Delete", true]]), modifiers: new Map()})]),
             {just_activated: (data) => {
                 this.tool_controller.selection_controller.selected_nodes.forEach((node) => {
                     node.get_connections().forEach((conn) => {
