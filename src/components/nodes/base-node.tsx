@@ -5,16 +5,20 @@ import { INPUT_SLOT, OUTPUT_SLOT, SuperSlotTypes } from './slot/slot-type';
 import { NodeAnchor } from '../misc/node-anchors';
 import { NodeConnection } from './node-connection';
 import { NodeSlot } from './slot/node-slot';
-import { NodeData } from './data/node-data';
+import { NodeData, NodeParameter } from './data/node-data';
+import { NodeField } from './data/node-field';
 
 export class BaseNode {
-    id: number;
+    id: string;
     node_name: string;
     type_name: string;
 
     // Used to set node parameters etc.
     private _node_data: () => NodeData;
     private _set_node_data:  (data: NodeData) => void;
+
+    private _last_output: () => Map<string, any>;
+    private _set_last_output: (out: Map<string, any>) => void;
 
     private raw_pos: Vector2;
     private _slots: Map<SuperSlotTypes, NodeSlot[]> = new Map<SuperSlotTypes, NodeSlot[]>;
@@ -28,7 +32,7 @@ export class BaseNode {
     private _size: () => Vector2;
     private _setSize: (v: Vector2) => void;
 
-    constructor(node_name: string, node_data: NodeData, position: Vector2, id: number = -1, type_name: string = "BaseNode") {
+    constructor(node_name: string, node_data: NodeData, position: Vector2, id: string = "", type_name: string = "BaseNode") {
         this.type_name = type_name;
         this.id = id;
         this.node_name = node_name;
@@ -37,6 +41,10 @@ export class BaseNode {
         const [nodeData, setNodeData] = createSignal(node_data);
         this._node_data = nodeData;
         this._set_node_data = setNodeData;
+
+        const [lastOutput, setLastOutput] = createSignal(new Map());
+        this._last_output = lastOutput;
+        this._set_last_output = setLastOutput;
 
         const [pos, setPos] = createSignal(position);
         this._pos = pos;
@@ -53,6 +61,9 @@ export class BaseNode {
         // this._add_slot(new NodeSlot(this, INPUT_SLOT));
         // this._add_slot(new NodeSlot(this, OUTPUT_SLOT));
     }
+
+    get last_output() { return this._last_output() }
+    set last_output(output: Map<string, any>) { this._set_last_output(output) }
 
     get node_data() { return this._node_data(); }
     set node_data(data: NodeData) { this._set_node_data(data); }
@@ -221,10 +232,13 @@ export class BaseNode {
                             <div class="node-header">{this.node_name}</div>
                             
                             <div class="node-content">
-                                <div style={{display: "flex"}}>
-                                    <label>test</label>
-                                    <input type="text" />
-                                </div>
+                                <For each={this._node_data().parameters.values().toArray()}>
+                                    {(parameter: NodeParameter) => <NodeField 
+                                            node={this}
+                                            parameter={parameter}
+                                        />
+                                    }
+                                </For>
                                 <div class="node-internal-data"> ... </div>
                             </div>
                         </div>

@@ -4,33 +4,6 @@ import { NodeData } from "~/components/nodes/data/node-data";
 import { batch, createSignal } from "solid-js";
 import { NodeSceneData, SceneData } from "./node-scene-file";
 
-// TODO: Refactor all of this code to match with NodeSceneFile Standards
-
-async function load_json_file(path: string) {
-    try {
-        const response = await fetch(path);
-        const data = parse_json_as_type_file(await response.json());
-
-        return data;
-
-    } catch (e) {
-        console.error("Erro ao ler o arquivo local:", e);
-    }
-
-    return null;
-}
-
-export function parse_json_as_type_file(data: TypeFile) {
-    data.slot_types = new Map<string, SlotTypeData>(Object.entries(data.slot_types));
-    data.node_types = new Map<string, NodeTypesData>(Object.entries(data.node_types));
-    data.node_types.forEach(type_data => {
-        type_data.slots = new Map<string, SlotData>(Object.entries(type_data.slots))
-        type_data.parameters = new Map<string, NodeParameterData>(Object.entries(type_data.parameters))
-    });
-
-    return data;
-}
-
 interface TypeFile {
     version: number,
     id: string,
@@ -140,7 +113,7 @@ export class NodeTypeFile {
     }
 
     public load_type_data(type_data: any) {
-        const parsed_data = parse_json_as_type_file(type_data)
+        const parsed_data = NodeTypeFile.json_to_type_file(type_data)
         this._parse_type_data(parsed_data);
     }
 
@@ -151,12 +124,17 @@ export class NodeTypeFile {
 
     public async _load_file_async(file_path: string) {
         this.file_path = file_path;
-        const json_data = await load_json_file(this.file_path);
-        if (!json_data) {
-            return;
+        try {
+            const response = await fetch(file_path);
+            const json_data = await response.json();
+            if (!json_data) {
+                return;
+            }
+            
+            this._parse_type_data(json_data);
+        } catch {
+
         }
-        
-        this._parse_type_data(json_data);
     }
 
     public async _parse_type_data(json_data: TypeFile) {
@@ -189,5 +167,39 @@ export class NodeTypeFile {
             });
             this.notify()
         })
+    }
+
+    static json_to_type_file(json_data: any): TypeFile {
+        return {
+            version: json_data.version ?? -1,
+            id: json_data.id ?? "unknown",
+            slot_types: new Map(Object.entries(json_data.slot_types || {}).map(([id, data]: [string, any]) => {
+                return [id, {
+                    extends: data.extends,
+                    conn_whitelist: data.conn_whitelist || [],
+                    default_data_type: data.default_data_type
+                }];
+            })),
+
+            node_types: new Map(Object.entries(json_data.node_types || {}).map(([id, data]: [string, any]) => {
+                return [id, {
+                    description: data.description || "",
+                    parameters: new Map(Object.entries(data.parameters || {}).map(([param_id, param_data]: [string, any]) => {
+                        return [param_id, {
+                            type: param_data.type,
+                            range: param_data.range ?? null
+                        }];
+                    })),
+
+                    slots: new Map(Object.entries(data.slots || {}).map(([slot_id, slot_data]: [string, any]) => {
+                        return [slot_id, {
+                            type: slot_data.type,
+                            data_type: slot_data.data_type ?? null,
+                            tooltip: slot_data.tooltip || ""
+                        }];
+                    }))
+                }];
+            }))
+        };
     }
 }

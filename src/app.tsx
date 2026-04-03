@@ -16,9 +16,9 @@ async function testHandleConnection() {
 export default function App() {
   const node_editor = new NodeEditor(editorClient);
   onMount(() => {
-      window.addEventListener("beforeunload", (e) => {
-          editorClient.disconnect();
-      });
+    window.addEventListener("beforeunload", (e) => {
+      editorClient.disconnect();
+    });
   });
   testHandleConnection()
   // node_editor.scene_controller.load_scene("/data/node_scene.json", "/data/node_types.json");

@@ -22,7 +22,7 @@ export interface SceneData {
 }
 
 export interface NodePathData {
-    node_id: number,
+    node_id: string,
     slot_name?: string
 }
 
@@ -104,20 +104,24 @@ export class NodeSceneFile {
         this.notify();
     }
 
+    public load_from_json_data(json_data: any) {
+        this.raw_data = json_data;
+        const data = NodeSceneFile.json_to_scene_data(json_data)
+        if (this._virtual_file) {
+            this._virtual_file.scene_data = data;
+            return;
+        }
+        this.scene_data = data;
+    }
+
     public async _load_file_path_async(file_path: string) {
         this.file_path = file_path;
 
         try {
             const response = await fetch(file_path);
             const json_data = await response.json();
+            this.load_from_json_data(json_data);
 
-            this.raw_data = json_data;
-            const data = NodeSceneFile.json_to_scene_data(json_data)
-            if (this._virtual_file) {
-                this._virtual_file.scene_data = data;
-                return;
-            }
-            this.scene_data = data;
         } catch {
 
         }
@@ -126,14 +130,7 @@ export class NodeSceneFile {
     public async _load_file_async(file: File) {
         try {
             const json_data = JSON.parse(await file.text());
-            this.raw_data = json_data;
-            const data = NodeSceneFile.json_to_scene_data(json_data)
-            if (this._virtual_file) {
-                this._virtual_file.file = file;
-                this._virtual_file.scene_data = data;
-                return;
-            }
-            this.scene_data = data;
+            this.load_from_json_data(json_data);
         } catch {
 
         }
@@ -182,17 +179,17 @@ export class NodeSceneFile {
     }
 
     static parse_node_path(path: string): NodePathData {
-        const regex = new RegExp("nodes:node_(\\d+):slots:([^:\\s]+)", "i");
+        const regex = new RegExp("nodes:node_([a-z0-9-]+):slots:([^:\\s]+)", "i");
         const match = regex.exec(path);
         if (match) {
             return {
-                node_id: Number.parseInt(match[1]),
+                node_id: match[1],
                 slot_name: match.length > 1 ? match[2] : undefined
             }
         }
 
         return {
-            node_id: -1
+            node_id: ""
         }
     }
 }

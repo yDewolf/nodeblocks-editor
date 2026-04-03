@@ -1,6 +1,8 @@
 import { CustomNodeConstructor } from "~/helpers/node-constructor";
 import { NodeAnchor } from "./node-anchors";
-import { createSignal } from "solid-js";
+import { createSignal, For } from "solid-js";
+import { NodeParameter } from "../nodes/data/node-data";
+import { NodeField } from "../nodes/data/node-field";
 
 
 export class NodePreview {
@@ -21,18 +23,17 @@ export class NodePreview {
     public View(onPointerDown: (node_preview: NodePreview) => void) {
         const onClickOnSlot = () => {};
         const onHoverSlot = () => {};
-        const ref_node = this.node_constructor.make_node(this.node_constructor.type_name, {x: 0, y: 0}, -1);
+        const ref_node = this.node_constructor.make_node(this.node_constructor.type_name, {x: 0, y: 0}, "");
     
         return (
             <div 
                 onPointerDown={() => onPointerDown(this)}
-                class="node-type-preview"
+                class="node-type-preview remove-input"
                 classList={{
                     "selected-node-type": this._selected()
                 }}
                 style={{
                     width: "fit-content",
-                    "pointer-events": "none",
                     cursor: "pointer"
                 }}
             >
@@ -51,11 +52,14 @@ export class NodePreview {
                     <div class="node-body">
                         <div class="node-header">{ref_node.node_name}</div>
                         
-                        <div class="node-content" style={{"pointer-events": "none"}}>
-                            <div style={{display: "flex"}}>
-                                <label>test</label>
-                                <input type="text" />
-                            </div>
+                        <div class="node-content remove-input">
+                            <For each={this.node_constructor._data_model.parameters.values().toArray()}>
+                                {(parameter: NodeParameter) => <NodeField 
+                                    node={null}
+                                    parameter={parameter}
+                                />
+                                }
+                            </For>
                             <div class="node-internal-data"> ... </div>
                         </div>
                     </div>

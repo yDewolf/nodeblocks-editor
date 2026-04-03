@@ -27,7 +27,6 @@ export class SceneController {
     public load_scene(scene_path: string, node_types_path: string) {
         this._load_node_types(node_types_path);
         this._load_node_scene(scene_path);
-        this.node_controller.reset_id_count();
     }
 
     public gen_scene_data(): SceneData {
@@ -41,7 +40,7 @@ export class SceneController {
                 type: node.type_name,
                 position: node.pos,
                 size: node.rect.size,
-                data: node.node_data.parameters
+                data: node.node_data.map_parameters()
             });
         });
 
@@ -122,10 +121,10 @@ export class SceneController {
                 return;
             }
 
-            const node_id = Number.parseInt(splitted_name[1]);
+            const node_id = splitted_name[1];
             if (constructor) {
                 const node = constructor.make_node(
-                    "TODO",
+                    constructor.type_name + "_" + node_id.toString(),
                     node_data.position,
                     node_id
                 )
@@ -173,5 +172,13 @@ export class SceneController {
     public load_node_type_data(type_data: any) {
         this.node_type_reader.load_type_data(type_data);
         this.node_controller.load_node_types(this.node_type_reader);
+    }
+
+    public load_scene_data(scene_data: any) {
+        this.node_scene_reader.load_from_json_data(scene_data);
+        
+        this.node_scene_reader.swap_virtual_data();
+        this._clear_scene();
+        this._parse_loaded_node_scene();
     }
 }

@@ -87,3 +87,7 @@ body {
 .moving-mode {
   cursor: grabbing;
 }
+
+.remove-input {
+  pointer-events: none;
+}

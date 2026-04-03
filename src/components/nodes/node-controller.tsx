@@ -5,9 +5,6 @@ import { BaseNodeConstructor, CustomNodeConstructor } from "~/helpers/node-const
 import { NodeTypeFile } from "~/helpers/node-type-file";
 
 export class NodeController {
-    current_id: Accessor<number>;
-    _set_current_id: (v: number) => void;
-
     private _nodes: () => BaseNode[];
     private _setNodes: (val: BaseNode[]) => void;
 
@@ -21,32 +18,18 @@ export class NodeController {
         this.node_constructors = new Map();
         this.node_constructors.set("default", new BaseNodeConstructor("default"))
 
-        const [current_id, setCurrentId] = createSignal(0)
-        this._set_current_id = setCurrentId;
-        this.current_id = current_id
-        
         const [nodes, setNodes] = createSignal<BaseNode[]>([])
         this._nodes = nodes;
         this._setNodes = setNodes;
     }
         
-    protected _increment_last_id(): number {
-        this._set_current_id(this.current_id() + 1);
-        return this.current_id();
-    }
-
     public clear() {
-        this.reset_id_count();
         this._setNodes([]);
     }
 
-    public reset_id_count() {
-        this._set_current_id(0);
-    }
 
-    public get_node(id: number): BaseNode {
+    public get_node(id: string): BaseNode {
         const filtered = this.nodes.filter((node) => node.id == id);
-        console.log(filtered);
         return filtered[0];
     }
 
@@ -58,14 +41,13 @@ export class NodeController {
             console.error("Couldn't find constructor for", this.selected_constructor, "type");
             return;
         }
-        const new_id = this._increment_last_id();
-        const new_node = construct.make_node(name, pos, new_id);
+        const new_id = crypto.randomUUID();
+        const new_node = construct.make_node(name != "" ? name : construct.type_name, pos, new_id);
         this.nodes = [...this.nodes, new_node];
     }
 
     public add_node(node: BaseNode) {
         // FIXME: Nem sempre o id dos nodes vai ficar certo se você for "importar uma cena"
-        this._set_current_id(Math.max(node.id, this.current_id()))        
         this.nodes = [...this.nodes, node];
     }
 

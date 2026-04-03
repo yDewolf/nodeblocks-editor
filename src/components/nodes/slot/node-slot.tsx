@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createMemo, createSignal, Show } from "solid-js";
 import { BaseNode } from "../base-node";
 import { NodeConnection } from "../node-connection";
 import { Vector2 } from "~/data_types/geometry";
@@ -21,11 +21,18 @@ export class NodeSlot {
     _connections: () => Map<NodeSlot, NodeConnection>;
     _set_connections: (v: Map<NodeSlot, NodeConnection>) => void;
 
+    private _last_output: () => any;
+    private _set_last_output: (out: any) => void;
+
     constructor(parent: BaseNode, slot_type: BaseSlotType, slot_name: string, data_type: NodeDataType | null = null) {
         this.style = new NodeSlotStyle(slot_type);
 
         this.data_type = data_type == null ? slot_type.data_type : data_type;
         this.slot_name = slot_name;
+
+        const [lastOutput, setLastOutput] = createSignal(null);
+        this._last_output = lastOutput;
+        this._set_last_output = setLastOutput;
 
         const [selected, setSelected] = createSignal(false);
         this._selected = selected;
@@ -38,6 +45,9 @@ export class NodeSlot {
         this.parent_node = parent;
         this.type = slot_type
     }
+
+    get last_output() { return this._last_output() }
+    set last_output(output: any) { this._set_last_output(output) }
 
     get selected() { return this._selected() }
     set selected(value: boolean) { this._set_selected(value); }
@@ -132,6 +142,14 @@ export class NodeSlot {
     }
 
     public View(onClickOnSlot: (slot: NodeSlot) => void, onHoverSlot: (slot: NodeSlot) => void) {
+        const slot_output = createMemo(() => {
+            if (this.last_output) {
+                console.log(this.last_output)
+                return this.last_output;
+            }
+            return null;
+        });
+
         return (
             <div 
                 ref={this._element}
@@ -160,7 +178,13 @@ export class NodeSlot {
                         "output-slot": this.type.super_type == SuperSlotTypes.OUTPUT,
                     }}
                 >
-                    {/* <div class="slot-label">bleh</div> */}
+                    <Show when={slot_output() != null}>
+                        <div class="slot-label">{
+                            typeof slot_output() === 'object' 
+                            ? JSON.stringify(slot_output()) 
+                            : String(slot_output())
+                        }</div>
+                    </Show>
                 </div>
             </div>
         )

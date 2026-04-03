@@ -14,9 +14,7 @@ import { SceneController } from "./controllers/scene-controller";
 import { NodeTypeSelector } from "../misc/node-type-selector";
 import { NodePreview } from "../misc/node-preview";
 import { NodeServerClient } from "~/network/websocket-handler";
-import { ClientCommand } from '../../network/request-types';
 import { NodeSceneFile } from "~/helpers/node-scene-file";
-import { parse_json_as_type_file } from "~/helpers/node-type-file";
 
 export class NodeEditor {
     _editor_client: NodeServerClient
@@ -124,7 +122,7 @@ export class NodeEditor {
                     const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
 
-                    this.scene_controller.node_controller.add_new_node("Teste", {x: world_pos.x, y: world_pos.y})
+                    this.scene_controller.node_controller.add_new_node("", {x: world_pos.x, y: world_pos.y})
                 }
             }}
         );
@@ -226,6 +224,39 @@ export class NodeEditor {
             
             console.log("DEBUG: Parsing Type Data: ", message.type_data);
             this.scene_controller.load_node_type_data(message.type_data);
+        });
+
+        this._editor_client.set_handler("node_output", (message) => {
+            if (message.type != "node_output") {
+                return;
+            }
+            
+            const node = this.scene_controller.node_controller.get_node(message.node_id);
+            if (node == undefined) {
+                console.error("ERROR: Couldn't find node with id ", message.node_id);
+                return;
+            }
+            const node_output = new Map(Object.entries(message.value).map(([id, data]: [string, any]) => {
+                return [id, {...data}];
+            }));
+            node_output.forEach((value, slot_name) => {
+                const slot = node.get_slot(slot_name);
+                if (slot) {
+                    slot.last_output = value;
+                }
+            });
+            node.last_output = node_output;
+            console.log("DEBUG: Node ", node, " output is: ", message.value);
+        });
+
+        this._editor_client.set_handler("sync_client_scene", (message) => {
+            if (message.type != "sync_client_scene") {
+                return;
+            }
+            console.log("Scene on server: ", message.payload);
+            if (message.payload) {
+                const scene_data = this.scene_controller.load_scene_data(message.payload);
+            }
         });
     }
 
@@ -354,6 +385,7 @@ export class NodeEditor {
                             <button onclick={() => {this._editor_client.sendCommand({type: "LOAD_SCENE", payload: NodeSceneFile.scene_data_to_json(this.scene_controller.gen_scene_data())})}}>Send Current Scene</button>
                             <button onclick={() => {this._editor_client.sendCommand({type: "RUN"})}}>Run Instance</button>
                             <button onclick={() => {this._editor_client.sendCommand({type: "STOP"})}}>Stop Instance</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: "SYNC_CLIENT_SCENE"})}}>Load Server Scene</button>
                         </div>
                     </div>
                 </div>

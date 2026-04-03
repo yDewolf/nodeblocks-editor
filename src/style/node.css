@@ -123,3 +123,15 @@
   display: flex;
   flex-direction: column;
 }
+
+.node-field {
+  display: flex;
+  label {
+    margin-right: 10px;
+  }
+
+  input {
+    margin-left: auto;
+    margin-right: 0;
+  }
+}

@@ -10,37 +10,37 @@ import { UNKNOWN_TYPE } from "~/components/nodes/data/node-data-type";
 export class BaseNodeConstructor {
     type_name: string;
 
-    _data: NodeData
+    _data_model: NodeData
     _slots: Map<string, SlotData>;
     _slot_types: Map<string, BaseSlotType>;
 
     constructor(type_name: string) {
         this.type_name = type_name
 
-        this._data = new NodeData(new Map());
+        this._data_model = new NodeData(new Map());
         this._slots = new Map();
         this._slot_types = new Map();
 
         // Testing purposes
-        this._slot_types.set("input", INPUT_SLOT)
-        this._slot_types.set("output", OUTPUT_SLOT)
+        // this._slot_types.set("input", INPUT_SLOT)
+        // this._slot_types.set("output", OUTPUT_SLOT)
 
-        this._slots.set("in_0", {
-            type: "input",
-            data_type: "any",
-            tooltip: ""
-        })
+        // this._slots.set("in_0", {
+        //     type: "input",
+        //     data_type: "any",
+        //     tooltip: ""
+        // })
 
-        this._slots.set("out_0", {
-            type: "output",
-            data_type: "any",
-            tooltip: ""
-        })
+        // this._slots.set("out_0", {
+        //     type: "output",
+        //     data_type: "any",
+        //     tooltip: ""
+        // })
     }
 
-    public make_node(node_name: string, position: Vector2, id: number = -1): BaseNode {
+    public make_node(node_name: string, position: Vector2, id: string = ""): BaseNode {
         const node = new BaseNode(
-            node_name, this._data, position, id, this.type_name
+            node_name, new NodeData(this._data_model.raw_parameters), position, id, this.type_name
         );
 
         this._slots.forEach((slot_data, slot_name) => {
@@ -90,7 +90,7 @@ export class CustomNodeConstructor extends BaseNodeConstructor {
     constructor(type_name: string, data: NodeData, slots: Map<string, SlotData>, slot_types: Map<string, CustomSlotType>) {
         super(type_name);
         
-        this._data = data;
+        this._data_model = data;
         this._slots = slots;
         this._slot_types = slot_types;
     }

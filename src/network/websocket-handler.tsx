@@ -76,6 +76,8 @@ export class NodeServerClient {
     }
 
     public disconnect() {
-        this.socket?.close();
+        console.log("Closing Socket")
+        this.socket?.close(1000, "Closed Workspace");
+        this.socket = null;
     }
 }
