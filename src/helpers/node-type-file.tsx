@@ -20,7 +20,7 @@ async function load_json_file(path: string) {
     return null;
 }
 
-function parse_json_as_type_file(data: TypeFile) {
+export function parse_json_as_type_file(data: TypeFile) {
     data.slot_types = new Map<string, SlotTypeData>(Object.entries(data.slot_types));
     data.node_types = new Map<string, NodeTypesData>(Object.entries(data.node_types));
     data.node_types.forEach(type_data => {
@@ -139,9 +139,14 @@ export class NodeTypeFile {
         })
     }
 
+    public load_type_data(type_data: any) {
+        const parsed_data = parse_json_as_type_file(type_data)
+        this._parse_type_data(parsed_data);
+    }
+
     public async _load_file_data_async(file: File) {
         const json_data = JSON.parse(await file.text());
-        this._parse_file_data(json_data);
+        this._parse_type_data(json_data);
     }
 
     public async _load_file_async(file_path: string) {
@@ -151,10 +156,10 @@ export class NodeTypeFile {
             return;
         }
         
-        this._parse_file_data(json_data);
+        this._parse_type_data(json_data);
     }
 
-    public async _parse_file_data(json_data: TypeFile) {
+    public async _parse_type_data(json_data: TypeFile) {
         this.raw_data = json_data;
         this.node_types_version = json_data.version;
         this.node_types_id = json_data.id;

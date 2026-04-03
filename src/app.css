@@ -43,7 +43,7 @@ body {
 }
 
 .right-tab {
-  display: none;
+  /* display: none; */
   width: 20%;
 }
 

@@ -30,8 +30,7 @@ export class SceneController {
         this.node_controller.reset_id_count();
     }
 
-
-    public save_scene(): SceneData {
+    public gen_scene_data(): SceneData {
         const node_types_data = this.node_type_reader.raw_data;
         const node_types_id = this.node_type_reader.node_types_id;
         const node_types_version = this.node_type_reader.node_types_version;
@@ -63,6 +62,11 @@ export class SceneController {
             connections: scene_connections
         }
 
+        return scene_data;
+    }
+
+    public save_scene(): SceneData {
+        const scene_data = this.gen_scene_data()
         this.node_scene_reader.save_data_to_file(scene_data);
         return scene_data;
     }
@@ -164,5 +168,10 @@ export class SceneController {
                 console.log("loaded file", this.node_type_reader.node_constructors)
             }
         );
+    }
+    
+    public load_node_type_data(type_data: any) {
+        this.node_type_reader.load_type_data(type_data);
+        this.node_controller.load_node_types(this.node_type_reader);
     }
 }

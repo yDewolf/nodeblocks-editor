@@ -154,7 +154,7 @@ export class NodeSceneFile {
             }
     
             return value;
-        }, 4);
+        });
     }
     
     static json_to_scene_data(json_data: any): SceneData {

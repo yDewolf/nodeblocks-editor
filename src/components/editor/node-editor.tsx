@@ -1,5 +1,5 @@
 import { EditorSpace } from "./editor-space";
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { BaseNode } from "../nodes/base-node";
 import { Grid } from "../misc/grid";
 import { SelectionController } from "./controllers/selection-controller";
@@ -13,8 +13,14 @@ import { EventHandler, InputEvents } from "./input_manager/event-handling";
 import { SceneController } from "./controllers/scene-controller";
 import { NodeTypeSelector } from "../misc/node-type-selector";
 import { NodePreview } from "../misc/node-preview";
+import { NodeServerClient } from "~/network/websocket-handler";
+import { ClientCommand } from '../../network/request-types';
+import { NodeSceneFile } from "~/helpers/node-scene-file";
+import { parse_json_as_type_file } from "~/helpers/node-type-file";
 
 export class NodeEditor {
+    _editor_client: NodeServerClient
+
     scene_controller: SceneController;
     tool_controller: ToolController
 
@@ -27,7 +33,8 @@ export class NodeEditor {
     private _cursor_world_pos: () => Vector2;
     private _set_cursor_world_pos: (v: Vector2) => void;
 
-    constructor () {
+    constructor (editor_client: NodeServerClient) {
+        this._editor_client = editor_client;
         this.scene_controller = new SceneController();
 
         const [cursorWorldPos, setCursorWorldPos] = createSignal({x: 0, y: 0});
@@ -44,6 +51,7 @@ export class NodeEditor {
         this.tool_controller = new ToolController(this);
         this.setup_event_handlers();
         this.setup_keybinds();
+        this.setup_message_handlers();
     }
 
     get cursor_world_pos() { return this._cursor_world_pos(); }
@@ -210,10 +218,20 @@ export class NodeEditor {
         );
     }
 
+    public setup_message_handlers() {
+        this._editor_client.set_handler("handshake_sync", (message) => {
+            if (message.type != "handshake_sync") {
+                return;
+            }
+            
+            console.log("DEBUG: Parsing Type Data: ", message.type_data);
+            this.scene_controller.load_node_type_data(message.type_data);
+        });
+    }
+
     public View() {
         let viewportRef: HTMLDivElement | undefined;
         const selector = new NodeTypeSelector();
-
         return (
             <div 
                 class="editor-view"
@@ -331,7 +349,12 @@ export class NodeEditor {
                         {this.tool_controller.View()}
                     </div>
                     <div class="right-tab">
-                         
+                        <div class="input-row">
+                            <button onclick={() => {this._editor_client.sendCommand({type: "STEP"})}}>STEP</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: "LOAD_SCENE", payload: NodeSceneFile.scene_data_to_json(this.scene_controller.gen_scene_data())})}}>Send Current Scene</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: "RUN"})}}>Run Instance</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: "STOP"})}}>Stop Instance</button>
+                        </div>
                     </div>
                 </div>
             </div>
