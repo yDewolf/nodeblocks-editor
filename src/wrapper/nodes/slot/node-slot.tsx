@@ -2,9 +2,8 @@ import { createMemo, createSignal, Show } from "solid-js";
 import { BaseNode } from "../base-node";
 import { NodeConnection } from "../node-connection";
 import { Vector2 } from "~/wrapper/data_types/geometry";
-import { BaseSlotType, SuperSlotTypes } from "./slot-type";
 import { NodeSlotStyle } from "./slot-style";
-import { NodeDataType } from "../data/node-data-type";
+import { BaseNodeType, BaseSlotType, SuperSlotTypes } from "../data/node-data-type";
 
 export class NodeSlot {
     private _element: HTMLDivElement | undefined;
@@ -13,7 +12,7 @@ export class NodeSlot {
 
     slot_name: string;
 
-    data_type: NodeDataType;
+    data_type: BaseNodeType;
     type: BaseSlotType;
     _selected: () => boolean;
     _set_selected: (v: boolean) => void;
@@ -24,7 +23,7 @@ export class NodeSlot {
     private _last_output: () => any;
     private _set_last_output: (out: any) => void;
 
-    constructor(parent: BaseNode, slot_type: BaseSlotType, slot_name: string, data_type: NodeDataType | null = null) {
+    constructor(parent: BaseNode, slot_type: BaseSlotType, slot_name: string, data_type: BaseNodeType | null = null) {
         this.style = new NodeSlotStyle(slot_type);
 
         this.data_type = data_type == null ? slot_type.data_type : data_type;
@@ -83,7 +82,7 @@ export class NodeSlot {
             return false;
         }
 
-        if (!this.type.can_connect_to(slot.type)) {
+        if (!this.type.is_compatible_with(slot.type)) {
             return false;
         }
 

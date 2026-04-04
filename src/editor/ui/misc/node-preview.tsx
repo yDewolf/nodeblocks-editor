@@ -2,7 +2,7 @@ import { CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeAnchor } from "./node-anchors";
 import { createSignal, For } from "solid-js";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
-import { NodeField } from "~/wrapper/nodes/data/node-field";
+import { NodeField } from "~/editor/ui/node/node-field";
 
 
 export class NodePreview {

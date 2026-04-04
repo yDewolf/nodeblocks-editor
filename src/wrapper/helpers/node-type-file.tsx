@@ -1,8 +1,9 @@
-import { CustomSlotType } from "~/wrapper/nodes/slot/slot-type";
 import { BaseNodeConstructor, CustomNodeConstructor } from "./node-constructor";
 import { NodeData } from "~/wrapper/nodes/data/node-data";
 import { batch, createSignal } from "solid-js";
-import { NodeSceneData, SceneData } from "./node-scene-file";
+import { SceneData } from "./node-scene-file";
+import { BaseSlotType } from "../nodes/data/node-data-type";
+import { CustomSlotType } from "../nodes/data/custom-data-types";
 
 interface TypeFile {
     version: number,
@@ -40,7 +41,7 @@ export class NodeTypeFile {
     raw_data: Object | null = null;
     node_types_id: string | null = null;
     
-    slot_types: Map<string, CustomSlotType>;
+    slot_types: Map<string, BaseSlotType>;
     node_constructors: Map<string, CustomNodeConstructor>;
 
     private _version: () => number;
@@ -145,10 +146,10 @@ export class NodeTypeFile {
         // Parse Slot Types
         json_data.slot_types.forEach((type_data, type_name) => {
             const custom_type = new CustomSlotType(
-                type_data.extends,
+                type_name,
                 type_data.default_data_type,
-                type_data.conn_whitelist,
-                type_name
+                type_data.extends,
+                type_data.conn_whitelist
             );
             this.slot_types.set(type_name, custom_type);
         });

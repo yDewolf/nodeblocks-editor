@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 import { NodeSlot } from "./slot/node-slot";
-import { SuperSlotTypes } from "./slot/slot-type";
+import { SuperSlotTypes } from "./data/node-data-type";
 
 
 // Representa uma conexão entre dois nodes

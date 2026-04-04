@@ -1,9 +1,9 @@
 import { createSignal } from 'solid-js';
 import { Rect, Vector2 } from '../data_types/geometry';
-import { SuperSlotTypes } from './slot/slot-type';
 import { NodeConnection } from './node-connection';
 import { NodeSlot } from './slot/node-slot';
-import { NodeData, NodeParameter } from './data/node-data';
+import { NodeData } from './data/node-data';
+import { SuperSlotTypes } from './data/node-data-type';
 
 export class BaseNode {
     id: string;

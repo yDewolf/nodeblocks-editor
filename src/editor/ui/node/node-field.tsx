@@ -1,12 +1,12 @@
-import { BaseNode } from "../base-node";
-import { NodeParameter } from "./node-data";
-import { DataTypes } from "./node-data-type";
+import { BaseNode } from "../../../wrapper/nodes/base-node";
+import { NodeParameter } from "../../../wrapper/nodes/data/node-data";
+import { DataTypes } from "../../../wrapper/nodes/data/node-data-type";
 
 
 export const NodeField = (props: {node: BaseNode | null, parameter: NodeParameter}) => {
     const field_id = props.node?.id.toString() + props.parameter._field_name;
     let input_type = "text";
-    switch (props.parameter.type._super_type) {
+    switch (props.parameter.type.super_type) {
         case DataTypes.FLOAT: input_type = "number";
         case DataTypes.INT: input_type = "number";
         case DataTypes.UINT: input_type = "number";

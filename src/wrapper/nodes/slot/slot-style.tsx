@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
-import { BaseSlotType, SuperSlotTypes } from "./slot-type";
 import { Vector2 } from "~/wrapper/data_types/geometry";
+import { BaseSlotType, SuperSlotTypes } from "../data/node-data-type";
 
 export class NodeSlotStyle {
     default_anchor: Vector2;
