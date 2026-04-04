@@ -237,9 +237,12 @@ export class NodeEditor {
                 console.error("ERROR: Couldn't find node with id ", message.node_id);
                 return;
             }
-            const node_output = new Map(Object.entries(message.value).map(([id, data]: [string, any]) => {
-                return [id, {...data}];
-            }));
+            const node_output: Map<string, Map<string, any>> = new Map(
+                Object.entries(message.value).map(([slot_name, slot_data]: [string, any]) => {
+                    const slot_output_map = new Map<string, any>(Object.entries(slot_data));
+                    return [slot_name, slot_output_map];
+                })
+            );
             node_output.forEach((value, slot_name) => {
                 const slot = node.get_slot(slot_name);
                 if (slot) {
@@ -247,14 +250,12 @@ export class NodeEditor {
                 }
             });
             node.last_output = node_output;
-            console.log("DEBUG: Node ", node, " output is: ", message.value);
         });
 
         this._editor_client.set_handler("sync_client_scene", (message) => {
             if (message.type != "sync_client_scene") {
                 return;
             }
-            console.log("Scene on server: ", message.payload);
             if (message.payload) {
                 const scene_data = this.scene_controller.load_scene_data(message.payload);
             }

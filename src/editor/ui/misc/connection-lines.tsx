@@ -49,8 +49,8 @@ export const ConnectionLines = (props: { connection: NodeConnection, onDisconnec
     const path = createMemo(() => {
         const start = props.connection.slot_a.get_world_position();
         const end = props.connection.slot_b.get_world_position();
-        const anchor_a = props.connection.slot_a.style.anchor
-        const anchor_b = props.connection.slot_b.style.anchor
+        const anchor_a = props.connection.slot_a.style.anchor;
+        const anchor_b = props.connection.slot_b.style.anchor;
 
         return make_simple_curved_path(start, end, anchor_a, anchor_b);
     });

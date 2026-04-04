@@ -124,9 +124,10 @@ export class SceneController {
             const node_id = splitted_name[1];
             if (constructor) {
                 const node = constructor.make_node(
-                    constructor.type_name + "_" + node_id.toString(),
+                    constructor.type_name, //+ "_" + node_id.toString(),
                     node_data.position,
-                    node_id
+                    node_id,
+                    node_data.data,
                 )
                 this.node_controller.add_node(node);
             }
@@ -153,7 +154,7 @@ export class SceneController {
                 console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
                 return;
             }
-            console.log("connected slots");
+
             this.connection_controller.connect_node_to(
                 slot_a, slot_b
             );

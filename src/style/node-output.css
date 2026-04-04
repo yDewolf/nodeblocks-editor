@@ -1,0 +1,18 @@
+
+.node-output-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.output-text {
+    font-size: 24px;
+
+    border: solid 2px;
+    padding: 5px;
+}
+
+.slot-output {
+    margin-bottom: 10px;
+    display: none;
+}

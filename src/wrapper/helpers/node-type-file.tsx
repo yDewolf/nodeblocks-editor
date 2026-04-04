@@ -24,14 +24,14 @@ export interface SlotData {
     tooltip: string
 }
 
-export interface NodeParameterData {
+export interface NodeDataModel {
     type: string,
     range: any | null,
 }
 
 interface NodeTypesData {
     description: string,
-    parameters: Map<string, NodeParameterData>
+    parameters: Map<string, NodeDataModel>
     slots: Map<string, SlotData>
 }
 

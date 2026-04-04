@@ -21,10 +21,18 @@ export class BaseNodeConstructor {
         this._slot_types = new Map();
     }
 
-    public make_node(node_name: string, position: Vector2, id: string = ""): GraphNode {
+    public make_node(node_name: string, position: Vector2, id: string = "", node_data: Map<string, any> | undefined = undefined): GraphNode {
         const node = new GraphNode(
             node_name, new NodeData(this._data_model.raw_parameters), position, id, this.type_name
         );
+        if (node_data) {
+            node_data.entries().forEach(([key, value]) => {
+                const param = node.node_data.parameters.get(key);
+                if (param) {
+                    param.value = value;
+                }
+            });
+        }
 
         this._slots.forEach((slot_data, slot_name) => {
             const slot = this._make_slot(node, slot_name, slot_data);

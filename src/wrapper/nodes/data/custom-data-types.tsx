@@ -6,7 +6,6 @@ export class CustomSlotType extends BaseSlotType {
         const parsed_data_type = DataTypeUtils._match_node_data_type(data_type);
         const parsed_super_type = DataTypeUtils.parse_slot_super_type(super_type);
 
-        console.log(data_type, super_type);
         super(type_name, parsed_data_type, parsed_super_type, type_whitelist, name_whitelist);
     }
 }

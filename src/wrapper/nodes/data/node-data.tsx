@@ -1,4 +1,4 @@
-import { NodeParameterData } from "~/wrapper/helpers/node-type-file";
+import { NodeDataModel } from "~/wrapper/helpers/node-type-file";
 import { DataTypeUtils, BaseNodeType } from "./node-data-type";
 import { createSignal } from "solid-js";
 
@@ -7,12 +7,12 @@ export class NodeParameter {
     _range: number[] | null = null
     _field_name: string
 
-    _raw_field_data: NodeParameterData
+    _raw_field_data: NodeDataModel
 
     _set_value: (value: any) => void;
     _value: () => any;
 
-    constructor(field_data: NodeParameterData, field_name: string) {
+    constructor(field_data: NodeDataModel, field_name: string) {
         this._field_name = field_name;
         this._raw_field_data = field_data;
         if (field_data.range) {
@@ -28,19 +28,19 @@ export class NodeParameter {
     }
 
     get value() { return this._value(); }
-    set value(new_value: string) { this._set_value(new_value); console.log(new_value); }
+    set value(new_value: string) { this._set_value(new_value); }
 }
 
 export class NodeData {
     parameters: Map<string, NodeParameter>
-    raw_parameters: Map<string, NodeParameterData>
+    raw_parameters: Map<string, NodeDataModel>
 
-    constructor(raw_params: Map<string, NodeParameterData>) {
+    constructor(raw_params: Map<string, NodeDataModel>) {
         this.raw_parameters = raw_params;
         this.parameters = NodeData.parse_parameters(raw_params);
     }
 
-    static parse_parameters(fields: Map<string, NodeParameterData>): Map<string, NodeParameter> {
+    static parse_parameters(fields: Map<string, NodeDataModel>): Map<string, NodeParameter> {
         let parsed_fields: Map<string, NodeParameter> = new Map(); 
         fields.forEach((field_data, field_name) => {
             const obj = new NodeParameter(

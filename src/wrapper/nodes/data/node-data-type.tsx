@@ -21,7 +21,7 @@ export enum DataGroup {
 export abstract class BaseDataType<Group extends DataGroup, SuperType> {
     constructor(
         public type_name: string,
-        public _data_group: Group,
+        private _data_group: Group,
         public super_type: SuperType,
         public type_whitelist: SuperType[] = [],
         public name_whitelist: string[] = []

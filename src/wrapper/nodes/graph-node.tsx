@@ -14,8 +14,8 @@ export class GraphNode {
     private _node_data: () => NodeData;
     private _set_node_data:  (data: NodeData) => void;
 
-    private _last_output: () => Map<string, any>;
-    private _set_last_output: (out: Map<string, any>) => void;
+    private _last_output: () => Map<string, Map<string, any>>;
+    private _set_last_output: (out: Map<string, Map<string, any>>) => void;
 
     private raw_pos: Vector2;
     private _slots: Map<SuperSlotTypes, NodeSlot[]> = new Map<SuperSlotTypes, NodeSlot[]>;
@@ -35,6 +35,7 @@ export class GraphNode {
         this.node_name = node_name;
         this.raw_pos = position;
 
+        console.log(node_data);
         const [nodeData, setNodeData] = createSignal(node_data);
         this._node_data = nodeData;
         this._set_node_data = setNodeData;
@@ -61,7 +62,7 @@ export class GraphNode {
 
 
     get last_output() { return this._last_output() }
-    set last_output(output: Map<string, any>) { this._set_last_output(output) }
+    set last_output(output: Map<string, Map<string, any>>) { this._set_last_output(output) }
 
     get node_data() { return this._node_data(); }
     set node_data(data: NodeData) { this._set_node_data(data); }

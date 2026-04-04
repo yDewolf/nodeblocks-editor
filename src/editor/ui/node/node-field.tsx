@@ -31,7 +31,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
 
     const onInputValueChanged = (new_value: any) => {
         // if (typeof new_value == typeof props.parameter.value) {
-        console.log("DEBUG: Setting parameter ", props.parameter._field_name, "of node ", props.node?.id, " to ", new_value, " previous value: ", props.parameter.value);
+        // console.log("DEBUG: Setting parameter ", props.parameter._field_name, "of node ", props.node?.id, " to ", new_value, " previous value: ", props.parameter.value);
         if (input_type == "number") {
             new_value = Number.parseFloat(new_value);
         }
@@ -42,7 +42,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
     return (
         <div class="node-field" classList={{"remove-input": props.node == null}}>
             <label for={field_id}>{props.parameter._field_name}</label>
-            <input name={field_id} type={input_type} onBeforeInput={(event) => onBeforeInput(event)} onInput={(event) => onInputValueChanged(event.currentTarget.value)}/>
+            <input name={field_id} type={input_type} value={props.parameter.value} onBeforeInput={(event) => onBeforeInput(event)} onInput={(event) => onInputValueChanged(event.currentTarget.value)}/>
         </div>
     );
 }

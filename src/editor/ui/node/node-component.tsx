@@ -5,6 +5,7 @@ import { NodeField } from "~/editor/ui/node/node-field";
 import { NodeAnchor } from "../misc/node-anchors";
 import { EditorCamera } from "~/editor/internal/editor-space";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
+import { NodeOutput } from './node-output';
 
 export const NodeComponent = (props: { 
     node: GraphNode, 
@@ -89,8 +90,10 @@ export const NodeComponent = (props: {
                                         />
                                     }
                                 </For>
-                                <div class="node-internal-data"> ... </div>
+                                {/* <div class="node-internal-data"> ... </div> */}
                             </div>
+
+                            <NodeOutput node={props.node}/>
                         </div>
                     </div>
                 </div>

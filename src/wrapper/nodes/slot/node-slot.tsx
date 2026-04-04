@@ -4,6 +4,7 @@ import { NodeConnection } from "../node-connection";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { NodeSlotStyle } from "./slot-style";
 import { BaseNodeType, BaseSlotType, SuperSlotTypes } from "../data/node-data-type";
+import { SlotOutput } from '../../../editor/ui/node/slot-output';
 
 export class NodeSlot {
     private _element: HTMLDivElement | undefined; // FIXME: SlotComponent
@@ -20,8 +21,8 @@ export class NodeSlot {
     _connections: () => Map<NodeSlot, NodeConnection>;
     _set_connections: (v: Map<NodeSlot, NodeConnection>) => void;
 
-    private _last_output: () => any;
-    private _set_last_output: (out: any) => void;
+    private _last_output: () => Map<string, any>;
+    private _set_last_output: (out: Map<string, any>) => void;
 
     constructor(parent: GraphNode, slot_type: BaseSlotType, slot_name: string, data_type: BaseNodeType | null = null) {
         this.style = new NodeSlotStyle(slot_type);
@@ -29,7 +30,7 @@ export class NodeSlot {
         this.data_type = data_type == null ? slot_type.data_type : data_type;
         this.slot_name = slot_name;
 
-        const [lastOutput, setLastOutput] = createSignal(null);
+        const [lastOutput, setLastOutput] = createSignal(new Map());
         this._last_output = lastOutput;
         this._set_last_output = setLastOutput;
 
@@ -46,7 +47,7 @@ export class NodeSlot {
     }
 
     get last_output() { return this._last_output() }
-    set last_output(output: any) { this._set_last_output(output) }
+    set last_output(output: Map<string, any>) { this._set_last_output(output); }
 
     get selected() { return this._selected() }
     set selected(value: boolean) { this._set_selected(value); }
@@ -94,6 +95,9 @@ export class NodeSlot {
     // FIXME: Create a SlotComponent, that does everything below
     public get_world_position(): Vector2 {
         // Keep signal updates
+        this.parent_node.width;
+        this.parent_node.height;
+
         this.style.anchor;
         this.style.version;
 
@@ -142,14 +146,6 @@ export class NodeSlot {
     }
 
     public View(onClickOnSlot: (slot: NodeSlot) => void, onHoverSlot: (slot: NodeSlot) => void) {
-        const slot_output = createMemo(() => {
-            if (this.last_output) {
-                console.log(this.last_output)
-                return this.last_output;
-            }
-            return null;
-        });
-
         return (
             <div 
                 ref={this._element}
@@ -178,13 +174,7 @@ export class NodeSlot {
                         "output-slot": this.type.super_type == SuperSlotTypes.OUTPUT,
                     }}
                 >
-                    <Show when={slot_output() != null}>
-                        <div class="slot-label">{
-                            typeof slot_output() === 'object' 
-                            ? JSON.stringify(slot_output()) 
-                            : String(slot_output())
-                        }</div>
-                    </Show>
+                    <SlotOutput slot={this}/>
                 </div>
             </div>
         )

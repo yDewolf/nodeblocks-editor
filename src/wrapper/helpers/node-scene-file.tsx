@@ -163,7 +163,7 @@ export class NodeSceneFile {
                     ...data,
                     position: { x: data.position[0], y: data.position[1] },
                     size: { x: data.size[0], y: data.size[1] },
-                    data: new Map(Object.entries(data.data))
+                    data: new Map<string, any>(Object.entries(data.data))
                 }];
             })),
             connections: new Map(Object.entries(json_data.connections).map(([id, data]: [string, any]) => {
@@ -174,7 +174,6 @@ export class NodeSceneFile {
                 }];
             })),
         };
-        
         return scene;
     }
 

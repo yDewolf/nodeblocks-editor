@@ -1,3 +1,4 @@
+@import url("node-output.css");
 
 .internal-node {
   pointer-events: auto;
@@ -17,6 +18,11 @@
 
 .node-body {
   margin: 5px 10px;
+}
+
+.node-content {
+  display: flex;
+  flex-direction: column;
 }
 
 .node-slots {
