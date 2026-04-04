@@ -1,6 +1,6 @@
 import { EditorSpace } from "./internal/editor-space";
 import { createSignal, For, Show } from "solid-js";
-import { BaseNode } from "../wrapper/nodes/base-node";
+import { GraphNode } from "../wrapper/nodes/graph-node";
 import { NodeSlot } from '../wrapper/nodes/slot/node-slot';
 import { Vector2 } from '../wrapper/data_types/geometry';
 import { KeyEventManager as GeneralEventManager } from "./internal/input_manager/input-manager";
@@ -337,13 +337,13 @@ export class NodeEditor {
                             {(node) => <NodeComponent 
                                     node={node}
                                     camera={this.editor_space.camera}
-                                    onClick={(node: BaseNode) => {
+                                    onClick={(node: GraphNode) => {
                                         this.input_manager.generalizedEventHandler({node: node}, InputEvents.CLICK_ON_NODE)
                                     }}
                                     onClickOnSlot={(slot: NodeSlot) => {
                                         this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.CLICK_ON_NODE_SLOT)
                                     }}
-                                    onHoverNode={(node: BaseNode) => {
+                                    onHoverNode={(node: GraphNode) => {
                                         this.input_manager.generalizedEventHandler({node: node}, InputEvents.HOVER_NODE)
                                     }}
                                     onHoverSlot={(slot: NodeSlot) => {

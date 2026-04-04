@@ -1,6 +1,6 @@
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { SlotData } from "./node-type-file";
-import { BaseNode } from "~/wrapper/nodes/base-node";
+import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeData } from "~/wrapper/nodes/data/node-data";
 import { BaseSlotType, DataTypeUtils, UNKNOWN_TYPE } from "~/wrapper/nodes/data/node-data-type";
@@ -21,8 +21,8 @@ export class BaseNodeConstructor {
         this._slot_types = new Map();
     }
 
-    public make_node(node_name: string, position: Vector2, id: string = ""): BaseNode {
-        const node = new BaseNode(
+    public make_node(node_name: string, position: Vector2, id: string = ""): GraphNode {
+        const node = new GraphNode(
             node_name, new NodeData(this._data_model.raw_parameters), position, id, this.type_name
         );
 
@@ -39,7 +39,7 @@ export class BaseNodeConstructor {
         return node;
     }
 
-    public _make_slot(parent_node: BaseNode, slot_name: string, slot_data: SlotData) {
+    public _make_slot(parent_node: GraphNode, slot_name: string, slot_data: SlotData) {
         const slot_type = this._slot_types.get(slot_data.type);
         if (!slot_type) {
             return null;
@@ -54,7 +54,7 @@ export class BaseNodeConstructor {
         )
     }
 
-    public _make_all_slots(parent_node: BaseNode) {
+    public _make_all_slots(parent_node: GraphNode) {
         let slots: NodeSlot[] = []
         this._slots.forEach((slot_data, slot_name) => {
             const slot = this._make_slot(parent_node, slot_name, slot_data);

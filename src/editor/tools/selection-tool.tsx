@@ -1,5 +1,5 @@
 import { BaseEditorTool } from "./base-tool";
-import { BaseNode } from "~/wrapper/nodes/base-node";
+import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { NodeEditor } from "../node-editor";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
@@ -50,12 +50,12 @@ export class SelectionTool extends BaseEditorTool {
         }
     }
 
-    onClickOnNode(node: BaseNode): void {
+    onClickOnNode(node: GraphNode): void {
         this.connection_controller.unselect_slot();
         this.selection_controller.onClickOnNode(node)
     }
 
-    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void {
+    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: GraphNode[]): void {
         this.selection_controller.onMoveCursor(
             pos, 
             delta,
@@ -86,7 +86,7 @@ export class SelectionTool extends BaseEditorTool {
         this.selection_controller.hovered_node = slot.parent_node;
     }
 
-    onHoverNode(node: BaseNode): void {
+    onHoverNode(node: GraphNode): void {
         this.selection_controller.hovered_node = node;
     }
 

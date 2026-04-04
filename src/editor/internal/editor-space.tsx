@@ -1,5 +1,5 @@
 import { Rect, Vector2 } from "~/wrapper/data_types/geometry";
-import { BaseNode } from "../../wrapper/nodes/base-node";
+import { GraphNode } from "../../wrapper/nodes/graph-node";
 import { createSignal } from 'solid-js';
 
 export class EditorCamera {
@@ -61,7 +61,7 @@ export class EditorSpace {
         this.camera = new EditorCamera({x: 1920, y: 1080});
     }
 
-    public filter_visible_nodes(nodes: Array<BaseNode>) {
+    public filter_visible_nodes(nodes: Array<GraphNode>) {
         const filtered_nodes = nodes.filter(node => {
             return this.is_point_visible(node.pos) // FIXME Alterar isso aqui para usar um rect do node 
         });

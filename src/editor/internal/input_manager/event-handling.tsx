@@ -1,4 +1,4 @@
-import { BaseNode } from "~/wrapper/nodes/base-node";
+import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 
 export enum InputEvents {
@@ -12,7 +12,7 @@ export enum InputEvents {
 
 export interface EventData {
     event?: UIEvent
-    node?: BaseNode,
+    node?: GraphNode,
     slot?: NodeSlot
 }
 

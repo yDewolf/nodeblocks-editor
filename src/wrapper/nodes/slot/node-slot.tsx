@@ -1,14 +1,14 @@
 import { createMemo, createSignal, Show } from "solid-js";
-import { BaseNode } from "../base-node";
+import { GraphNode } from "../graph-node";
 import { NodeConnection } from "../node-connection";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { NodeSlotStyle } from "./slot-style";
 import { BaseNodeType, BaseSlotType, SuperSlotTypes } from "../data/node-data-type";
 
 export class NodeSlot {
-    private _element: HTMLDivElement | undefined;
-    parent_node: BaseNode;
-    style: NodeSlotStyle;
+    private _element: HTMLDivElement | undefined; // FIXME: SlotComponent
+    parent_node: GraphNode;
+    style: NodeSlotStyle; // FIXME: SlotComponent
 
     slot_name: string;
 
@@ -23,7 +23,7 @@ export class NodeSlot {
     private _last_output: () => any;
     private _set_last_output: (out: any) => void;
 
-    constructor(parent: BaseNode, slot_type: BaseSlotType, slot_name: string, data_type: BaseNodeType | null = null) {
+    constructor(parent: GraphNode, slot_type: BaseSlotType, slot_name: string, data_type: BaseNodeType | null = null) {
         this.style = new NodeSlotStyle(slot_type);
 
         this.data_type = data_type == null ? slot_type.data_type : data_type;
@@ -91,6 +91,7 @@ export class NodeSlot {
         return true;
     }
 
+    // FIXME: Create a SlotComponent, that does everything below
     public get_world_position(): Vector2 {
         // Keep signal updates
         this.style.anchor;

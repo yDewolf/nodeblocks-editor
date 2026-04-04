@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 import { EditorCamera } from "~/editor/internal/editor-space";
 import { Rect, Vector2 } from "~/wrapper/data_types/geometry";
-import { BaseNode } from "~/wrapper/nodes/base-node";
+import { GraphNode } from "~/wrapper/nodes/graph-node";
 
 export class SelectionRect {
     _rect: () => Rect
@@ -36,8 +36,8 @@ export class SelectionRect {
     set pos(pos: Vector2) { this.rect.offset = pos }
     set size(size: Vector2) { this.rect.size = size }
 
-    public get_overlapping_nodes(all_nodes: BaseNode[]): Array<BaseNode> {
-        let selected_nodes: Array<BaseNode> = new Array<BaseNode>();
+    public get_overlapping_nodes(all_nodes: GraphNode[]): Array<GraphNode> {
+        let selected_nodes: Array<GraphNode> = new Array<GraphNode>();
         all_nodes.forEach(node => {
             if (this.has_node(node)) {
                 selected_nodes.push(node);
@@ -47,7 +47,7 @@ export class SelectionRect {
         return selected_nodes;
     }
 
-    public has_node(node: BaseNode): boolean {
+    public has_node(node: GraphNode): boolean {
         if (this.rect.overlaps(node.rect)) {
             return true;
         }

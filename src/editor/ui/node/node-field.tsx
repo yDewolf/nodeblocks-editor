@@ -1,9 +1,9 @@
-import { BaseNode } from "../../../wrapper/nodes/base-node";
+import { GraphNode } from "../../../wrapper/nodes/graph-node";
 import { NodeParameter } from "../../../wrapper/nodes/data/node-data";
 import { DataTypes } from "../../../wrapper/nodes/data/node-data-type";
 
 
-export const NodeField = (props: {node: BaseNode | null, parameter: NodeParameter}) => {
+export const NodeField = (props: {node: GraphNode | null, parameter: NodeParameter}) => {
     const field_id = props.node?.id.toString() + props.parameter._field_name;
     let input_type = "text";
     switch (props.parameter.type.super_type) {

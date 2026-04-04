@@ -1,4 +1,4 @@
-import { BaseNode } from "~/wrapper/nodes/base-node";
+import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { NodeEditor } from "../node-editor";
@@ -17,11 +17,11 @@ export interface ComponentEventHandler {
 
     onPointerUp(e: PointerEvent): void;
 
-    onClickOnNode(node: BaseNode): void;
+    onClickOnNode(node: GraphNode): void;
 
     onClickOnNodeSlot(slot: NodeSlot): void;
 
-    onHoverNode(node: BaseNode): void;
+    onHoverNode(node: GraphNode): void;
     
     onHoverSlot(slot: NodeSlot): void;
     
@@ -48,14 +48,14 @@ export abstract class BaseEventHandler implements ComponentEventHandler {
     onPointerUp(e: PointerEvent): void {
     }
     
-    onClickOnNode(node: BaseNode): void {
+    onClickOnNode(node: GraphNode): void {
     }
     onClickOnNodeSlot(slot: NodeSlot): void {
     }
-    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void {
+    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: GraphNode[]): void {
     }
     
-    onHoverNode(node: BaseNode): void {
+    onHoverNode(node: GraphNode): void {
     }
     onHoverSlot(slot: NodeSlot): void {
     }
@@ -64,7 +64,7 @@ export abstract class BaseEventHandler implements ComponentEventHandler {
 }
 
 export interface EditorTool extends ComponentEventHandler {
-    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]): void;
+    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: GraphNode[]): void;
 }
 
 export abstract class BaseEditorTool extends BaseEventHandler {

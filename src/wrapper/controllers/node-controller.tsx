@@ -1,23 +1,23 @@
 import { Accessor, createSignal } from "solid-js";
 import { Vector2 } from '~/wrapper/data_types/geometry';
-import { BaseNode } from '../nodes/base-node';
+import { GraphNode } from '../nodes/graph-node';
 import { BaseNodeConstructor, CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
 
 export class NodeController {
-    private _nodes: () => BaseNode[];
-    private _setNodes: (val: BaseNode[]) => void;
+    private _nodes: () => GraphNode[];
+    private _setNodes: (val: GraphNode[]) => void;
 
     private node_constructors: Map<string, BaseNodeConstructor>;
 
     get nodes() { return this._nodes() }
-    private set nodes(value: BaseNode[]) { this._setNodes(value); }
+    private set nodes(value: GraphNode[]) { this._setNodes(value); }
 
     constructor() {
         this.node_constructors = new Map();
         this.node_constructors.set("default", new BaseNodeConstructor("default"))
 
-        const [nodes, setNodes] = createSignal<BaseNode[]>([])
+        const [nodes, setNodes] = createSignal<GraphNode[]>([])
         this._nodes = nodes;
         this._setNodes = setNodes;
     }
@@ -27,7 +27,7 @@ export class NodeController {
     }
 
 
-    public get_node(id: string): BaseNode {
+    public get_node(id: string): GraphNode {
         const filtered = this.nodes.filter((node) => node.id == id);
         return filtered[0];
     }
@@ -45,12 +45,12 @@ export class NodeController {
         this.nodes = [...this.nodes, new_node];
     }
 
-    public add_node(node: BaseNode) {
+    public add_node(node: GraphNode) {
         // FIXME: Nem sempre o id dos nodes vai ficar certo se você for "importar uma cena"
         this.nodes = [...this.nodes, node];
     }
 
-    public remove_node(node: BaseNode) {
+    public remove_node(node: GraphNode) {
         // TODO: Make this signal based (node.free() emits a signal that removes the node everywhere)
         this.nodes = this.nodes.filter((_node) => _node != node)
     }

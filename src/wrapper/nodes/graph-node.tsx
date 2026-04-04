@@ -5,7 +5,7 @@ import { NodeSlot } from './slot/node-slot';
 import { NodeData } from './data/node-data';
 import { SuperSlotTypes } from './data/node-data-type';
 
-export class BaseNode {
+export class GraphNode {
     id: string;
     node_name: string;
     type_name: string;
@@ -105,6 +105,27 @@ export class BaseNode {
         return target_slot
     }
 
+    public get_connections() {
+        let combined: NodeConnection[] = [];
+        this.slots.values().forEach(slots => {
+            slots.forEach((slot) => {
+                combined = combined.concat(slot.raw_connections)
+            })
+        });
+
+        return combined;
+    }
+
+    public _add_slot(slot: NodeSlot) {
+        let target_slots = this.slots.get(slot.type.super_type);
+        if (target_slots == undefined) {
+            target_slots = [];
+        }
+
+        this._slots.set(slot.type.super_type, [...target_slots, slot]);
+    }
+
+    // FIXME: Should these be on NodeComponent? 
     public updateSize(width: number, height: number) {
         if (width == 0 && height == 0) {
             return;
@@ -135,25 +156,4 @@ export class BaseNode {
         return { x: (this.x - camera_offset.x), y: (this.y - camera_offset.y) };
     }
 
-    public get_connections() {
-        let combined: NodeConnection[] = [];
-        this.slots.values().forEach(slots => {
-            slots.forEach((slot) => {
-                combined = combined.concat(slot.raw_connections)
-            })
-        });
-
-        return combined;
-    }
-
-    public _add_slot(slot: NodeSlot) {
-        let target_slots = this.slots.get(slot.type.super_type);
-        if (target_slots == undefined) {
-            target_slots = [];
-        }
-
-        this._slots.set(slot.type.super_type, [...target_slots, slot]);
-    }
-
-    
 }

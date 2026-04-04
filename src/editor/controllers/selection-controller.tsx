@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 import { EditorSpace } from "~/editor/internal/editor-space";
 import { Vector2 } from "~/wrapper/data_types/geometry";
-import { BaseNode } from "~/wrapper/nodes/base-node";
+import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { Grid } from "../ui/misc/grid";
 import { SelectionRect } from "../ui/misc/selection_rect";
 
@@ -10,11 +10,11 @@ export class SelectionController {
     editor_space: EditorSpace
     editor_grid: Grid
 
-    _selectedNodes: () => BaseNode[];
-    _setSelectedNodes: (nodes: BaseNode[]) => void;
+    _selectedNodes: () => GraphNode[];
+    _setSelectedNodes: (nodes: GraphNode[]) => void;
     
-    _hovered_node: () => BaseNode | null;
-    _set_hovered_node: (node: BaseNode | null) => void;
+    _hovered_node: () => GraphNode | null;
+    _set_hovered_node: (node: GraphNode | null) => void;
     
     area_selection: boolean = false;
     selecting: boolean = false;
@@ -27,7 +27,7 @@ export class SelectionController {
         this.editor_space = editor_space
         this.editor_grid = editor_grid;
         
-        const [selectedNode, setSelectedNode] = createSignal<BaseNode[]>([]);
+        const [selectedNode, setSelectedNode] = createSignal<GraphNode[]>([]);
         this._selectedNodes = selectedNode
         this._setSelectedNodes = setSelectedNode
 
@@ -46,10 +46,10 @@ export class SelectionController {
     set moving(value: boolean) { this._setMoving(value) }
 
     get hovered_node() { return this._hovered_node(); }
-    set hovered_node(node: BaseNode | null) { this._set_hovered_node(node); }
+    set hovered_node(node: GraphNode | null) { this._set_hovered_node(node); }
 
     get selected_nodes() { return this._selectedNodes() }
-    private set selected_nodes(value: BaseNode[]) { this._setSelectedNodes(value) }
+    private set selected_nodes(value: GraphNode[]) { this._setSelectedNodes(value) }
 
     get has_selected() { return this.selected_nodes.length > 0; }
 
@@ -70,7 +70,7 @@ export class SelectionController {
         this.selecting = false;
     }
 
-    public onClickOnNode(node: BaseNode) {
+    public onClickOnNode(node: GraphNode) {
         if (this.selected_nodes.includes(node)) {
             this.selecting = false;
             this.moving = true;
@@ -103,7 +103,7 @@ export class SelectionController {
         this._setSelectedNodes([])
     }
 
-    public onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: BaseNode[]) {
+    public onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: GraphNode[]) {
         // pos.x = pos.x + this.editor_space.camera.offset.x
         // pos.y = pos.y + this.editor_space.camera.offset.y
 
@@ -137,7 +137,7 @@ export class SelectionController {
             this.selection_rect.size = new_size;
 
             const overlapping_nodes = this.selection_rect.get_overlapping_nodes(all_nodes);
-            let nodes_to_remove = new Array<BaseNode>()
+            let nodes_to_remove = new Array<GraphNode>()
             this.selected_nodes.forEach(node => {
                 if (overlapping_nodes.includes(node)) { 
                     return;

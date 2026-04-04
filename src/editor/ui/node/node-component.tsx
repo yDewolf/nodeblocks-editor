@@ -1,5 +1,5 @@
 import { createMemo, For, onCleanup, Show } from "solid-js";
-import { BaseNode } from "~/wrapper/nodes/base-node";
+import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { NodeField } from "~/editor/ui/node/node-field";
 import { NodeAnchor } from "../misc/node-anchors";
@@ -7,11 +7,11 @@ import { EditorCamera } from "~/editor/internal/editor-space";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 
 export const NodeComponent = (props: { 
-    node: BaseNode, 
+    node: GraphNode, 
     camera: EditorCamera, 
-    onClick: (node: BaseNode) => void, 
+    onClick: (node: GraphNode) => void, 
     onClickOnSlot: (slot: NodeSlot) => void, 
-    onHoverNode: (node: BaseNode) => void, 
+    onHoverNode: (node: GraphNode) => void, 
     onHoverSlot: (slot: NodeSlot) => void 
 }) => {
     let ro: ResizeObserver | undefined;
