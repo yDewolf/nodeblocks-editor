@@ -1,6 +1,6 @@
 import { onMount } from "solid-js";
 import "./app.css";
-import { NodeEditor } from "./components/editor/node-editor";
+import { NodeEditor } from "./editor/node-editor";
 import { NodeServerClient } from "./network/websocket-handler";
 
 const editorClient = new NodeServerClient("localhost", 3001)
