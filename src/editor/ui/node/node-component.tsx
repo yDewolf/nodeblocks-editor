@@ -1,0 +1,99 @@
+import { createMemo, For, onCleanup, Show } from "solid-js";
+import { BaseNode } from "~/wrapper/nodes/base-node";
+import { NodeParameter } from "~/wrapper/nodes/data/node-data";
+import { NodeField } from "~/wrapper/nodes/data/node-field";
+import { NodeAnchor } from "../misc/node-anchors";
+import { EditorCamera } from "~/editor/internal/editor-space";
+import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
+
+export const NodeComponent = (props: { 
+    node: BaseNode, 
+    camera: EditorCamera, 
+    onClick: (node: BaseNode) => void, 
+    onClickOnSlot: (slot: NodeSlot) => void, 
+    onHoverNode: (node: BaseNode) => void, 
+    onHoverSlot: (slot: NodeSlot) => void 
+}) => {
+    let ro: ResizeObserver | undefined;
+    const handleRef = (el: HTMLDivElement) => {
+        const rect = el.getBoundingClientRect();
+        props.node.updateSize(rect.width / props.camera.zoom, rect.height / props.camera.zoom);
+
+        ro = new ResizeObserver((entries) => {
+            const entry = entries[0];
+            if (entry) {
+                props.node.updateSize(
+                    entry.contentRect.width, 
+                    entry.contentRect.height
+                );
+            }
+        });
+        ro.observe(el);
+    };
+
+    onCleanup(() => ro?.disconnect());
+
+    const isVisible = createMemo(() => {
+        return props.camera.camera_rect.overlaps(props.node.rect);
+    });
+
+    return (
+            <Show when={isVisible()}>
+                <div 
+                    ref={handleRef}
+                    onMouseOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        props.onHoverNode(props.node);
+                    }}
+                    style={{
+                        position: "absolute",
+                        transform: `translate(${props.node.x}px, ${props.node.y}px)`,
+                        // "pointer-events": "none"
+                    }}
+                >
+                    <div class="node-slots">
+                        <NodeAnchor anchor_pos={{x: 0, y: -1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
+                        <div class="side-anchors">
+                            <NodeAnchor anchor_pos={{x: -1, y: 0}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
+                            <div></div>
+                            <NodeAnchor anchor_pos={{x: 1, y: 0}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
+                        </div>
+                        <NodeAnchor anchor_pos={{x: 0, y: 1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
+                    </div>
+                     <div
+                        class="internal-node"
+                        data-node-id={props.node.id}
+                        onPointerDown={(e) => {
+                            if (e.button != 0) {
+                                return;
+                            }
+                            // FIXME: Stop Propagation shouldn't break PointerDown Cleanup
+                            // e.stopPropagation();
+                            (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+                            props.onClick(props.node);
+                        }}
+                        classList={{
+                            "selected-mode": props.node.selected
+                        }}
+                    >
+                        <div class="node-body">
+                            <div class="node-header">{props.node.node_name}</div>
+                            
+                            <div class="node-content">
+                                <For each={props.node.node_data.parameters.values().toArray()}>
+                                    {(parameter: NodeParameter) => <NodeField 
+                                            node={props.node}
+                                            parameter={parameter}
+                                        />
+                                    }
+                                </For>
+                                <div class="node-internal-data"> ... </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Show>
+        );
+};
