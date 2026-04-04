@@ -1,11 +1,22 @@
 ## High Priority
-- [x] Input Manager (doing)
+- [ ] Server Status UI Indicator
+- [ ] Server Communication
+    - [ ] Add/Remove Nodes
+    - [ ] Add/Remove Connections
+    
+- [ ] Server Command Panel
+- [x] Input Manager
 - [x] Node Selector (UI for selecting node types)
 - [x] Save Node Scene
 - [x] Load Node Scene
 
 ## Medium Priority
-- [ ] Node Interpreter Server
+- [ ] Debug UI (show scene status)
+- [ ] Improve Editor UI
+    - [ ] Node Selector
+    - [ ] File Selector
+
+- [X] Node Interpreter Server
     - Take Node Scene file and parse it to whatever it is supposed to
     - Default Node Classes (so nodes can be loaded but not parsed to a custom type)
         - Node Connection Controller (maybe)
