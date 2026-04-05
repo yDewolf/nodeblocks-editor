@@ -35,7 +35,6 @@ export class GraphNode {
         this.node_name = node_name;
         this.raw_pos = position;
 
-        console.log(node_data);
         const [nodeData, setNodeData] = createSignal(node_data);
         this._node_data = nodeData;
         this._set_node_data = setNodeData;

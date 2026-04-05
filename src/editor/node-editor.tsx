@@ -227,6 +227,15 @@ export class NodeEditor {
             this.scene_controller.load_node_type_data(message.type_data);
         });
 
+        this._editor_client.set_handler("sync_instance_state", (message) => {
+            if (message.type != "sync_instance_state") {
+                return;
+            }
+
+            console.log("DEBUG: Received Sync Instance States", message.payload);
+            // TODO: Do something with the new states like update UI, disable actions, etc.
+        });
+
         this._editor_client.set_handler("node_output", (message) => {
             if (message.type != "node_output") {
                 return;
@@ -256,9 +265,8 @@ export class NodeEditor {
             if (message.type != "sync_client_scene") {
                 return;
             }
-            if (message.payload) {
-                const scene_data = this.scene_controller.load_scene_data(message.payload);
-            }
+
+            const scene_data = this.scene_controller.load_scene_data(message.payload);
         });
     }
 
@@ -383,10 +391,10 @@ export class NodeEditor {
                     </div>
                     <div class="right-tab">
                         <div class="input-row">
-                            <button onclick={() => {this._editor_client.sendCommand({type: "STEP"})}}>STEP</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: "INSTANCE", payload: {action: "STEP"}})}}>STEP</button>
                             <button onclick={() => {this._editor_client.sendCommand({type: "LOAD_SCENE", payload: NodeSceneFile.scene_data_to_json(this.scene_controller.gen_scene_data())})}}>Send Current Scene</button>
-                            <button onclick={() => {this._editor_client.sendCommand({type: "RUN"})}}>Run Instance</button>
-                            <button onclick={() => {this._editor_client.sendCommand({type: "STOP"})}}>Stop Instance</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: "INSTANCE", payload: {action: "RUN"}})}}>Run Instance</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: "INSTANCE", payload: {action: "STOP"}})}}>Stop Instance</button>
                             <button onclick={() => {this._editor_client.sendCommand({type: "SYNC_CLIENT_SCENE"})}}>Load Server Scene</button>
                         </div>
                     </div>

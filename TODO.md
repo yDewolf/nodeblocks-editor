@@ -33,6 +33,8 @@
 - [ ] NodeType file editor
 
 ## Quality of Life (Unordered)
+- [ ] Different shapes for each slot type
+- [ ] Highlight connectable slots
 - [ ] Copying and pasting nodes
 - [ ] Node "Circuits"
     - Save some Node configuration as a Circuit so you can just paste the Circuit anywhere you need

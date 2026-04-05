@@ -104,6 +104,14 @@ export class NodeSceneFile {
         this.notify();
     }
 
+    public clear_data() {
+        this.file = null;
+        this.file_path = null;
+        this.raw_data = null;
+        this.scene_data = null;
+        this.notify();
+    }
+
     public load_from_json_data(json_data: any) {
         this.raw_data = json_data;
         const data = NodeSceneFile.json_to_scene_data(json_data)

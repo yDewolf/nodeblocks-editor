@@ -103,7 +103,7 @@ export class SceneController {
         return true;
     }
 
-    protected _clear_scene() {
+    public _clear_scene() {
         this.node_controller.clear();
         this.connection_controller.clear();
     }
@@ -176,9 +176,13 @@ export class SceneController {
     }
 
     public load_scene_data(scene_data: any) {
-        this.node_scene_reader.load_from_json_data(scene_data);
-        
-        this.node_scene_reader.swap_virtual_data();
+        if (scene_data) {
+            this.node_scene_reader.load_from_json_data(scene_data);
+            this.node_scene_reader.swap_virtual_data();
+        } else {
+            this.node_scene_reader.clear_data();
+        }
+
         this._clear_scene();
         this._parse_loaded_node_scene();
     }
