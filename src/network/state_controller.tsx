@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 import { NodeServerClient } from "./websocket-handler";
-import { InstanceStates, LoopStates } from "./websocket-protocol";
+import { ClientMessages, InstanceCommands, InstanceStates, LoopStates } from "./websocket-protocol";
 
 export class StateController {
     private _client: NodeServerClient;
@@ -38,4 +38,18 @@ export class StateController {
     }
 
     get instance_state() {return this._instance_state();}
+    get loop_state() {return this._loop_state(); }
+
+    public request_play() {
+        console.log(this._client);
+        if (this._client) {
+            this._client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.RUN}})
+        }
+    }
+
+    public request_stop() {
+        if (this._client) {
+            this._client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.STOP}})
+        }
+    }
 }

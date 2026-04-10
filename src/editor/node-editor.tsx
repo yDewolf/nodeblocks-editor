@@ -18,9 +18,13 @@ import { NodePreview } from "./ui/misc/node-preview";
 import { NodeComponent } from './ui/node/node-component';
 import { ServerPanel } from "./ui/panels/server-panel";
 import { ClientMessages, InstanceCommands } from "~/network/websocket-protocol";
+import { StateController } from "~/network/state_controller";
+import { WebsocketStatusController } from "~/network/status_controller";
 
 export class NodeEditor {
     _editor_client: NodeServerClient
+    _state_controller: StateController
+    _status_controller: WebsocketStatusController
 
     scene_controller: SceneController;
     tool_controller: ToolController
@@ -36,6 +40,8 @@ export class NodeEditor {
 
     constructor (editor_client: NodeServerClient) {
         this._editor_client = editor_client;
+        this._state_controller = new StateController(this._editor_client);
+        this._status_controller = new WebsocketStatusController(this._editor_client);
         this.scene_controller = new SceneController();
 
         const [cursorWorldPos, setCursorWorldPos] = createSignal({x: 0, y: 0});
@@ -394,12 +400,10 @@ export class NodeEditor {
                         {this.tool_controller.View()}
                     </div>
                     <div class="right-tab">
-                        <ServerPanel client={this._editor_client} editor={this}/>
+                        <ServerPanel editor={this} state_controller={this._state_controller}/>
                         <div class="input-row">
                             <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.STEP}})}}>STEP</button>
                             <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.LOAD_SCENE, payload: NodeSceneFile.scene_data_to_json(this.scene_controller.gen_scene_data())})}}>Send Current Scene</button>
-                            <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.RUN}})}}>Run Instance</button>
-                            <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.STOP}})}}>Stop Instance</button>
                             <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.SYNC_CLIENT_SCENE})}}>Load Server Scene</button>
                         </div>
                     </div>

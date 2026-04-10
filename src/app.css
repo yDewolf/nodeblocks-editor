@@ -2,6 +2,8 @@
 @import url("style/misc.css");
 @import url("style/node-selector.css");
 @import url("style/node.css");
+@import url("style/panels.css");
+
 
 :root {
   --selection-color: #7bb4ff;

@@ -41,7 +41,10 @@ export class NodeServerClient {
                         this.handleMessage(data);
                     };
     
-                    this.socket.onclose = () => console.log("[Disconnected]");
+                    this.socket.onclose = () => {
+                        console.log("[Disconnected]");
+                        this.socket = null;
+                    };
                 } catch (err) {
                     this.is_connecting = false;
                     reject(err)
