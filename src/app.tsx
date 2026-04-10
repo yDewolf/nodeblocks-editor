@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import { onMount } from "solid-js";
 import "./app.css";
 import { NodeEditor } from "./editor/node-editor";
@@ -5,10 +6,11 @@ import { NodeServerClient } from "./network/websocket-handler";
 
 const editorClient = new NodeServerClient("localhost", 3001)
 const node_editor = new NodeEditor(editorClient);
+const client_id: string = nanoid();
 
 async function testHandleConnection() {
   try {
-    const promise = await editorClient.connect("test_client");
+    const promise = await editorClient.connect(client_id);
   } catch (error) {
     console.error("Couldn't connect to server:", error);
     console.log("Loading default types")

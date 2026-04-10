@@ -5,6 +5,8 @@
     - [ ] Add/Remove Connections
     
 - [ ] Server Command Panel
+- [ ] New Node Field Type -> File (takes any file, .zip and sends to server with the scene)
+- [ ] Implement Basic Torch Server
 - [x] Input Manager
 - [x] Node Selector (UI for selecting node types)
 - [x] Save Node Scene
