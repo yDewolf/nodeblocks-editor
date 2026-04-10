@@ -16,6 +16,8 @@ import { ConnectionLines, ConnectionPreview } from "./ui/misc/connection-lines";
 import { Grid } from "./ui/misc/grid";
 import { NodePreview } from "./ui/misc/node-preview";
 import { NodeComponent } from './ui/node/node-component';
+import { ServerPanel } from "./ui/panels/server-panel";
+import { ClientMessages, InstanceCommands } from "~/network/websocket-protocol";
 
 export class NodeEditor {
     _editor_client: NodeServerClient
@@ -223,8 +225,10 @@ export class NodeEditor {
                 return;
             }
             
-            console.log("DEBUG: Parsing Type Data: ", message.type_data);
-            this.scene_controller.load_node_type_data(message.type_data);
+            if ("type_data" in message) {
+                console.log("DEBUG: Parsing Type Data: ", message.type_data);
+                this.scene_controller.load_node_type_data(message.type_data);
+            }
         });
 
         this._editor_client.set_handler("sync_instance_state", (message) => {
@@ -390,12 +394,13 @@ export class NodeEditor {
                         {this.tool_controller.View()}
                     </div>
                     <div class="right-tab">
+                        <ServerPanel client={this._editor_client} editor={this}/>
                         <div class="input-row">
-                            <button onclick={() => {this._editor_client.sendCommand({type: "INSTANCE", payload: {action: "STEP"}})}}>STEP</button>
-                            <button onclick={() => {this._editor_client.sendCommand({type: "LOAD_SCENE", payload: NodeSceneFile.scene_data_to_json(this.scene_controller.gen_scene_data())})}}>Send Current Scene</button>
-                            <button onclick={() => {this._editor_client.sendCommand({type: "INSTANCE", payload: {action: "RUN"}})}}>Run Instance</button>
-                            <button onclick={() => {this._editor_client.sendCommand({type: "INSTANCE", payload: {action: "STOP"}})}}>Stop Instance</button>
-                            <button onclick={() => {this._editor_client.sendCommand({type: "SYNC_CLIENT_SCENE"})}}>Load Server Scene</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.STEP}})}}>STEP</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.LOAD_SCENE, payload: NodeSceneFile.scene_data_to_json(this.scene_controller.gen_scene_data())})}}>Send Current Scene</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.RUN}})}}>Run Instance</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.STOP}})}}>Stop Instance</button>
+                            <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.SYNC_CLIENT_SCENE})}}>Load Server Scene</button>
                         </div>
                     </div>
                 </div>

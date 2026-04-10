@@ -1,13 +1,16 @@
+import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, SceneActions, ServerMessages } from "./websocket-protocol";
+
+
 export type ServerMessage = 
-    | { type: "node_output"; node_id: string; value: any }
-    | { type: "status"; status: string; session: string }
-    | { type: "handshake_sync"; type_data: any; session: string }
-    | { type: "error"; message: string }
-    | { type: "sync_client_scene"; payload: any }
-    | { type: "sync_instance_state"; payload: {loop_state: any, instance_state: any} };
+    | { type: ServerMessages.NODE_OUTPUT; node_id: string; value: any }
+    | { type: ServerMessages.HANDSHAKE_SYNC; status: string; session: string, type_data: any}
+    | { type: ServerMessages.HANDSHAKE_SYNC; message: string }
+    | { type: ServerMessages.SYNC_CLIENT_SCENE; payload: any }
+    | { type: ServerMessages.SYNC_INSTANCE_STATE; payload: {loop_state: any, instance_state: any} };
 
 export type ClientCommand = 
-    | { type: "INSTANCE", payload: {action: "RUN" | "STOP" | "STEP" | "RESUME"} }
-    | { type: "LOAD_SCENE"; payload: any }
-    | { type: "SYNC_CLIENT_SCENE" }
-    | { type: "SET_LOOP_STATE"; payload: { state: number } };
+    | { type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands} }
+    | { type: ClientMessages.LOAD_SCENE; payload: any }
+    | { type: ClientMessages.SYNC_CLIENT_SCENE }
+    | { type: ClientMessages.SET_INSTANCE_LOOP_STATE; payload: { state: LoopStates } }
+    | { type: ClientMessages.SET_INSTANCE_STATE; payload: { state: InstanceStates } };
