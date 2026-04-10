@@ -402,7 +402,6 @@ export class NodeEditor {
                     <div class="right-tab">
                         <ServerPanel editor={this} state_controller={this._state_controller}/>
                         <div class="input-row">
-                            <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.STEP}})}}>STEP</button>
                             <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.LOAD_SCENE, payload: NodeSceneFile.scene_data_to_json(this.scene_controller.gen_scene_data())})}}>Send Current Scene</button>
                             <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.SYNC_CLIENT_SCENE})}}>Load Server Scene</button>
                         </div>
