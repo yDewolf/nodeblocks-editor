@@ -16,23 +16,21 @@
 }
 
 .button-tab {
-    height: 30px;
+    height: 45px;
     background-color: white;
 }
 
 .tabs {
-    height: 100%;
     display: flex;
     align-items: center;
     list-style: none;
-    padding: 0;
+    padding: 10px 5px;
 }
 
 .tab-item {
     height: 100%;
     align-content: center;
 
-    padding: 0 5px;
     border-right: 2px solid gray;
 }
 

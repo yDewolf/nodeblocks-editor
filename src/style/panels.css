@@ -1,7 +1,20 @@
 .server-panel {
     padding: 10px 8px;
+}
+
+.panel-column {
     display: flex;
+    flex-direction: column;
+}
+
+.panel-row {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+}
+
+.control-panel {
+    justify-content: right;
 }
 
 .state-panel {
@@ -12,7 +25,8 @@
     height: 0;
     width: 0;
     border-radius: 50%;
-    padding: 8px;
+    padding: 12px;
+    margin: 5px;
     background-color: gray;
 }
 
@@ -28,13 +42,45 @@
     background-color: gray;
 }
 
-.state-button {
+@keyframes scaleUp {
+  0% { transform: scale(0); }
+  95% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.icon-button {
+    animation: scaleUp 100ms ease-out;
+    display: flex;
+    align-items: center;
+
     background: none;
     border: none;
 
     cursor: pointer;
     img {
+
         width: 32px;
         height: 32px;
     }
+}
+
+.icon-button:hover {
+    transform: scale(1.2);
+}
+
+.icon-button.no-animation:hover {
+    transform: inherit;
+}
+
+@keyframes keepSpinning {
+    0% {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+}
+
+.auto-loop {
+    animation: keepSpinning 1500ms linear infinite;
+}
+
+.wait-resume {
+    animation: keepSpinning 1500ms linear infinite;
 }

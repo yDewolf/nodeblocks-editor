@@ -1,5 +1,6 @@
 
 .node-type-selector {
+  justify-content: left;
   display: flex;
   flex-direction: column;
 }

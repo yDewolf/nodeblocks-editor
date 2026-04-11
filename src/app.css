@@ -46,12 +46,18 @@ body {
 
 .right-tab {
   /* display: none; */
+  height: fit-content;
   width: 20%;
+  pointer-events: none;
+
+  * {
+    pointer-events: auto;
+  }
 }
 
 .left-tab {
   width: fit-content;
-  /* width: 20%; */
+  min-width: 300px;
   background-color: rgba(28, 29, 37, 0.521);
 }
 

@@ -389,7 +389,9 @@ export class NodeEditor {
                                             this.scene_controller.safe_change_scene_file(selected_file);
                                         }
                                     }/>
-                                    <label for="scene-input">File</label>
+                                    <label for="scene-input" class="icon-button no-animation">
+                                        <img src="assets/icons/file.svg" alt="File" title="Open Scene"/>
+                                    </label>
                                 </li>
                             </ul>
                         </div>
@@ -402,8 +404,7 @@ export class NodeEditor {
                     <div class="right-tab">
                         <ServerPanel editor={this} state_controller={this._state_controller}/>
                         <div class="input-row">
-                            <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.LOAD_SCENE, payload: NodeSceneFile.scene_data_to_json(this.scene_controller.gen_scene_data())})}}>Send Current Scene</button>
-                            <button onclick={() => {this._editor_client.sendCommand({type: ClientMessages.SYNC_CLIENT_SCENE})}}>Load Server Scene</button>
+                            
                         </div>
                     </div>
                 </div>

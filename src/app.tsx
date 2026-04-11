@@ -19,6 +19,12 @@ async function testHandleConnection() {
   }
 }
 
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    editorClient.disconnect();
+  });
+}
+
 export default function App() {
   onMount(() => {
     window.addEventListener("beforeunload", (e) => {
