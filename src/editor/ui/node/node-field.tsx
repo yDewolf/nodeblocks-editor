@@ -1,48 +1,80 @@
 import { GraphNode } from "../../../wrapper/nodes/graph-node";
 import { NodeParameter } from "../../../wrapper/nodes/data/node-data";
 import { DataTypes } from "../../../wrapper/nodes/data/node-data-type";
+import { Show } from "solid-js";
 
 
 export const NodeField = (props: {node: GraphNode | null, parameter: NodeParameter}) => {
+    let inputRef!: HTMLInputElement;
+    
     const field_id = props.node?.id.toString() + props.parameter._field_name;
     let input_type = "text";
+    let step = props.parameter._step ?? undefined;
+    let min = props.parameter._range?.at(0);
+    const max = props.parameter._range?.at(1);
+    const clamp = (val: number, min?: number, max?: number) => {
+        if (min !== undefined && val < min) return min;
+        if (max !== undefined && val > max) return max;
+        return val;
+    };
+
     switch (props.parameter.type.super_type) {
-        case DataTypes.FLOAT: input_type = "number";
-        case DataTypes.INT: input_type = "number";
-        case DataTypes.UINT: input_type = "number";
+        case DataTypes.FLOAT: 
+            input_type = "number"; 
+            step = step != undefined ? step : 0.1;
+            break
+        case DataTypes.INT: 
+            input_type = "number";
+            break
+
+        case DataTypes.UINT: 
+            input_type = "number"; 
+            min = min != undefined ? min : 0;
+            break
     }
 
-    const onBeforeInput = (event: InputEvent) => {
-        let value = event.data;
-        if (!value) {
-            return;
+    if (props.parameter._range) { input_type = "range" }
+
+    const onInputValueChanged = (raw_value: any) => {
+        if (raw_value === "") return;
+
+        let new_value: any = raw_value;
+        if (input_type === "number") {
+            let parsed = props.parameter.type.super_type === DataTypes.FLOAT ? parseFloat(raw_value) : parseInt(raw_value);
+            if (isNaN(parsed)) return;
+
+            new_value = clamp(parsed, min, max);
         }
 
-        if ((props.parameter._range && props.parameter._range.length > 1)) {
-            const minimum = props.parameter._range[0];
-            const maximum = props.parameter._range[-1];
-            
-            const parsed_value = Number.parseFloat(value);
-            if (parsed_value < minimum || parsed_value > maximum) {
-                event.preventDefault()
-            }
+        if (new_value !== props.parameter.value) {
+            props.parameter.value = new_value;
         }
-    }
 
-    const onInputValueChanged = (new_value: any) => {
-        // if (typeof new_value == typeof props.parameter.value) {
-        // console.log("DEBUG: Setting parameter ", props.parameter._field_name, "of node ", props.node?.id, " to ", new_value, " previous value: ", props.parameter.value);
-        if (input_type == "number") {
-            new_value = Number.parseFloat(new_value);
+        if (inputRef) {
+            inputRef.value = props.parameter.value.toString()
         }
-        props.parameter.value = new_value;
-        // }
     }
 
     return (
         <div class="node-field" classList={{"remove-input": props.node == null}}>
             <label for={field_id}>{props.parameter._field_name}</label>
-            <input name={field_id} type={input_type} value={props.parameter.value} onBeforeInput={(event) => onBeforeInput(event)} onInput={(event) => onInputValueChanged(event.currentTarget.value)}/>
+            <input
+                ref={inputRef}
+                name={field_id} 
+                type={input_type}
+                value={props.parameter.value ?? ""} 
+                onInput={(event) => {
+                    event.preventDefault();
+                    onInputValueChanged(event.currentTarget.value)}
+                }
+                onPointerDown={(event) => {
+                    event.stopPropagation();
+                }}
+                step={step}
+                min={min}
+                max={max}
+            />
+            <Show when={input_type == "range"}>{props.parameter.value}</Show>
         </div>
     );
 }

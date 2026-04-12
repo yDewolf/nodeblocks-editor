@@ -4,6 +4,7 @@ import { createSignal } from "solid-js";
 
 export class NodeParameter {
     type: BaseNodeType
+    _step: number | null = null
     _range: number[] | null = null
     _field_name: string
 
@@ -15,6 +16,9 @@ export class NodeParameter {
     constructor(field_data: NodeDataModel, field_name: string) {
         this._field_name = field_name;
         this._raw_field_data = field_data;
+        if (field_data.step) {
+            this._step = field_data.step;
+        }
         if (field_data.range) {
             this._range = field_data.range;
         }

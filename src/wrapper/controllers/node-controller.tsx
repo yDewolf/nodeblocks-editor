@@ -1,7 +1,7 @@
-import { Accessor, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import { Vector2 } from '~/wrapper/data_types/geometry';
 import { GraphNode } from '../nodes/graph-node';
-import { BaseNodeConstructor, CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
+import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
 
 export class NodeController {
@@ -27,8 +27,12 @@ export class NodeController {
     }
 
 
-    public get_node(id: string): GraphNode {
+    public get_node(id: string): GraphNode | null {
         const filtered = this.nodes.filter((node) => node.id == id);
+        if (!filtered) {
+            return null;
+        }
+
         return filtered[0];
     }
 

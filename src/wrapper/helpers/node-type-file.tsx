@@ -26,6 +26,7 @@ export interface SlotData {
 
 export interface NodeDataModel {
     type: string,
+    step: number | null,
     range: any | null,
 }
 
@@ -190,6 +191,7 @@ export class NodeTypeFile {
                     parameters: new Map(Object.entries(data.parameters || {}).map(([param_id, param_data]: [string, any]) => {
                         return [param_id, {
                             type: param_data.type,
+                            step: param_data.step ?? null,
                             range: param_data.range ?? null
                         }];
                     })),
