@@ -120,6 +120,7 @@ export class NodeTypeFile {
 
     public async _load_file_data_async(file: File) {
         const json_data = JSON.parse(await file.text());
+        const type_data = NodeTypeFile.json_to_type_file(json_data);
         this._parse_type_data(json_data);
     }
 
@@ -132,9 +133,10 @@ export class NodeTypeFile {
                 return;
             }
             
-            this._parse_type_data(json_data);
+            const type_data = NodeTypeFile.json_to_type_file(json_data);
+            this._parse_type_data(type_data);
         } catch {
-
+            
         }
     }
 
@@ -142,7 +144,7 @@ export class NodeTypeFile {
         this.raw_data = json_data;
         this.node_types_version = json_data.version;
         this.node_types_id = json_data.id;
-        
+
         // Parse Slot Types
         json_data.slot_types.forEach((type_data, type_name) => {
             const custom_type = new CustomSlotType(

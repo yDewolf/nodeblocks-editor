@@ -1,9 +1,9 @@
 import { NodeEditor } from "~/editor/node-editor";
 import { StatePanel } from "./state-panel";
-import { StateController } from "~/network/state_controller";
+import { StateController } from "~/network/controllers/state_controller";
 import { Match, Switch } from "solid-js";
-import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, WebsocketStatus } from "~/network/websocket-protocol";
-import { WebsocketStatusController } from "~/network/status_controller";
+import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, WebsocketStatus } from "~/network/websocket/websocket-protocol";
+import { WebsocketStatusController } from "~/network/controllers/status_controller";
 import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 
 export const ServerStatus = (props: {status_controller: WebsocketStatusController}) => {
@@ -50,10 +50,10 @@ export const ServerPanel = (props: {editor: NodeEditor, state_controller: StateC
                     <ServerStatus status_controller={props.editor._status_controller}/>
                 </div>
                 <div class="control-panel panel-row">
-                    <button class="icon-button" onclick={() => {props.editor._editor_client.sendCommand({type: ClientMessages.LOAD_SCENE, payload: NodeSceneFile.scene_data_to_json(props.editor.scene_controller.gen_scene_data())})}}>
+                    <button class="icon-button" onclick={() => {props.editor._sync_controller.send_local_scene()}}>
                         <img src="assets/icons/send-file.svg" alt="Upload Scene" title="Upload Scene"/>
                     </button>
-                    <button class="icon-button" onclick={() => {props.editor._editor_client.sendCommand({type: ClientMessages.SYNC_CLIENT_SCENE})}}>
+                    <button class="icon-button" onclick={() => {props.editor._sync_controller.sync_with_server_scene()}}>
                         <img src="assets/icons/download-file.svg" alt="Load Scene" title="Load Scene"/>
                     </button>
                 </div>

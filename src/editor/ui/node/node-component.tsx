@@ -53,6 +53,7 @@ export const NodeComponent = (props: {
                         transform: `translate(${props.node.x}px, ${props.node.y}px)`,
                         // "pointer-events": "none"
                     }}
+                    class="node"
                 >
                     <div class="node-slots">
                         <NodeAnchor anchor_pos={{x: 0, y: -1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>

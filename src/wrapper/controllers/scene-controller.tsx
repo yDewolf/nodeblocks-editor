@@ -165,7 +165,6 @@ export class SceneController {
         this.node_type_reader._load_file_async(file_path).then(
             () => {
                 this.node_controller.load_node_types(this.node_type_reader);
-                console.log("loaded file", this.node_type_reader.node_constructors)
             }
         );
     }

@@ -1,11 +1,15 @@
+import { nanoid } from "nanoid";
 import { ClientCommand, ServerMessage } from "./request-types";
+import { ServerMessages } from "./websocket-protocol";
+
+type MessageByType<MessageType extends ServerMessages> = Extract<ServerMessage, {type: MessageType}>
 
 export class NodeServerClient {
     private socket: WebSocket | null = null;
     private baseUrl: string;
     
     private is_connecting: boolean = false;
-    private message_handlers: Map<string, ((message: ServerMessage) => void)[]>
+    private message_handlers: Map<ServerMessages, Map<string, ((message: any) => void)>>
 
     constructor(host: string = "localhost", port: number = 3001) {
         this.baseUrl = `ws://${host}:${port}`;
@@ -52,20 +56,31 @@ export class NodeServerClient {
             });
     }
 
-    public set_handler(message_type: string, handler_func: (message: ServerMessage) => void) {
+    public add_handler<MessageType extends ServerMessages>(message_type: MessageType, handler_func: (message: MessageByType<MessageType>) => void): string{
         if (!this.message_handlers.has(message_type)) {
-            this.message_handlers.set(message_type, []);
+            this.message_handlers.set(message_type, new Map());
         }
 
         let handlers = this.message_handlers.get(message_type);
-        if (handlers == null) {handlers = [];}
-        this.message_handlers.set(message_type, [...handlers, handler_func])
+        if (handlers == null) {handlers = new Map();}
+        const handler_id = nanoid(6);
+        
+        handlers.set(handler_id, handler_func)
+        this.message_handlers.set(message_type, handlers)
+        return handler_id;
+    }
+
+    public remove_handler(handler_type: ServerMessages, handler_id: string) {
+        const handlers = this.message_handlers.get(handler_type);
+        if (handlers) {
+            return handlers.delete(handler_id);
+        }
     }
 
     private handleMessage(message: ServerMessage) {
         const handlers = this.message_handlers.get(message.type);
         if (handlers) {
-            handlers.forEach((handler) => {
+            handlers.forEach((handler, key) => {
                 handler(message);
             })
         }

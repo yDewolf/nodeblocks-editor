@@ -7,7 +7,7 @@ import { KeyEventManager as GeneralEventManager } from "./internal/input_manager
 import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./internal/input_manager/keybind-events";
 import { EventHandler, InputEvents } from "./internal/input_manager/event-handling";
 import { SceneController } from "../wrapper/controllers/scene-controller";
-import { NodeServerClient } from "~/network/websocket-handler";
+import { NodeServerClient } from "~/network/websocket/websocket-handler";
 import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
@@ -17,14 +17,16 @@ import { Grid } from "./ui/misc/grid";
 import { NodePreview } from "./ui/misc/node-preview";
 import { NodeComponent } from './ui/node/node-component';
 import { ServerPanel } from "./ui/panels/server-panel";
-import { ClientMessages, InstanceCommands } from "~/network/websocket-protocol";
-import { StateController } from "~/network/state_controller";
-import { WebsocketStatusController } from "~/network/status_controller";
+import { ClientMessages, InstanceCommands, ServerMessages } from "~/network/websocket/websocket-protocol";
+import { StateController } from "~/network/controllers/state_controller";
+import { WebsocketStatusController } from "~/network/controllers/status_controller";
+import { ServerSyncController } from "~/network/controllers/sync_controller";
 
 export class NodeEditor {
     _editor_client: NodeServerClient
     _state_controller: StateController
     _status_controller: WebsocketStatusController
+    _sync_controller: ServerSyncController
 
     scene_controller: SceneController;
     tool_controller: ToolController
@@ -43,6 +45,7 @@ export class NodeEditor {
         this._state_controller = new StateController(this._editor_client);
         this._status_controller = new WebsocketStatusController(this._editor_client);
         this.scene_controller = new SceneController();
+        this._sync_controller = new ServerSyncController(this._editor_client, this.scene_controller)
 
         const [cursorWorldPos, setCursorWorldPos] = createSignal({x: 0, y: 0});
         this._cursor_world_pos = cursorWorldPos;
@@ -226,31 +229,14 @@ export class NodeEditor {
     }
 
     public setup_message_handlers() {
-        this._editor_client.set_handler("handshake_sync", (message) => {
-            if (message.type != "handshake_sync") {
-                return;
-            }
-            
+        this._editor_client.add_handler(ServerMessages.HANDSHAKE_SYNC, (message) => {
             if ("type_data" in message) {
                 console.log("DEBUG: Parsing Type Data: ", message.type_data);
                 this.scene_controller.load_node_type_data(message.type_data);
             }
         });
 
-        this._editor_client.set_handler("sync_instance_state", (message) => {
-            if (message.type != "sync_instance_state") {
-                return;
-            }
-
-            console.log("DEBUG: Received Sync Instance States", message.payload);
-            // TODO: Do something with the new states like update UI, disable actions, etc.
-        });
-
-        this._editor_client.set_handler("node_output", (message) => {
-            if (message.type != "node_output") {
-                return;
-            }
-            
+        this._editor_client.add_handler(ServerMessages.NODE_OUTPUT, (message) => {
             const node = this.scene_controller.node_controller.get_node(message.node_id);
             if (node == undefined) {
                 console.error("ERROR: Couldn't find node with id ", message.node_id);
@@ -269,14 +255,6 @@ export class NodeEditor {
                 }
             });
             node.last_output = node_output;
-        });
-
-        this._editor_client.set_handler("sync_client_scene", (message) => {
-            if (message.type != "sync_client_scene") {
-                return;
-            }
-
-            const scene_data = this.scene_controller.load_scene_data(message.payload);
         });
     }
 

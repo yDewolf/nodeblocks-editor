@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
-import { NodeServerClient } from "./websocket-handler";
-import { ClientMessages, InstanceCommands, InstanceStates, LoopStates } from "./websocket-protocol";
+import { NodeServerClient } from "../websocket/websocket-handler";
+import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, ServerMessages } from "../websocket/websocket-protocol";
 
 export class StateController {
     private _client: NodeServerClient;
@@ -25,11 +25,7 @@ export class StateController {
     }
 
     private setup_handlers() {
-        this._client.set_handler("sync_instance_state", (message) => {
-            if (message.type != "sync_instance_state") {
-                return
-            }
-
+        this._client.add_handler(ServerMessages.SYNC_INSTANCE_STATE, (message) => {
             const instance_state = message.payload.instance_state as InstanceStates;
             const loop_state = message.payload.loop_state as LoopStates;
             this._set_instance_state(instance_state);

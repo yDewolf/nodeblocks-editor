@@ -11,7 +11,13 @@
 
   pointer-events: none;
   transform: scale(0.75);
-  width: fit-content;
+  width: auto;
+
+  .node-field {
+    input {
+      width: 100%;
+    }
+  }
 }
 
 .node-type-preview:hover {

@@ -1,5 +1,9 @@
 @import url("node-output.css");
 
+.node {
+  width: fit-content;
+}
+
 .internal-node {
   pointer-events: auto;
   cursor: pointer;
@@ -135,6 +139,7 @@
 }
 
 .node-field {
+  width: 100%;
   display: flex;
   label {
     margin-right: 10px;

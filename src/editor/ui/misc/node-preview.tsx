@@ -28,12 +28,11 @@ export class NodePreview {
         return (
             <div 
                 onPointerDown={() => onPointerDown(this)}
-                class="node-type-preview remove-input"
+                class="node node-type-preview remove-input"
                 classList={{
                     "selected-node-type": this._selected()
                 }}
                 style={{
-                    width: "fit-content",
                     cursor: "pointer"
                 }}
             >

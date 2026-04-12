@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
-import { NodeServerClient } from "./websocket-handler";
-import { InstanceStates, LoopStates, ClientMessages, InstanceCommands, WebsocketStatus } from "./websocket-protocol";
+import { NodeServerClient } from "../websocket/websocket-handler";
+import { InstanceStates, LoopStates, ClientMessages, InstanceCommands, WebsocketStatus, ServerMessages } from "../websocket/websocket-protocol";
 
 export class WebsocketStatusController {
     private _client: NodeServerClient;
@@ -19,11 +19,7 @@ export class WebsocketStatusController {
     }
 
     private setup_handlers() {
-        this._client.set_handler("handshake_sync", (message) => {
-            if (message.type != "handshake_sync") {
-                return
-            }
-
+        this._client.add_handler(ServerMessages.HANDSHAKE_SYNC, (message) => {
             if ("status" in message) {
                 const status = message.status as WebsocketStatus;
                 this._set_websocket_status(status);

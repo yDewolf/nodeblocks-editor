@@ -1,6 +1,6 @@
 import { Match, Switch } from "solid-js"
-import { StateController } from "~/network/state_controller"
-import { InstanceStates, LoopStates } from "~/network/websocket-protocol"
+import { StateController } from "~/network/controllers/state_controller"
+import { InstanceStates, LoopStates } from "~/network/websocket/websocket-protocol"
 
 
 
