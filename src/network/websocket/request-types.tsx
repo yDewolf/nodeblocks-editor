@@ -1,4 +1,16 @@
+import { ConnectionSceneData, MinimalNodeSceneData } from "~/wrapper/helpers/node-scene-file";
 import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, SceneActions, ServerMessages } from "./websocket-protocol";
+
+
+export type NodeActionPayload = 
+    | {action: SceneActions.ADD, uid: string, action_data: MinimalNodeSceneData}
+    | {action: SceneActions.REMOVE, uid: string}
+    | {action: SceneActions.UPDATE, uid: string, action_data: MinimalNodeSceneData}
+
+export type ConnectionActionPayload =
+    | {action: SceneActions.ADD, uid: string, action_data: ConnectionSceneData}
+    | {action: SceneActions.REMOVE, uid: string}
+    | {action: SceneActions.UPDATE, uid: string, action_data: ConnectionSceneData}
 
 
 export type ServerMessage = 
@@ -10,6 +22,8 @@ export type ServerMessage =
 
 export type ClientCommand = 
     | { type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands} }
+    | { type: ClientMessages.NODE_ACTION, payload: NodeActionPayload }
+    | { type: ClientMessages.CONNECTION_ACTION, payload: ConnectionActionPayload }
     | { type: ClientMessages.LOAD_SCENE; payload: any }
     | { type: ClientMessages.SYNC_CLIENT_SCENE }
     | { type: ClientMessages.SET_INSTANCE_LOOP_STATE; payload: { state: LoopStates } }

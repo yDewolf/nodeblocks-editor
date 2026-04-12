@@ -1,9 +1,10 @@
 import { NodeServerClient } from "../websocket/websocket-handler";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
-import { ClientMessages, ServerMessages } from "../websocket/websocket-protocol";
+import { ClientMessages, SceneActions, ServerMessages } from "../websocket/websocket-protocol";
 import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 import { createEffect, createRoot, on } from "solid-js";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
+import { MinimalNodeSceneData } from '../../wrapper/helpers/node-scene-file';
 
 export class ServerSyncController {
     _client: NodeServerClient
@@ -66,23 +67,39 @@ export class ServerSyncController {
             createEffect(on(() => {
                 return Array.from(node.node_data.parameters.values()).map(param => param.value);
             }, (parameters) => {
-                this._on_node_modified(node);
+                this._on_node_updated(node);
                 
             }, { defer: true }));
         });
 
-        console.log("Node Added", node);
+        this._client.sendCommand({
+            type: ClientMessages.NODE_ACTION,
+            payload: {action: SceneActions.ADD, uid: node.id,
+                action_data: {type: node.type_name, data: node.node_data.map_parameters()}
+            }
+        });
+        // console.log("Node Added", node);
     }
 
     public _on_node_removed(node_id: string) {
         const dispose = this._node_disposers.get(node_id);
         if (dispose) {dispose()}
 
-        console.log("Node removed", node_id);
+        this._client.sendCommand({
+            type: ClientMessages.NODE_ACTION,
+            payload: {action: SceneActions.REMOVE, uid: node_id}
+        });
+        // console.log("Node removed", node_id);
         // 
     }   
 
-    public _on_node_modified(node: GraphNode) {
-        console.log("Node modified", node);
+    public _on_node_updated(node: GraphNode) {
+        this._client.sendCommand({
+            type: ClientMessages.NODE_ACTION,
+            payload: {action: SceneActions.UPDATE, uid: node.id,
+                action_data: {type: node.type_name, data: node.node_data.map_parameters()}
+            }
+        });
+        // console.log("Node modified", node);
     }
 }

@@ -2,11 +2,14 @@ import { createSignal } from "solid-js";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { downloadToFile } from "./file-utils";
 
-export interface NodeSceneData {
+export interface MinimalNodeSceneData {
     type: string,
-    position: Vector2,
-    size: Vector2,
     data: Map<string, any>
+}
+
+export interface NodeSceneData extends MinimalNodeSceneData {
+    position?: Vector2,
+    size?: Vector2,
 }
 
 export interface ConnectionSceneData {
