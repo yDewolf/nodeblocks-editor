@@ -6,13 +6,15 @@ import { SuperSlotTypes } from "./data/node-data-type";
 // Representa uma conexão entre dois nodes
 // Apenas uma instância existe, ao invés de cada node apontar para o outro node
 export class NodeConnection {
+    uid: string
     slot_a: NodeSlot
     slot_b: NodeSlot
 
     _data: () => Map<string, unknown>;
     _set_data: (data: Map<string, unknown>) => void;
 
-    constructor(slot_a: NodeSlot, slot_b: NodeSlot) {
+    constructor(slot_a: NodeSlot, slot_b: NodeSlot, uid: string = "") {
+        this.uid = uid;
         this.slot_a = slot_a;
         this.slot_b = slot_b;
 

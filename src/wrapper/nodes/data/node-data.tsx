@@ -60,7 +60,7 @@ export class NodeData {
         let parameters = new Map();
         this.parameters.forEach((param, key) => {
             parameters.set(key, param.value);
-        })
+        });
 
         return parameters;
     }

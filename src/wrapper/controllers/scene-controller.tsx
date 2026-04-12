@@ -46,9 +46,9 @@ export class SceneController {
 
         let scene_connections: Map<string, ConnectionSceneData> = new Map();
         this.connection_controller.connections.forEach((conn, id) => {
-            const input_path: string = `nodes:node_${conn.input_slot.parent_node.id}:slots:${conn.input_slot.slot_name}`;
-            const output_path: string = `nodes:node_${conn.output_slot.parent_node.id}:slots:${conn.output_slot.slot_name}`;
-            scene_connections.set(`connection_${id}`, {
+            const input_path: string = NodeSceneFile.make_slot_path(conn.input_slot);
+            const output_path: string = NodeSceneFile.make_slot_path(conn.output_slot);
+            scene_connections.set(`connection_${conn.uid}`, {
                 from: output_path,
                 to: input_path
             });
@@ -110,30 +110,25 @@ export class SceneController {
 
     // 
     protected _parse_loaded_node_scene() {
+        console.log(this.node_scene_reader.scene_data)
         if (this.node_scene_reader.scene_data == null) {
             return;
         }
 
         this.node_scene_reader.scene_data.nodes.forEach((node_data: NodeSceneData, node_key: string) => {
             const constructor = this.node_type_reader.get_constructor(node_data.type);
-            const splitted_name = node_key.split("_");
-            if (splitted_name.length < 2) {
-                return;
-            }
-
-            const node_id = splitted_name[1];
             if (constructor) {
                 const node = constructor.make_node(
                     constructor.type_name, //+ "_" + node_id.toString(),
                     node_data.position,
-                    node_id,
+                    node_key,
                     node_data.data,
                 )
                 this.node_controller.add_node(node);
             }
         });
 
-        this.node_scene_reader.scene_data.connections.forEach((conn_data: ConnectionSceneData) => {
+        this.node_scene_reader.scene_data.connections.forEach((conn_data: ConnectionSceneData, conn_uid: string) => {
             const node_a_path = NodeSceneFile.parse_node_path(conn_data.from);
             const node_b_path = NodeSceneFile.parse_node_path(conn_data.to);
             if (node_a_path.slot_name == undefined || node_b_path.slot_name == undefined) {
@@ -156,7 +151,7 @@ export class SceneController {
             }
 
             this.connection_controller.connect_node_to(
-                slot_a, slot_b
+                slot_a, slot_b, conn_uid
             );
         });
     }
@@ -175,13 +170,12 @@ export class SceneController {
     }
 
     public load_scene_data(scene_data: any) {
-        if (scene_data) {
+        // this.node_scene_reader.clear_data();
+        if (scene_data && Object.entries(scene_data).length > 0) {
             this.node_scene_reader.load_from_json_data(scene_data);
             this.node_scene_reader.swap_virtual_data();
-        } else {
-            this.node_scene_reader.clear_data();
         }
-
+        
         this._clear_scene();
         this._parse_loaded_node_scene();
     }

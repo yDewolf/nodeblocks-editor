@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { createSignal } from "solid-js";
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
@@ -69,12 +70,12 @@ export class ConnectionController {
         this.selected_slot = null;
     }
 
-    public connect_node_to(slot_a: NodeSlot, slot_b: NodeSlot): boolean {
+    public connect_node_to(slot_a: NodeSlot, slot_b: NodeSlot, conn_uid: string = `conn_${nanoid(6)}`): boolean {
         if (!slot_a.can_connect_to(slot_b)) {
             return false;
         }
 
-        const connection = new NodeConnection(slot_a, slot_b);
+        const connection = new NodeConnection(slot_a, slot_b, conn_uid);
         if (connection.causes_recursion()) {
             return false;
         }
@@ -91,5 +92,14 @@ export class ConnectionController {
 
     public are_connected(slot_a: NodeSlot, slot_b: NodeSlot): NodeConnection | undefined {
         return slot_a.connections.get(slot_b);    
+    }
+
+    public get_conn(uid: string) {
+        const filtered = this.connections.filter((conn) => conn.uid == uid);
+        if (!filtered) {
+            return null;
+        }
+
+        return filtered[0];
     }
 }

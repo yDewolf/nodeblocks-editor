@@ -1,15 +1,16 @@
 import { createSignal } from "solid-js";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { downloadToFile } from "./file-utils";
+import { NodeSlot } from "../nodes/slot/node-slot";
 
 export interface MinimalNodeSceneData {
     type: string,
-    data: Map<string, any>
+    data: Map<string, any>,
+    position: Vector2,
 }
 
 export interface NodeSceneData extends MinimalNodeSceneData {
-    position?: Vector2,
-    size?: Vector2,
+    size: Vector2,
 }
 
 export interface ConnectionSceneData {
@@ -172,8 +173,9 @@ export class NodeSceneFile {
             nodes: new Map(Object.entries(json_data.nodes).map(([id, data]: [string, any]) => {
                 return [id, {
                     ...data,
+                    uid: id,
                     position: { x: data.position[0], y: data.position[1] },
-                    size: { x: data.size[0], y: data.size[1] },
+                    size: { x: "size" in data ? data.size[0] : -1, y: "size" in data ? data.size[1] : -1 },
                     data: new Map<string, any>(Object.entries(data.data))
                 }];
             })),
@@ -189,7 +191,7 @@ export class NodeSceneFile {
     }
 
     static parse_node_path(path: string): NodePathData {
-        const regex = new RegExp("nodes:node_([a-z0-9-]+):slots:([^:\\s]+)", "i");
+        const regex = new RegExp("nodes:([a-z0-9-]+):slots:([^:\\s]+)", "i");
         const match = regex.exec(path);
         if (match) {
             return {
@@ -201,5 +203,9 @@ export class NodeSceneFile {
         return {
             node_id: ""
         }
+    }
+
+    static make_slot_path(slot: NodeSlot): string {
+        return `nodes:${slot.parent_node.id}:slots:${slot.slot_name}`
     }
 }
