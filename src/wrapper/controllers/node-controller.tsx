@@ -3,6 +3,7 @@ import { Vector2 } from '~/wrapper/data_types/geometry';
 import { GraphNode } from '../nodes/graph-node';
 import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
+import { MinimalNodeSceneData, NodeSceneData } from "../helpers/node-scene-file";
 
 export class NodeController {
     private _nodes: () => GraphNode[];
@@ -36,17 +37,30 @@ export class NodeController {
         return filtered[0];
     }
 
-    public add_new_node(name: string, pos: Vector2, node_type: string) {
-        // const new_node = new BaseNode(name, pos, this._increment_last_id())
-        // this._setNodes([...this._nodes(), new_node]);
+    public create_node(name: string, pos: Vector2, node_type: string, uid: string | undefined = undefined, node_data: Map<string, any> | undefined = undefined): GraphNode | null {
         const construct = this.node_constructors.get(node_type);
         if (!construct) {
             console.error("Couldn't find constructor for", node_type, "type");
-            return;
+            return null;
         }
-        const new_id = crypto.randomUUID();
-        const new_node = construct.make_node(name != "" ? name : construct.type_name, pos, new_id);
-        this.nodes = [...this.nodes, new_node];
+        const node_id = uid == undefined ? crypto.randomUUID() : uid;
+        const new_node = construct.make_node(
+            name != "" ? name : construct.type_name, 
+            pos, 
+            node_id,
+            node_data
+        );
+        return new_node;
+    }
+        
+
+    public add_new_node(name: string, pos: Vector2, node_type: string, uid: string | undefined = undefined ): GraphNode | null {
+        const new_node = this.create_node(name, pos, node_type, uid);
+        if (new_node) {
+            this.nodes = [...this.nodes, new_node];
+        }
+
+        return new_node;
     }
 
     public add_node(node: GraphNode) {

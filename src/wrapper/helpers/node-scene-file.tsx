@@ -5,7 +5,7 @@ import { NodeSlot } from "../nodes/slot/node-slot";
 
 export interface MinimalNodeSceneData {
     type: string,
-    data: Map<string, any>,
+    data: { [k: string]: any; },
     position: Vector2,
 }
 

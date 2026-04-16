@@ -21,12 +21,14 @@ import { ClientMessages, InstanceCommands, ServerMessages } from "~/network/webs
 import { StateController } from "~/network/controllers/state_controller";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
 import { ServerSyncController } from "~/network/controllers/sync_controller";
+import { ActionController } from "~/network/controllers/action-controller";
 
 export class NodeEditor {
     _editor_client: NodeServerClient
     _state_controller: StateController
     _status_controller: WebsocketStatusController
     _sync_controller: ServerSyncController
+    _action_controller: ActionController
 
     scene_controller: SceneController;
     tool_controller: ToolController
@@ -45,6 +47,8 @@ export class NodeEditor {
         this._state_controller = new StateController(this._editor_client);
         this._status_controller = new WebsocketStatusController(this._editor_client);
         this.scene_controller = new SceneController();
+        this._action_controller = new ActionController(this._editor_client, this.scene_controller);
+
         this._sync_controller = new ServerSyncController(this._editor_client, this.scene_controller)
 
         const [cursorWorldPos, setCursorWorldPos] = createSignal({x: 0, y: 0});
@@ -134,7 +138,12 @@ export class NodeEditor {
                     const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
 
-                    this.scene_controller.node_controller.add_new_node("", {x: world_pos.x, y: world_pos.y}, this.selection_controller.selected_node_type)
+                    const new_node = this.scene_controller.node_controller.create_node("", {x: world_pos.x, y: world_pos.y}, this.selection_controller.selected_node_type);
+                    if (new_node) {
+                        this._action_controller.request_add_nodes([new_node]);
+                    }
+                    // TODO: Warn the user about some node construct error
+                    // this.scene_controller.node_controller.add_new_node()
                 }
             }}
         );
@@ -151,12 +160,15 @@ export class NodeEditor {
         this.input_manager.set_keybind_handler(
             new Keybind("DeleteNode", [new KeybindMap({keys: new Map([["Delete", true]]), modifiers: new Map()})]),
             {just_activated: (data) => {
-                this.tool_controller.selection_controller.selected_nodes.forEach((node) => {
-                    node.get_connections().forEach((conn) => {
-                        this.scene_controller.connection_controller.disconnect_nodes(conn);
-                    });
-                    this.scene_controller.node_controller.remove_node(node);
-                });
+                this._action_controller.request_remove_nodes(
+                    this.tool_controller.selection_controller.selected_nodes
+                )
+                // this.tool_controller.selection_controller.selected_nodes.forEach((node) => {
+                //     node.get_connections().forEach((conn) => {
+                //         this.scene_controller.connection_controller.disconnect_nodes(conn);
+                //     });
+                //     this.scene_controller.node_controller.remove_node(node);
+                // });
                 // console.log(JSON.stringify(scene_data));
                 // console.log("data to json", NodeSceneFile.scene_data_to_json(scene_data));
             }}

@@ -1,6 +1,6 @@
 import { NodeServerClient } from "../websocket/websocket-handler";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
-import { ClientMessages, SceneActions, ServerMessages } from "../websocket/websocket-protocol";
+import { ClientMessages, SceneActionTypes, ServerMessages } from "../websocket/websocket-protocol";
 import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 import { createEffect, createRoot, on } from "solid-js";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
@@ -109,7 +109,7 @@ export class ServerSyncController {
 
         this._client.sendCommand({
             type: ClientMessages.NODE_ACTION,
-            payload: {action: SceneActions.ADD, uid: node.id,
+            payload: {action: SceneActionTypes.ADD, uid: node.id,
                 action_data: {type: node.type_name, data: Object.fromEntries(node.node_data.map_parameters()), position: node.pos}
             }
         });
@@ -124,7 +124,7 @@ export class ServerSyncController {
         
         this._client.sendCommand({
             type: ClientMessages.NODE_ACTION,
-            payload: {action: SceneActions.REMOVE, uid: node_id}
+            payload: {action: SceneActionTypes.REMOVE, uid: node_id}
         });
         // console.log("Node removed", node_id);
         // 
@@ -135,7 +135,7 @@ export class ServerSyncController {
 
         this._client.sendCommand({
             type: ClientMessages.NODE_ACTION,
-            payload: {action: SceneActions.UPDATE, uid: node.id,
+            payload: {action: SceneActionTypes.UPDATE, uid: node.id,
                 action_data: {type: node.type_name, data: Object.fromEntries(node.node_data.map_parameters()), position: node.pos}
             }
         });
@@ -159,7 +159,7 @@ export class ServerSyncController {
 
         this._client.sendCommand({
             type: ClientMessages.CONNECTION_ACTION,
-            payload: {action: SceneActions.ADD, uid: conn.uid,
+            payload: {action: SceneActionTypes.ADD, uid: conn.uid,
                 action_data: {
                     from: NodeSceneFile.make_slot_path(conn.input_slot), 
                     to: NodeSceneFile.make_slot_path(conn.output_slot)
@@ -178,7 +178,7 @@ export class ServerSyncController {
         console.log(conn_uid, console.trace())
         this._client.sendCommand({
             type: ClientMessages.CONNECTION_ACTION,
-            payload: {action: SceneActions.REMOVE, uid: conn_uid}
+            payload: {action: SceneActionTypes.REMOVE, uid: conn_uid}
         });
         // console.log("Node removed", node_id);
         // 
@@ -191,7 +191,7 @@ export class ServerSyncController {
 
         this._client.sendCommand({
             type: ClientMessages.CONNECTION_ACTION,
-            payload: {action: SceneActions.UPDATE, uid: conn.uid,
+            payload: {action: SceneActionTypes.UPDATE, uid: conn.uid,
                 action_data: {
                     from: NodeSceneFile.make_slot_path(conn.input_slot), 
                     to: NodeSceneFile.make_slot_path(conn.output_slot)

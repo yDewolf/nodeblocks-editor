@@ -1,16 +1,33 @@
 import { ConnectionSceneData, MinimalNodeSceneData } from "~/wrapper/helpers/node-scene-file";
-import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, SceneActions, ServerMessages } from "./websocket-protocol";
+import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, EditorActionStatus, SceneActionTypes, ServerMessages, WebsocketStatus } from "./websocket-protocol";
 
-
+// FIXME: Change this to be uids instead of uid
 export type NodeActionPayload = 
-    | {action: SceneActions.ADD, uid: string, action_data: MinimalNodeSceneData}
-    | {action: SceneActions.REMOVE, uid: string}
-    | {action: SceneActions.UPDATE, uid: string, action_data: MinimalNodeSceneData}
+    | {action: SceneActionTypes.ADD, action_data: { [uid: string]: MinimalNodeSceneData; }}
+    | {action: SceneActionTypes.REMOVE, uids: string[]}
+    | {action: SceneActionTypes.UPDATE, action_data: { [uid: string]: MinimalNodeSceneData; }}
 
-export type ConnectionActionPayload =
-    | {action: SceneActions.ADD, uid: string, action_data: ConnectionSceneData}
-    | {action: SceneActions.REMOVE, uid: string}
-    | {action: SceneActions.UPDATE, uid: string, action_data: ConnectionSceneData}
+export type ConnectionActionPayload = 
+    | {action: SceneActionTypes.ADD, action_data: { [uid: string]: ConnectionSceneData; }}
+    | {action: SceneActionTypes.REMOVE, uids: string[]}
+    | {action: SceneActionTypes.UPDATE, action_data: { [uid: string]: ConnectionSceneData; }}
+
+export type ClientAction = 
+    | { action_uid: string, type: ClientMessages.NODE_ACTION, payload: NodeActionPayload }
+    | { action_uid: string, type: ClientMessages.CONNECTION_ACTION, payload: ConnectionActionPayload }
+
+
+// @DEPRECATED
+export type dNodeActionPayload = 
+    | {action: SceneActionTypes.ADD, uid: string, action_data: MinimalNodeSceneData}
+    | {action: SceneActionTypes.REMOVE, uid: string}
+    | {action: SceneActionTypes.UPDATE, uid: string, action_data: MinimalNodeSceneData}
+
+// @DEPRECATED
+export type dConnectionActionPayload =
+    | {action: SceneActionTypes.ADD, uid: string, action_data: ConnectionSceneData}
+    | {action: SceneActionTypes.REMOVE, uid: string}
+    | {action: SceneActionTypes.UPDATE, uid: string, action_data: ConnectionSceneData}
 
 
 export type ServerMessage = 
@@ -18,12 +35,17 @@ export type ServerMessage =
     | { type: ServerMessages.HANDSHAKE_SYNC; status: number; session: string, type_data: any}
     | { type: ServerMessages.HANDSHAKE_SYNC; message: string }
     | { type: ServerMessages.SYNC_CLIENT_SCENE; payload: any }
-    | { type: ServerMessages.SYNC_INSTANCE_STATE; payload: {loop_state: any, instance_state: any} };
+    | { type: ServerMessages.SYNC_INSTANCE_STATE; payload: {loop_state: any, instance_state: any} }
+    | { type: ServerMessages.SYNC_ACTION; action_uids: string[], status: EditorActionStatus[]};
+
 
 export type ClientCommand = 
     | { type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands} }
-    | { type: ClientMessages.NODE_ACTION, payload: NodeActionPayload }
-    | { type: ClientMessages.CONNECTION_ACTION, payload: ConnectionActionPayload }
+    // @DEPRECATED
+    | { type: ClientMessages.NODE_ACTION, payload: dNodeActionPayload }
+    // @DEPRECATED
+    | { type: ClientMessages.CONNECTION_ACTION, payload: dConnectionActionPayload }
+    
     | { type: ClientMessages.LOAD_SCENE; payload: any }
     | { type: ClientMessages.SYNC_CLIENT_SCENE }
     | { type: ClientMessages.SET_INSTANCE_LOOP_STATE; payload: { state: LoopStates } }
