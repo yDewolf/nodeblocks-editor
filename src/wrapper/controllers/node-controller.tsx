@@ -1,11 +1,10 @@
-import { createMemo, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import { Vector2 } from '~/wrapper/data_types/geometry';
 import { GraphNode } from '../nodes/graph-node';
 import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
-import { MinimalNodeSceneData, NodeSceneData } from "../helpers/node-scene-file";
-import { Action } from "~/network/controllers/action-controller";
-import { NodeActionPayload } from "~/network/websocket/request-types";
+import { Action } from "~/network/controllers/actions/action-controller";
+import { NodeActionPayload, NodeSceneRequestData } from "~/network/websocket/request-types";
 import { SceneActionTypes } from "~/network/websocket/websocket-protocol";
 
 export class NodeController {
@@ -27,11 +26,15 @@ export class NodeController {
         this._nodes = nodes;
         this._setNodes = setNodes;
     }
+
+    public load_node_types(node_file: NodeTypeFile) {
+        this.node_constructors = node_file.node_constructors;
+        this.nodes = [];
+    }
         
     public clear() {
         this._setNodes([]);
     }
-
 
     public get_node(id: string): GraphNode | null {
         const filtered = this.nodes.filter((node) => node.id == id);
@@ -48,6 +51,7 @@ export class NodeController {
             console.error("Couldn't find constructor for", node_type, "type");
             return null;
         }
+
         const node_id = uid == undefined ? crypto.randomUUID() : uid;
         const new_node = construct.make_node(
             name != "" ? name : construct.type_name, 
@@ -57,30 +61,18 @@ export class NodeController {
         );
         return new_node;
     }
-        
 
-    public add_new_node(name: string, pos: Vector2, node_type: string, uid: string | undefined = undefined ): GraphNode | null {
-        const new_node = this.create_node(name, pos, node_type, uid);
-        if (new_node) {
-            this.nodes = [...this.nodes, new_node];
+    public add_node(node: GraphNode): boolean {
+        if (this.get_node(node.id) || this.nodes.includes(node)) {
+            return false;
         }
-
-        return new_node;
-    }
-
-    public add_node(node: GraphNode) {
-        // FIXME: Nem sempre o id dos nodes vai ficar certo se você for "importar uma cena"
-        this.nodes = [...this.nodes, node];
+        this.nodes.push(node);
+        return true;
     }
 
     protected free_node(node: GraphNode) {
         // TODO: Make this signal based (node.free() emits a signal that removes the node everywhere)
         this.nodes = this.nodes.filter((_node) => _node != node)
-    }
-
-    public load_node_types(node_file: NodeTypeFile) {
-        this.node_constructors = node_file.node_constructors;
-        this.nodes = [];
     }
 
     public sync_free(action: Action<NodeActionPayload>) {
@@ -98,6 +90,16 @@ export class NodeController {
     public queue_free_nodes(nodes: GraphNode[], ref_action: Action<NodeActionPayload>) {
         nodes.forEach((node) => {
             this._free_queue.set(ref_action, node);
+        });
+    }
+
+    public add_nodes_unsynced(nodes_data: NodeSceneRequestData) {
+        Object.entries(nodes_data).forEach(([uid, node_data]) => {
+            const new_node = this.create_node(
+                "", node_data.position, node_data.type,
+                uid 
+            );
+            if (new_node) { this.add_node(new_node); }
         });
     }
 }

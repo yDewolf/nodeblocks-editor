@@ -1,7 +1,6 @@
 import { nanoid } from "nanoid";
 import { createSignal } from "solid-js";
-import { Action } from "~/network/controllers/action-controller";
-import { ConnectionActionPayload } from "~/network/websocket/request-types";
+import { Action } from "~/network/controllers/actions/action-controller";
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 
@@ -11,9 +10,11 @@ export class ConnectionController {
 
     _disconnect_queue: Map<Action<any>, NodeConnection[]> = new Map();
 
+    // FIXME: This probably shouldn't be here
     _selected_slot: () => NodeSlot | null;
     _set_selected_slot: (slot: NodeSlot | null) => void;
 
+    // FIXME: This probably shouldn't be here
     _hovered_slot: () => NodeSlot | null;
     _set_hovered_slot: (slot: NodeSlot | null) => void;
 
@@ -46,6 +47,7 @@ export class ConnectionController {
         this._set_selected_slot(null);
     }
 
+    // FIXME: This probably shouldn't be here
     public select_slot(slot: NodeSlot) {
         if (this.selected_slot != null) {
             const conn = this.are_connected(this.selected_slot, slot)
@@ -67,6 +69,7 @@ export class ConnectionController {
         this.selected_slot.selected = true;
     }
 
+    // FIXME: This probably shouldn't be here
     public unselect_slot() {
         if (this.selected_slot != null) {
             this.selected_slot.selected = false;
@@ -104,7 +107,6 @@ export class ConnectionController {
     }
 
     public queue_disconnect(connections: NodeConnection[], ref_action: Action<any>) {
-        
         this._disconnect_queue.set(ref_action, connections);
     }
 

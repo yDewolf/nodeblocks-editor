@@ -1,11 +1,12 @@
 import { ConnectionSceneData, MinimalNodeSceneData } from "~/wrapper/helpers/node-scene-file";
 import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, EditorActionStatus, SceneActionTypes, ServerMessages, WebsocketStatus } from "./websocket-protocol";
 
-// FIXME: Change this to be uids instead of uid
+export type NodeSceneRequestData = {[uid: string]: MinimalNodeSceneData};
+
 export type NodeActionPayload = 
-    | {action: SceneActionTypes.ADD, action_data: { [uid: string]: MinimalNodeSceneData; }}
+    | {action: SceneActionTypes.ADD, action_data: NodeSceneRequestData}
     | {action: SceneActionTypes.REMOVE, uids: string[]}
-    | {action: SceneActionTypes.UPDATE, action_data: { [uid: string]: MinimalNodeSceneData; }}
+    | {action: SceneActionTypes.UPDATE, action_data: NodeSceneRequestData}
 
 export type ConnectionActionPayload = 
     | {action: SceneActionTypes.ADD, action_data: { [uid: string]: ConnectionSceneData; }}

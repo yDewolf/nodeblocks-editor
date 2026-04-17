@@ -8,7 +8,6 @@ import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./internal/inpu
 import { EventHandler, InputEvents } from "./internal/input_manager/event-handling";
 import { SceneController } from "../wrapper/controllers/scene-controller";
 import { NodeServerClient } from "~/network/websocket/websocket-handler";
-import { MinimalNodeSceneData, NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
 import { NodeTypeSelector } from "./ui/misc/node-type-selector";
@@ -21,7 +20,9 @@ import { ClientMessages, InstanceCommands, ServerMessages } from "~/network/webs
 import { StateController } from "~/network/controllers/state_controller";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
 import { ServerSyncController } from "~/network/controllers/sync_controller";
-import { ActionController } from "~/network/controllers/action-controller";
+import { ActionController } from "~/network/controllers/actions/action-controller";
+import { NodeSceneRequestData } from "~/network/websocket/request-types";
+import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 
 export class NodeEditor {
     protected _editor_client: NodeServerClient
@@ -140,16 +141,13 @@ export class NodeEditor {
                     const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
 
-                    const new_node = this.scene_controller.node_controller.create_node("", {x: world_pos.x, y: world_pos.y}, this.selection_controller.selected_node_type);
-                    if (new_node) {
-                        let nodes: {[uid: string]: MinimalNodeSceneData;} = {};
-                        nodes[crypto.randomUUID()] = {
-                            type: this.selection_controller.selected_node_type, 
-                            position: {x: world_pos.x, y: world_pos.y},
-                            data: {}
-                        };
-                        this._action_controller.request_add_nodes(nodes);
-                    }
+                    let nodes: NodeSceneRequestData = {};
+                    nodes[crypto.randomUUID()] = {
+                        type: this.selection_controller.selected_node_type, 
+                        position: {x: world_pos.x, y: world_pos.y},
+                        data: {}
+                    };
+                    NodeActionUtils.request_add_nodes(nodes, this._action_controller);
                     // TODO: Warn the user about some node construct error
                     // this.scene_controller.node_controller.add_new_node()
                 }
@@ -169,18 +167,11 @@ export class NodeEditor {
             new Keybind("DeleteNode", [new KeybindMap({keys: new Map([["Delete", true]]), modifiers: new Map()})]),
             {just_activated: (data) => {
                 if (this.tool_controller.selection_controller.selected_nodes.length > 0) {
-                    this._action_controller.request_remove_nodes(
-                        this.tool_controller.selection_controller.selected_nodes
+                    NodeActionUtils.request_remove_nodes(
+                        this.tool_controller.selection_controller.selected_nodes,
+                        this._action_controller
                     );
                 }
-                // this.tool_controller.selection_controller.selected_nodes.forEach((node) => {
-                //     node.get_connections().forEach((conn) => {
-                //         this.scene_controller.connection_controller.disconnect_nodes(conn);
-                //     });
-                //     this.scene_controller.node_controller.remove_node(node);
-                // });
-                // console.log(JSON.stringify(scene_data));
-                // console.log("data to json", NodeSceneFile.scene_data_to_json(scene_data));
             }}
         );
     }

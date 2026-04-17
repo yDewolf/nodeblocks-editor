@@ -1,5 +1,5 @@
 import { createMemo, createSignal } from "solid-js";
-import { Action, ActionController, PayloadTypes } from "~/network/controllers/action-controller";
+import { Action, ActionController, PayloadTypes } from "~/network/controllers/actions/action-controller";
 import { NodeActionPayload, ConnectionActionPayload, dNodeActionPayload } from "~/network/websocket/request-types";
 import { ClientMessages, EditorActionStatus, SceneActionTypes } from "~/network/websocket/websocket-protocol";
 

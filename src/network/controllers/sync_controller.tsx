@@ -1,5 +1,5 @@
 import { NodeServerClient } from "../websocket/websocket-handler";
-import { SceneController } from "~/wrapper/controllers/scene-controller";
+import { SceneController, SceneUtils } from "~/wrapper/controllers/scene-controller";
 import { ClientMessages, SceneActionTypes, ServerMessages } from "../websocket/websocket-protocol";
 import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 import { createEffect, createRoot, on } from "solid-js";
@@ -84,7 +84,7 @@ export class ServerSyncController {
     public send_local_scene() {
         this._client.sendCommand({
             type: ClientMessages.LOAD_SCENE, 
-            payload: NodeSceneFile.scene_data_to_json(this._scene_controller.gen_scene_data())
+            payload: NodeSceneFile.scene_data_to_json(SceneUtils.gen_scene_data(this._scene_controller))
         });
     }
 
