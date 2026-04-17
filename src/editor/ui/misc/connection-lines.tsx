@@ -63,7 +63,7 @@ export const ConnectionLines = (props: { connection: NodeConnection, onDisconnec
     };
 
     return (
-        <g class={"connection-group"}>
+        <g class={"connection-group"} classList={{"unsynced": !props.connection.is_synced()}}>
             <path class="clickable-path"
                 onContextMenu={handleContextMenu}
                 d={path()}

@@ -1,7 +1,9 @@
 import { NodeController } from "~/wrapper/controllers/node-controller";
 import { ConnectionController } from "./connection-controller";
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
-import { ConnectionSceneData, NodeSceneData, NodeSceneFile, SceneData } from "~/wrapper/helpers/node-scene-file";
+import { ConnectionSceneData, MinimalNodeSceneData, NodeSceneData, NodeSceneFile, SceneData } from "~/wrapper/helpers/node-scene-file";
+import { GraphNode } from "../nodes/graph-node";
+import { ActionController } from "~/network/controllers/action-controller";
 
 export class SceneController {
     node_type_reader: NodeTypeFile;
@@ -9,8 +11,8 @@ export class SceneController {
 
     node_controller: NodeController;
     connection_controller: ConnectionController;
-    
-    constructor() {
+
+    constructor(private action_controller: ActionController) {
         this.node_type_reader = new NodeTypeFile();
         this.node_scene_reader = new NodeSceneFile();
         
@@ -115,18 +117,18 @@ export class SceneController {
             return;
         }
 
+        let nodes: {[uid: string]: MinimalNodeSceneData;} = {};
         this.node_scene_reader.scene_data.nodes.forEach((node_data: NodeSceneData, node_key: string) => {
             const constructor = this.node_type_reader.get_constructor(node_data.type);
             if (constructor) {
-                const node = constructor.make_node(
-                    constructor.type_name, //+ "_" + node_id.toString(),
-                    node_data.position,
-                    node_key,
-                    node_data.data,
-                )
-                this.node_controller.add_node(node);
+                nodes[node_key] = {
+                    type: constructor.type_name,
+                    position: node_data.position,
+                    data: node_data.data
+                }
             }
         });
+        this.action_controller.request_add_nodes(nodes);
 
         this.node_scene_reader.scene_data.connections.forEach((conn_data: ConnectionSceneData, conn_uid: string) => {
             const node_a_path = NodeSceneFile.parse_node_path(conn_data.from);
@@ -150,6 +152,7 @@ export class SceneController {
                 return;
             }
 
+            // TODO: Request add connection
             this.connection_controller.connect_node_to(
                 slot_a, slot_b, conn_uid
             );
@@ -178,5 +181,14 @@ export class SceneController {
         
         this._clear_scene();
         this._parse_loaded_node_scene();
+    }
+
+    public add_nodes_unsynced(nodes_data: {[uid: string]: MinimalNodeSceneData}) {
+        Object.entries(nodes_data).forEach(([uid, node_data]) => {
+            this.node_controller.add_new_node(
+                "", node_data.position, node_data.type,
+                uid 
+            );
+        });
     }
 }

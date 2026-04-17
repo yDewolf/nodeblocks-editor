@@ -1,13 +1,18 @@
-import { createSignal } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 import { Vector2 } from '~/wrapper/data_types/geometry';
 import { GraphNode } from '../nodes/graph-node';
 import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
 import { MinimalNodeSceneData, NodeSceneData } from "../helpers/node-scene-file";
+import { Action } from "~/network/controllers/action-controller";
+import { NodeActionPayload } from "~/network/websocket/request-types";
+import { SceneActionTypes } from "~/network/websocket/websocket-protocol";
 
 export class NodeController {
     private _nodes: () => GraphNode[];
     private _setNodes: (val: GraphNode[]) => void;
+
+    private _free_queue: Map<Action<NodeActionPayload>, GraphNode> = new Map();;
 
     private node_constructors: Map<string, BaseNodeConstructor>;
 
@@ -68,7 +73,7 @@ export class NodeController {
         this.nodes = [...this.nodes, node];
     }
 
-    public remove_node(node: GraphNode) {
+    protected free_node(node: GraphNode) {
         // TODO: Make this signal based (node.free() emits a signal that removes the node everywhere)
         this.nodes = this.nodes.filter((_node) => _node != node)
     }
@@ -76,5 +81,23 @@ export class NodeController {
     public load_node_types(node_file: NodeTypeFile) {
         this.node_constructors = node_file.node_constructors;
         this.nodes = [];
+    }
+
+    public sync_free(action: Action<NodeActionPayload>) {
+        if (action.request.payload.action != SceneActionTypes.REMOVE) return;
+        
+        action.request.payload.uids.forEach((uid) => {
+            const node = this.get_node(uid);
+            if (node) {
+                this.free_node(node);
+            }
+        });
+        this._free_queue.delete(action);
+    }
+
+    public queue_free_nodes(nodes: GraphNode[], ref_action: Action<NodeActionPayload>) {
+        nodes.forEach((node) => {
+            this._free_queue.set(ref_action, node);
+        });
     }
 }

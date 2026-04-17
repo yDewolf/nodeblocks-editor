@@ -8,7 +8,7 @@ import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./internal/inpu
 import { EventHandler, InputEvents } from "./internal/input_manager/event-handling";
 import { SceneController } from "../wrapper/controllers/scene-controller";
 import { NodeServerClient } from "~/network/websocket/websocket-handler";
-import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
+import { MinimalNodeSceneData, NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
 import { NodeTypeSelector } from "./ui/misc/node-type-selector";
@@ -24,13 +24,15 @@ import { ServerSyncController } from "~/network/controllers/sync_controller";
 import { ActionController } from "~/network/controllers/action-controller";
 
 export class NodeEditor {
-    _editor_client: NodeServerClient
-    _state_controller: StateController
-    _status_controller: WebsocketStatusController
+    protected _editor_client: NodeServerClient
+    scene_controller: SceneController;
+    
+    protected _state_controller: StateController
+    protected _status_controller: WebsocketStatusController
+    
     _sync_controller: ServerSyncController
     _action_controller: ActionController
 
-    scene_controller: SceneController;
     tool_controller: ToolController
 
     selection_controller: SelectionController
@@ -46,9 +48,9 @@ export class NodeEditor {
         this._editor_client = editor_client;
         this._state_controller = new StateController(this._editor_client);
         this._status_controller = new WebsocketStatusController(this._editor_client);
-        this.scene_controller = new SceneController();
-        this._action_controller = new ActionController(this._editor_client, this.scene_controller);
-
+        
+        this._action_controller = new ActionController(this._editor_client, this);
+        this.scene_controller = new SceneController(this._action_controller);
         this._sync_controller = new ServerSyncController(this._editor_client, this.scene_controller)
 
         const [cursorWorldPos, setCursorWorldPos] = createSignal({x: 0, y: 0});
@@ -140,7 +142,13 @@ export class NodeEditor {
 
                     const new_node = this.scene_controller.node_controller.create_node("", {x: world_pos.x, y: world_pos.y}, this.selection_controller.selected_node_type);
                     if (new_node) {
-                        this._action_controller.request_add_nodes([new_node]);
+                        let nodes: {[uid: string]: MinimalNodeSceneData;} = {};
+                        nodes[crypto.randomUUID()] = {
+                            type: this.selection_controller.selected_node_type, 
+                            position: {x: world_pos.x, y: world_pos.y},
+                            data: {}
+                        };
+                        this._action_controller.request_add_nodes(nodes);
                     }
                     // TODO: Warn the user about some node construct error
                     // this.scene_controller.node_controller.add_new_node()
@@ -160,9 +168,11 @@ export class NodeEditor {
         this.input_manager.set_keybind_handler(
             new Keybind("DeleteNode", [new KeybindMap({keys: new Map([["Delete", true]]), modifiers: new Map()})]),
             {just_activated: (data) => {
-                this._action_controller.request_remove_nodes(
-                    this.tool_controller.selection_controller.selected_nodes
-                )
+                if (this.tool_controller.selection_controller.selected_nodes.length > 0) {
+                    this._action_controller.request_remove_nodes(
+                        this.tool_controller.selection_controller.selected_nodes
+                    );
+                }
                 // this.tool_controller.selection_controller.selected_nodes.forEach((node) => {
                 //     node.get_connections().forEach((conn) => {
                 //         this.scene_controller.connection_controller.disconnect_nodes(conn);

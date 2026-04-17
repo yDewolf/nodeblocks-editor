@@ -31,3 +31,11 @@
 .connection-path-preview {
   stroke: rgba(0, 0, 0, 0.5);
 }
+
+.unsynced {
+  opacity: 0.5;
+}
+
+.unsynced:hover {
+  opacity: 1.0;
+}

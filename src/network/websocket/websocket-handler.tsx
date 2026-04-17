@@ -47,6 +47,7 @@ export class NodeServerClient {
     
                     this.socket.onclose = () => {
                         console.log("[Disconnected]");
+                        this.is_connecting = false;
                         this.socket = null;
                     };
                 } catch (err) {
@@ -97,5 +98,12 @@ export class NodeServerClient {
         console.log("Closing Socket")
         this.socket?.close(1000, "Closed Workspace");
         this.socket = null;
+    }
+
+    public is_connected() {
+        if (this.socket == null) return false;
+        if (this.is_connecting) return false;
+        
+        return true;
     }
 }

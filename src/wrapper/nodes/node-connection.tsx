@@ -1,11 +1,12 @@
 import { createSignal } from "solid-js";
 import { NodeSlot } from "./slot/node-slot";
 import { SuperSlotTypes } from "./data/node-data-type";
+import { BaseConnection } from "./scene-element";
 
 
 // Representa uma conexão entre dois nodes
 // Apenas uma instância existe, ao invés de cada node apontar para o outro node
-export class NodeConnection {
+export class NodeConnection extends BaseConnection {
     uid: string
     slot_a: NodeSlot
     slot_b: NodeSlot
@@ -14,6 +15,7 @@ export class NodeConnection {
     _set_data: (data: Map<string, unknown>) => void;
 
     constructor(slot_a: NodeSlot, slot_b: NodeSlot, uid: string = "") {
+        super();
         this.uid = uid;
         this.slot_a = slot_a;
         this.slot_b = slot_b;

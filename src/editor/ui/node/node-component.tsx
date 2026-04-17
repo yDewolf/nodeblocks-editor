@@ -53,6 +53,9 @@ export const NodeComponent = (props: {
                         transform: `translate(${props.node.x}px, ${props.node.y}px)`,
                         // "pointer-events": "none"
                     }}
+                    classList={{
+                        "unsynced": !props.node.is_synced()
+                    }}
                     class="node"
                 >
                     <div class="node-slots">

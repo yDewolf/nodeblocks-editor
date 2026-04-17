@@ -1,11 +1,15 @@
 import { nanoid } from "nanoid";
 import { createSignal } from "solid-js";
+import { Action } from "~/network/controllers/action-controller";
+import { ConnectionActionPayload } from "~/network/websocket/request-types";
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 
 export class ConnectionController {
     _connections: () => NodeConnection[];
     _set_connections: (conn: NodeConnection[]) => void;
+
+    _disconnect_queue: Map<Action<any>, NodeConnection[]> = new Map();
 
     _selected_slot: () => NodeSlot | null;
     _set_selected_slot: (slot: NodeSlot | null) => void;
@@ -88,6 +92,20 @@ export class ConnectionController {
     public disconnect_nodes(connection: NodeConnection) {
         this.connections = this.connections.filter((conn) => conn != connection);
         connection.disconnect()
+    }
+
+    public sync_disconnect(action: Action<any>) {
+        const connections = this._disconnect_queue.get(action);
+        if (connections) {
+            connections.forEach((conn) => {
+                this.disconnect_nodes(conn);
+            });
+        }
+    }
+
+    public queue_disconnect(connections: NodeConnection[], ref_action: Action<any>) {
+        
+        this._disconnect_queue.set(ref_action, connections);
     }
 
     public are_connected(slot_a: NodeSlot, slot_b: NodeSlot): NodeConnection | undefined {
