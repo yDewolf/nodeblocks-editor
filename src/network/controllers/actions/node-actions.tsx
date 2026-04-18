@@ -6,12 +6,25 @@ import { Action, ActionController } from "./action-controller";
 
 export class NodeActionUtils {
     protected static _sync_node = (action: Action<NodeActionPayload>, action_controller: ActionController): void => {
+        if (action.request.type != ClientMessages.NODE_ACTION) return;
         switch (action.request.payload.action) {
             case SceneActionTypes.ADD:
+                Object.entries(action.request.payload.action_data).forEach(([uid, node_data]) => {
+                    const node = action_controller._editor.scene_controller.node_controller.get_node(uid);
+                    if (node) {
+                        node.update_synced();
+                    }
+                });
                 // TODO: Finish adding node
                 break;
 
             case SceneActionTypes.REMOVE:
+                action.request.payload.uids.forEach((uid) => {
+                        const node = action_controller._editor.scene_controller.node_controller.get_node(uid);
+                        if (node) {
+                            node.update_synced();
+                        }
+                    });    
                 action_controller._editor.scene_controller.node_controller.sync_free(action);
                 // TODO: Finish removing node
                 break;
@@ -68,7 +81,10 @@ export class NodeActionUtils {
         if (action.request.type != ClientMessages.NODE_ACTION) return
 
         const nodes_data = action.request.payload.action_data;
-        action_controller._editor.scene_controller.node_controller.add_nodes_unsynced(nodes_data);
+        const added_nodes = action_controller._editor.scene_controller.node_controller.add_nodes_unsynced(nodes_data);
+        added_nodes.forEach((node) => {
+            node.append_add_action(action);
+        });
 
         // TODO: Handle potential add errors
         if (!action_controller._client.is_connected()) {

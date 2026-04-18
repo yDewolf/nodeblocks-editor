@@ -7,6 +7,7 @@ import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { MinimalNodeSceneData, ConnectionSceneData } from '../../wrapper/helpers/node-scene-file';
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
 
+// TODO: Observe Actions
 export class ServerSyncController {
     _client: NodeServerClient
     _scene_controller: SceneController
@@ -21,8 +22,8 @@ export class ServerSyncController {
         this._client = client;
         this._scene_controller = scene_controller;
         this.setup_handlers();
-        this.observe_nodes();
-        this.observe_connections();
+        // this.observe_nodes();
+        // this.observe_connections();
     }
 
     protected setup_handlers() {
@@ -108,12 +109,12 @@ export class ServerSyncController {
         });
 
         const converted_data = node.node_data.map_parameters();
-        this._client.sendCommand({
-            type: ClientMessages.NODE_ACTION,
-            payload: {action: SceneActionTypes.ADD, uid: node.id,
-                action_data: {type: node.type_name, data: Object.fromEntries(converted_data.entries()), position: node.pos}
-            }
-        });
+        // this._client.sendCommand({
+        //     type: ClientMessages.NODE_ACTION,
+        //     payload: {action: SceneActionTypes.ADD, uid: node.id,
+        //         action_data: {type: node.type_name, data: Object.fromEntries(converted_data.entries()), position: node.pos}
+        //     }
+        // });
         // console.log("Node Added", node);
     }
 
@@ -123,10 +124,10 @@ export class ServerSyncController {
         const dispose = this._node_disposers.get(node_id);
         if (dispose) {dispose()}
         
-        this._client.sendCommand({
-            type: ClientMessages.NODE_ACTION,
-            payload: {action: SceneActionTypes.REMOVE, uid: node_id}
-        });
+        // this._client.sendCommand({
+        //     type: ClientMessages.NODE_ACTION,
+        //     payload: {action: SceneActionTypes.REMOVE, uid: node_id}
+        // });
         // console.log("Node removed", node_id);
         // 
     }   
@@ -134,12 +135,12 @@ export class ServerSyncController {
     public _on_node_updated(node: GraphNode) {
         if (this.syncing_scene) { return; }
 
-        this._client.sendCommand({
-            type: ClientMessages.NODE_ACTION,
-            payload: {action: SceneActionTypes.UPDATE, uid: node.id,
-                action_data: {type: node.type_name, data: Object.fromEntries(node.node_data.map_parameters()), position: node.pos}
-            }
-        });
+        // this._client.sendCommand({
+        //     type: ClientMessages.NODE_ACTION,
+        //     payload: {action: SceneActionTypes.UPDATE, uid: node.id,
+        //         action_data: {type: node.type_name, data: Object.fromEntries(node.node_data.map_parameters()), position: node.pos}
+        //     }
+        // });
         // console.log("Node modified", node);
     }
 
@@ -158,15 +159,15 @@ export class ServerSyncController {
             }, { defer: true }));
         });
 
-        this._client.sendCommand({
-            type: ClientMessages.CONNECTION_ACTION,
-            payload: {action: SceneActionTypes.ADD, uid: conn.uid,
-                action_data: {
-                    from: NodeSceneFile.make_slot_path(conn.input_slot), 
-                    to: NodeSceneFile.make_slot_path(conn.output_slot)
-                }
-            }
-        });
+        // this._client.sendCommand({
+        //     type: ClientMessages.CONNECTION_ACTION,
+        //     payload: {action: SceneActionTypes.ADD, uid: conn.uid,
+        //         action_data: {
+        //             from: NodeSceneFile.make_slot_path(conn.input_slot), 
+        //             to: NodeSceneFile.make_slot_path(conn.output_slot)
+        //         }
+        //     }
+        // });
         // console.log("Node Added", node);
     }
 
@@ -176,10 +177,10 @@ export class ServerSyncController {
         const dispose = this._conn_disposers.get(conn_uid);
         if (dispose) {dispose()}
 
-        this._client.sendCommand({
-            type: ClientMessages.CONNECTION_ACTION,
-            payload: {action: SceneActionTypes.REMOVE, uid: conn_uid}
-        });
+        // this._client.sendCommand({
+        //     type: ClientMessages.CONNECTION_ACTION,
+        //     payload: {action: SceneActionTypes.REMOVE, uid: conn_uid}
+        // });
         // console.log("Node removed", node_id);
         // 
     }   
@@ -189,15 +190,15 @@ export class ServerSyncController {
     public _on_conn_updated(conn: NodeConnection) {
         if (this.syncing_scene) { return; }
 
-        this._client.sendCommand({
-            type: ClientMessages.CONNECTION_ACTION,
-            payload: {action: SceneActionTypes.UPDATE, uid: conn.uid,
-                action_data: {
-                    from: NodeSceneFile.make_slot_path(conn.input_slot), 
-                    to: NodeSceneFile.make_slot_path(conn.output_slot)
-                }
-            }
-        });
+        // this._client.sendCommand({
+        //     type: ClientMessages.CONNECTION_ACTION,
+        //     payload: {action: SceneActionTypes.UPDATE, uid: conn.uid,
+        //         action_data: {
+        //             from: NodeSceneFile.make_slot_path(conn.input_slot), 
+        //             to: NodeSceneFile.make_slot_path(conn.output_slot)
+        //         }
+        //     }
+        // });
         // console.log("Node modified", node);
     }
 }

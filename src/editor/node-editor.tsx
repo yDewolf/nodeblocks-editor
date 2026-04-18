@@ -146,7 +146,7 @@ export class NodeEditor {
                     nodes[crypto.randomUUID()] = {
                         type: this.selection_controller.selected_node_type, 
                         position: {x: world_pos.x, y: world_pos.y},
-                        data: {}
+                        data: new Map()
                     };
                     NodeActionUtils.request_add_nodes(nodes, this._action_controller);
                     // TODO: Warn the user about some node construct error

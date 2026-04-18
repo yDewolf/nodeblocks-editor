@@ -93,7 +93,8 @@ export class NodeController {
         });
     }
 
-    public add_nodes_unsynced(nodes_data: NodeSceneRequestData) {
+    public add_nodes_unsynced(nodes_data: NodeSceneRequestData): Array<GraphNode> {
+        let nodes: Array<GraphNode> = new Array();
         Object.entries(nodes_data).forEach(([uid, node_data]) => {
             let data = node_data.data;
             if (!(data instanceof Map)) {
@@ -107,8 +108,10 @@ export class NodeController {
                 );
                 if (new_node) { 
                     this.add_node(new_node); 
+                    nodes.push(new_node);
                 }
             }
         });
+        return nodes
     }
 }

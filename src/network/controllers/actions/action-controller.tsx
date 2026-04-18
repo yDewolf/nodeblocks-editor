@@ -1,5 +1,5 @@
 import { NodeServerClient } from "../../websocket/websocket-handler";
-import { EditorActionStatus, SceneActionTypes, ServerMessages } from "../../websocket/websocket-protocol";
+import { ClientMessages, EditorActionStatus, SceneActionTypes, ServerMessages } from "../../websocket/websocket-protocol";
 import { ClientAction, ConnectionActionPayload, NodeActionPayload, NodeSceneRequestData } from '../../websocket/request-types';
 import { nanoid } from "nanoid";
 import { createSignal } from "solid-js";
@@ -63,31 +63,42 @@ export class ActionController {
     private MAX_ACTION_HISTORY: number = 10;
     private action_history: Array<Action<any>> = new Array(); 
 
-    protected unsynced_actions: Array<Action<any>> = new Array();
+    protected _unsynced_actions: () => Array<Action<any>>;
+    protected _set_unsynced_actions: (value: Array<Action<any>>) => void;
 
     constructor(client: NodeServerClient, editor: NodeEditor) {
         this._client = client
         this._editor = editor;
+        const [unsyncedActions, setUnsyncedActions] = createSignal([]);
+        this._unsynced_actions = unsyncedActions;
+        this._set_unsynced_actions = setUnsyncedActions;
 
         this._client.add_handler(ServerMessages.SYNC_ACTION, (message) => {
             this.sync_actions(message.action_statuses);
         });
     }
 
+    get unsynced_actions() { return this._unsynced_actions(); }
+    set unsynced_actions(value: Array<Action<any>>) { this._set_unsynced_actions(value); }
+
     // Called when client receives server's SYNC_ACTION packet
-    protected sync_actions(action_statuses: { [uid: string]: EditorActionStatus; }) {
+    protected sync_actions = (action_statuses: { [uid: string]: EditorActionStatus; }) => {
+        let synced_actions: Array<Action<any>> = [];
         Object.entries(action_statuses).forEach(([uid, status]) => {
             const unsynced_action = this.unsynced_actions.filter((action) => action.uid == uid).at(0);
             if (unsynced_action) {
                 unsynced_action.update_action_status(status);
+                synced_actions.push(unsynced_action);
             }
-        })
+        });
+        this.unsynced_actions = this.unsynced_actions.filter((action) => synced_actions.includes(action));
     }
 
     public add_new_action(action: Action<any>) {
-        this.unsynced_actions.push(action);
+        this.unsynced_actions = [...this.unsynced_actions, action];
         this.action_history.push(action);
 
+        this._client.sendCommand(action.request);
         if (this.action_history.length > this.MAX_ACTION_HISTORY) {
             this.action_history.shift();
         }
