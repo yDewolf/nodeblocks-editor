@@ -25,9 +25,9 @@ export class NodeActionUtils {
             payload: {action: SceneActionTypes.ADD, 
                 action_data: nodes
             }
-        },  (action) => this._unsynced_node_add(action, action_controller), 
-            (action) => this._unsynced_node_remove(action, action_controller), 
-            (action) => this._sync_node(action, action_controller)
+        },  (action) => {this._unsynced_node_add(action, action_controller)}, 
+            (action) => {this._unsynced_node_remove(action, action_controller)}, 
+            (action) => {this._sync_node(action, action_controller)}
         );
         action_controller.add_new_action(action);
         action.unsynced_apply();
@@ -69,7 +69,7 @@ export class NodeActionUtils {
 
         const nodes_data = action.request.payload.action_data;
         action_controller._editor.scene_controller.node_controller.add_nodes_unsynced(nodes_data);
-        
+
         // TODO: Handle potential add errors
         if (!action_controller._client.is_connected()) {
             action.update_action_status(

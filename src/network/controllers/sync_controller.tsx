@@ -107,10 +107,11 @@ export class ServerSyncController {
             }, { defer: true }));
         });
 
+        const converted_data = node.node_data.map_parameters();
         this._client.sendCommand({
             type: ClientMessages.NODE_ACTION,
             payload: {action: SceneActionTypes.ADD, uid: node.id,
-                action_data: {type: node.type_name, data: Object.fromEntries(node.node_data.map_parameters()), position: node.pos}
+                action_data: {type: node.type_name, data: Object.fromEntries(converted_data.entries()), position: node.pos}
             }
         });
         // console.log("Node Added", node);
@@ -175,7 +176,6 @@ export class ServerSyncController {
         const dispose = this._conn_disposers.get(conn_uid);
         if (dispose) {dispose()}
 
-        console.log(conn_uid, console.trace())
         this._client.sendCommand({
             type: ClientMessages.CONNECTION_ACTION,
             payload: {action: SceneActionTypes.REMOVE, uid: conn_uid}

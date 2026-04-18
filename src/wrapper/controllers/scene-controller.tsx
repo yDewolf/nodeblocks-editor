@@ -101,7 +101,6 @@ export class SceneController {
     }
 
     protected _parse_loaded_node_scene() {
-        console.log(this.node_scene_reader.scene_data)
         if (this.node_scene_reader.scene_data == null) {
             return;
         }
@@ -157,7 +156,7 @@ export class SceneUtils {
 
         let scene_nodes: Map<string, NodeSceneData> = new Map();
         scene_controller.node_controller.nodes.forEach((node, idx) => {
-            scene_nodes.set(`node_${node.id}`, {
+            scene_nodes.set(node.id, {
                 type: node.type_name,
                 position: node.pos,
                 size: node.rect.size,
@@ -169,15 +168,15 @@ export class SceneUtils {
         scene_controller.connection_controller.connections.forEach((conn, id) => {
             const input_path: string = NodeSceneFile.make_slot_path(conn.input_slot);
             const output_path: string = NodeSceneFile.make_slot_path(conn.output_slot);
-            scene_connections.set(`connection_${conn.uid}`, {
+            scene_connections.set(conn.uid, {
                 from: output_path,
                 to: input_path
             });
         });
 
         const scene_data: SceneData = {
-            node_types_id: node_types_id != null ? node_types_id : "unknown",
-            node_types_version: node_types_version,
+            types_id: node_types_id != null ? node_types_id : "unknown",
+            types_version: node_types_version,
             nodes: scene_nodes,
             connections: scene_connections
         }

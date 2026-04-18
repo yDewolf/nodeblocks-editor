@@ -63,10 +63,10 @@ export class NodeController {
     }
 
     public add_node(node: GraphNode): boolean {
-        if (this.get_node(node.id) || this.nodes.includes(node)) {
+        if (this.get_node(node.id) != null || this.nodes.includes(node)) {
             return false;
         }
-        this.nodes.push(node);
+        this.nodes = [...this.nodes, node];
         return true;
     }
 
@@ -95,11 +95,20 @@ export class NodeController {
 
     public add_nodes_unsynced(nodes_data: NodeSceneRequestData) {
         Object.entries(nodes_data).forEach(([uid, node_data]) => {
-            const new_node = this.create_node(
-                "", node_data.position, node_data.type,
-                uid 
-            );
-            if (new_node) { this.add_node(new_node); }
+            let data = node_data.data;
+            if (!(data instanceof Map)) {
+                Object.fromEntries(Object.entries(data).map(([key, value]: [string, any]) => {
+                    return [key, {...value}]
+                }));
+            }
+            if (data instanceof Map) {
+                const new_node = this.create_node(
+                    "", node_data.position, node_data.type, uid, data
+                );
+                if (new_node) { 
+                    this.add_node(new_node); 
+                }
+            }
         });
     }
 }
