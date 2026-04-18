@@ -5,7 +5,7 @@ import { NodeSlot } from "../nodes/slot/node-slot";
 
 export interface MinimalNodeSceneData {
     type: string,
-    data: Map<string, any> | {[key: string]: any},
+    data: Map<string, any>, //| {[key: string]: any},
     position: Vector2,
 }
 
@@ -156,10 +156,6 @@ export class NodeSceneFile {
     
             if (value instanceof Map) {
                 return Object.fromEntries(value);
-            }
-    
-            if (value && typeof value === 'object' && 'x' in value && 'y' in value) {
-                return [value.x, value.y];
             }
     
             return value;

@@ -28,24 +28,25 @@ export class ConnectionController {
         this._set_connections([]);
     }
 
-    public connect_node_to(slot_a: NodeSlot, slot_b: NodeSlot, conn_uid: string = ConnectionController.make_conn_uid()): boolean {
+    public connect_node_to(slot_a: NodeSlot, slot_b: NodeSlot, conn_uid: string = ConnectionController.make_conn_uid()): NodeConnection | undefined {
         if (!slot_a.can_connect_to(slot_b)) {
-            return false;
+            return undefined;
         }
 
         const connection = new NodeConnection(slot_a, slot_b, conn_uid);
         if (connection.causes_recursion()) {
-            return false;
+            return undefined;
         }
 
         this.connections = [...this.connections, connection];
         connection.connect();
-        return true;
+        return connection;
     }
 
     public disconnect_nodes(connection: NodeConnection) {
         this.connections = this.connections.filter((conn) => conn != connection);
-        connection.disconnect()
+        connection.disconnect();
+        connection.free();
     }
 
     public sync_disconnect(action: Action<any>) {
@@ -62,13 +63,19 @@ export class ConnectionController {
     }
 
     public unsynced_connect(conns_data: ConnSceneRequestData, node_controller: NodeController) {
+        let connections: Array<NodeConnection> = new Array();
         Object.entries(conns_data).forEach(([uid, conn_data]) => {
             const slots = ConnectionController.get_slots_from_path_data(conn_data, node_controller)
             if (slots) {
                 const [slot_a, slot_b] = slots;
-                this.connect_node_to(slot_a, slot_b, uid);                
+                const conn = this.connect_node_to(slot_a, slot_b, uid);             
+                if (conn) {
+                    connections.push(conn);
+                }
             }
         });
+
+        return connections
     }
 
     public are_connected(slot_a: NodeSlot, slot_b: NodeSlot): NodeConnection | undefined {

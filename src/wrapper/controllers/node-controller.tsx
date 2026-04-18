@@ -73,6 +73,7 @@ export class NodeController {
     protected free_node(node: GraphNode) {
         // TODO: Make this signal based (node.free() emits a signal that removes the node everywhere)
         this.nodes = this.nodes.filter((_node) => _node != node)
+        node.free();
     }
 
     public sync_free(action: Action<NodeActionPayload>) {

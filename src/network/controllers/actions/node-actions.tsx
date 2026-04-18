@@ -12,7 +12,7 @@ export class NodeActionUtils {
                 Object.entries(action.request.payload.action_data).forEach(([uid, node_data]) => {
                     const node = action_controller._editor.scene_controller.node_controller.get_node(uid);
                     if (node) {
-                        node.update_synced();
+                        node._set_related_actions([...node._related_actions()])
                     }
                 });
                 // TODO: Finish adding node
@@ -20,12 +20,13 @@ export class NodeActionUtils {
 
             case SceneActionTypes.REMOVE:
                 action.request.payload.uids.forEach((uid) => {
-                        const node = action_controller._editor.scene_controller.node_controller.get_node(uid);
-                        if (node) {
-                            node.update_synced();
-                        }
-                    });    
+                    const node = action_controller._editor.scene_controller.node_controller.get_node(uid);
+                    if (node) {
+                        node._set_related_actions([...node._related_actions()])
+                    }
+                });
                 action_controller._editor.scene_controller.node_controller.sync_free(action);
+                action_controller._editor.scene_controller.connection_controller.sync_disconnect(action);
                 // TODO: Finish removing node
                 break;
         }
@@ -67,7 +68,7 @@ export class NodeActionUtils {
             node.append_remove_action(action);
             // FIXME: Am I supposed to send an action asking the server to delete the connections?
             node.get_connections().forEach((conn) => {
-                action_controller._editor.scene_controller.connection_controller.disconnect_nodes(conn);
+                conn.append_node_remove_action(action);
             });
         });
 
@@ -109,6 +110,7 @@ export class NodeActionUtils {
                 });
             }
         });
+
         action_controller._editor.scene_controller.connection_controller.queue_disconnect(connections, action);
         action_controller._editor.scene_controller.node_controller.queue_free_nodes(nodes, action);
         

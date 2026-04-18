@@ -6,13 +6,26 @@ import { Action, ActionController } from "./action-controller";
 
 export class ConnActionUtils {
     protected static _sync_action = (action: Action<ConnectionActionPayload>, action_controller: ActionController): void => {
+        if (action.request.type != ClientMessages.CONNECTION_ACTION) return;
         switch (action.request.payload.action) {
             case SceneActionTypes.ADD:
+                Object.entries(action.request.payload.action_data).forEach(([uid, conn_data]) => {
+                    const conn = action_controller._editor.scene_controller.connection_controller.get_conn(uid);
+                    if (conn) { 
+                        conn._set_related_actions([...conn._related_actions()])
+                    }
+                });
                 // TODO: Finish adding connection
                 break;
 
             case SceneActionTypes.REMOVE:
                 // TODO: Finish removing connection
+                action.request.payload.uids.forEach((uid) => {
+                    const conn = action_controller._editor.scene_controller.connection_controller.get_conn(uid);
+                    if (conn) { 
+                        conn._set_related_actions([...conn._related_actions()])
+                    }
+                });
                 action_controller._editor.scene_controller.connection_controller.sync_disconnect(action);
                 break;
         }
@@ -40,7 +53,7 @@ export class ConnActionUtils {
         conns.forEach((conn) => { uids.push(conn.uid); });
 
         const action: Action<ConnectionActionPayload> = new Action({
-            action_uid: Action.make_action_id(SceneActionTypes.ADD),
+            action_uid: Action.make_action_id(SceneActionTypes.REMOVE),
             type: ClientMessages.CONNECTION_ACTION,
             payload: {
                 action: SceneActionTypes.REMOVE,
@@ -65,10 +78,13 @@ export class ConnActionUtils {
         if (action.request.type != ClientMessages.CONNECTION_ACTION) return
 
         const conns_data = action.request.payload.action_data;
-        action_controller._editor.scene_controller.connection_controller.unsynced_connect(
+        const connections = action_controller._editor.scene_controller.connection_controller.unsynced_connect(
             conns_data, action_controller._editor.scene_controller.node_controller
         );
-
+        connections.forEach((conn) => {
+            conn.append_add_action(action);
+        });
+        
         // TODO: Handle potential add errors
         if (!action_controller._client.is_connected()) {
             action.update_action_status(

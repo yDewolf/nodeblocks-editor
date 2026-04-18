@@ -4,8 +4,8 @@ import { ClientMessages, SceneActionTypes, ServerMessages } from "../websocket/w
 import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 import { createEffect, createRoot, on } from "solid-js";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
-import { MinimalNodeSceneData, ConnectionSceneData } from '../../wrapper/helpers/node-scene-file';
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
+import { NodeSceneRequestData } from "../websocket/request-types";
 
 // TODO: Observe Actions
 export class ServerSyncController {
@@ -22,7 +22,7 @@ export class ServerSyncController {
         this._client = client;
         this._scene_controller = scene_controller;
         this.setup_handlers();
-        // this.observe_nodes();
+        this.observe_nodes();
         // this.observe_connections();
     }
 
@@ -135,13 +135,20 @@ export class ServerSyncController {
     public _on_node_updated(node: GraphNode) {
         if (this.syncing_scene) { return; }
 
-        // this._client.sendCommand({
-        //     type: ClientMessages.NODE_ACTION,
-        //     payload: {action: SceneActionTypes.UPDATE, uid: node.id,
-        //         action_data: {type: node.type_name, data: Object.fromEntries(node.node_data.map_parameters()), position: node.pos}
-        //     }
-        // });
-        // console.log("Node modified", node);
+        let nodes: NodeSceneRequestData = {};
+        nodes[node.id] = {
+            type: node.type_name, 
+            data: Object.fromEntries(node.node_data.map_parameters().entries()), 
+            position: node.pos
+        };
+
+        this._client.sendCommand({
+            type: ClientMessages.NODE_ACTION,
+            payload: {action: SceneActionTypes.UPDATE,
+                action_data: nodes
+            }
+        });
+        console.log("Node modified", nodes);
     }
 
 
