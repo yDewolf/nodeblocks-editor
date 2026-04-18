@@ -3,8 +3,9 @@ import { ConnectionController } from "./connection-controller";
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
 import { ConnectionSceneData, NodeSceneData, NodeSceneFile, SceneData } from "~/wrapper/helpers/node-scene-file";
 import { ActionController } from "~/network/controllers/actions/action-controller";
-import { NodeSceneRequestData } from "~/network/websocket/request-types";
+import { ConnSceneRequestData, NodeSceneRequestData } from "~/network/websocket/request-types";
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
+import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
 
 export class SceneController {
     node_type_reader: NodeTypeFile;
@@ -41,6 +42,7 @@ export class SceneController {
     public _clear_scene() {
         this.node_controller.clear();
         this.connection_controller.clear();
+        
     }
 
         public load_node_type_data(type_data: any) {
@@ -118,33 +120,11 @@ export class SceneController {
         });
         NodeActionUtils.request_add_nodes(nodes, this.action_controller);
 
+        let connections: ConnSceneRequestData = {};
         this.node_scene_reader.scene_data.connections.forEach((conn_data: ConnectionSceneData, conn_uid: string) => {
-            const node_a_path = NodeSceneFile.parse_node_path(conn_data.from);
-            const node_b_path = NodeSceneFile.parse_node_path(conn_data.to);
-            if (node_a_path.slot_name == undefined || node_b_path.slot_name == undefined) {
-                console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
-                return;
-            }
-
-            const node_a = this.node_controller.get_node(node_a_path.node_id);
-            const node_b = this.node_controller.get_node(node_b_path.node_id);
-            if (!node_a || !node_b) {
-                console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
-                return;
-            }
-
-            const slot_a = node_a.get_slot(node_a_path.slot_name);
-            const slot_b = node_b.get_slot(node_b_path.slot_name);
-            if (slot_a == undefined || slot_b == undefined) {
-                console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
-                return;
-            }
-
-            // TODO: Request add connection
-            this.connection_controller.connect_node_to(
-                slot_a, slot_b, conn_uid
-            );
+            connections[conn_uid] = conn_data;
         });
+        ConnActionUtils.request_connect(connections, this.action_controller);
     }
 }
 

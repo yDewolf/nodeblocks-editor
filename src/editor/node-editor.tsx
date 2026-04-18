@@ -23,6 +23,7 @@ import { ServerSyncController } from "~/network/controllers/sync_controller";
 import { ActionController } from "~/network/controllers/actions/action-controller";
 import { NodeSceneRequestData } from "~/network/websocket/request-types";
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
+import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
 
 export class NodeEditor {
     protected _editor_client: NodeServerClient
@@ -63,7 +64,7 @@ export class NodeEditor {
         this.editor_space = new EditorSpace()
         this.editor_grid = new Grid({x: 32, y: 32});
 
-        this.selection_controller = new SelectionController(this.editor_space, this.editor_grid);
+        this.selection_controller = new SelectionController(this.editor_space, this.editor_grid, this);
         
         this.tool_controller = new ToolController(this);
         this.setup_event_handlers();
@@ -334,12 +335,14 @@ export class NodeEditor {
                             <For each={this.scene_controller.connection_controller.connections}>
                                 {(conn) => <ConnectionLines 
                                     connection={conn} 
-                                    onDisconnect={() => this.scene_controller.connection_controller.disconnect_nodes(conn)} 
+                                    onDisconnect={() => {
+                                        ConnActionUtils.request_disconnect([conn], this._action_controller);
+                                    }} 
                                 />}
                             </For>
                             
-                            <Show when={this.scene_controller.connection_controller.selected_slot}>
-                                <ConnectionPreview start_slot={this.scene_controller.connection_controller.selected_slot} hovered_slot={this.scene_controller.connection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
+                            <Show when={this.selection_controller.selected_slot}>
+                                <ConnectionPreview start_slot={this.selection_controller.selected_slot} hovered_slot={this.selection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
                             </Show>
                         </svg>
 

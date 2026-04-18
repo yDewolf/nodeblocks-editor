@@ -1,11 +1,9 @@
 import { NodeServerClient } from "../../websocket/websocket-handler";
-import { ClientMessages, EditorActionStatus, SceneActionTypes, ServerMessages } from "../../websocket/websocket-protocol";
-import { GraphNode } from "~/wrapper/nodes/graph-node";
+import { EditorActionStatus, SceneActionTypes, ServerMessages } from "../../websocket/websocket-protocol";
 import { ClientAction, ConnectionActionPayload, NodeActionPayload, NodeSceneRequestData } from '../../websocket/request-types';
 import { nanoid } from "nanoid";
 import { createSignal } from "solid-js";
 import { NodeEditor } from "~/editor/node-editor";
-import { NodeConnection } from "~/wrapper/nodes/node-connection";
 
 export type PayloadTypes = NodeActionPayload | ConnectionActionPayload;
 export class Action<PayloadType extends PayloadTypes> {

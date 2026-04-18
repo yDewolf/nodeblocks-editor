@@ -2,6 +2,7 @@ import { ConnectionSceneData, MinimalNodeSceneData } from "~/wrapper/helpers/nod
 import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, EditorActionStatus, SceneActionTypes, ServerMessages, WebsocketStatus } from "./websocket-protocol";
 
 export type NodeSceneRequestData = {[uid: string]: MinimalNodeSceneData};
+export type ConnSceneRequestData = {[uid: string]: ConnectionSceneData};
 
 export type NodeActionPayload = 
     | {action: SceneActionTypes.ADD, action_data: NodeSceneRequestData}
@@ -9,9 +10,9 @@ export type NodeActionPayload =
     | {action: SceneActionTypes.UPDATE, action_data: NodeSceneRequestData}
 
 export type ConnectionActionPayload = 
-    | {action: SceneActionTypes.ADD, action_data: { [uid: string]: ConnectionSceneData; }}
+    | {action: SceneActionTypes.ADD, action_data: ConnSceneRequestData}
     | {action: SceneActionTypes.REMOVE, uids: string[]}
-    | {action: SceneActionTypes.UPDATE, action_data: { [uid: string]: ConnectionSceneData; }}
+    | {action: SceneActionTypes.UPDATE, action_data: ConnSceneRequestData}
 
 export type ClientAction = 
     | { action_uid: string, type: ClientMessages.NODE_ACTION, payload: NodeActionPayload }
