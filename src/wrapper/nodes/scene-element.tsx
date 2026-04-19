@@ -13,6 +13,7 @@ export interface SyncAbleElement<ActionPayloadType extends PayloadTypes> {
     append_update_action(action: Action<ActionPayloadType>): boolean;
 
     _is_synced: (() => boolean) | undefined;
+    _has_failed_action: (() => boolean) | undefined;
 
     free(): void;
     // _is_synced: () => boolean;
@@ -21,11 +22,15 @@ export interface SyncAbleElement<ActionPayloadType extends PayloadTypes> {
 export abstract class SceneElement<ActionPayloadType extends PayloadTypes> implements SyncAbleElement<ActionPayloadType> {
     _related_actions: () => Action<ActionPayloadType>[];
     _set_related_actions: (value: any) => void;
+
     _is_synced: (() => boolean) | undefined = undefined;
+    _has_failed_action: (() => boolean) | undefined = undefined;
+    
     _disposable: (() => void) | undefined = undefined; 
     // _is_synced: () => boolean;
     // _set_is_synced: (value: boolean) => void;
     get is_synced() {return this._is_synced!() ?? false; }
+    get has_failed_action() { return this._has_failed_action!() ?? false; }
 
     constructor() {
         const [relatedActions, setRelatedActions] = createSignal([]);
@@ -44,6 +49,13 @@ export abstract class SceneElement<ActionPayloadType extends PayloadTypes> imple
                     (action) => action.status === EditorActionStatus.UNSYNCED
                 );
                 return is_synced;
+            });
+            this._has_failed_action = createMemo(() => {
+                if (this.related_actions.length == 0) return false;
+                const has_failed = this.related_actions.some(
+                    (action) => action.status === EditorActionStatus.FAILED
+                );
+                return has_failed;
             });
             this._disposable = dispose;
         });
@@ -100,6 +112,14 @@ export abstract class BaseConnection extends SceneElement<ConnectionActionPayloa
                 const nodeActionsSynced = !this.related_node_actions.some(action => action.status === EditorActionStatus.UNSYNCED);
                 
                 return actionsSynced && nodeActionsSynced;
+            });
+            this._has_failed_action = createMemo(() => {
+                if (this.related_actions.length == 0) return false;
+    
+                const has_failed_action = this.related_actions.some(action => action.status === EditorActionStatus.FAILED);
+                const has_failed_node_action = this.related_node_actions.some(action => action.status === EditorActionStatus.FAILED);
+                
+                return has_failed_action || has_failed_node_action;
             });
             this._disposable = dispose;
         })

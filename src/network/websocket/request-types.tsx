@@ -18,19 +18,16 @@ export type ConnectionActionPayload =
 export type ServerMessage = 
     | { type: ServerMessages.NODE_OUTPUT; node_id: string; value: any }
     | { type: ServerMessages.HANDSHAKE_SYNC; status: number; session: string, type_data: any}
-    | { type: ServerMessages.HANDSHAKE_SYNC; message: string }
+    | { type: ServerMessages.HANDSHAKE_SYNC; status: number; message: string }
     | { type: ServerMessages.SYNC_CLIENT_SCENE; payload: any }
     | { type: ServerMessages.SYNC_INSTANCE_STATE; payload: {loop_state: any, instance_state: any} }
     | { type: ServerMessages.SYNC_ACTION; action_statuses: { [uid: string]: EditorActionStatus; }};
     
-    
+
+export type ClientMessage = ClientCommand | ClientAction;
+
 export type ClientCommand = 
     | { type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands} }
-    // @DEPRECATED
-    | { type: ClientMessages.NODE_ACTION, payload: NodeActionPayload }
-    // @DEPRECATED
-    | { type: ClientMessages.CONNECTION_ACTION, payload: ConnectionActionPayload }
-    
     | { type: ClientMessages.LOAD_SCENE; payload: any }
     | { type: ClientMessages.SYNC_CLIENT_SCENE }
     | { type: ClientMessages.SET_INSTANCE_LOOP_STATE; payload: { state: LoopStates } }

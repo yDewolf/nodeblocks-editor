@@ -6,6 +6,7 @@ import { createEffect, createRoot, on } from "solid-js";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
 import { NodeSceneRequestData } from "../websocket/request-types";
+import { Action } from "./actions/action-controller";
 
 // TODO: Observe Actions
 export class ServerSyncController {
@@ -144,6 +145,7 @@ export class ServerSyncController {
 
         this._client.sendCommand({
             type: ClientMessages.NODE_ACTION,
+            action_uid: Action.make_action_id(SceneActionTypes.UPDATE),
             payload: {action: SceneActionTypes.UPDATE,
                 action_data: nodes
             }

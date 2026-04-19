@@ -54,7 +54,8 @@ export const NodeComponent = (props: {
                         // "pointer-events": "none"
                     }}
                     classList={{
-                        "unsynced": !props.node.is_synced
+                        "unsynced": !props.node.is_synced,
+                        "failed": props.node.has_failed_action
                     }}
                     class="node"
                 >
