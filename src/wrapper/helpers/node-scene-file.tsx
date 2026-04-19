@@ -14,8 +14,8 @@ export interface NodeSceneData extends MinimalNodeSceneData {
 }
 
 export interface ConnectionSceneData {
-    from: string,
-    to: string
+    from_slot: string,
+    to_slot: string
 }
 
 export interface SceneData {
@@ -162,6 +162,33 @@ export class NodeSceneFile {
         });
     }
     
+    static to_plain_object(scene_data: any): any {
+        if (scene_data === null || typeof scene_data !== 'object') {
+            return scene_data;
+        }
+
+        if (scene_data instanceof Map) {
+            return Object.fromEntries(
+                Array.from(scene_data.entries()).map(([key, value]) => [key, this.to_plain_object(value)])
+            );
+        }
+
+        if (Array.isArray(scene_data)) {
+            return scene_data.map(this.to_plain_object);
+        }
+
+        const obj: any = {};
+        for (const key in scene_data) {
+            if (key.startsWith("_") || typeof scene_data[key] === 'function') {
+                continue;
+            }
+            
+            obj[key] = this.to_plain_object(scene_data[key]);
+        }
+        
+        return obj;
+    }
+
     static json_to_scene_data(json_data: any): SceneData {
         const scene: SceneData = {
             types_id: json_data.types_id,
@@ -170,7 +197,7 @@ export class NodeSceneFile {
                 return [id, {
                     ...data,
                     uid: id,
-                    position: { x: data.position[0], y: data.position[1] },
+                    position: data.position,
                     size: { x: "size" in data ? data.size[0] : -1, y: "size" in data ? data.size[1] : -1 },
                     data: new Map<string, any>(Object.entries(data.data))
                 }];
@@ -178,8 +205,8 @@ export class NodeSceneFile {
             connections: new Map(Object.entries(json_data.connections).map(([id, data]: [string, any]) => {
                 return [id, {
                     ...data,
-                    from: data.from,
-                    to: data.to
+                    from: data.from_slot,
+                    to: data.to_slot
                 }];
             })),
         };
