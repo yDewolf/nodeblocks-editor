@@ -31,8 +31,8 @@ export class ConnActionUtils {
         }
     }
 
-    public static request_connect = (conns: ConnSceneRequestData, action_controller: ActionController) => {
-        const action: Action<ConnectionActionPayload> = new Action({
+    public static request_connect = (conns: ConnSceneRequestData, action_controller: ActionController, clientside: boolean = false) => {
+        const action: Action<ConnectionActionPayload> = new Action(clientside, {
             action_uid: Action.make_action_id(SceneActionTypes.ADD),
             type: ClientMessages.CONNECTION_ACTION,
             payload: {
@@ -48,11 +48,11 @@ export class ConnActionUtils {
         action.unsynced_apply();
     }
 
-    public static request_disconnect = (conns: NodeConnection[], action_controller: ActionController) => {
+    public static request_disconnect = (conns: NodeConnection[], action_controller: ActionController, clientside: boolean = false) => {
         let uids = new Array<string>();
         conns.forEach((conn) => { uids.push(conn.uid); });
 
-        const action: Action<ConnectionActionPayload> = new Action({
+        const action: Action<ConnectionActionPayload> = new Action(clientside, {
             action_uid: Action.make_action_id(SceneActionTypes.REMOVE),
             type: ClientMessages.CONNECTION_ACTION,
             payload: {
@@ -86,7 +86,7 @@ export class ConnActionUtils {
         });
         
         // TODO: Handle potential add errors
-        if (!action_controller._client.is_connected()) {
+        if (!action_controller._client.is_connected() || action.is_clientside) {
             action.update_action_status(
                 EditorActionStatus.SUCCESSFULL
             );
@@ -107,7 +107,7 @@ export class ConnActionUtils {
         action_controller._editor.scene_controller.connection_controller.queue_disconnect(connections, action);
 
         // TODO: Handle possible removal errors
-        if (!action_controller._client.is_connected()) {
+        if (!action_controller._client.is_connected() || action.is_clientside) {
             action.update_action_status(
                 EditorActionStatus.SUCCESSFULL
             );

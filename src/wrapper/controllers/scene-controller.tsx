@@ -14,6 +14,8 @@ export class SceneController {
     node_controller: NodeController;
     connection_controller: ConnectionController;
 
+    do_clientside_request: boolean = false;
+
     constructor(private action_controller: ActionController) {
         this.node_type_reader = new NodeTypeFile();
         this.node_scene_reader = new NodeSceneFile();
@@ -118,13 +120,13 @@ export class SceneController {
                 }
             }
         });
-        NodeActionUtils.request_add_nodes(nodes, this.action_controller);
+        NodeActionUtils.request_add_nodes(nodes, this.action_controller, this.do_clientside_request);
 
         let connections: ConnSceneRequestData = {};
         this.node_scene_reader.scene_data.connections.forEach((conn_data: ConnectionSceneData, conn_uid: string) => {
             connections[conn_uid] = conn_data;
         });
-        ConnActionUtils.request_connect(connections, this.action_controller);
+        ConnActionUtils.request_connect(connections, this.action_controller, this.do_clientside_request);
     }
 }
 
@@ -149,8 +151,8 @@ export class SceneUtils {
             const input_path: string = NodeSceneFile.make_slot_path(conn.input_slot);
             const output_path: string = NodeSceneFile.make_slot_path(conn.output_slot);
             scene_connections.set(conn.uid, {
-                from: output_path,
-                to: input_path
+                from_slot: output_path,
+                to_slot: input_path
             });
         });
 

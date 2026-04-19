@@ -30,6 +30,7 @@ export class ServerSyncController {
     protected setup_handlers() {
         this._client.add_handler(ServerMessages.SYNC_CLIENT_SCENE, (message) => {
             const scene_data = this._scene_controller.load_scene_data(message.payload);
+            this._scene_controller.do_clientside_request = false;
             this.syncing_scene = false;
         });
     }
@@ -37,12 +38,13 @@ export class ServerSyncController {
     public send_local_scene() {
         this._client.sendCommand({
             type: ClientMessages.LOAD_SCENE, 
-            payload: NodeSceneFile.scene_data_to_json(SceneUtils.gen_scene_data(this._scene_controller))
+            payload: NodeSceneFile.to_plain_object(SceneUtils.gen_scene_data(this._scene_controller))
         });
     }
 
     public sync_with_server_scene() {
         this._client.sendCommand({type: ClientMessages.SYNC_CLIENT_SCENE})
+        this._scene_controller.do_clientside_request = true;
         this.syncing_scene = true;
     }
 

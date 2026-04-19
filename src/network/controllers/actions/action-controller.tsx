@@ -7,22 +7,27 @@ import { NodeEditor } from "~/editor/node-editor";
 
 export type PayloadTypes = NodeActionPayload | ConnectionActionPayload;
 export class Action<PayloadType extends PayloadTypes> {
+    private clientside: boolean = false;
     private _request: ClientAction;
     private _status: () => EditorActionStatus;
     private _set_status: (new_status: EditorActionStatus) => void;
 
     constructor(
+        clientside: boolean,
         request: ClientAction, 
         private _unsynced_apply: (action: Action<PayloadType>) => void, 
         private _unsynced_revert: (action: Action<PayloadType>) => void,
         private _finish_sync: (action: Action<PayloadType>) => void
     ) {
+        this.clientside = clientside;
         const [status, setStatus] = createSignal(EditorActionStatus.UNSYNCED);
         this._status = status;
         this._set_status = setStatus;
         this._request = request
     }
     
+    get is_clientside() { return this.clientside; }
+
     // Applies client only stuff
     public unsynced_apply() {
         this._unsynced_apply(this);
@@ -95,12 +100,14 @@ export class ActionController {
     }
 
     public add_new_action(action: Action<any>) {
-        this.unsynced_actions = [...this.unsynced_actions, action];
         this.action_history.push(action);
-
-        this._client.sendCommand(action.request);
         if (this.action_history.length > this.MAX_ACTION_HISTORY) {
             this.action_history.shift();
+        }
+        
+        if (!action.is_clientside) {
+            this.unsynced_actions = [...this.unsynced_actions, action];
+            this._client.sendCommand(action.request);
         }
     }
 }

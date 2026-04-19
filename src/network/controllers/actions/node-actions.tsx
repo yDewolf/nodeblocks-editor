@@ -5,7 +5,7 @@ import { NodeConnection } from "~/wrapper/nodes/node-connection";
 import { Action, ActionController } from "./action-controller";
 
 export class NodeActionUtils {
-    protected static _sync_node = (action: Action<NodeActionPayload>, action_controller: ActionController): void => {
+    protected static _sync_node = (action: Action<NodeActionPayload>, action_controller: ActionController, clientside: boolean = false): void => {
         if (action.request.type != ClientMessages.NODE_ACTION) return;
         switch (action.request.payload.action) {
             case SceneActionTypes.ADD:
@@ -32,8 +32,8 @@ export class NodeActionUtils {
         }
     }
 
-    public static request_add_nodes = (nodes: NodeSceneRequestData, action_controller: ActionController) => {
-        const action: Action<NodeActionPayload> = new Action({
+    public static request_add_nodes = (nodes: NodeSceneRequestData, action_controller: ActionController, clientside: boolean = false) => {
+        const action: Action<NodeActionPayload> = new Action(clientside, {
             action_uid: Action.make_action_id(SceneActionTypes.ADD),
             type: ClientMessages.NODE_ACTION,
             payload: {action: SceneActionTypes.ADD, 
@@ -47,7 +47,7 @@ export class NodeActionUtils {
         action.unsynced_apply();
     }
 
-    public static request_update_nodes = (nodes: GraphNode[], action_controller: ActionController) => {
+    public static request_update_nodes = (nodes: GraphNode[], action_controller: ActionController, clientside: boolean = false) => {
         let uids = new Array<string>();
         nodes.forEach((node) => {
             uids.push(node.id);
@@ -62,7 +62,7 @@ export class NodeActionUtils {
             };
         });
 
-        const action: Action<NodeActionPayload> = new Action({
+        const action: Action<NodeActionPayload> = new Action(clientside, {
             action_uid: Action.make_action_id(SceneActionTypes.UPDATE),
             type: ClientMessages.NODE_ACTION,
             payload: {action: SceneActionTypes.UPDATE, 
@@ -80,13 +80,13 @@ export class NodeActionUtils {
         action.unsynced_apply();
     }
 
-    public static request_remove_nodes = (nodes: GraphNode[], action_controller: ActionController) => {
+    public static request_remove_nodes = (nodes: GraphNode[], action_controller: ActionController, clientside: boolean = false) => {
         let uids = new Array<string>();
         nodes.forEach((node) => {
             uids.push(node.id);
         });
         
-        const action: Action<NodeActionPayload> = new Action({
+        const action: Action<NodeActionPayload> = new Action(clientside, {
             action_uid: Action.make_action_id(SceneActionTypes.REMOVE),
             type: ClientMessages.NODE_ACTION,
             payload: {action: SceneActionTypes.REMOVE, 
@@ -121,7 +121,7 @@ export class NodeActionUtils {
         });
 
         // TODO: Handle potential add errors
-        if (!action_controller._client.is_connected()) {
+        if (!action_controller._client.is_connected() || action.is_clientside) {
             action.update_action_status(
                 EditorActionStatus.SUCCESSFULL
             );
@@ -143,7 +143,7 @@ export class NodeActionUtils {
         // });
 
         // TODO: Handle potential add errors
-        if (!action_controller._client.is_connected()) {
+        if (!action_controller._client.is_connected() || action.is_clientside) {
             action.update_action_status(
                 EditorActionStatus.SUCCESSFULL
             );
@@ -170,7 +170,7 @@ export class NodeActionUtils {
         action_controller._editor.scene_controller.node_controller.queue_free_nodes(nodes, action);
         
         // TODO: Handle possible removal errors
-        if (!action_controller._client.is_connected()) {
+        if (!action_controller._client.is_connected() || action.is_clientside) {
             action.update_action_status(
                 EditorActionStatus.SUCCESSFULL
             );

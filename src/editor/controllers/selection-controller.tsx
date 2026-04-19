@@ -213,8 +213,8 @@ export class SelectionController {
 
             let conns: ConnSceneRequestData = {};
             conns[ConnectionController.make_conn_uid()] = {
-                from: NodeSceneFile.make_slot_path(this.selected_slot), 
-                to: NodeSceneFile.make_slot_path(slot)
+                from_slot: NodeSceneFile.make_slot_path(this.selected_slot), 
+                to_slot: NodeSceneFile.make_slot_path(slot)
             };
             ConnActionUtils.request_connect(conns, this._editor._action_controller);
             // TODO: Desselect slot only if shift is not pressed
