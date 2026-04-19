@@ -24,6 +24,7 @@ import { ActionController } from "~/network/controllers/actions/action-controlle
 import { NodeSceneRequestData } from "~/network/websocket/request-types";
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
+import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 
 export class NodeEditor {
     protected _editor_client: NodeServerClient
@@ -362,6 +363,10 @@ export class NodeEditor {
                                     }}
                                     onHoverSlot={(slot: NodeSlot) => {
                                         this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.HOVER_SLOT)
+                                    }}
+                                    syncParameter={(node: GraphNode, parameter: NodeParameter) => {
+                                        // TODO: Update only this parameter
+                                        NodeActionUtils.request_update_nodes([node], this._action_controller);
                                     }}
                                 />
                             }

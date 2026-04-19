@@ -47,6 +47,39 @@ export class NodeActionUtils {
         action.unsynced_apply();
     }
 
+    public static request_update_nodes = (nodes: GraphNode[], action_controller: ActionController) => {
+        let uids = new Array<string>();
+        nodes.forEach((node) => {
+            uids.push(node.id);
+        });
+
+        let node_data: NodeSceneRequestData = {};
+        nodes.forEach((node) => {
+            node_data[node.id] = {
+                type: node.type_name, 
+                data: Object.fromEntries(node.node_data.map_parameters().entries()), 
+                position: node.pos
+            };
+        });
+
+        const action: Action<NodeActionPayload> = new Action({
+            action_uid: Action.make_action_id(SceneActionTypes.UPDATE),
+            type: ClientMessages.NODE_ACTION,
+            payload: {action: SceneActionTypes.UPDATE, 
+                action_data: node_data
+            }
+        },  (action) => this._unsynced_node_update(action, action_controller), 
+            (action) => {console.error("Too lazy to implement Node Update revert function now")}, 
+            (action) => this._sync_node(action, action_controller)
+        );
+        nodes.forEach((node) => {
+            node.append_update_action(action);
+        });
+
+        action_controller.add_new_action(action);
+        action.unsynced_apply();
+    }
+
     public static request_remove_nodes = (nodes: GraphNode[], action_controller: ActionController) => {
         let uids = new Array<string>();
         nodes.forEach((node) => {
@@ -86,6 +119,28 @@ export class NodeActionUtils {
         added_nodes.forEach((node) => {
             node.append_add_action(action);
         });
+
+        // TODO: Handle potential add errors
+        if (!action_controller._client.is_connected()) {
+            action.update_action_status(
+                EditorActionStatus.SUCCESSFULL
+            );
+        }
+    }
+
+    protected static _unsynced_node_update = (action: Action<NodeActionPayload>, action_controller: ActionController) => {
+        if (action.request.payload.action != SceneActionTypes.UPDATE) return
+        if (action.request.type != ClientMessages.NODE_ACTION) return
+
+        // const nodes_data = action.request.payload.action_data;
+        // let nodes: Array<GraphNode> = [];
+        // Object.entries(action.request.payload.action_data).forEach(([uid, node_data]) => {
+        //     const node = action_controller._editor.scene_controller.node_controller.get_node(uid);
+        //     if (node) {
+        //         nodes.push(node);
+        //         // TODO: Do some "set_unsynced_value" on parameters, idk
+        //     }
+        // });
 
         // TODO: Handle potential add errors
         if (!action_controller._client.is_connected()) {
