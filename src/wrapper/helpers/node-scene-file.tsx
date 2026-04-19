@@ -5,7 +5,7 @@ import { NodeSlot } from "../nodes/slot/node-slot";
 
 export interface MinimalNodeSceneData {
     type: string,
-    data: Map<string, any>,
+    data: Map<string, any>, //| {[key: string]: any},
     position: Vector2,
 }
 
@@ -19,8 +19,8 @@ export interface ConnectionSceneData {
 }
 
 export interface SceneData {
-    node_types_id: string,
-    node_types_version: number,
+    types_id: string,
+    types_version: number,
     nodes: Map<string, NodeSceneData>,
     connections: Map<string, ConnectionSceneData>
 }
@@ -77,11 +77,11 @@ export class NodeSceneFile {
         }
 
         const virtual_data = this._virtual_file.scene_data;
-        if (virtual_data.node_types_id != this.scene_data?.node_types_id) {
+        if (virtual_data.types_id != this.scene_data?.types_id) {
             return false;
         }
 
-        if (virtual_data.node_types_version != this.scene_data.node_types_version) {
+        if (virtual_data.types_version != this.scene_data.types_version) {
             return false;
         }
 
@@ -158,18 +158,14 @@ export class NodeSceneFile {
                 return Object.fromEntries(value);
             }
     
-            if (value && typeof value === 'object' && 'x' in value && 'y' in value) {
-                return [value.x, value.y];
-            }
-    
             return value;
         });
     }
     
     static json_to_scene_data(json_data: any): SceneData {
         const scene: SceneData = {
-            node_types_id: json_data.node_types_id,
-            node_types_version: json_data.node_types_version,
+            types_id: json_data.types_id,
+            types_version: json_data.types_version,
             nodes: new Map(Object.entries(json_data.nodes).map(([id, data]: [string, any]) => {
                 return [id, {
                     ...data,

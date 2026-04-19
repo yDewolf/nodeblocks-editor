@@ -1,93 +1,81 @@
 import { nanoid } from "nanoid";
 import { createSignal } from "solid-js";
+import { Action } from "~/network/controllers/actions/action-controller";
+import { ConnectionActionPayload, ConnSceneRequestData } from "~/network/websocket/request-types";
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
+import { ConnectionSceneData, NodeSceneFile } from "../helpers/node-scene-file";
+import { NodeController } from "./node-controller";
 
 export class ConnectionController {
     _connections: () => NodeConnection[];
     _set_connections: (conn: NodeConnection[]) => void;
 
-    _selected_slot: () => NodeSlot | null;
-    _set_selected_slot: (slot: NodeSlot | null) => void;
+    _disconnect_queue: Map<Action<any>, NodeConnection[]> = new Map();
 
-    _hovered_slot: () => NodeSlot | null;
-    _set_hovered_slot: (slot: NodeSlot | null) => void;
 
     constructor() {
         const [connections, setConnections] = createSignal([]);
         this._connections = connections;
         this._set_connections = setConnections;
 
-        const [selectedSlot, setSelectedSlot] = createSignal(null);
-        this._selected_slot = selectedSlot;
-        this._set_selected_slot = setSelectedSlot;
-
-        const [hoveredSlot, sethoveredSlot] = createSignal(null);
-        this._hovered_slot = hoveredSlot;
-        this._set_hovered_slot = sethoveredSlot;
     }
 
     get connections() { return this._connections(); }
     set connections(conn: NodeConnection[]) { this._set_connections(conn); }
 
-    get selected_slot() { return this._selected_slot() }
-    set selected_slot(slot: NodeSlot | null) { this._set_selected_slot(slot) }
-
-    get hovered_slot() { return this._hovered_slot() }
-    set hovered_slot(slot: NodeSlot | null) { this._set_hovered_slot(slot) }
-
     public clear() {
         this._set_connections([]);
-        this._set_hovered_slot(null);
-        this._set_selected_slot(null);
     }
 
-    public select_slot(slot: NodeSlot) {
-        if (this.selected_slot != null) {
-            const conn = this.are_connected(this.selected_slot, slot)
-            if (conn != undefined) {
-                this.disconnect_nodes(conn);
-                this.unselect_slot();
-                return;
-            }
-
-            const succesfull = this.connect_node_to(this.selected_slot, slot);
-            // TODO: Desselect slot only if shift is not pressed
-            this.unselect_slot();
-            return;
-        }
-
-        this.unselect_slot();
-
-        this.selected_slot = slot;
-        this.selected_slot.selected = true;
-    }
-
-    public unselect_slot() {
-        if (this.selected_slot != null) {
-            this.selected_slot.selected = false;
-        } 
-        this.selected_slot = null;
-    }
-
-    public connect_node_to(slot_a: NodeSlot, slot_b: NodeSlot, conn_uid: string = `conn_${nanoid(6)}`): boolean {
+    public connect_node_to(slot_a: NodeSlot, slot_b: NodeSlot, conn_uid: string = ConnectionController.make_conn_uid()): NodeConnection | undefined {
         if (!slot_a.can_connect_to(slot_b)) {
-            return false;
+            return undefined;
         }
 
         const connection = new NodeConnection(slot_a, slot_b, conn_uid);
         if (connection.causes_recursion()) {
-            return false;
+            return undefined;
         }
 
         this.connections = [...this.connections, connection];
         connection.connect();
-        return true;
+        return connection;
     }
 
     public disconnect_nodes(connection: NodeConnection) {
         this.connections = this.connections.filter((conn) => conn != connection);
-        connection.disconnect()
+        connection.disconnect();
+        connection.free();
+    }
+
+    public sync_disconnect(action: Action<any>) {
+        const connections = this._disconnect_queue.get(action);
+        if (connections) {
+            connections.forEach((conn) => {
+                this.disconnect_nodes(conn);
+            });
+        }
+    }
+
+    public queue_disconnect(connections: NodeConnection[], ref_action: Action<any>) {
+        this._disconnect_queue.set(ref_action, connections);
+    }
+
+    public unsynced_connect(conns_data: ConnSceneRequestData, node_controller: NodeController) {
+        let connections: Array<NodeConnection> = new Array();
+        Object.entries(conns_data).forEach(([uid, conn_data]) => {
+            const slots = ConnectionController.get_slots_from_path_data(conn_data, node_controller)
+            if (slots) {
+                const [slot_a, slot_b] = slots;
+                const conn = this.connect_node_to(slot_a, slot_b, uid);             
+                if (conn) {
+                    connections.push(conn);
+                }
+            }
+        });
+
+        return connections
     }
 
     public are_connected(slot_a: NodeSlot, slot_b: NodeSlot): NodeConnection | undefined {
@@ -101,5 +89,34 @@ export class ConnectionController {
         }
 
         return filtered[0];
+    }
+
+    public static get_slots_from_path_data(conn_data: ConnectionSceneData, node_controller: NodeController) {
+        const node_a_path = NodeSceneFile.parse_node_path(conn_data.from);
+        const node_b_path = NodeSceneFile.parse_node_path(conn_data.to);
+        if (node_a_path.slot_name == undefined || node_b_path.slot_name == undefined) {
+            console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
+            return;
+        }
+
+        const node_a = node_controller.get_node(node_a_path.node_id);
+        const node_b = node_controller.get_node(node_b_path.node_id);
+        if (!node_a || !node_b) {
+            console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
+            return;
+        }
+
+        const slot_a = node_a.get_slot(node_a_path.slot_name);
+        const slot_b = node_b.get_slot(node_b_path.slot_name);
+        if (slot_a == undefined || slot_b == undefined) {
+            console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
+            return;
+        }
+
+        return [slot_a, slot_b];
+    }
+
+    public static make_conn_uid() {
+        return `conn_${nanoid(6)}`;
     }
 }

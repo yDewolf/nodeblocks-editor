@@ -3,8 +3,15 @@ import { NodeParameter } from "../../../wrapper/nodes/data/node-data";
 import { DataTypes } from "../../../wrapper/nodes/data/node-data-type";
 import { Show } from "solid-js";
 
+export const debounce = (func: Function, wait: number) => {
+    let timeout: any;
+    return (...args: any[]) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func(...args), wait);
+    };
+};
 
-export const NodeField = (props: {node: GraphNode | null, parameter: NodeParameter}) => {
+export const NodeField = (props: {node: GraphNode | null, parameter: NodeParameter, parameter_sync: ((node: GraphNode, parameter: NodeParameter) => void) | undefined}) => {
     let inputRef!: HTMLInputElement;
     
     const field_id = props.node?.id.toString() + props.parameter._field_name;
@@ -35,6 +42,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
 
     if (props.parameter._range) { input_type = "range" }
 
+    const debouncedSync = debounce(props.parameter_sync!, 250);
     const onInputValueChanged = (raw_value: any) => {
         if (raw_value === "") return;
 
@@ -49,6 +57,8 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
         if (new_value !== props.parameter.value) {
             props.parameter.value = new_value;
         }
+
+        debouncedSync();
 
         if (inputRef) {
             inputRef.value = props.parameter.value.toString()

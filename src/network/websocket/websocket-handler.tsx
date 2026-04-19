@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { ClientCommand, ServerMessage } from "./request-types";
+import { ClientAction, ClientCommand, ClientMessage, ServerMessage } from "./request-types";
 import { ServerMessages } from "./websocket-protocol";
 
 type MessageByType<MessageType extends ServerMessages> = Extract<ServerMessage, {type: MessageType}>
@@ -47,6 +47,7 @@ export class NodeServerClient {
     
                     this.socket.onclose = () => {
                         console.log("[Disconnected]");
+                        this.is_connecting = false;
                         this.socket = null;
                     };
                 } catch (err) {
@@ -86,7 +87,7 @@ export class NodeServerClient {
         }
     }
 
-    public sendCommand(command: ClientCommand) {
+    public sendCommand(command: ClientMessage) {
         if (this.socket?.readyState === WebSocket.OPEN) {
             console.log("Sending", command)
             this.socket.send(JSON.stringify(command));
@@ -97,5 +98,12 @@ export class NodeServerClient {
         console.log("Closing Socket")
         this.socket?.close(1000, "Closed Workspace");
         this.socket = null;
+    }
+
+    public is_connected() {
+        if (this.socket == null) return false;
+        if (this.is_connecting) return false;
+        
+        return true;
     }
 }

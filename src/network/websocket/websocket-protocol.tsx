@@ -25,6 +25,8 @@ export enum ClientMessages {
     SET_INSTANCE_STATE = "SET_STATE",
     SET_INSTANCE_LOOP_STATE = "SET_LOOP_STATE",
 
+    // FIXME: Make another enum for these (server and client) 
+    // something like ClientActions or EditorActionTypes
     NODE_ACTION = "NODE",
     CONNECTION_ACTION = "CONNECTION",
 
@@ -35,7 +37,8 @@ export enum ServerMessages {
     HANDSHAKE_SYNC = "handshake_sync",
     NODE_OUTPUT = "node_output",
     SYNC_CLIENT_SCENE = "sync_client_scene",
-    SYNC_INSTANCE_STATE = "sync_instance_state"
+    SYNC_INSTANCE_STATE = "sync_instance_state",
+    SYNC_ACTION = "sync_action"
 }
 
 export enum WebsocketStatus {
@@ -44,8 +47,15 @@ export enum WebsocketStatus {
     DISCONNECTED = 0
 }
 
-export enum SceneActions {
+export enum SceneActionTypes {
     ADD = "ADD",
     REMOVE = "REMOVE",
     UPDATE = "UPDATE"
+}
+
+// TODO: Implement this on server
+export enum EditorActionStatus {
+    SUCCESSFULL = "SUCCESSFULL",
+    UNSYNCED = "UNSYNCED",
+    FAILED = "FAILED"
 }

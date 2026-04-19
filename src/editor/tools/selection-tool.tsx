@@ -26,7 +26,7 @@ export class SelectionTool extends BaseEditorTool {
     }
 
     onClickOnNodeSlot(slot: NodeSlot): void {
-        this.connection_controller.select_slot(slot);
+        this.selection_controller.select_slot(slot);
         this.selection_controller.clearSelection();
     }
 
@@ -36,7 +36,7 @@ export class SelectionTool extends BaseEditorTool {
             if (this.selection_controller.has_selected) {
                 this.selection_controller.clearSelection();
             }
-            this.connection_controller.unselect_slot();
+            this.selection_controller.unselect_slot();
 
             (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
             this.selection_controller.onStartAreaSelection({x: world_pos.x, y: world_pos.y});
@@ -51,7 +51,7 @@ export class SelectionTool extends BaseEditorTool {
     }
 
     onClickOnNode(node: GraphNode): void {
-        this.connection_controller.unselect_slot();
+        this.selection_controller.unselect_slot();
         this.selection_controller.onClickOnNode(node)
     }
 
@@ -82,7 +82,7 @@ export class SelectionTool extends BaseEditorTool {
     }
 
     onHoverSlot(slot: NodeSlot): void {
-        this.connection_controller.hovered_slot = slot;
+        this.selection_controller.hovered_slot = slot;
         this.selection_controller.hovered_node = slot.parent_node;
     }
 
@@ -92,6 +92,6 @@ export class SelectionTool extends BaseEditorTool {
 
     onHoverBackground(): void {
         this.selection_controller.hovered_node = null;
-        this.connection_controller.hovered_slot = null;
+        this.selection_controller.hovered_slot = null;
     }
 }

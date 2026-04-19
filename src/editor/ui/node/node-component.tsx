@@ -13,7 +13,8 @@ export const NodeComponent = (props: {
     onClick: (node: GraphNode) => void, 
     onClickOnSlot: (slot: NodeSlot) => void, 
     onHoverNode: (node: GraphNode) => void, 
-    onHoverSlot: (slot: NodeSlot) => void 
+    onHoverSlot: (slot: NodeSlot) => void,
+    syncParameter: (node: GraphNode, parameter: NodeParameter) => void
 }) => {
     let ro: ResizeObserver | undefined;
     const handleRef = (el: HTMLDivElement) => {
@@ -53,6 +54,10 @@ export const NodeComponent = (props: {
                         transform: `translate(${props.node.x}px, ${props.node.y}px)`,
                         // "pointer-events": "none"
                     }}
+                    classList={{
+                        "unsynced": !props.node.is_synced,
+                        "failed": props.node.has_failed_action
+                    }}
                     class="node"
                 >
                     <div class="node-slots">
@@ -85,9 +90,12 @@ export const NodeComponent = (props: {
                             
                             <div class="node-content">
                                 <For each={props.node.node_data.parameters.values().toArray()}>
-                                    {(parameter: NodeParameter) => <NodeField 
+                                    {(parameter: NodeParameter) => <NodeField
                                             node={props.node}
                                             parameter={parameter}
+                                            parameter_sync={() => {
+                                                props.syncParameter(props.node, parameter)
+                                            }}
                                         />
                                     }
                                 </For>

@@ -58,17 +58,18 @@ export class NodeTypeFile {
     }
 
     public is_scene_compatible(scene_data: SceneData): boolean {
-        if (scene_data.node_types_id != this.node_types_id) {
+        if (scene_data.types_id != this.node_types_id) {
             return false;
         }
-
+        
         // TODO: Add better version compatibility (> x.x.x or (x.x.x[, etc)
-        if (scene_data.node_types_version != this.node_types_version) {
+        if (scene_data.types_version != this.node_types_version) {
             return false;
         }
 
         const has_missing_constructor = scene_data.nodes.values().some((node_data) => {
             if (!this.node_constructors.has(node_data.type)) {
+                console.warn("WARNING: Currently loaded types can't construct type", node_data.type)
                 return true;
             }
         })

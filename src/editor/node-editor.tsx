@@ -8,7 +8,6 @@ import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./internal/inpu
 import { EventHandler, InputEvents } from "./internal/input_manager/event-handling";
 import { SceneController } from "../wrapper/controllers/scene-controller";
 import { NodeServerClient } from "~/network/websocket/websocket-handler";
-import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
 import { NodeTypeSelector } from "./ui/misc/node-type-selector";
@@ -21,14 +20,22 @@ import { ClientMessages, InstanceCommands, ServerMessages } from "~/network/webs
 import { StateController } from "~/network/controllers/state_controller";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
 import { ServerSyncController } from "~/network/controllers/sync_controller";
+import { ActionController } from "~/network/controllers/actions/action-controller";
+import { NodeSceneRequestData } from "~/network/websocket/request-types";
+import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
+import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
+import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 
 export class NodeEditor {
-    _editor_client: NodeServerClient
-    _state_controller: StateController
-    _status_controller: WebsocketStatusController
-    _sync_controller: ServerSyncController
-
+    protected _editor_client: NodeServerClient
     scene_controller: SceneController;
+    
+    protected _state_controller: StateController
+    protected _status_controller: WebsocketStatusController
+    
+    _sync_controller: ServerSyncController
+    _action_controller: ActionController
+
     tool_controller: ToolController
 
     selection_controller: SelectionController
@@ -44,7 +51,9 @@ export class NodeEditor {
         this._editor_client = editor_client;
         this._state_controller = new StateController(this._editor_client);
         this._status_controller = new WebsocketStatusController(this._editor_client);
-        this.scene_controller = new SceneController();
+        
+        this._action_controller = new ActionController(this._editor_client, this);
+        this.scene_controller = new SceneController(this._action_controller);
         this._sync_controller = new ServerSyncController(this._editor_client, this.scene_controller)
 
         const [cursorWorldPos, setCursorWorldPos] = createSignal({x: 0, y: 0});
@@ -56,7 +65,7 @@ export class NodeEditor {
         this.editor_space = new EditorSpace()
         this.editor_grid = new Grid({x: 32, y: 32});
 
-        this.selection_controller = new SelectionController(this.editor_space, this.editor_grid);
+        this.selection_controller = new SelectionController(this.editor_space, this.editor_grid, this);
         
         this.tool_controller = new ToolController(this);
         this.setup_event_handlers();
@@ -134,7 +143,15 @@ export class NodeEditor {
                     const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
 
-                    this.scene_controller.node_controller.add_new_node("", {x: world_pos.x, y: world_pos.y}, this.selection_controller.selected_node_type)
+                    let nodes: NodeSceneRequestData = {};
+                    nodes[crypto.randomUUID()] = {
+                        type: this.selection_controller.selected_node_type, 
+                        position: {x: world_pos.x, y: world_pos.y},
+                        data: new Map()
+                    };
+                    NodeActionUtils.request_add_nodes(nodes, this._action_controller);
+                    // TODO: Warn the user about some node construct error
+                    // this.scene_controller.node_controller.add_new_node()
                 }
             }}
         );
@@ -151,14 +168,12 @@ export class NodeEditor {
         this.input_manager.set_keybind_handler(
             new Keybind("DeleteNode", [new KeybindMap({keys: new Map([["Delete", true]]), modifiers: new Map()})]),
             {just_activated: (data) => {
-                this.tool_controller.selection_controller.selected_nodes.forEach((node) => {
-                    node.get_connections().forEach((conn) => {
-                        this.scene_controller.connection_controller.disconnect_nodes(conn);
-                    });
-                    this.scene_controller.node_controller.remove_node(node);
-                });
-                // console.log(JSON.stringify(scene_data));
-                // console.log("data to json", NodeSceneFile.scene_data_to_json(scene_data));
+                if (this.tool_controller.selection_controller.selected_nodes.length > 0) {
+                    NodeActionUtils.request_remove_nodes(
+                        this.tool_controller.selection_controller.selected_nodes,
+                        this._action_controller
+                    );
+                }
             }}
         );
     }
@@ -248,6 +263,7 @@ export class NodeEditor {
                     return [slot_name, slot_output_map];
                 })
             );
+            console.log(message);
             node_output.forEach((value, slot_name) => {
                 const slot = node.get_slot(slot_name);
                 if (slot) {
@@ -321,12 +337,14 @@ export class NodeEditor {
                             <For each={this.scene_controller.connection_controller.connections}>
                                 {(conn) => <ConnectionLines 
                                     connection={conn} 
-                                    onDisconnect={() => this.scene_controller.connection_controller.disconnect_nodes(conn)} 
+                                    onDisconnect={() => {
+                                        ConnActionUtils.request_disconnect([conn], this._action_controller);
+                                    }} 
                                 />}
                             </For>
                             
-                            <Show when={this.scene_controller.connection_controller.selected_slot}>
-                                <ConnectionPreview start_slot={this.scene_controller.connection_controller.selected_slot} hovered_slot={this.scene_controller.connection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
+                            <Show when={this.selection_controller.selected_slot}>
+                                <ConnectionPreview start_slot={this.selection_controller.selected_slot} hovered_slot={this.selection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
                             </Show>
                         </svg>
 
@@ -345,6 +363,10 @@ export class NodeEditor {
                                     }}
                                     onHoverSlot={(slot: NodeSlot) => {
                                         this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.HOVER_SLOT)
+                                    }}
+                                    syncParameter={(node: GraphNode, parameter: NodeParameter) => {
+                                        // TODO: Update only this parameter
+                                        NodeActionUtils.request_update_nodes([node], this._action_controller);
                                     }}
                                 />
                             }
