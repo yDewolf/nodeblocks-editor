@@ -57,6 +57,7 @@ export class NodeActionUtils {
         nodes.forEach((node) => {
             node_data[node.id] = {
                 type: node.type_name, 
+                // @ts-ignore Isso aqui é 99% seguro. É só para o Map ser convertido para Object e não quebrar o JSON
                 data: Object.fromEntries(node.node_data.map_parameters().entries()), 
                 position: node.pos
             };

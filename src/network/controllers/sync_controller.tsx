@@ -2,22 +2,22 @@ import { NodeServerClient } from "../websocket/websocket-handler";
 import { SceneController, SceneUtils } from "~/wrapper/controllers/scene-controller";
 import { ClientMessages, SceneActionTypes, ServerMessages } from "../websocket/websocket-protocol";
 import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
-import { createEffect, createRoot, on } from "solid-js";
-import { GraphNode } from "~/wrapper/nodes/graph-node";
-import { NodeConnection } from "~/wrapper/nodes/node-connection";
-import { NodeSceneRequestData } from "../websocket/request-types";
-import { Action } from "./actions/action-controller";
+// import { createEffect, createRoot, on } from "solid-js";
+// import { GraphNode } from "~/wrapper/nodes/graph-node";
+// import { NodeConnection } from "~/wrapper/nodes/node-connection";
+// import { NodeSceneRequestData } from "../websocket/request-types";
+// import { Action } from "./actions/action-controller";
 
 // TODO: Observe Actions
 export class ServerSyncController {
     _client: NodeServerClient
     _scene_controller: SceneController
-    private _last_node_ids: Set<string> = new Set();
-    private _last_conn_ids: Set<string> = new Set();
-    private _node_disposers: Map<string, () => void> = new Map();
-    private _conn_disposers: Map<string, () => void> = new Map();
+    // private _last_node_ids: Set<string> = new Set();
+    // private _last_conn_ids: Set<string> = new Set();
+    // private _node_disposers: Map<string, () => void> = new Map();
+    // private _conn_disposers: Map<string, () => void> = new Map();
 
-    private syncing_scene: boolean = false;
+    // private syncing_scene: boolean = false;
 
     constructor(client: NodeServerClient, scene_controller: SceneController) {
         this._client = client;
@@ -31,7 +31,7 @@ export class ServerSyncController {
         this._client.add_handler(ServerMessages.SYNC_CLIENT_SCENE, (message) => {
             const scene_data = this._scene_controller.load_scene_data(message.payload);
             this._scene_controller.do_clientside_request = false;
-            this.syncing_scene = false;
+            // this.syncing_scene = false;
         });
     }
 
@@ -45,7 +45,7 @@ export class ServerSyncController {
     public sync_with_server_scene() {
         this._client.sendCommand({type: ClientMessages.SYNC_CLIENT_SCENE})
         this._scene_controller.do_clientside_request = true;
-        this.syncing_scene = true;
+        // this.syncing_scene = true;
     }
 
     // FIXME: Everything below is kinda deprecated

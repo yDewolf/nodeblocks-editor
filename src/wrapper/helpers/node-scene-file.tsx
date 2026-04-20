@@ -194,10 +194,13 @@ export class NodeSceneFile {
             types_id: json_data.types_id,
             types_version: json_data.types_version,
             nodes: new Map(Object.entries(json_data.nodes).map(([id, data]: [string, any]) => {
+                if (data.position instanceof Array) {
+                    console.warn("WARNING: Scene Node Position shouldn't be an Array")
+                }
                 return [id, {
                     ...data,
                     uid: id,
-                    position: data.position,
+                    position: data.position instanceof Array ? {x: data.position[0], y: data.position[1]} : data.position,
                     size: { x: "size" in data ? data.size[0] : -1, y: "size" in data ? data.size[1] : -1 },
                     data: new Map<string, any>(Object.entries(data.data))
                 }];

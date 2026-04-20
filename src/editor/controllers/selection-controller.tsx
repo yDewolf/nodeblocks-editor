@@ -10,6 +10,8 @@ import { ConnActionUtils } from '../../network/controllers/actions/conn-actions'
 import { NodeEditor } from "../node-editor";
 import { ConnSceneRequestData } from "~/network/websocket/request-types";
 import { NodeSceneFile } from '../../wrapper/helpers/node-scene-file';
+import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
+import { debounce, throttle } from "../utils/debounce-utils";
 
 export class SelectionController {
     selection_rect: SelectionRect
@@ -33,6 +35,7 @@ export class SelectionController {
     selecting: boolean = false;
     _moving: () => boolean;
     _setMoving: (value: boolean) => void;
+    private debounced_request_update: Function;
     
     selected_node_type: string = "default"
     
@@ -61,6 +64,10 @@ export class SelectionController {
         this._moving = moving
         this._setMoving = setMoving
         
+        this.debounced_request_update = debounce((nodes: any) => {
+            NodeActionUtils.request_update_nodes(nodes, this._editor._action_controller);
+        }, 100);
+
         this.selection_rect = new SelectionRect(this.editor_space.camera);
         
         createRoot(() => {
@@ -148,9 +155,6 @@ export class SelectionController {
     }
 
     public onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: GraphNode[]) {
-        // pos.x = pos.x + this.editor_space.camera.offset.x
-        // pos.y = pos.y + this.editor_space.camera.offset.y
-
         if (this.moving) {
             this.selected_nodes.forEach(node => {
                 node.move({
@@ -158,6 +162,7 @@ export class SelectionController {
                     y: delta.y / this.editor_space.camera.zoom
                 }, this.editor_grid.grid);
             });
+            this.debounced_request_update(this.selected_nodes);
         }
 
         if (Math.abs(delta.x) < 1 && Math.abs(delta.y) < 1) {

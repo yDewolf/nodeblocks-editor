@@ -2,14 +2,7 @@ import { GraphNode } from "../../../wrapper/nodes/graph-node";
 import { NodeParameter } from "../../../wrapper/nodes/data/node-data";
 import { DataTypes } from "../../../wrapper/nodes/data/node-data-type";
 import { Show } from "solid-js";
-
-export const debounce = (func: Function, wait: number) => {
-    let timeout: any;
-    return (...args: any[]) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func(...args), wait);
-    };
-};
+import { debounce } from "~/editor/utils/debounce-utils";
 
 export const NodeField = (props: {node: GraphNode | null, parameter: NodeParameter, parameter_sync: ((node: GraphNode, parameter: NodeParameter) => void) | undefined}) => {
     let inputRef!: HTMLInputElement;
