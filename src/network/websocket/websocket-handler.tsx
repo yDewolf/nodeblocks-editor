@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { ClientAction, ClientCommand, ClientMessage, ServerMessage } from "./request-types";
+import { ClientMessage, ServerMessage } from "./request-types";
 import { ServerMessages } from "./websocket-protocol";
 
 type MessageByType<MessageType extends ServerMessages> = Extract<ServerMessage, {type: MessageType}>
@@ -7,63 +7,67 @@ type MessageByType<MessageType extends ServerMessages> = Extract<ServerMessage, 
 export class NodeServerClient {
     private socket: WebSocket | null = null;
     private baseUrl: string;
-    
+    private session_token: string | undefined = undefined;
+
     private is_connecting: boolean = false;
     private message_handlers: Map<ServerMessages, Map<string, ((message: any) => void)>>
 
-    constructor(host: string = "localhost", port: number = 3001) {
+    constructor(host: string = "localhost", port: number = 3001, session_token: string | undefined = undefined) {
         this.baseUrl = `ws://${host}:${port}`;
         this.message_handlers = new Map();
+        this.session_token = session_token;
     }
 
-    public connect(userId: string, subRoute: string = ""): Promise<void> | null {
+    public connect(userId: string, token?: string): Promise<void> | null {
         if (this.is_connecting || (this.socket && this.socket.readyState == WebSocket.OPEN)) {
             return null;
         }
         
+        if (token) this.session_token = token;
+
         this.is_connecting = true;
-            return new Promise((resolve, reject) => {
-                try {
-                    const url = `${this.baseUrl}/instance/${userId}/`;
-                    console.log(`Trying to connect to ${url}`);
-                    this.socket = new WebSocket(url);
-    
-                    this.socket.onopen = (event) => {
-                        this.is_connecting = false;
-                        console.log(`[Connected] to ${url}`, event);
-                        resolve();
-                    };
-    
-                    this.socket.onerror = (err) => {
-                        console.log("Something went wrong with websocket");
-                        this.socket = null;
-                        this.is_connecting = false;
-                        reject(new Error("Failed to connect to NodeServer"));
-                    };
-                    this.socket.onmessage = (event) => {
-                        const data: ServerMessage = JSON.parse(event.data);
-                        this.handleMessage(data);
-                    };
-    
-                    this.socket.onclose = () => {
-                        console.log("[Disconnected]");
-                        this.is_connecting = false;
-                        this.socket = null;
-                    };
-                } catch (err) {
-                    this.is_connecting = false;
-                    reject(err)
+        return new Promise((resolve, reject) => {
+            try {
+                const url = new URL(`${this.baseUrl}/instance/${userId}/`);
+                if (this.session_token) {
+                    url.searchParams.append("token", this.session_token);
                 }
-            });
+
+                console.log(`Trying to connect to ${url.toString()}`);
+                this.socket = new WebSocket(url.toString());
+
+                this.socket.onopen = (event) => {
+                    this.is_connecting = false;
+                    console.log(`[Connected] to ${url.toString()}`, event);
+                    resolve();
+                };
+
+                this.socket.onerror = (err) => {
+                    console.log("Something went wrong with websocket");
+                    this.socket = null;
+                    this.is_connecting = false;
+                    reject(new Error("Failed to connect to NodeServer"));
+                };
+                this.socket.onmessage = (event) => {
+                    const data: ServerMessage = JSON.parse(event.data);
+                    this.handleMessage(data);
+                };
+
+                this.socket.onclose = () => {
+                    console.log("[Disconnected]");
+                    this.is_connecting = false;
+                    this.socket = null;
+                };
+            } catch (err) {
+                this.is_connecting = false;
+                reject(err)
+            }
+        });
     }
 
     public add_handler<MessageType extends ServerMessages>(message_type: MessageType, handler_func: (message: MessageByType<MessageType>) => void): string{
-        if (!this.message_handlers.has(message_type)) {
-            this.message_handlers.set(message_type, new Map());
-        }
-
         let handlers = this.message_handlers.get(message_type);
-        if (handlers == null) {handlers = new Map();}
+        if (handlers == undefined) {handlers = new Map();}
         const handler_id = nanoid(6);
         
         handlers.set(handler_id, handler_func)
@@ -83,7 +87,7 @@ export class NodeServerClient {
         if (handlers) {
             handlers.forEach((handler, key) => {
                 handler(message);
-            })
+            });
         }
     }
 

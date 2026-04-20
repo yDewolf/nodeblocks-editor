@@ -17,7 +17,7 @@ export type ConnectionActionPayload =
     
 export type ServerMessage = 
     | { type: ServerMessages.NODE_OUTPUT; node_id: string; value: any }
-    | { type: ServerMessages.HANDSHAKE_SYNC; status: number; session: string, type_data: any}
+    | { type: ServerMessages.HANDSHAKE_SYNC; status: number; session: string, type_data: any, reconnection: boolean}
     | { type: ServerMessages.HANDSHAKE_SYNC; status: number; message: string }
     | { type: ServerMessages.SYNC_CLIENT_SCENE; payload: any }
     | { type: ServerMessages.SYNC_INSTANCE_STATE; payload: {loop_state: any, instance_state: any} }

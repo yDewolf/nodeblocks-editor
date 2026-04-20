@@ -249,6 +249,10 @@ export class NodeEditor {
                 console.log("DEBUG: Parsing Type Data: ", message.type_data);
                 this.scene_controller.load_node_type_data(message.type_data);
             }
+
+            if ("reconnection" in message) {
+                if (message.reconnection) this._sync_controller.sync_with_server_scene()
+            }
         });
 
         this._editor_client.add_handler(ServerMessages.NODE_OUTPUT, (message) => {
