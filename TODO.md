@@ -1,8 +1,8 @@
 ## High Priority
-- [ ] Server Status UI Indicator
-- [ ] Server Communication
-    - [ ] Add/Remove Nodes
-    - [ ] Add/Remove Connections
+- [x] Server Status UI Indicator
+- [x] Server Communication
+    - [x] Add/Remove Nodes
+    - [x] Add/Remove Connections
     
 - [ ] Server Command Panel
 - [ ] New Node Field Type -> File (takes any file, .zip and sends to server with the scene)
