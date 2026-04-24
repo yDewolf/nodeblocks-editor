@@ -28,7 +28,7 @@ export class NodeServerClient {
         this.is_connecting = true;
         return new Promise((resolve, reject) => {
             try {
-                const url = new URL(`${this.baseUrl}/instance/${userId}/`);
+                const url = new URL(`${this.baseUrl}/instance/${userId}`);
                 if (this.session_token) {
                     url.searchParams.append("token", this.session_token);
                 }
