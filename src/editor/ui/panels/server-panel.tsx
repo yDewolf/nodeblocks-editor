@@ -4,7 +4,6 @@ import { StateController } from "~/network/controllers/state_controller";
 import { Match, Switch } from "solid-js";
 import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, WebsocketStatus } from "~/network/websocket/websocket-protocol";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
-import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 
 export const ServerStatus = (props: {status_controller: WebsocketStatusController}) => {
     return (

@@ -1,4 +1,4 @@
-import { createResource, createRoot, For, onMount } from "solid-js";
+import { createResource, createRoot, createSignal, For, onMount, Show } from "solid-js";
 import { NodeServerClient } from "~/network/websocket/websocket-handler";
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 
@@ -33,6 +33,7 @@ const FileUploader = (props: {client: NodeServerClient}) => {
 };
 
 export const FileExplorer = (props: {client: NodeServerClient}) => {
+    const [received_files, setFiles] = createSignal(Array<{name: string, size: number, type: string}>());
     const [files, { refetch }] = createResource(async () => {
         const url = new URL(`${props.client.base_http_url}/api/${props.client.user_id}/files`);
         if (props.client.session_token) {
@@ -40,14 +41,10 @@ export const FileExplorer = (props: {client: NodeServerClient}) => {
         }
         
         const response = await fetch(url);
-        const content: Array<{name: string, size: number, type: string}> = await response.json();
-        if (typeof content !== typeof Array) {
-            return [];
-        }
-        return content;
-    }, {initialValue: new Array()});
+        const json_content: object = await response.json()
+        setFiles(Array.from(Object.values(json_content)));
+    });
 
-    // Ouvinte do WebSocket para sincronização
     props.client.add_handler(ServerMessages.SYNC_FILES, () => {
         refetch();
     });
@@ -76,7 +73,7 @@ export const FileExplorer = (props: {client: NodeServerClient}) => {
         refetch();
     });
     return (
-        <div class="file-explorer">
+        <div class="file-explorer" style={{"pointer-events": "auto"}}>
             <div class="file-explorer-actions">
                 <h3>Workspace</h3>
                 <div class="column-row">
@@ -87,20 +84,20 @@ export const FileExplorer = (props: {client: NodeServerClient}) => {
                 </div>
             </div>
             <div class="file-list">
-                <For each={files() || []} fallback={<span>No files...</span>}>
-                {(file) => (
-                    <div class="file-item">
-                        <span>{file.name}</span>
-                        <div class="file-actions">
-                            <button class="icon-button" onClick={() => downloadFile(file.name)}>
-                                <img src="assets/icons/download-file.svg" alt="Download"/>
-                            </button>
-                            <button class="icon-button" onClick={() => deleteFile(file.name)}>
-                                X
-                            </button>
+                <For each={received_files()} fallback={<span>No files...</span>}>
+                    {(file) => 
+                        <div class="file-item">
+                            <span>{file.name}</span>
+                            <div class="file-actions">
+                                <button class="icon-button" onClick={() => downloadFile(file.name)}>
+                                    <img src="assets/icons/download-file.svg" alt="Download"/>
+                                </button>
+                                <button class="icon-button" onClick={() => deleteFile(file.name)}>
+                                    X
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    }
                 </For>
             </div>
         </div>
