@@ -72,10 +72,26 @@ export const FileExplorer = (props: {client: NodeServerClient}) => {
     onMount(() => {
         refetch();
     });
+    
+    const [show, setShow] = createSignal(false);
     return (
+        <Show
+            when={show()}
+            fallback={
+                <div class="left-tab-modal column-row">
+                    <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => setShow(true)}>
+                        <img src="assets/icons/menu.svg" alt="Open" />
+                    </button>
+                    <span>Workspace</span>
+                </div>
+            }
+        >
+
         <div class="file-explorer" style={{"pointer-events": "auto"}}>
             <div class="file-explorer-actions">
-                <h3>Workspace</h3>
+                <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => setShow(false)}>
+                    <img src="assets/icons/menu.svg" alt="Open" />
+                </button>
                 <div class="column-row">
                     <button class="icon-button refresh-button" onclick={() => refetch()}>
                         <img src="assets/icons/refresh.svg" alt="Refresh"/>
@@ -101,5 +117,6 @@ export const FileExplorer = (props: {client: NodeServerClient}) => {
                 </For>
             </div>
         </div>
+        </Show>
     );
 };

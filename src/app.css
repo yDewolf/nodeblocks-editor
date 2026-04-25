@@ -69,9 +69,9 @@ body {
 
 .left-tab {
   height: 100%;
-  width: 100%;
+  
+  border: solid 1px black;
   background-color: rgba(28, 29, 37, 0.521);
-  border-radius: 4px;
 }
 
 .left-tab-modal {

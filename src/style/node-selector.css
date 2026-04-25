@@ -1,5 +1,7 @@
 
 .node-type-selector {
+  height: 100%;
+  overflow-y: scroll;
   justify-content: left;
   display: flex;
   flex-direction: column;
