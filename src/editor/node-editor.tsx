@@ -26,6 +26,7 @@ import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { FileExplorer } from "./ui/panels/file/file-explorer";
+import { EditorLeftTab } from "./ui/panels/left-tab";
 
 export class NodeEditor {
     _editor_client: NodeServerClient
@@ -380,35 +381,15 @@ export class NodeEditor {
                 </div>
                 
                 <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
-                    <div class="left-tab">
-                        <div class="button-tab column-row">
-                            <ul class="tabs">
-                                <li class="tab-item">
-                                    <input class="visually-hidden" type="file" accept=".json" id="scene-input" onChange={
-                                        (e) => {
-                                            if (!e.target.files) {
-                                                return;
-                                            }
-
-                                            let selected_file: File = e.target.files[0];
-                                            this.scene_controller.safe_change_scene_file(selected_file);
-                                        }
-                                    }/>
-                                    <label for="scene-input" class="icon-button no-animation">
-                                        <img src="assets/icons/file.svg" alt="File" title="Open Scene"/>
-                                    </label>
-                                </li>
-                            </ul>
-                        </div>
-                        
-                        {selector.View(this.scene_controller, (node_preview: NodePreview) => this.tool_controller.current_tool?.onClickOnNodePreview(node_preview))}
+                    <div class="left-tab-holder">
+                        <EditorLeftTab selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
+                        <FileExplorer client={this._editor_client}/>
                     </div>
                     <div class="middle-tab">
                         {this.tool_controller.View()}
                     </div>
                     <div class="right-tab">
                         <ServerPanel editor={this} state_controller={this._state_controller}/>
-                        <FileExplorer client={this._editor_client}/>
                     </div>
                 </div>
             </div>

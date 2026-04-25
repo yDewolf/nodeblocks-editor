@@ -16,6 +16,7 @@
 }
 
 .button-tab {
+    justify-content: space-between;
     height: 45px;
     background-color: white;
 }
@@ -38,4 +39,11 @@
     transition: all 100ms;
     color: white;
     background-color: var(--selection-color);
+}
+
+.modal-button {
+    width: fit-content;
+    height: fit-content;
+    
+    padding: 4px;
 }

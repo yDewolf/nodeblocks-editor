@@ -44,6 +44,7 @@ body {
   flex-direction: column;
 }
 
+
 .right-tab {
   /* display: none; */
   width: 30%;
@@ -54,10 +55,31 @@ body {
   }
 }
 
-.left-tab {
+
+.left-tab-holder {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
   width: fit-content;
   min-width: 300px;
+
+}
+
+.left-tab {
+  height: 100%;
+  width: 100%;
   background-color: rgba(28, 29, 37, 0.521);
+  border-radius: 4px;
+}
+
+.left-tab-modal {
+  padding: 4px 8px;
+  background-color: white;
+  border: solid black 1px;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .middle-tab {
