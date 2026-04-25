@@ -24,7 +24,7 @@
     background-color: rgb(255, 255, 255);
     color: black;
     padding: 0 5px;
-    
+
     span {
         text-overflow: ellipsis;
         -webkit-line-break: 1;
@@ -36,6 +36,7 @@
         }
     }
 }
+
 
 .file-explorer-actions {
     display: flex;
