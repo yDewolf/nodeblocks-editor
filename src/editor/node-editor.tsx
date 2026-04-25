@@ -25,13 +25,14 @@ import { NodeSceneRequestData } from "~/network/websocket/request-types";
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
+import { FileExplorer } from "./ui/panels/file/file-explorer";
 
 export class NodeEditor {
-    protected _editor_client: NodeServerClient
+    _editor_client: NodeServerClient
     scene_controller: SceneController;
     
-    protected _state_controller: StateController
-    protected _status_controller: WebsocketStatusController
+    _state_controller: StateController
+    _status_controller: WebsocketStatusController
     
     _sync_controller: ServerSyncController
     _action_controller: ActionController
@@ -407,9 +408,7 @@ export class NodeEditor {
                     </div>
                     <div class="right-tab">
                         <ServerPanel editor={this} state_controller={this._state_controller}/>
-                        <div class="input-row">
-                            
-                        </div>
+                        <FileExplorer client={this._editor_client}/>
                     </div>
                 </div>
             </div>

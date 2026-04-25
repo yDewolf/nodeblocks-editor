@@ -3,16 +3,13 @@ import { onMount } from "solid-js";
 import "./app.css";
 import { NodeEditor } from "./editor/node-editor";
 import { NodeServerClient } from "./network/websocket/websocket-handler";
-import { ServerMessages, WebsocketStatus } from './network/websocket/websocket-protocol';
-import { setStore, storage } from './network/websocket/session-store';
 
 const editorClient = new NodeServerClient("localhost", 3001)
 const node_editor = new NodeEditor(editorClient);
-const client_id: string = nanoid();
 
 async function testHandleConnection() {
   try {
-    const promise = await editorClient.connect(client_id, storage.session == "" ? undefined : storage.session);
+    const promise = await editorClient.connect(client_id);
 
   } catch (error) {
     console.error("Couldn't connect to server:", error);
@@ -31,15 +28,6 @@ export default function App() {
   onMount(() => {
     const handleUnload = () => editorClient.disconnect();
     window.addEventListener("beforeunload", handleUnload);
-
-    editorClient.add_handler(ServerMessages.HANDSHAKE_SYNC, (msg) => {
-      if (msg.status != WebsocketStatus.CONNECTED) return;
-  
-      if ("session" in msg) {
-        setStore({"session": msg.session});
-      }
-    });
-
     testHandleConnection()
   });
 
