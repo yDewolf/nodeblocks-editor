@@ -1,6 +1,36 @@
-import { createSignal, createResource, onMount, createEffect, For } from "solid-js";
+import { createResource, For, onMount } from "solid-js";
 import { NodeServerClient } from "~/network/websocket/websocket-handler";
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
+
+const FileUploader = (props: {client: NodeServerClient}) => {
+    const handleUpload = async (event: any) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const url = new URL(`${props.client.base_http_url}/api/${props.client.user_id}/file/upload`);
+            if (props.client.session_token) {
+                url.searchParams.append("token", props.client.session_token);
+            }
+            const response = await fetch(url, {
+                method: "POST",
+                body: formData,
+            });
+        } catch (error) {
+            console.error("Couldn't upload file:", error);
+        }
+    };
+
+    return (
+        <label for="workspace-file-input" class="icon-button">
+            <input class="visually-hidden" type="file" onChange={handleUpload} id="workspace-file-input" />
+            <img src="assets/icons/send-file.svg" alt="Download"/>
+        </label>
+    );
+};
 
 export const FileExplorer = (props: {client: NodeServerClient}) => {
     const [files, { refetch }] = createResource(async () => {
@@ -42,7 +72,9 @@ export const FileExplorer = (props: {client: NodeServerClient}) => {
         window.open(url, "_blank")
     };
     
-    refetch();
+    onMount(() => {
+        refetch();
+    });
     return (
         <div class="file-explorer">
             <div class="file-explorer-actions">
@@ -51,9 +83,7 @@ export const FileExplorer = (props: {client: NodeServerClient}) => {
                     <button class="icon-button refresh-button" onclick={() => refetch()}>
                         <img src="assets/icons/refresh.svg" alt="Refresh"/>
                     </button>
-                    <button class="icon-button" onclick={() => console.log("Not implemented yet")}>
-                        <img src="assets/icons/send-file.svg" alt="Upload File"/>
-                    </button>
+                    <FileUploader client={props.client}/>
                 </div>
             </div>
             <div class="file-list">
