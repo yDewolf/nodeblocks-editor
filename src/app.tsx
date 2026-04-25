@@ -6,6 +6,7 @@ import { NodeServerClient } from "./network/websocket/websocket-handler";
 
 const editorClient = new NodeServerClient("localhost", 3001)
 const node_editor = new NodeEditor(editorClient);
+const client_id = "test_user";
 
 async function testHandleConnection() {
   try {

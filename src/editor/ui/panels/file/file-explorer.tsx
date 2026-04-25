@@ -1,4 +1,4 @@
-import { createResource, For, onMount } from "solid-js";
+import { createResource, createRoot, For, onMount } from "solid-js";
 import { NodeServerClient } from "~/network/websocket/websocket-handler";
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 
@@ -39,13 +39,13 @@ export const FileExplorer = (props: {client: NodeServerClient}) => {
             url.searchParams.append("token", props.client.session_token);
         }
         
-        try {
-            const response = await fetch(url);
-            return await response.json();
-        } catch {
-
+        const response = await fetch(url);
+        const content: Array<{name: string, size: number, type: string}> = await response.json();
+        if (typeof content !== typeof Array) {
+            return [];
         }
-    });
+        return content;
+    }, {initialValue: new Array()});
 
     // Ouvinte do WebSocket para sincronização
     props.client.add_handler(ServerMessages.SYNC_FILES, () => {
@@ -87,7 +87,7 @@ export const FileExplorer = (props: {client: NodeServerClient}) => {
                 </div>
             </div>
             <div class="file-list">
-                <For each={files()} fallback={<p></p>}>
+                <For each={files() || []} fallback={<span>No files...</span>}>
                 {(file) => (
                     <div class="file-item">
                         <span>{file.name}</span>
