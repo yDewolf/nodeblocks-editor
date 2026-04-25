@@ -1,6 +1,6 @@
 .file-explorer {
-    padding: 6px;
-    border-radius: 4px;
+    border: solid 1px black;
+
     background-color: rgba(28, 29, 37, 0.521);
     margin-top: auto;
     height: 500px;
@@ -9,6 +9,7 @@
 }
 
 .file-list {
+    padding: 8px;
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
@@ -40,6 +41,10 @@
 
 
 .file-explorer-actions {
+    padding: 4px 8px;
+    background-color: white;
+    color: black;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
