@@ -1,0 +1,50 @@
+.file-explorer {
+    padding: 5px;
+    background-color: rgba(28, 29, 37, 0.521);
+    margin-top: auto;
+    height: 500px;
+    
+    color: white;
+}
+
+.file-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    height: 100%;
+}
+
+.file-item, .file-actions {
+    display: flex;
+    align-items: center;
+}
+
+.file-item {
+    justify-content: space-between;
+    background-color: rgb(255, 255, 255);
+    color: black;
+    padding: 0 5px;
+    
+    span {
+        text-overflow: ellipsis;
+        -webkit-line-break: 1;
+    }
+
+    .icon-button {
+        img {
+            width: 20px;
+        }
+    }
+}
+
+.file-explorer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .icon-button {
+        img {
+            width: 28px;
+        }
+    }
+}

@@ -1,3 +1,5 @@
+@import url("misc/file_explorer.css");
+
 .server-panel {
     padding: 10px 8px;
 }
@@ -83,4 +85,8 @@
 
 .wait-resume {
     animation: keepSpinning 1500ms linear infinite;
+}
+
+.icon-button.refresh-button:active {
+    animation: keepSpinning 500ms linear 1;
 }

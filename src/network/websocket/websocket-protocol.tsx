@@ -38,7 +38,8 @@ export enum ServerMessages {
     NODE_OUTPUT = "node_output",
     SYNC_CLIENT_SCENE = "sync_client_scene",
     SYNC_INSTANCE_STATE = "sync_instance_state",
-    SYNC_ACTION = "sync_action"
+    SYNC_ACTION = "sync_action",
+    SYNC_FILES = "sync_files"
 }
 
 export enum WebsocketStatus {

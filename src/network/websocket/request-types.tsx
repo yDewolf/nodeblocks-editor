@@ -21,7 +21,8 @@ export type ServerMessage =
     | { type: ServerMessages.HANDSHAKE_SYNC; status: number; message: string }
     | { type: ServerMessages.SYNC_CLIENT_SCENE; payload: any }
     | { type: ServerMessages.SYNC_INSTANCE_STATE; payload: {loop_state: any, instance_state: any} }
-    | { type: ServerMessages.SYNC_ACTION; action_statuses: { [uid: string]: EditorActionStatus; }};
+    | { type: ServerMessages.SYNC_ACTION; action_statuses: { [uid: string]: EditorActionStatus; }}
+    | { type: ServerMessages.SYNC_FILES;}
     
 
 export type ClientMessage = ClientCommand | ClientAction;
