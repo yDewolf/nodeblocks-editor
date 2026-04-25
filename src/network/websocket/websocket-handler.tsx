@@ -2,11 +2,13 @@ import { nanoid } from "nanoid";
 import { ClientMessage, ServerMessage } from "./request-types";
 import { ServerMessages, WebsocketStatus } from "./websocket-protocol";
 import { setStore, storage } from "./session-store";
+import { createSignal } from "solid-js";
 
 type MessageByType<MessageType extends ServerMessages> = Extract<ServerMessage, {type: MessageType}>
 
 export class NodeServerClient {
-    private socket: WebSocket | null = null;
+    private _socket: () => WebSocket | null;
+    private _set_socket: (socket: WebSocket | null) => void;
     private _base_socket_url: string;
     private _base_http_url: string;
 
@@ -17,12 +19,19 @@ export class NodeServerClient {
     private message_handlers: Map<ServerMessages, Map<string, ((message: any) => void)>>
 
     constructor(host: string = "localhost", port: number = 3001) {
+        const [socket, setSocket] = createSignal(null);
+        this._socket = socket;
+        this._set_socket = setSocket;
+
         this._base_socket_url = `ws://${host}:${port}`;
         this._base_http_url = `http://${host}:${port}`;
         this.message_handlers = new Map();
         this._session_token = storage.session == "" ? undefined : storage.session;
         this._setup_default_handlers();
     }
+
+    get socket() {return this._socket()}
+    set socket(socket: WebSocket | null) {this._set_socket(socket)}
 
     get user_id() { return this._user_id; }
     get session_token() { return this._session_token }
@@ -78,7 +87,7 @@ export class NodeServerClient {
                 this.socket.onclose = () => {
                     console.log("[Disconnected]");
                     this.is_connecting = false;
-                    this.socket = null;
+                    this.disconnect();
                 };
             } catch (err) {
                 this.is_connecting = false;

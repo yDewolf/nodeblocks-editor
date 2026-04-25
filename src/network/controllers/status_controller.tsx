@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createEffect, createRoot, createSignal } from "solid-js";
 import { NodeServerClient } from "../websocket/websocket-handler";
 import { InstanceStates, LoopStates, ClientMessages, InstanceCommands, WebsocketStatus, ServerMessages } from "../websocket/websocket-protocol";
 
@@ -16,6 +16,14 @@ export class WebsocketStatusController {
         this._set_websocket_status = setWebsocketStatus;
 
         this.setup_handlers();
+
+        createRoot(() => {
+            createEffect(() => {
+                if (this._client.socket == null) {
+                    this._set_websocket_status(WebsocketStatus.DISCONNECTED);
+                }
+            });
+        });
     }
 
     private setup_handlers() {
