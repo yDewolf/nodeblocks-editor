@@ -6,10 +6,12 @@ import { NodeAnchor } from "../misc/node-anchors";
 import { EditorCamera } from "~/editor/internal/editor-space";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeOutput } from './node-output';
+import { UserWorkspace } from "~/network/session/user-workspace";
 
 export const NodeComponent = (props: { 
     node: GraphNode, 
-    camera: EditorCamera, 
+    camera: EditorCamera,
+    workspace: UserWorkspace, 
     onClick: (node: GraphNode) => void, 
     onClickOnSlot: (slot: NodeSlot) => void, 
     onHoverNode: (node: GraphNode) => void, 
@@ -92,6 +94,7 @@ export const NodeComponent = (props: {
                                 <For each={props.node.node_data.parameters.values().toArray()}>
                                     {(parameter: NodeParameter) => <NodeField
                                             node={props.node}
+                                            workspace={props.workspace}
                                             parameter={parameter}
                                             parameter_sync={() => {
                                                 props.syncParameter(props.node, parameter)

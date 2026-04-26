@@ -361,6 +361,7 @@ export class NodeEditor {
                         <For each={this.scene_controller.node_controller.nodes}>
                             {(node) => <NodeComponent 
                                     node={node}
+                                    workspace={this._session_controller.user_workspace}
                                     camera={this.editor_space.camera}
                                     onClick={(node: GraphNode) => {
                                         this.input_manager.generalizedEventHandler({node: node}, InputEvents.CLICK_ON_NODE)

@@ -1,10 +1,11 @@
 import { GraphNode } from "../../../wrapper/nodes/graph-node";
 import { NodeParameter } from "../../../wrapper/nodes/data/node-data";
 import { DataTypes } from "../../../wrapper/nodes/data/node-data-type";
-import { Show } from "solid-js";
+import { For, Match, Show, Switch } from "solid-js";
 import { debounce } from "~/editor/utils/debounce-utils";
+import { UserWorkspace } from "~/network/session/user-workspace";
 
-export const NodeField = (props: {node: GraphNode | null, parameter: NodeParameter, parameter_sync: ((node: GraphNode, parameter: NodeParameter) => void) | undefined}) => {
+export const NodeField = (props: {node: GraphNode | null, parameter: NodeParameter, workspace: UserWorkspace | undefined, parameter_sync: ((node: GraphNode, parameter: NodeParameter) => void) | undefined}) => {
     let inputRef!: HTMLInputElement;
     
     const field_id = props.node?.id.toString() + props.parameter._field_name;
@@ -30,6 +31,10 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
         case DataTypes.UINT: 
             input_type = "number"; 
             min = min != undefined ? min : 0;
+            break
+        
+        case DataTypes.FILE:
+            input_type = "file";
             break
     }
 
@@ -61,23 +66,44 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
     return (
         <div class="node-field" classList={{"remove-input": props.node == null}}>
             <label for={field_id}>{props.parameter._field_name}</label>
-            <input
-                ref={inputRef}
-                name={field_id} 
-                type={input_type}
-                value={props.parameter.value ?? ""} 
-                onInput={(event) => {
-                    event.preventDefault();
-                    onInputValueChanged(event.currentTarget.value)}
-                }
-                onPointerDown={(event) => {
-                    event.stopPropagation();
-                }}
-                step={step}
-                min={min}
-                max={max}
-            />
-            <Show when={input_type == "range"}>{props.parameter.value}</Show>
+            <Switch fallback={
+                <div>
+                    <input
+                        ref={inputRef}
+                        name={field_id} 
+                        type={input_type}
+                        value={props.parameter.value ?? ""} 
+                        onInput={(event) => {
+                            event.preventDefault();
+                            onInputValueChanged(event.currentTarget.value)}
+                        }
+                        onPointerDown={(event) => {
+                            event.stopPropagation();
+                        }}
+                        step={step}
+                        min={min}
+                        max={max}
+                    />
+                    <Show when={input_type == "range"}>{props.parameter.value}</Show>
+                </div>
+            }>
+                <Match when={input_type == "file"}>
+                    <select>
+                        <option value="">
+                            
+                        </option>
+                        <For each={props.workspace ? props.workspace.files : []}>
+                            {(file) => {
+                                return (
+                                    <option value={file.name}>
+                                        {file.name}
+                                    </option>
+                                )
+                            }}
+                        </For>
+                    </select>
+                </Match>
+            </Switch>
         </div>
     );
 }
