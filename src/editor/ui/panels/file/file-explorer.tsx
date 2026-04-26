@@ -12,7 +12,7 @@ const FileUploader = (props: {workspace: UserWorkspace}) => {
 
 export const FileExplorer = (props: {workspace: UserWorkspace}) => {
     onMount(() => {
-        props.workspace._refresh_files();
+        props.workspace.update_files();
     });
     
     const [show, setShow] = createSignal(false);
@@ -35,7 +35,7 @@ export const FileExplorer = (props: {workspace: UserWorkspace}) => {
                     <img src="assets/icons/menu.svg" alt="Open" />
                 </button>
                 <div class="column-row">
-                    <button class="icon-button refresh-button" onclick={() => props.workspace._refresh_files}>
+                    <button class="icon-button refresh-button" onclick={() => props.workspace.update_files()}>
                         <img src="assets/icons/refresh.svg" alt="Refresh"/>
                     </button>
                     <FileUploader workspace={props.workspace}/>

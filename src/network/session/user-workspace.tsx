@@ -14,7 +14,7 @@ export class UserWorkspace {
     private _files: () => Array<WorkspaceFile>
     private _set_files: (files: Array<WorkspaceFile>) => void;
 
-    _refresh_files: () => void = () => {};
+    private _refresh_files: () => void = () => {};
 
     constructor(client: NodeServerClient) {
         this.client = client;
@@ -46,6 +46,10 @@ export class UserWorkspace {
     get files() { return this._files() }
     set files(files: Array<WorkspaceFile>) { this._set_files(files) }
 
+    public update_files = () => {
+        this._refresh_files();
+    }
+
     public delete_file = async (filename: string) => {
         const url = new URL(`${this.client.base_http_url}/api/${this.client.user_id}/file/delete`);
         if (this.client.session_token) {
@@ -56,7 +60,7 @@ export class UserWorkspace {
         const response = await fetch(url);
     }
 
-    public  download_file = async (filename: string) => {
+    public download_file = async (filename: string) => {
         const url = new URL(`${this.client.base_http_url}/api/${this.client.user_id}/file/download`);
         if (this.client.session_token) {
             url.searchParams.append("token", this.client.session_token);
@@ -66,7 +70,7 @@ export class UserWorkspace {
         window.open(url, "_blank")
     }
 
-    public  upload_file = async (event: any) => {
+    public upload_file = async (event: any) => {
         const file = event.target.files[0];
         if (!file) return;
 

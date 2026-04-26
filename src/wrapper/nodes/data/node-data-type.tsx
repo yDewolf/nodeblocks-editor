@@ -4,6 +4,7 @@ export enum DataTypes {
     INT = "int",
     ARRAY = "array",
     CUSTOM = "custom",
+    FILE = "file",
     UNKNOWN = "unknown"
 }
 
@@ -57,12 +58,14 @@ export const FLOAT_TYPE = new BaseNodeType("float", DataTypes.FLOAT, [DataTypes.
 export const INT_TYPE = new BaseNodeType("int", DataTypes.INT, [DataTypes.INT, DataTypes.UINT]);
 export const UINT_TYPE = new BaseNodeType("uint", DataTypes.UINT, [DataTypes.UINT, DataTypes.INT]);
 export const ARRAY_TYPE = new BaseNodeType("array", DataTypes.ARRAY, [DataTypes.ARRAY]);
+export const FILE_TYPE = new BaseNodeType("file", DataTypes.FILE, [DataTypes.FILE]);
 export const UNKNOWN_TYPE = new BaseNodeType("unknown", DataTypes.UNKNOWN, [DataTypes.UNKNOWN]);
 const DEFAULT_NODE_TYPES = new Map<string, BaseNodeType>([
     [FLOAT_TYPE.type_name, FLOAT_TYPE],
     [INT_TYPE.type_name, INT_TYPE],
     [UINT_TYPE.type_name, UINT_TYPE],
     [ARRAY_TYPE.type_name, ARRAY_TYPE],
+    [FILE_TYPE.type_name, FILE_TYPE],
     [UNKNOWN_TYPE.type_name, UNKNOWN_TYPE]
 ]);
 
