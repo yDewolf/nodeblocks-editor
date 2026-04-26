@@ -27,10 +27,11 @@ import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { FileExplorer } from "./ui/panels/file/file-explorer";
 import { EditorLeftTab } from "./ui/panels/left-tab";
+import { SessionController } from "~/network/session/session-controller";
 
 export class NodeEditor {
-    _editor_client: NodeServerClient
     scene_controller: SceneController;
+    _session_controller: SessionController;
     
     _state_controller: StateController
     _status_controller: WebsocketStatusController
@@ -49,8 +50,9 @@ export class NodeEditor {
     private _cursor_world_pos: () => Vector2;
     private _set_cursor_world_pos: (v: Vector2) => void;
 
-    constructor (editor_client: NodeServerClient) {
-        this._editor_client = editor_client;
+    constructor (session_controller: SessionController) {
+        this._session_controller = session_controller;
+
         this._state_controller = new StateController(this._editor_client);
         this._status_controller = new WebsocketStatusController(this._editor_client);
         
@@ -74,6 +76,8 @@ export class NodeEditor {
         this.setup_keybinds();
         this.setup_message_handlers();
     }
+
+    get _editor_client() { return this._session_controller.client; }
 
     get cursor_world_pos() { return this._cursor_world_pos(); }
     set cursor_world_pos(v: Vector2) { this._set_cursor_world_pos(v); }
@@ -383,7 +387,7 @@ export class NodeEditor {
                 <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
                     <div class="left-tab-holder">
                         <EditorLeftTab selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
-                        <FileExplorer client={this._editor_client}/>
+                        <FileExplorer workspace={this._session_controller.user_workspace}/>
                     </div>
                     <div class="middle-tab">
                         {this.tool_controller.View()}
