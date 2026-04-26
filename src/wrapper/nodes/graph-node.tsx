@@ -62,7 +62,7 @@ export class GraphNode extends BaseNode {
         // this._add_slot(new NodeSlot(this, OUTPUT_SLOT));
     }
 
-
+    
     get last_output() { return this._last_output() }
     set last_output(output: Map<string, Map<string, any>>) { this._set_last_output(output) }
 

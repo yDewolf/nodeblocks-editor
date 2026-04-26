@@ -56,6 +56,8 @@ export class NodePreview {
                                 {(parameter: NodeParameter) => <NodeField 
                                     node={null}
                                     parameter={parameter}
+                                    parameter_sync={undefined}
+                                    workspace={undefined}
                                 />
                                 }
                             </For>

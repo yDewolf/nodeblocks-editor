@@ -7,7 +7,7 @@ export const SlotOutput = (props: {slot: NodeSlot}) => {
             if (props.slot.last_output.size == 0) {
                 return null;
             }
-            return Object.fromEntries(props.slot.last_output.entries());
+            return props.slot.last_output;
         }
         return null;
     });

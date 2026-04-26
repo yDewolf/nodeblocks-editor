@@ -268,9 +268,8 @@ export class NodeEditor {
                 return;
             }
             const node_output: Map<string, Map<string, any>> = new Map(
-                Object.entries(message.value).map(([slot_name, slot_data]: [string, any]) => {
-                    const slot_output_map = new Map<string, any>(Object.entries(slot_data));
-                    return [slot_name, slot_output_map];
+                Object.entries(message.value).map(([slot_name, slot_output]: [string, any]) => {
+                    return [slot_name, slot_output];
                 })
             );
             console.log(message);
