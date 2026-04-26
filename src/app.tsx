@@ -3,14 +3,15 @@ import { onMount } from "solid-js";
 import "./app.css";
 import { NodeEditor } from "./editor/node-editor";
 import { NodeServerClient } from "./network/websocket/websocket-handler";
+import { UserSession } from './network/session/user-session';
+import { SessionController } from './network/session/session-controller';
 
-const editorClient = new NodeServerClient("localhost", 3001)
-const node_editor = new NodeEditor(editorClient);
-const client_id = "test_user";
+const session_controller = new SessionController("localhost", 3001)
+const node_editor = new NodeEditor(session_controller);
 
 async function testHandleConnection() {
   try {
-    const promise = await editorClient.connect(client_id);
+    const promise = await session_controller.client.connect();
 
   } catch (error) {
     console.error("Couldn't connect to server:", error);
@@ -21,13 +22,13 @@ async function testHandleConnection() {
 
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
-    editorClient.disconnect();
+    session_controller.client.disconnect();
   });
 }
 
 export default function App() {
   onMount(() => {
-    const handleUnload = () => editorClient.disconnect();
+    const handleUnload = () => session_controller.client.disconnect();
     window.addEventListener("beforeunload", handleUnload);
     testHandleConnection()
   });

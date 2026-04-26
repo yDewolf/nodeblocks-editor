@@ -1,76 +1,18 @@
-import { createResource, createRoot, createSignal, For, onMount, Show } from "solid-js";
-import { NodeServerClient } from "~/network/websocket/websocket-handler";
-import { ServerMessages } from "~/network/websocket/websocket-protocol";
+import { createSignal, For, onMount, Show } from "solid-js";
+import { UserWorkspace } from "~/network/session/user-workspace";
 
-const FileUploader = (props: {client: NodeServerClient}) => {
-    const handleUpload = async (event: any) => {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append("file", file);
-
-        try {
-            const url = new URL(`${props.client.base_http_url}/api/${props.client.user_id}/file/upload`);
-            if (props.client.session_token) {
-                url.searchParams.append("token", props.client.session_token);
-            }
-            const response = await fetch(url, {
-                method: "POST",
-                body: formData,
-            });
-        } catch (error) {
-            console.error("Couldn't upload file:", error);
-        }
-    };
-
+const FileUploader = (props: {workspace: UserWorkspace}) => {
     return (
         <label for="workspace-file-input" class="icon-button">
-            <input class="visually-hidden" type="file" onChange={handleUpload} id="workspace-file-input" />
+            <input class="visually-hidden" type="file" onChange={props.workspace.upload_file} id="workspace-file-input" />
             <img src="assets/icons/send-file.svg" alt="Download"/>
         </label>
     );
 };
 
-export const FileExplorer = (props: {client: NodeServerClient}) => {
-    const [received_files, setFiles] = createSignal(Array<{name: string, size: number, type: string}>());
-    const [files, { refetch }] = createResource(async () => {
-        const url = new URL(`${props.client.base_http_url}/api/${props.client.user_id}/files`);
-        if (props.client.session_token) {
-            url.searchParams.append("token", props.client.session_token);
-        }
-        
-        const response = await fetch(url);
-        const json_content: object = await response.json()
-        setFiles(Array.from(Object.values(json_content)));
-    });
-
-    props.client.add_handler(ServerMessages.SYNC_FILES, () => {
-        refetch();
-    });
-
-    const deleteFile = async (filename: string) => {
-        const url = new URL(`${props.client.base_http_url}/api/${props.client.user_id}/file/delete`);
-        if (props.client.session_token) {
-            url.searchParams.append("token", props.client.session_token);
-        }
-
-        url.searchParams.append("filename", filename);
-        const response = await fetch(url);
-    };
-
-    const downloadFile = (filename: string) => {
-        const url = new URL(`${props.client.base_http_url}/api/${props.client.user_id}/file/download`);
-        if (props.client.session_token) {
-            url.searchParams.append("token", props.client.session_token);
-        }
-
-        url.searchParams.append("filename", filename);
-        window.open(url, "_blank")
-    };
-    
+export const FileExplorer = (props: {workspace: UserWorkspace}) => {
     onMount(() => {
-        refetch();
+        props.workspace._refresh_files();
     });
     
     const [show, setShow] = createSignal(false);
@@ -93,22 +35,22 @@ export const FileExplorer = (props: {client: NodeServerClient}) => {
                     <img src="assets/icons/menu.svg" alt="Open" />
                 </button>
                 <div class="column-row">
-                    <button class="icon-button refresh-button" onclick={() => refetch()}>
+                    <button class="icon-button refresh-button" onclick={() => props.workspace._refresh_files}>
                         <img src="assets/icons/refresh.svg" alt="Refresh"/>
                     </button>
-                    <FileUploader client={props.client}/>
+                    <FileUploader workspace={props.workspace}/>
                 </div>
             </div>
             <div class="file-list">
-                <For each={received_files()} fallback={<span>No files...</span>}>
+                <For each={props.workspace.files} fallback={<span>No files...</span>}>
                     {(file) => 
                         <div class="file-item">
                             <span>{file.name}</span>
                             <div class="file-actions">
-                                <button class="icon-button" onClick={() => downloadFile(file.name)}>
+                                <button class="icon-button" onClick={() => props.workspace.download_file(file.name)}>
                                     <img src="assets/icons/download-file.svg" alt="Download"/>
                                 </button>
-                                <button class="icon-button" onClick={() => deleteFile(file.name)}>
+                                <button class="icon-button" onClick={() => props.workspace.delete_file(file.name)}>
                                     X
                                 </button>
                             </div>

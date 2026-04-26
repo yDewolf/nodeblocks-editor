@@ -1,8 +1,9 @@
 import { nanoid } from "nanoid";
 import { ClientMessage, ServerMessage } from "./request-types";
 import { ServerMessages, WebsocketStatus } from "./websocket-protocol";
-import { setStore, storage } from "./session-store";
+import { setStore, sessionStorage } from "../session/session-store";
 import { createSignal } from "solid-js";
+import { UserSession } from "../session/user-session";
 
 type MessageByType<MessageType extends ServerMessages> = Extract<ServerMessage, {type: MessageType}>
 
@@ -12,13 +13,14 @@ export class NodeServerClient {
     private _base_socket_url: string;
     private _base_http_url: string;
 
-    private _session_token: string | undefined = undefined;
-    private _user_id: string | undefined = undefined;
+    private session: UserSession;
     
     private is_connecting: boolean = false;
     private message_handlers: Map<ServerMessages, Map<string, ((message: any) => void)>>
 
-    constructor(host: string = "localhost", port: number = 3001) {
+    constructor(session: UserSession, host: string = "localhost", port: number = 3001) {
+        this.session = session;
+
         const [socket, setSocket] = createSignal(null);
         this._socket = socket;
         this._set_socket = setSocket;
@@ -26,15 +28,15 @@ export class NodeServerClient {
         this._base_socket_url = `ws://${host}:${port}`;
         this._base_http_url = `http://${host}:${port}`;
         this.message_handlers = new Map();
-        this._session_token = storage.session == "" ? undefined : storage.session;
+
         this._setup_default_handlers();
     }
 
     get socket() {return this._socket()}
     set socket(socket: WebSocket | null) {this._set_socket(socket)}
 
-    get user_id() { return this._user_id; }
-    get session_token() { return this._session_token }
+    get user_id() { return this.session.username; }
+    get session_token() { return this.session.session_token }
     get base_socket_url() { return this._base_socket_url }
     get base_http_url() { return this._base_http_url }
 
@@ -42,26 +44,23 @@ export class NodeServerClient {
         this.add_handler(ServerMessages.HANDSHAKE_SYNC, (message) => {
             if (message.status != WebsocketStatus.CONNECTED) return;
             if ("session" in message) {
-                this._session_token = message.session;
-                setStore({"session": this._session_token});
+                this.session.session_token = message.session;
+                setStore("session", this.session.session_token);
             }
         });
     }
 
-    public connect(userId: string, token?: string): Promise<void> | null {
+    public connect(): Promise<void> | null {
         if (this.is_connecting || (this.socket && this.socket.readyState == WebSocket.OPEN)) {
             return null;
         }
         
-        if (token) this._session_token = token;
-
-        this._user_id = userId;
         this.is_connecting = true;
         return new Promise((resolve, reject) => {
             try {
-                const url = new URL(`${this._base_socket_url}/ws/instance/${userId}`);
-                if (this._session_token) {
-                    url.searchParams.append("token", this._session_token);
+                const url = new URL(`${this._base_socket_url}/ws/instance/${this.session.username}`);
+                if (this.session_token) {
+                    url.searchParams.append("token", this.session_token);
                 }
 
                 console.log(`Trying to connect to ${url.toString()}`);
