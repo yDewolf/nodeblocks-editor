@@ -11,10 +11,6 @@ const FileUploader = (props: {workspace: UserWorkspace}) => {
 };
 
 export const FileExplorer = (props: {workspace: UserWorkspace}) => {
-    onMount(() => {
-        props.workspace.update_files();
-    });
-    
     const [show, setShow] = createSignal(false);
     return (
         <Show

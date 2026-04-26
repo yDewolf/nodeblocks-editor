@@ -38,6 +38,10 @@ export class UserWorkspace {
             this._refresh_files = refetch;
         })
         
+        client.add_handler(ServerMessages.HANDSHAKE_SYNC, () => {
+            this._refresh_files();
+        })
+
         client.add_handler(ServerMessages.SYNC_FILES, () => {
             this._refresh_files();
         });
