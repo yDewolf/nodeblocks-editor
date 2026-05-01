@@ -1,3 +1,8 @@
+.tab-modal {
+  background-color: white;
+  border: solid black 1px;
+  align-items: center;
+}
 
 @keyframes scaleUp {
   0% { transform: scale(0); }

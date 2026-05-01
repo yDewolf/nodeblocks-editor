@@ -7,16 +7,14 @@ import { KeyEventManager as GeneralEventManager } from "./internal/input_manager
 import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./internal/input_manager/keybind-events";
 import { EventHandler, InputEvents } from "./internal/input_manager/event-handling";
 import { SceneController } from "../wrapper/controllers/scene-controller";
-import { NodeServerClient } from "~/network/websocket/websocket-handler";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
 import { NodeTypeSelector } from "./ui/misc/node-type-selector";
 import { ConnectionLines, ConnectionPreview } from "./ui/misc/connection-lines";
 import { Grid } from "./ui/misc/grid";
-import { NodePreview } from "./ui/misc/node-preview";
 import { NodeComponent } from './ui/node/node-component';
 import { ServerPanel } from "./ui/panels/server-panel";
-import { ClientMessages, InstanceCommands, ServerMessages } from "~/network/websocket/websocket-protocol";
+import { ServerMessages } from "~/network/websocket/websocket-protocol";
 import { StateController } from "~/network/controllers/state_controller";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
 import { ServerSyncController } from "~/network/controllers/sync_controller";
@@ -28,6 +26,7 @@ import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { FileExplorer } from "./ui/panels/file/file-explorer";
 import { EditorLeftTab } from "./ui/panels/left-tab";
 import { SessionController } from "~/network/session/session-controller";
+import "~/style/screens/editor.css";
 
 export class NodeEditor {
     scene_controller: SceneController;
@@ -299,8 +298,8 @@ export class NodeEditor {
                     class="viewport"
                     style={{
                         position: "absolute", 
-                        height: "100%", 
-                        width: "100%"
+                        height: "100vh", 
+                        width: "100vw"
                     }}
                     classList={{
                         'move-mode': this.input_manager.get_keybind_state("PanCamera"),
