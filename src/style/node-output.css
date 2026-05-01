@@ -16,3 +16,7 @@
     margin-bottom: 10px;
     display: none;
 }
+
+.node-output {
+    width: 100%;
+}

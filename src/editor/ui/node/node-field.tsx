@@ -45,7 +45,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
         if (raw_value === "") return;
 
         let new_value: any = raw_value;
-        if (input_type === "number") {
+        if (input_type === "number" || input_type === "range") {
             let parsed = props.parameter.type.super_type === DataTypes.FLOAT ? parseFloat(raw_value) : parseInt(raw_value);
             if (isNaN(parsed)) return;
 

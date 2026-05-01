@@ -1,20 +1,13 @@
 import { createMemo, Match, Switch } from "solid-js";
 import { DataTypes } from "~/wrapper/nodes/data/node-data-type";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
-import { NodeComponent } from './node-component';
+import { ArrayView } from "./array-output";
 
 const ScalarView = (props: { output_value: any | undefined }) => {
     // console.log("Scalar: ", props.value_map);
-    return (<span class="output-text">{String(props.output_value)}</span>)
+    return (<span class="node-output output-text">{String(props.output_value)}</span>)
 };
 
-const ArrayView = (props: { output_value: any | undefined  }) => {
-    // console.log("Array: ", props.value_map);
-    return (<div class="output-array">
-        {/* Pensar em como renderizar isso aqui */}
-        Array({props.output_value?.length})
-    </div>)
-};
 
 export const NodeOutput = (props: {node: GraphNode}) => {
     // Output do node: props.node.last_output (Map<NodeSlot, any>)
@@ -37,7 +30,7 @@ export const NodeOutput = (props: {node: GraphNode}) => {
     });
 
     return (
-        <div class="node-output-container">
+        <div class="node-output node-output-container">
             <Switch fallback={<span class="none">No Output</span>}>
                 <Match when={
                     outputType() === DataTypes.FLOAT || 

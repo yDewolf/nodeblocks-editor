@@ -5,7 +5,7 @@ import { NodeField } from "~/editor/ui/node/node-field";
 import { NodeAnchor } from "../misc/node-anchors";
 import { EditorCamera } from "~/editor/internal/editor-space";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { NodeOutput } from './node-output';
+import { NodeOutput } from './output/node-output';
 import { UserWorkspace } from "~/network/session/user-workspace";
 
 export const NodeComponent = (props: { 
