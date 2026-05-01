@@ -27,7 +27,7 @@ export class ToolController {
         this.change_tool(selection_tool);
         return (
             <div class="tool-selector">
-                <ul>
+                <ul class="row-container">
                     <li>
                         <button onclick={() => {this.change_tool(selection_tool)}}>Select</button>
                     </li>

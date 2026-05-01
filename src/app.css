@@ -1,8 +1,7 @@
-@import url("style/components.css");
-@import url("style/misc.css");
-@import url("style/node.css");
-@import url("style/node-selector.css");
-@import url("style/panels.css");
+@import url("style/containers.css");
+@import url("style/components/import.css");
+@import url("style/panels/import.css");
+@import url("style/misc/misc.css");
 
 
 :root {
@@ -32,21 +31,17 @@ body {
   pointer-events: none;
 
   position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
+  width: 100vw;
+  height: 100vh;
 }
 
 .left-tab, .right-tab, .middle-tab {
   pointer-events: auto;
-
-  display: flex;
-  flex-direction: column;
 }
 
 
 .right-tab {
-  /* display: none; */
+  align-items: end;
   width: 30%;
   pointer-events: none;
 
@@ -58,13 +53,10 @@ body {
 
 .left-tab-holder {
   padding: 10px;
-  display: flex;
-  flex-direction: column;
   gap: 10px;
 
   width: fit-content;
   min-width: 300px;
-
 }
 
 .left-tab {
@@ -74,12 +66,10 @@ body {
   background-color: rgba(28, 29, 37, 0.521);
 }
 
-.left-tab-modal {
-  padding: 4px 8px;
+.tab-modal {
   background-color: white;
   border: solid black 1px;
   align-items: center;
-  justify-content: space-between;
 }
 
 .middle-tab {
@@ -100,7 +90,6 @@ body {
     padding: 0;
 
     list-style: none;
-    display: flex;
 
     li {
       margin: 0 10px;

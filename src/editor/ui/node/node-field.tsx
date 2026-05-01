@@ -64,7 +64,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
     }
 
     return (
-        <div class="node-field" classList={{"remove-input": props.node == null}}>
+        <div class="node-field row-container" classList={{"remove-input": props.node == null}}>
             <label for={field_id}>{props.parameter._field_name}</label>
             <Switch fallback={
                 <div>

@@ -9,15 +9,12 @@
 }
 
 .file-list {
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    overflow-y: scroll;
+    width: auto;
+    gap: 2px;
     height: 100%;
 }
 
 .file-item, .file-actions {
-    display: flex;
     align-items: center;
 }
 
@@ -41,11 +38,9 @@
 
 
 .file-explorer-actions {
-    padding: 4px 8px;
     background-color: white;
     color: black;
 
-    display: flex;
     align-items: center;
     justify-content: space-between;
 

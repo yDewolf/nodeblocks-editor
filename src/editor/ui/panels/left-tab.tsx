@@ -12,7 +12,7 @@ export const EditorLeftTab = (props: {selector: NodeTypeSelector, scene_controll
         <Show
             when={show()}
             fallback={
-                <div class="left-tab-modal column-row">
+                <div class="tab-modal keep row-container side-padded space-between">
                     <span>Nodes</span>
                     <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => setShow(true)}>
                         <img src="assets/icons/left-tab.svg" alt="Open" />
@@ -20,8 +20,8 @@ export const EditorLeftTab = (props: {selector: NodeTypeSelector, scene_controll
                 </div>
             }
         >
-            <div class="left-tab">
-                <div class="button-tab column-row">
+            <div class="left-tab container">
+                <div class="button-tab keep row-container">
                     <ul class="tabs">
                         <li class="tab-item">
                             <input class="visually-hidden" type="file" accept=".json" id="scene-input" onChange={

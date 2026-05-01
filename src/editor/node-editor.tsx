@@ -293,7 +293,8 @@ export class NodeEditor {
         return (
             <div 
                 class="editor-view"
-            >   
+                onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
+            >
                 <div 
                     class="viewport"
                     style={{
@@ -314,7 +315,7 @@ export class NodeEditor {
 
                     onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
                     onPointerDown={(e) => this.input_manager.onPointerDown(e)} 
-                    onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
+
                     onPointerLeave={(e) => this.input_manager.onPointerUp(e)}
                     onMouseOver={() => {
                         this.input_manager.generalizedEventHandler({}, InputEvents.HOVER_BACKGROUND)
@@ -388,15 +389,15 @@ export class NodeEditor {
                     </div>
                 </div>
                 
-                <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
-                    <div class="left-tab-holder">
+                <div class="editor-ui keep row-container" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
+                    <div class="left-tab-holder container">
                         <EditorLeftTab selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
                         <FileExplorer workspace={this._session_controller.user_workspace}/>
                     </div>
-                    <div class="middle-tab">
+                    <div class="middle-tab container">
                         {this.tool_controller.View()}
                     </div>
-                    <div class="right-tab">
+                    <div class="right-tab container">
                         <ServerPanel editor={this} state_controller={this._state_controller}/>
                     </div>
                 </div>

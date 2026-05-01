@@ -149,7 +149,7 @@ export class NodeSlot {
         return (
             <div 
                 ref={this._element}
-                class="slot-container"
+                class="slot-container container"
                 
                 onPointerDown={(e) => {
                     e.preventDefault();
