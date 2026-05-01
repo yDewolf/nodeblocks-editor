@@ -94,6 +94,13 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
                         </option>
                         <For each={props.workspace ? props.workspace.files : []}>
                             {(file) => {
+                                if (props.parameter._extension_filter && props.parameter._extension_filter.length > 0) {
+                                    if (file.name) {
+                                        if (!props.parameter._extension_filter.some((extension) => file.name.endsWith(extension))) {
+                                            return;
+                                        }
+                                    }
+                                }
                                 return (
                                     <option value={file.name}>
                                         {file.name}

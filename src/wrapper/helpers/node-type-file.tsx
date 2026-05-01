@@ -28,6 +28,7 @@ export interface NodeDataModel {
     type: string,
     step: number | null,
     range: any | null,
+    extension_filter: string[] | null
 }
 
 interface NodeTypesData {
@@ -193,7 +194,8 @@ export class NodeTypeFile {
                         return [param_id, {
                             type: param_data.type,
                             step: param_data.step ?? null,
-                            range: param_data.range ?? null
+                            range: param_data.range ?? null,
+                            extension_filter: param_data.extension_filter ?? null
                         }];
                     })),
 

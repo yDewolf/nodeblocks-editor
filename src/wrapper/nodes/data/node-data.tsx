@@ -3,12 +3,13 @@ import { DataTypeUtils, BaseNodeType } from "./node-data-type";
 import { createSignal } from "solid-js";
 
 export class NodeParameter {
-    type: BaseNodeType
-    _step: number | null = null
-    _range: number[] | null = null
-    _field_name: string
+    type: BaseNodeType;
+    _step: number | null = null;
+    _range: number[] | null = null;
+    _extension_filter: string[] | null = null;
+    _field_name: string;
 
-    _raw_field_data: NodeDataModel
+    _raw_field_data: NodeDataModel;
 
     _set_value: (value: any) => void;
     _value: () => any;
@@ -21,6 +22,9 @@ export class NodeParameter {
         }
         if (field_data.range) {
             this._range = field_data.range;
+        }
+        if (field_data.extension_filter) {
+            this._extension_filter = field_data.extension_filter;
         }
 
         const [getValue, setValue] = createSignal(null);
