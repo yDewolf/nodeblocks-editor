@@ -58,7 +58,8 @@ export const NodeComponent = (props: {
                     }}
                     classList={{
                         "unsynced": !props.node.is_synced,
-                        "failed": props.node.has_failed_action
+                        "failed": props.node.has_failed_action,
+                        "current-step": props.node.is_current_step
                     }}
                     class="node"
                 >

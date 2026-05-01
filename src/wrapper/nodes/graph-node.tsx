@@ -18,6 +18,10 @@ export class GraphNode extends BaseNode {
     private _last_output: () => Map<string, Map<string, any>>;
     private _set_last_output: (out: Map<string, Map<string, any>>) => void;
 
+    private _is_current_step: () => boolean;
+    private _set_current_step: (v: boolean) => void;
+
+
     private raw_pos: Vector2;
     private _slots: Map<SuperSlotTypes, NodeSlot[]> = new Map<SuperSlotTypes, NodeSlot[]>;
 
@@ -46,6 +50,10 @@ export class GraphNode extends BaseNode {
         this._last_output = lastOutput;
         this._set_last_output = setLastOutput;
 
+        const [currentStep, setCurrentStep] = createSignal(false);
+        this._is_current_step = currentStep;
+        this._set_current_step = setCurrentStep
+
         const [pos, setPos] = createSignal(position);
         this._pos = pos;
         this._setPos = setPos;
@@ -62,7 +70,9 @@ export class GraphNode extends BaseNode {
         // this._add_slot(new NodeSlot(this, OUTPUT_SLOT));
     }
 
-    
+    get is_current_step() { return this._is_current_step() }
+    set is_current_step(v: boolean) { this._set_current_step(v) }
+
     get last_output() { return this._last_output() }
     set last_output(output: Map<string, Map<string, any>>) { this._set_last_output(output) }
 

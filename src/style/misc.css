@@ -44,3 +44,10 @@
   background-color: rgb(190, 54, 54) !important;
   opacity: 0.7;
 }
+
+.current-step {
+  background-color: var(--selection-color-alpha);
+  .connection-path {
+    stroke: var(--selection-color);
+  }
+}

@@ -25,7 +25,7 @@ export const ConnectionPreview = (props: { start_slot: NodeSlot | null, hovered_
             return;
         }
         const start = props.start_slot.get_world_position();
-        const anchor_a = props.start_slot.style.anchor
+        const anchor_a = props.start_slot.style.anchor;
         
         let end = props.cursor_pos;
         let anchor_b = anchor_a;
@@ -62,8 +62,19 @@ export const ConnectionLines = (props: { connection: NodeConnection, onDisconnec
         props.onDisconnect(props.connection);
     };
 
+    const is_current_step = createMemo(() => {
+        const parent_node_step = props.connection.input_slot.parent_node.is_current_step;
+        return parent_node_step;
+    });
+
     return (
-        <g class={"connection-group"} classList={{"unsynced": !props.connection.is_synced}}>
+        <g 
+            class={"connection-group"} 
+            classList={{
+                "unsynced": !props.connection.is_synced,
+                "current-step": is_current_step()
+            }}
+        >
             <path class="clickable-path"
                 onContextMenu={handleContextMenu}
                 d={path()}

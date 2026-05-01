@@ -262,6 +262,9 @@ export class NodeEditor {
         });
 
         this._editor_client.add_handler(ServerMessages.NODE_OUTPUT, (message) => {
+            this.scene_controller.node_controller.nodes.forEach((node: GraphNode) => {
+                node.is_current_step = false;
+            })
             const node = this.scene_controller.node_controller.get_node(message.node_id);
             if (node == undefined) {
                 console.error("ERROR: Couldn't find node with id ", message.node_id);
@@ -279,6 +282,7 @@ export class NodeEditor {
                     slot.last_output = value;
                 }
             });
+            node.is_current_step = true;
             node.last_output = node_output;
         });
     }
