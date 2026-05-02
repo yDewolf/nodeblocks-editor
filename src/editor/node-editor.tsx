@@ -1,5 +1,5 @@
 import { EditorSpace } from "./internal/editor-space";
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { GraphNode } from "../wrapper/nodes/graph-node";
 import { NodeSlot } from '../wrapper/nodes/slot/node-slot';
 import { Vector2 } from '../wrapper/data_types/geometry';
@@ -52,6 +52,7 @@ export class NodeEditor {
 
     constructor (session_controller: SessionController) {
         this._session_controller = session_controller;
+        this._session_controller.notification_controller._editor = this;
 
         this._state_controller = new StateController(this._editor_client);
         this._status_controller = new WebsocketStatusController(this._editor_client);
@@ -70,8 +71,9 @@ export class NodeEditor {
         this.editor_grid = new Grid({x: 32, y: 32});
 
         this.selection_controller = new SelectionController(this.editor_space, this.editor_grid, this);
-        
         this.tool_controller = new ToolController(this);
+
+        
         this.setup_event_handlers();
         this.setup_keybinds();
         this.setup_message_handlers();
@@ -126,7 +128,7 @@ export class NodeEditor {
             {just_activated: (data) => {
                 const e = data.event;
                 if (e instanceof PointerEvent) {
-                    const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                    // const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
     
                     this.tool_controller.current_tool?.onPointerDown(e);
@@ -289,6 +291,22 @@ export class NodeEditor {
 
     public View() {
         let viewportRef: HTMLDivElement | undefined;
+        onMount(() => {
+            if (viewportRef) {
+                const rect = viewportRef.getBoundingClientRect();
+                this.editor_space.camera.size = { x: rect.width, y: rect.height };
+                const resizeObserver = new ResizeObserver((entries) => {
+                    for (let entry of entries) {
+                        const { width, height } = entry.contentRect;
+                        this.editor_space.camera.size = { x: width, y: height };
+                    }
+                });
+
+                resizeObserver.observe(viewportRef);
+                onCleanup(() => resizeObserver.disconnect());
+            }
+        });
+
         const selector = new NodeTypeSelector();
         return (
             <div 
@@ -296,6 +314,7 @@ export class NodeEditor {
                 onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
             >
                 <div 
+                    ref={viewportRef} 
                     class="viewport"
                     style={{
                         position: "absolute", 
@@ -332,11 +351,10 @@ export class NodeEditor {
                     
                     <div 
                         class="world-space"
-                        ref={viewportRef} 
                         style={{
-                            transform: `scale(${this.editor_space.camera.zoom}) translate(${-this.editor_space.camera.offset.x}px, ${-this.editor_space.camera.offset.y}px)`,
+                            "transform-origin": "0 0",
+                            transform: `translate(${-this.editor_space.camera.offset.x * this.editor_space.camera.zoom}px, ${-this.editor_space.camera.offset.y * this.editor_space.camera.zoom}px) scale(${this.editor_space.camera.zoom})`,
                             position: "absolute",
-                            "transform-origin": "0 0"
                         }}
                     >
                         <Show when={this.selection_controller.selection_rect.active}>

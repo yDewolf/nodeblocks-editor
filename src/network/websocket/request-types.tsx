@@ -25,6 +25,7 @@ export type ServerMessage =
     | { type: ServerMessages.SYNC_ACTION; action_statuses: { [uid: string]: EditorActionStatus; }}
     | { type: ServerMessages.SYNC_FILES;}
     | { type: ServerMessages.SYNC_NOTIFICATIONS; notifications: ServerNotification[]}
+    | { type: ServerMessages.CLOSE_SOCKET}
     | ServerNotification
     
 

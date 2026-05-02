@@ -41,7 +41,9 @@ export enum ServerMessages {
     SYNC_INSTANCE_STATE = "sync_instance_state",
     SYNC_ACTION = "sync_action",
     SYNC_FILES = "sync_files",
-    SYNC_NOTIFICATIONS = "sync_notifications"
+    SYNC_NOTIFICATIONS = "sync_notifications",
+
+    CLOSE_SOCKET = "disconnect"
 }
 
 export enum WebsocketStatus {

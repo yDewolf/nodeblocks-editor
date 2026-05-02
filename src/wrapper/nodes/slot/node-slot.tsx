@@ -1,4 +1,4 @@
-import { createMemo, createSignal, Show } from "solid-js";
+import { createMemo, createSignal, onMount, Show } from "solid-js";
 import { GraphNode } from "../graph-node";
 import { NodeConnection } from "../node-connection";
 import { Vector2 } from "~/wrapper/data_types/geometry";
@@ -23,6 +23,8 @@ export class NodeSlot {
 
     private _last_output: () => Map<string, any>;
     private _set_last_output: (out: Map<string, any>) => void;
+
+    _last_world_pos: Vector2 = {x: 0, y: 0};
 
     constructor(parent: GraphNode, slot_type: BaseSlotType, slot_name: string, data_type: BaseNodeType | null = null) {
         this.style = new NodeSlotStyle(slot_type);
@@ -102,16 +104,20 @@ export class NodeSlot {
         this.style.version;
 
         if (!this._element) {
-            return {
+            const world_pos = {
                 x: this.parent_node.x + (this.type.super_type === SuperSlotTypes.OUTPUT ? this.parent_node.width : 0),
                 y: this.parent_node.y + (this.parent_node.height / 2)
             };
+            this._last_world_pos = world_pos;
+            return world_pos;
         }
 
-        return {
+        const world_pos = {
             x: this.parent_node.x + this._element.offsetLeft + this._element.offsetWidth / 2,
             y: this.parent_node.y + this._element.offsetTop + this._element.offsetHeight / 2
-        };
+        }; 
+        this._last_world_pos = world_pos;
+        return world_pos; 
     }
     
     public update_anchor() {

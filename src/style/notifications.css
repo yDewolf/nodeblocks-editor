@@ -31,6 +31,11 @@
 
 .notification-content {
     align-items: center;
+    
+    p {
+        max-width: 200px;
+        -webkit-line-break: 1;
+    }
 }
 
 
@@ -61,4 +66,9 @@
 
 .notification-badge.unread.fade-fast {
     animation: fadeOutFade 10s forwards;
+}
+
+.stack-counter {
+    font-size: 0.9rem;
+    font-weight: bold;
 }

@@ -1,11 +1,14 @@
 import { NodeServerClient } from "../websocket/websocket-handler";
 import { ServerMessages } from "../websocket/websocket-protocol";
-import { NotificationTarget, ServerNotification } from '../websocket/requests/notifications';
+import { isConnNotify, isNodeNotify, isParamNotify, isSlotNotify, NotificationLevel, NotificationTarget, ServerNotification } from '../websocket/requests/notifications';
 import { createStore, produce, SetStoreFunction } from "solid-js/store";
+import { NodeEditor } from "~/editor/node-editor";
+import { Rect, Vector2 } from "~/wrapper/data_types/geometry";
 
 export type NotificationWithMeta = ServerNotification & {
     read: boolean,
-    timestamp: number
+    timestamp: number,
+    count: number
 }
 
 type NotificationStore = {
@@ -21,6 +24,8 @@ export class NotificationController {
     private _notifications: NotificationStore;
     private _set_notifications: SetStoreFunction<NotificationStore>;
 
+    _editor: NodeEditor | undefined = undefined;
+
     constructor(client: NodeServerClient) {
         const [notifications, setNotifications] = createStore<NotificationStore>({
             nodes: {} as Record<string, NotificationWithMeta[]>,
@@ -34,41 +39,80 @@ export class NotificationController {
 
         this._client = client;
         this._client.add_handler(ServerMessages.NOTIFICATION, this.handle_notification);
+        
+        this._setup_virtual_notifications();
+    }
+
+    private _setup_virtual_notifications() {
+        this._client.add_handler(ServerMessages.HANDSHAKE_SYNC, () => {
+            this.handle_notification({
+                type: ServerMessages.NOTIFICATION, 
+                level: NotificationLevel.INFO,
+                target: NotificationTarget.UNSPECIFIED,
+                message: "Connected to Server",
+                uid: "connected"
+            })
+        });
+        
+        this._client.add_handler(ServerMessages.CLOSE_SOCKET, () => {
+            this.handle_notification({
+                type: ServerMessages.NOTIFICATION, 
+                level: NotificationLevel.WARNING,
+                target: NotificationTarget.UNSPECIFIED,
+                message: "Socket Closed",
+                uid: "socket_closed"
+            })
+        });
     }
 
     private handle_notification = (msg: ServerNotification) => {
-        const msg_with_meta: NotificationWithMeta = {
-            ...msg,
-            read: false,
-            timestamp: Date.now()
-        };
         this._set_notifications(produce((state) => {
+            let target_list: NotificationWithMeta[];
             switch (msg.target) {
                 case NotificationTarget.NODE:
                     if (!state.nodes[msg.node_uid!]) state.nodes[msg.node_uid!] = [];
-                    state.nodes[msg.node_uid!].push(msg_with_meta);
+                    target_list = state.nodes[msg.node_uid!];
                     break;
-                
                 case NotificationTarget.SLOT:
                     const slot_key = `${msg.node_uid}:${msg.slot_name}`;
                     if (!state.slots[slot_key]) state.slots[slot_key] = [];
-                    state.slots[slot_key].push(msg_with_meta);
+                    target_list = state.slots[slot_key];
                     break;
-
                 case NotificationTarget.PARAMETER:
                     const param_key = `${msg.node_uid}:${msg.param_name}`;
                     if (!state.parameters[param_key]) state.parameters[param_key] = [];
-                    state.parameters[param_key].push(msg_with_meta);
+                    target_list = state.parameters[param_key];
                     break;
-
                 case NotificationTarget.CONNECTION:
                     if (!state.connections[msg.conn_uid!]) state.connections[msg.conn_uid!] = [];
-                    state.connections[msg.conn_uid!].push(msg_with_meta);
+                    target_list = state.connections[msg.conn_uid!];
                     break;
-
                 default:
-                    state.global.push(msg_with_meta);
+                    target_list = state.global;
             }
+
+            const existing = target_list.find(notification => 
+                notification.message == msg.message && 
+                notification.level == msg.level &&
+                notification.node_uid == msg.node_uid &&
+                notification.param_name == msg.param_name &&
+                notification.slot_name == msg.slot_name &&
+                notification.conn_uid == msg.conn_uid &&
+                !notification.read
+            );
+            
+            if (existing) {
+                existing.count = (existing.count || 1) + 1;
+                existing.timestamp = Date.now();
+                existing.read = false;
+                return;
+            }   
+            target_list.push({
+                ...msg,
+                read: false,
+                timestamp: Date.now(),
+                count: 1
+            });
         }));
     }
 
@@ -90,6 +134,16 @@ export class NotificationController {
 
     public forGlobal() {
         return this._notifications.global || [];
+    }
+
+    public forAll() {
+        return [
+            ...this.forGlobal(),
+            ...Object.values(this._notifications.nodes).flat(),
+            ...Object.values(this._notifications.slots).flat(),
+            ...Object.values(this._notifications.parameters).flat(),
+            ...Object.values(this._notifications.connections).flat(),
+        ]
     }
 
     public clear_notifications() {
@@ -127,11 +181,43 @@ export class NotificationController {
     }
 
     public get_notification_key(notification: ServerNotification): string {
-        if (notification.target == NotificationTarget.NODE) return notification.node_uid;
-        if (notification.target == NotificationTarget.SLOT) return `${notification.node_uid}:${notification.slot_name}`;
-        if (notification.target == NotificationTarget.PARAMETER) return `${notification.node_uid}:${notification.param_name}`;
-        if (notification.target == NotificationTarget.CONNECTION) return notification.conn_uid;
+        if (isNodeNotify(notification)) return notification.node_uid!;
+        if (isSlotNotify(notification)) return `${notification.node_uid}:${notification.slot_name}`;
+        if (isParamNotify(notification)) return `${notification.node_uid}:${notification.param_name}`;
+        if (isConnNotify(notification)) return notification.conn_uid!;
         
         return notification.uid;
+    }
+
+
+    public handle_goto(notification: ServerNotification) {
+        if (!this._editor) return;
+
+        if (notification.node_uid != undefined) {
+            const node = this._editor.scene_controller.node_controller.get_node(notification.node_uid);
+            if (node) {
+                if (notification.slot_name != undefined) {
+                    const slot = node.get_slot(notification.slot_name);
+                    if (slot) this._editor.editor_space.teleport_to_pos(slot._last_world_pos)
+                }
+            
+                this._editor.editor_space.teleport_to_rect(node.rect)
+                return;
+            }
+        }
+
+        if (notification.conn_uid != undefined) {
+            const conn = this._editor.scene_controller.connection_controller.get_conn(notification.conn_uid);
+            if (conn) {
+                const pos_a = conn.slot_a._last_world_pos;
+                const pos_b = conn.slot_b._last_world_pos;
+                const medium: Vector2 = {
+                    x: (pos_a.x + pos_b.x) / 2,
+                    y: (pos_a.y + pos_b.y) / 2,
+                }
+
+                this._editor.editor_space.teleport_to_pos(medium);
+            }
+        }
     }
 }

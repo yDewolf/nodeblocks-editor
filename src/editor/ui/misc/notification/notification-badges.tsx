@@ -1,6 +1,6 @@
 import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
 import { NotificationController, NotificationWithMeta } from "~/network/controllers/notification_controller";
-import { NotificationLevel, ServerNotification } from "~/network/websocket/requests/notifications";
+import { NotificationLevel, NotificationTarget, ServerNotification } from "~/network/websocket/requests/notifications";
 
 const NotificationIcon = (props: {level: NotificationLevel}) => {
     return (
@@ -25,9 +25,13 @@ export const NotificationCard = (props: {notification: NotificationWithMeta, not
     const mark_as_read = () => {
         props.notification_controller.mark_as_read(props.notification);
     }
+
+    const goto_root = () => {
+        props.notification_controller.handle_goto(props.notification);
+    }
     return (
         <div 
-            class="notification-badge keep row-container padded"
+            class="notification-badge keep row-container padded space-between"
             classList={{
                 "read": props.notification.read,
                 "unread": !props.notification.read,
@@ -43,11 +47,26 @@ export const NotificationCard = (props: {notification: NotificationWithMeta, not
         >
             <div class="notification-content keep row-container">
                 <NotificationIcon level={props.notification.level}/>
-                <span>{props.notification.message}</span>
+                <p>{props.notification.message}</p>
+                <Show when={props.notification.count > 1}>
+                    <span class="stack-counter">
+                        {props.notification.count}x
+                    </span>
+                </Show>
             </div>
-            <button class="icon-button small-icon" onclick={mark_as_read}>
-                <img src="public/assets/icons/checkmark.svg" alt=">" />
-            </button>
+            <div class="container">
+                <Show when={props.notification.target != NotificationTarget.UNSPECIFIED} 
+                    fallback={
+                        <button class="icon-button small-icon" onclick={mark_as_read}>
+                            <img src="public/assets/icons/checkmark.svg" alt="" />
+                        </button>
+                    }
+                >
+                    <button class="icon-button small-icon" onclick={goto_root}>
+                        <img src="public/assets/icons/arrow-right.svg" alt=">" />
+                    </button>
+                </Show>
+            </div>
         </div>
     )
 }
@@ -66,7 +85,7 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
     const all_notifications = createMemo(() => {
         const c = props.notification_controller;
         return [
-            ...c.forGlobal(),
+            ...c.forAll(),
         ].sort((a, b) => b.timestamp - a.timestamp);
     });
 

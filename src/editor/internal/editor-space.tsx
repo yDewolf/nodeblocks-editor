@@ -33,6 +33,7 @@ export class EditorCamera {
         this.camera_rect.size = {x: this.raw_size.x / new_zoom, y: this.raw_size.y / new_zoom}
     }
 
+    get size() { return this.raw_size; }
     set size(new_size: Vector2) {
         this.raw_size = new_size;
     }
@@ -82,9 +83,28 @@ export class EditorSpace {
         const mouse_x = e.clientX - rect.left;
         const mouse_y = e.clientY - rect.top;
 
-        const world_mouse_x = (mouse_x / this.camera.zoom) + this.camera.offset.x;
-        const world_mouse_y = (mouse_y / this.camera.zoom) + this.camera.offset.y;
+        const screen_pos = {x: mouse_x, y: mouse_y}
+        return [screen_pos, this.screen_pos_to_world_pos(screen_pos)]
+    }
 
-        return [{x: mouse_x, y: mouse_y}, {x: world_mouse_x, y: world_mouse_y}]
+    public screen_pos_to_world_pos(screen_pos: Vector2) {
+        return {
+            x: screen_pos.x / this.camera.zoom + this.camera.offset.x,
+            y: screen_pos.y / this.camera.zoom + this.camera.offset.y,
+        }
+    }
+
+    public teleport_to_rect(rect: Rect) {
+        this.camera.updateOffset({
+            x: (rect.offset.x + rect.size.x / 2) - this.camera.size.x / 2 / this.camera.zoom, 
+            y: (rect.offset.y + rect.size.y / 2) - this.camera.size.y / 2 / this.camera.zoom
+        });
+    }
+
+    public teleport_to_pos(pos: Vector2) {
+        this.camera.updateOffset({
+            x: (pos.x) - this.camera.size.x / 2 / this.camera.zoom, 
+            y: (pos.y) - this.camera.size.y / 2 / this.camera.zoom
+        });
     }
 }
