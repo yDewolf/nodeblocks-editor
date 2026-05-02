@@ -12,6 +12,15 @@ const FileUploader = (props: {workspace: UserWorkspace}) => {
 
 export const FileExplorer = (props: {workspace: UserWorkspace}) => {
     const [show, setShow] = createSignal(false);
+    const [changingState, setChangingState] = createSignal(false);
+    const delayed_set_show = (value: boolean) => {
+        setChangingState(true);
+        setTimeout(() => {
+            setShow(value);
+            setChangingState(false);
+        }, 200);
+    }
+
     return (
         <Show
             when={show()}
@@ -24,10 +33,10 @@ export const FileExplorer = (props: {workspace: UserWorkspace}) => {
                 </div>
             }
         >
-
-        <div class="file-explorer" style={{"pointer-events": "auto"}}>
+        
+        <div class="file-explorer modal-content" classList={{"open": show(), "closing": show() && changingState()}} style={{"pointer-events": "auto"}}>
             <div class="file-explorer-actions keep row-container side-padded">
-                <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => setShow(false)}>
+                <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => delayed_set_show(false)}>
                     <img src="assets/icons/menu.svg" alt="Open" />
                 </button>
                 <div class="keep row-container">

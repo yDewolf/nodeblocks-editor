@@ -1,7 +1,32 @@
+@keyframes animate_open {
+    0% { height: 0; }
+    100% {  }
+}
+
 .tab-modal {
-  background-color: white;
-  border: solid black 1px;
-  align-items: center;
+    background-color: white;
+    border: solid black 1px;
+    align-items: center;
+}
+
+.modal-button {
+    width: fit-content;
+    height: fit-content;
+    
+    padding: 4px;
+}
+
+.modal-content {
+    overflow: hidden;
+}
+
+.modal-content.open {
+    animation: animate_open 300ms;
+}
+
+.modal-content.closing {
+    transition: height 250ms ease-out;
+    height: 0;
 }
 
 @keyframes scaleUp {
@@ -11,7 +36,7 @@
 }
 
 .icon-button {
-    animation: scaleUp 100ms ease-out;
+    /* animation: scaleUp 100ms ease-out; */
     display: flex;
     align-items: center;
 

@@ -7,7 +7,15 @@ import { NodePreview } from "../misc/node-preview";
 
 export const EditorLeftTab = (props: {selector: NodeTypeSelector, scene_controller: SceneController, tool_controller: ToolController}) => {
     const [show, setShow] = createSignal(false);
-    
+    const [changingState, setChangingState] = createSignal(false);
+    const delayed_set_show = (value: boolean) => {
+        setChangingState(true);
+        setTimeout(() => {
+            setShow(value);
+            setChangingState(false);
+        }, 200);
+    }
+
     return (
         <Show
             when={show()}
@@ -20,10 +28,10 @@ export const EditorLeftTab = (props: {selector: NodeTypeSelector, scene_controll
                 </div>
             }
         >
-            <div class="left-tab container">
+            <div class="left-tab container modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
                 <div class="button-tab keep row-container">
                     <ul class="tabs">
-                        <li class="tab-item">
+                        <li>
                             <input class="visually-hidden" type="file" accept=".json" id="scene-input" onChange={
                                 (e) => {
                                     if (!e.target.files) {
@@ -39,7 +47,7 @@ export const EditorLeftTab = (props: {selector: NodeTypeSelector, scene_controll
                             </label>
                         </li>
                     </ul>
-                    <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onclick={(e) => setShow(false)}>
+                    <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onclick={(e) => delayed_set_show(false)}>
                         <img src="assets/icons/left-tab.svg" alt="Close" />
                     </button>
                 </div>
