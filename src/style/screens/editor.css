@@ -1,5 +1,6 @@
 @import url("~/style/panels/import.css");
 @import url("~/style/misc/misc.css");
+@import url("~/style/notifications.css");
 
 .viewport {
   z-index: 1;
@@ -48,13 +49,28 @@
   background-color: rgba(28, 29, 37, 0.521);
 }
 
+.middle-tab-holder {
+    display: grid;
+    width: 80%;
+    padding: 20px;
+}
+
 .middle-tab {
   pointer-events: none;
 
-  padding: 20px;
-  width: 80%;
+  width: 100%;
+  height: 100%;
   flex-direction: column-reverse;
 }
+
+.middle-tab, .middle-tab-overlay {
+    grid-area: 1 / 1;
+}
+
+.middle-tab-overlay {
+    z-index: 3;
+}
+
 
 .tool-selector {
   width: 100%;

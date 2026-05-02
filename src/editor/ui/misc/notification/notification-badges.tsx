@@ -6,16 +6,16 @@ const NotificationIcon = (props: {level: NotificationLevel}) => {
     return (
         <Switch fallback={<img src="" alt="Unknown"/>}>
             <Match when={props.level == NotificationLevel.INFO}>
-                <img src="" alt="Info"/>
+                <span class="icon-span"><img src="public/assets/icons/notification/info.svg" alt="Info"/></span>
             </Match>
             <Match when={props.level == NotificationLevel.DEBUG}>
-                <img src="" alt="Debug"/>
+                <span class="icon-span"><img src="public/assets/icons/notification/debug.svg" alt="Debug"/></span>
             </Match>
             <Match when={props.level == NotificationLevel.WARNING}>
-                <img src="" alt="Warning"/>
+                <span class="icon-span"><img src="public/assets/icons/notification/warning.svg" alt="Warning"/></span>
             </Match>
             <Match when={props.level == NotificationLevel.ERROR}>
-                <img src="" alt="Error"/>
+                <span class="icon-span"><img src="public/assets/icons/notification/error.svg" alt="Error"/></span>
             </Match>
         </Switch>
     )
@@ -23,11 +23,11 @@ const NotificationIcon = (props: {level: NotificationLevel}) => {
 
 export const SidebarNotifications = (props: {notification_controller: NotificationController}) => {
     return (
-        <div class="sidebar-notification container">
+        <div class="sidebar-notifications container scrollable">
             <For each={props.notification_controller.forGlobal()}>
                 {(notification: ServerNotification) => {
                     return (
-                        <div class="notification-badge keep row-container">
+                        <div class="notification-badge keep row-container padded">
                             <NotificationIcon level={notification.level}/>
                             <span>{notification.message}</span>
                         </div>

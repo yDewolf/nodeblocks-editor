@@ -394,11 +394,13 @@ export class NodeEditor {
                         <EditorLeftTab selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
                         <FileExplorer workspace={this._session_controller.user_workspace}/>
                     </div>
-                    <div class="middle-tab">
-                        <div class="middle-tab-overlay">
+                    <div class="middle-tab-holder">
+                        <div class="middle-tab-overlay container">
                             <SidebarNotifications notification_controller={this._session_controller.notification_controller}/>
                         </div>
-                        {this.tool_controller.View()}
+                        <div class="middle-tab container">
+                            {this.tool_controller.View()}
+                        </div>
                     </div>
                     <div class="right-tab container">
                         <ServerPanel editor={this} state_controller={this._state_controller}/>
