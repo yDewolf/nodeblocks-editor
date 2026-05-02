@@ -26,6 +26,7 @@ import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { FileExplorer } from "./ui/panels/file/file-explorer";
 import { EditorLeftTab } from "./ui/panels/left-tab";
 import { SessionController } from "~/network/session/session-controller";
+import { SidebarNotifications } from "./ui/misc/notification/notification-badges";
 import "~/style/screens/editor.css";
 
 export class NodeEditor {
@@ -393,7 +394,10 @@ export class NodeEditor {
                         <EditorLeftTab selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
                         <FileExplorer workspace={this._session_controller.user_workspace}/>
                     </div>
-                    <div class="middle-tab container">
+                    <div class="middle-tab">
+                        <div class="middle-tab-overlay">
+                            <SidebarNotifications notification_controller={this._session_controller.notification_controller}/>
+                        </div>
                         {this.tool_controller.View()}
                     </div>
                     <div class="right-tab container">

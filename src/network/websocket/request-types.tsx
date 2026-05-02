@@ -1,5 +1,6 @@
 import { ConnectionSceneData, MinimalNodeSceneData } from "~/wrapper/helpers/node-scene-file";
 import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, EditorActionStatus, SceneActionTypes, ServerMessages, WebsocketStatus } from "./websocket-protocol";
+import { ServerNotification } from "./requests/notifications";
 
 export type NodeSceneRequestData = {[uid: string]: MinimalNodeSceneData};
 export type ConnSceneRequestData = {[uid: string]: ConnectionSceneData};
@@ -23,6 +24,8 @@ export type ServerMessage =
     | { type: ServerMessages.SYNC_INSTANCE_STATE; payload: {loop_state: any, instance_state: any} }
     | { type: ServerMessages.SYNC_ACTION; action_statuses: { [uid: string]: EditorActionStatus; }}
     | { type: ServerMessages.SYNC_FILES;}
+    | { type: ServerMessages.SYNC_NOTIFICATIONS; notifications: ServerNotification[]}
+    | ServerNotification
     
 
 export type ClientMessage = ClientCommand | ClientAction;
