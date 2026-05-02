@@ -1,9 +1,6 @@
-import { nanoid } from 'nanoid';
 import { onMount } from "solid-js";
 import "./app.css";
 import { NodeEditor } from "./editor/node-editor";
-import { NodeServerClient } from "./network/websocket/websocket-handler";
-import { UserSession } from './network/session/user-session';
 import { SessionController } from './network/session/session-controller';
 
 const session_controller = new SessionController("localhost", 3001)

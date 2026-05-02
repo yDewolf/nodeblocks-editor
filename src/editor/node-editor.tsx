@@ -7,16 +7,14 @@ import { KeyEventManager as GeneralEventManager } from "./internal/input_manager
 import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./internal/input_manager/keybind-events";
 import { EventHandler, InputEvents } from "./internal/input_manager/event-handling";
 import { SceneController } from "../wrapper/controllers/scene-controller";
-import { NodeServerClient } from "~/network/websocket/websocket-handler";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
 import { NodeTypeSelector } from "./ui/misc/node-type-selector";
 import { ConnectionLines, ConnectionPreview } from "./ui/misc/connection-lines";
 import { Grid } from "./ui/misc/grid";
-import { NodePreview } from "./ui/misc/node-preview";
 import { NodeComponent } from './ui/node/node-component';
 import { ServerPanel } from "./ui/panels/server-panel";
-import { ClientMessages, InstanceCommands, ServerMessages } from "~/network/websocket/websocket-protocol";
+import { ServerMessages } from "~/network/websocket/websocket-protocol";
 import { StateController } from "~/network/controllers/state_controller";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
 import { ServerSyncController } from "~/network/controllers/sync_controller";
@@ -28,6 +26,7 @@ import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { FileExplorer } from "./ui/panels/file/file-explorer";
 import { EditorLeftTab } from "./ui/panels/left-tab";
 import { SessionController } from "~/network/session/session-controller";
+import "~/style/screens/editor.css";
 
 export class NodeEditor {
     scene_controller: SceneController;
@@ -293,13 +292,14 @@ export class NodeEditor {
         return (
             <div 
                 class="editor-view"
-            >   
+                onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
+            >
                 <div 
                     class="viewport"
                     style={{
                         position: "absolute", 
-                        height: "100%", 
-                        width: "100%"
+                        height: "100vh", 
+                        width: "100vw"
                     }}
                     classList={{
                         'move-mode': this.input_manager.get_keybind_state("PanCamera"),
@@ -314,7 +314,7 @@ export class NodeEditor {
 
                     onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
                     onPointerDown={(e) => this.input_manager.onPointerDown(e)} 
-                    onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
+
                     onPointerLeave={(e) => this.input_manager.onPointerUp(e)}
                     onMouseOver={() => {
                         this.input_manager.generalizedEventHandler({}, InputEvents.HOVER_BACKGROUND)
@@ -388,15 +388,15 @@ export class NodeEditor {
                     </div>
                 </div>
                 
-                <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
-                    <div class="left-tab-holder">
+                <div class="editor-ui keep row-container" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
+                    <div class="left-tab-holder container">
                         <EditorLeftTab selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
                         <FileExplorer workspace={this._session_controller.user_workspace}/>
                     </div>
-                    <div class="middle-tab">
+                    <div class="middle-tab container">
                         {this.tool_controller.View()}
                     </div>
-                    <div class="right-tab">
+                    <div class="right-tab container">
                         <ServerPanel editor={this} state_controller={this._state_controller}/>
                     </div>
                 </div>

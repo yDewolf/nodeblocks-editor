@@ -24,10 +24,10 @@ export const ServerStatus = (props: {status_controller: WebsocketStatusControlle
 
 export const ServerPanel = (props: {editor: NodeEditor, state_controller: StateController}) => {
     return (
-        <div class="server-panel">
-            <div class="panel-column">
-                <div class="panel-row">
-                    <div style={{display: "flex"}}>
+        <div class="container padded">
+            <div class="container">
+                <div class="keep row-container">
+                    <div class="keep row-container">
                         <StatePanel state_controller={props.state_controller}/>
                         <Switch>
                             <Match when={
@@ -48,7 +48,7 @@ export const ServerPanel = (props: {editor: NodeEditor, state_controller: StateC
                     </div>
                     <ServerStatus status_controller={props.editor._status_controller}/>
                 </div>
-                <div class="control-panel panel-row">
+                <div class="control-panel keep row-container">
                     <button class="icon-button" onclick={() => {props.editor._sync_controller.send_local_scene()}}>
                         <img src="assets/icons/send-file.svg" alt="Upload Scene" title="Upload Scene"/>
                     </button>

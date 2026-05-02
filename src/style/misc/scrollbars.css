@@ -1,0 +1,18 @@
+.scrollable.container {
+    overflow-y: scroll;
+    max-height: 100%;
+}
+
+.scrollable.row-container {
+    overflow-x: scroll;
+    max-width: 100%;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--light-third-color);
+    border: 3px solid var(--secondary-color);
+}
+
+*::-webkit-scrollbar {
+    width: 12px;
+}

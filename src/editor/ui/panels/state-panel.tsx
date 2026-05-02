@@ -6,7 +6,7 @@ import { InstanceStates, LoopStates } from "~/network/websocket/websocket-protoc
 
 export const StatePanel = (props: {state_controller: StateController}) => {
     return (
-        <div class="state-panel">
+        <div class="keep row-container">
             <Switch fallback={<span>Not Connected</span>}>
                 <Match when={props.state_controller.instance_state == InstanceStates.RUNNING}>
                     <button class="icon-button" onclick={() => props.state_controller.request_stop()}>

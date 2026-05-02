@@ -1,15 +1,6 @@
-@import url("style/components.css");
-@import url("style/misc.css");
-@import url("style/node.css");
-@import url("style/node-selector.css");
-@import url("style/panels.css");
-
-
-:root {
-  --selection-color: #7bb4ff;
-  --selection-color-alpha: #7bb4ff4d;
-  --node-selected-color: #dcebfd;
-}
+@import url("style/colors.css");
+@import url("style/containers.css");
+@import url("style/components/import.css");
 
 * {
   margin: 0;
@@ -19,95 +10,6 @@ body {
   font-family: Gordita, Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   overflow: hidden;
 }
-
-.viewport {
-  z-index: 1;
-  cursor: crosshair;
-}
-
-.editor-ui {
-  z-index: 2;
-  inset: 0;
-
-  pointer-events: none;
-
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  display: flex;
-}
-
-.left-tab, .right-tab, .middle-tab {
-  pointer-events: auto;
-
-  display: flex;
-  flex-direction: column;
-}
-
-
-.right-tab {
-  /* display: none; */
-  width: 30%;
-  pointer-events: none;
-
-  * {
-    pointer-events: auto;
-  }
-}
-
-
-.left-tab-holder {
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  width: fit-content;
-  min-width: 300px;
-
-}
-
-.left-tab {
-  height: 100%;
-  
-  border: solid 1px black;
-  background-color: rgba(28, 29, 37, 0.521);
-}
-
-.left-tab-modal {
-  padding: 4px 8px;
-  background-color: white;
-  border: solid black 1px;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.middle-tab {
-  pointer-events: none;
-
-  padding: 20px;
-  width: 80%;
-  flex-direction: column-reverse;
-}
-
-.tool-selector {
-  width: 100%;
-  margin: 0 auto;
-  ul {
-    pointer-events: auto;
-    width: fit-content;
-    margin: 0 auto;
-    padding: 0;
-
-    list-style: none;
-    display: flex;
-
-    li {
-      margin: 0 10px;
-    }
-  }
-}
-
 
 .move-mode {
   cursor: grab;
