@@ -1,39 +1,106 @@
-import { For, Match, Switch } from "solid-js";
-import { NotificationController } from "~/network/controllers/notification_controller";
+import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
+import { NotificationController, NotificationWithMeta } from "~/network/controllers/notification_controller";
 import { NotificationLevel, ServerNotification } from "~/network/websocket/requests/notifications";
 
 const NotificationIcon = (props: {level: NotificationLevel}) => {
     return (
         <Switch fallback={<img src="" alt="Unknown"/>}>
             <Match when={props.level == NotificationLevel.INFO}>
-                <span class="icon-span"><img src="public/assets/icons/notification/info.svg" alt="Info"/></span>
+                <span class="icon-span small-icon"><img src="public/assets/icons/notification/info.svg" alt="Info"/></span>
             </Match>
             <Match when={props.level == NotificationLevel.DEBUG}>
-                <span class="icon-span"><img src="public/assets/icons/notification/debug.svg" alt="Debug"/></span>
+                <span class="icon-span small-icon"><img src="public/assets/icons/notification/debug.svg" alt="Debug"/></span>
             </Match>
             <Match when={props.level == NotificationLevel.WARNING}>
-                <span class="icon-span"><img src="public/assets/icons/notification/warning.svg" alt="Warning"/></span>
+                <span class="icon-span small-icon"><img src="public/assets/icons/notification/warning.svg" alt="Warning"/></span>
             </Match>
             <Match when={props.level == NotificationLevel.ERROR}>
-                <span class="icon-span"><img src="public/assets/icons/notification/error.svg" alt="Error"/></span>
+                <span class="icon-span small-icon"><img src="public/assets/icons/notification/error.svg" alt="Error"/></span>
             </Match>
         </Switch>
     )
 }
 
-export const SidebarNotifications = (props: {notification_controller: NotificationController}) => {
+export const NotificationCard = (props: {notification: NotificationWithMeta, notification_controller: NotificationController}) => {
+    const mark_as_read = () => {
+        props.notification_controller.mark_as_read(props.notification);
+    }
     return (
-        <div class="sidebar-notifications container scrollable">
-            <For each={props.notification_controller.forGlobal()}>
-                {(notification: ServerNotification) => {
-                    return (
-                        <div class="notification-badge keep row-container padded">
-                            <NotificationIcon level={notification.level}/>
-                            <span>{notification.message}</span>
-                        </div>
-                    )
-                }}
-            </For>
+        <div 
+            class="notification-badge keep row-container padded"
+            classList={{
+                "read": props.notification.read,
+                "unread": !props.notification.read,
+                "fade-slow": props.notification.level == NotificationLevel.ERROR,
+                "fade-fast": props.notification.level != NotificationLevel.ERROR,
+                
+                "error": props.notification.level == NotificationLevel.ERROR,
+                "warning": props.notification.level == NotificationLevel.WARNING,
+                "debug": props.notification.level == NotificationLevel.DEBUG,
+                "info": props.notification.level == NotificationLevel.INFO,
+            }}
+            style={{"pointer-events": "auto"}}
+        >
+            <div class="notification-content keep row-container">
+                <NotificationIcon level={props.notification.level}/>
+                <span>{props.notification.message}</span>
+            </div>
+            <button class="icon-button small-icon" onclick={mark_as_read}>
+                <img src="public/assets/icons/checkmark.svg" alt=">" />
+            </button>
+        </div>
+    )
+}
+
+export const SidebarNotifications = (props: {notification_controller: NotificationController}) => {
+    const [show, setShow] = createSignal(false);
+    const [changingState, setChangingState] = createSignal(false);
+    const delayed_set_show = (value: boolean) => {
+        setChangingState(true);
+        setTimeout(() => {
+            setShow(value);
+            setChangingState(false);
+        }, 200);
+    }
+
+    const all_notifications = createMemo(() => {
+        const c = props.notification_controller;
+        return [
+            ...c.forGlobal(),
+        ].sort((a, b) => b.timestamp - a.timestamp);
+    });
+
+    const unread = createMemo(() => all_notifications().filter(n => !n.read));
+    // const history = createMemo(() => all_notifications().filter(n => n.read));
+
+    return (
+        <div class="keep container sidebar-notification-holder">
+            <div class="keep row-container">
+                <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => {if (!show()) setShow(true); else delayed_set_show(false);}}>
+                    <img src="assets/icons/notification/notification-bell.svg" alt="Open" />
+                </button>
+                <span>{unread().length}</span>
+            </div>
+            {/* Notification List */}
+            <Show when={show()} fallback={
+                <For each={unread()}>
+                    {(notification: NotificationWithMeta) => {
+                        return (
+                            <NotificationCard notification={notification} notification_controller={props.notification_controller}/>
+                        )
+                    }}
+                </For>
+            }>
+                <div class="sidebar-notifications container scrollable modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
+                    <For each={all_notifications()}>
+                        {(notification: NotificationWithMeta) => {
+                            return (
+                                <NotificationCard notification={notification} notification_controller={props.notification_controller}/>
+                            )
+                        }}
+                    </For>
+                </div>
+            </Show>
         </div>
     )
 }

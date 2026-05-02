@@ -36,7 +36,7 @@ export const FileExplorer = (props: {workspace: UserWorkspace}) => {
         
         <div class="file-explorer modal-content" classList={{"open": show(), "closing": show() && changingState()}} style={{"pointer-events": "auto"}}>
             <div class="file-explorer-actions keep row-container side-padded">
-                <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => delayed_set_show(false)}>
+                <button class="icon-button modal-button" style={{"pointer-events": "auto"}} onClick={(e) => delayed_set_show(false)}>
                     <img src="assets/icons/menu.svg" alt="Open" />
                 </button>
                 <div class="keep row-container">

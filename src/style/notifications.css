@@ -1,3 +1,7 @@
+.sidebar-notification-holder {
+    user-select: none;
+}
+
 .sidebar-notifications {
     gap: 8px;
 
@@ -6,9 +10,55 @@
     height: 100px;
 }
 
+@keyframes spawnNotification {
+    0% { width: 0; }
+    100% { }
+}
+
+@keyframes fadeOutFade {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
 .notification-badge {
+    width: auto;
+
     gap: 10px;
     align-items: center;
     background-color: #140f0f23;
-    border-radius: 8px;
+}
+
+.notification-content {
+    align-items: center;
+}
+
+
+.notification-badge.error {
+    background-color: red;
+}
+
+.notification-badge.warning {
+    background-color: orange;
+}
+
+.notification-badge.debug {
+    background-color: green;
+}
+
+.notification-badge.info {
+    background-color: rgba(187, 187, 209, 0.205);
+}
+
+.notification-badge.read {
+    opacity: 1;
+    transform: scale(0.9);
+}
+
+.notification-badge.unread {
+    animation: fadeOutFade 30s forwards, spawnNotification 200ms linear;
+}
+
+.notification-badge.unread.fade-fast {
+    animation: fadeOutFade 10s forwards;
 }

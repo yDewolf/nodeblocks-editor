@@ -40,6 +40,20 @@ div {
     }
 }
 
+.medium-icon {
+    width: 32px;
+}
+
+img.small-icon {
+    width: 28px;
+}
+
+.small-icon {
+    img {
+        width: 28px !important;
+    }
+}
+
 .visually-hidden {
     display: none;
     position: absolute;
