@@ -88,6 +88,13 @@ img.small-icon {
     background-color: var(--selection-color);
 }
 
+.expand-icon {
+    transition: transform 100ms;
+}
+
+.expand-icon.expanded {
+    transform: scaleY(-1);
+}
 
 @media only screen and (max-width: 768px) {
     .row-container {

@@ -20,6 +20,7 @@ export interface ServerNotification {
     level: NotificationLevel;
     target: NotificationTarget;
     message: string;
+    description?: string;
     uid: string;
     
     node_uid?: string;

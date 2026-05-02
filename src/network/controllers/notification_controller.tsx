@@ -25,6 +25,7 @@ export class NotificationController {
     private _set_notifications: SetStoreFunction<NotificationStore>;
 
     _editor: NodeEditor | undefined = undefined;
+    ignored_level: NotificationLevel[] = [NotificationLevel.DEBUG];
 
     constructor(client: NodeServerClient) {
         const [notifications, setNotifications] = createStore<NotificationStore>({
@@ -66,6 +67,8 @@ export class NotificationController {
     }
 
     private handle_notification = (msg: ServerNotification) => {
+        if (this.ignored_level.includes(msg.level)) return;
+        
         this._set_notifications(produce((state) => {
             let target_list: NotificationWithMeta[];
             switch (msg.target) {
@@ -200,7 +203,7 @@ export class NotificationController {
                     const slot = node.get_slot(notification.slot_name);
                     if (slot) this._editor.editor_space.teleport_to_pos(slot._last_world_pos)
                 }
-            
+
                 this._editor.editor_space.teleport_to_rect(node.rect)
                 return;
             }

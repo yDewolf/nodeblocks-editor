@@ -22,16 +22,19 @@ const NotificationIcon = (props: {level: NotificationLevel}) => {
 }
 
 export const NotificationCard = (props: {notification: NotificationWithMeta, notification_controller: NotificationController}) => {
+    const [expanded, setExpanded] = createSignal(false);
+
     const mark_as_read = () => {
         props.notification_controller.mark_as_read(props.notification);
     }
 
     const goto_root = () => {
+        mark_as_read();
         props.notification_controller.handle_goto(props.notification);
     }
     return (
         <div 
-            class="notification-badge keep row-container padded space-between"
+            class="notification-badge container padded space-between"
             classList={{
                 "read": props.notification.read,
                 "unread": !props.notification.read,
@@ -45,28 +48,40 @@ export const NotificationCard = (props: {notification: NotificationWithMeta, not
             }}
             style={{"pointer-events": "auto"}}
         >
-            <div class="notification-content keep row-container">
-                <NotificationIcon level={props.notification.level}/>
-                <p>{props.notification.message}</p>
-                <Show when={props.notification.count > 1}>
-                    <span class="stack-counter">
-                        {props.notification.count}x
-                    </span>
-                </Show>
-            </div>
-            <div class="container">
-                <Show when={props.notification.target != NotificationTarget.UNSPECIFIED} 
-                    fallback={
-                        <button class="icon-button small-icon" onclick={mark_as_read}>
-                            <img src="public/assets/icons/checkmark.svg" alt="" />
+            <div class="keep row-container notification-header space-between">
+                <div class="notification-content keep row-container">
+                    <NotificationIcon level={props.notification.level}/>
+                    <p>{props.notification.message}</p>
+                    <Show when={props.notification.count > 1}>
+                        <span class="stack-counter">
+                            {props.notification.count}x
+                        </span>
+                    </Show>
+                </div>
+                <div class="row-container">
+                    <Show when={props.notification.target != NotificationTarget.UNSPECIFIED} 
+                        fallback={
+                            <button class="icon-button small-icon" onclick={mark_as_read}>
+                                <img src="public/assets/icons/checkmark.svg" alt="Read" />
+                            </button>
+                        }
+                    >
+                        <button class="icon-button small-icon" onclick={goto_root}>
+                            <img src="public/assets/icons/arrow-right.svg" alt=">" />
                         </button>
-                    }
-                >
-                    <button class="icon-button small-icon" onclick={goto_root}>
-                        <img src="public/assets/icons/arrow-right.svg" alt=">" />
-                    </button>
-                </Show>
+                    </Show>
+                    <Show when={props.notification.description != undefined}>
+                        <button class="icon-button small-icon" onclick={() => {if (!expanded()) setExpanded(true); else {setExpanded(false)}}}>
+                            <img class="expand-icon" classList={{"expanded": expanded()}} src="public/assets/icons/arrow-down.svg" alt="Expand" />
+                        </button>
+                    </Show>
+                </div>
             </div>
+            <Show when={expanded()}>
+                <div class="notification-description">
+                    <p>{props.notification.description}</p>
+                </div>
+            </Show>
         </div>
     )
 }
@@ -94,11 +109,18 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
 
     return (
         <div class="keep container sidebar-notification-holder">
-            <div class="keep row-container">
-                <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => {if (!show()) setShow(true); else delayed_set_show(false);}}>
-                    <img src="assets/icons/notification/notification-bell.svg" alt="Open" />
-                </button>
-                <span>{unread().length}</span>
+            <div class="keep row-container" style={{"align-items": "center"}}>
+                <div class="keep row-container">
+                    <button classList={{"active": show()}} class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => {if (!show()) setShow(true); else delayed_set_show(false);}}>
+                        <img src="assets/icons/notification/notification-bell.svg" alt="Open" />
+                    </button>
+                    <Show when={unread().length > 0}>
+                        <span>{unread().length}</span>
+                    </Show>
+                </div>
+                <Show when={show()}>
+                    <span>History</span>
+                </Show>
             </div>
             {/* Notification List */}
             <Show when={show()} fallback={
