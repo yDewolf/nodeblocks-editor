@@ -8,7 +8,8 @@ import { Rect, Vector2 } from "~/wrapper/data_types/geometry";
 export type NotificationWithMeta = ServerNotification & {
     read: boolean,
     timestamp: number,
-    count: number
+    count: number,
+    is_virtual: boolean
 }
 
 type NotificationStore = {
@@ -46,7 +47,7 @@ export class NotificationController {
 
     private _setup_virtual_notifications() {
         this._client.add_handler(ServerMessages.HANDSHAKE_SYNC, () => {
-            this.handle_notification({
+            this.send_virtual_notification({
                 type: ServerMessages.NOTIFICATION, 
                 level: NotificationLevel.INFO,
                 target: NotificationTarget.UNSPECIFIED,
@@ -56,7 +57,7 @@ export class NotificationController {
         });
         
         this._client.add_handler(ServerMessages.CLOSE_SOCKET, () => {
-            this.handle_notification({
+            this.send_virtual_notification({
                 type: ServerMessages.NOTIFICATION, 
                 level: NotificationLevel.WARNING,
                 target: NotificationTarget.UNSPECIFIED,
@@ -66,7 +67,11 @@ export class NotificationController {
         });
     }
 
-    private handle_notification = (msg: ServerNotification) => {
+    public send_virtual_notification = (msg: ServerNotification) => {
+        this.handle_notification(msg, true);
+    }
+
+    private handle_notification = (msg: ServerNotification, is_virtual: boolean = false) => {
         if (this.ignored_level.includes(msg.level)) return;
         
         this._set_notifications(produce((state) => {
@@ -114,7 +119,8 @@ export class NotificationController {
                 ...msg,
                 read: false,
                 timestamp: Date.now(),
-                count: 1
+                count: 1,
+                is_virtual: is_virtual
             });
         }));
     }

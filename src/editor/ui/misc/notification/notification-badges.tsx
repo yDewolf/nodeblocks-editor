@@ -1,6 +1,7 @@
-import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
+import { Accessor, createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
 import { NotificationController, NotificationWithMeta } from "~/network/controllers/notification_controller";
 import { NotificationLevel, NotificationTarget, ServerNotification } from "~/network/websocket/requests/notifications";
+import { Vector2 } from "~/wrapper/data_types/geometry";
 
 const NotificationIcon = (props: {level: NotificationLevel}) => {
     return (
@@ -21,7 +22,8 @@ const NotificationIcon = (props: {level: NotificationLevel}) => {
     )
 }
 
-export const NotificationCard = (props: {notification: NotificationWithMeta, notification_controller: NotificationController}) => {
+export const NotificationCard = (props: {notification: NotificationWithMeta, notification_controller: NotificationController, is_popup?: boolean}) => {
+    const [is_compressed, setCompressed] = createSignal(props.is_popup ?? false);
     const [expanded, setExpanded] = createSignal(false);
 
     const mark_as_read = () => {
@@ -36,6 +38,7 @@ export const NotificationCard = (props: {notification: NotificationWithMeta, not
         <div 
             class="notification-badge container padded space-between"
             classList={{
+                "popup": props.is_popup ?? false,
                 "read": props.notification.read,
                 "unread": !props.notification.read,
                 "fade-slow": props.notification.level == NotificationLevel.ERROR,
@@ -48,39 +51,46 @@ export const NotificationCard = (props: {notification: NotificationWithMeta, not
             }}
             style={{"pointer-events": "auto"}}
         >
-            <div class="keep row-container notification-header space-between">
-                <div class="notification-content keep row-container">
-                    <NotificationIcon level={props.notification.level}/>
-                    <p>{props.notification.message}</p>
+            <div class="fill keep row-container notification-header space-between">
+                <div class="notification-content">
+                    <button class="icon-button" onclick={() => {if (props.is_popup && is_compressed()) setCompressed(false); else if (props.is_popup) setCompressed(true)}}>
+                        <NotificationIcon level={props.notification.level}/>
+                    </button>
+                    <Show when={!is_compressed()}>
+                        <p>{props.notification.message}</p>
+                    </Show>
                     <Show when={props.notification.count > 1}>
                         <span class="stack-counter">
                             {props.notification.count}x
                         </span>
                     </Show>
                 </div>
-                <div class="row-container">
-                    <Show when={!props.notification.read}>
+                <Show when={!is_compressed()}>
+                    <div class="row-container">
                         <Show when={props.notification.target != NotificationTarget.UNSPECIFIED} 
                             fallback={
-                                <button class="icon-button small-icon" onclick={mark_as_read}>
-                                    <img src="public/assets/icons/checkmark.svg" alt="Read" />
-                                </button>
+                                <Show when={!props.notification.read}>
+                                    <button class="icon-button small-icon" onclick={mark_as_read}>
+                                        <img src="public/assets/icons/checkmark.svg" alt="Read" />
+                                    </button>
+                                </Show>
                             }
                             >
                             <button class="icon-button small-icon" onclick={goto_root}>
                                 <img src="public/assets/icons/arrow-right.svg" alt=">" />
                             </button>
                         </Show>
-                    </Show>
-                    <Show when={props.notification.description != undefined}>
-                        <button class="icon-button small-icon" onclick={() => {if (!expanded()) setExpanded(true); else {setExpanded(false)}}}>
-                            <img class="expand-icon" classList={{"expanded": expanded()}} src="public/assets/icons/arrow-down.svg" alt="Expand" />
-                        </button>
-                    </Show>
-                </div>
+                        <Show when={props.notification.description != undefined}>
+                            <button class="icon-button small-icon" onclick={() => {if (!expanded()) setExpanded(true); else {setExpanded(false)}}}>
+                                <img class="expand-icon" classList={{"expanded": expanded()}} src="public/assets/icons/arrow-down.svg" alt="Expand" />
+                            </button>
+                        </Show>
+                    </div>
+                </Show>
             </div>
-            <Show when={expanded()}>
+            <Show when={expanded() && !is_compressed()}>
                 <div class="notification-description">
+                    <p>{props.notification.message}</p>
                     <p>{props.notification.description}</p>
                 </div>
             </Show>
@@ -96,7 +106,7 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
         setTimeout(() => {
             setShow(value);
             setChangingState(false);
-        }, 200);
+        }, 300);
     }
 
     const all_notifications = createMemo(() => {
@@ -125,16 +135,16 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
                 </Show>
             </div>
             {/* Notification List */}
-            <Show when={show()} fallback={
-                <For each={unread()}>
-                    {(notification: NotificationWithMeta) => {
-                        return (
-                            <NotificationCard notification={notification} notification_controller={props.notification_controller}/>
-                        )
-                    }}
-                </For>
-            }>
-                <div class="sidebar-notifications container scrollable modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
+            <div class="sidebar-notifications container scrollable modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
+                <Show when={show()} fallback={
+                    <For each={unread()}>
+                        {(notification: NotificationWithMeta) => {
+                            return (
+                                <NotificationCard notification={notification} notification_controller={props.notification_controller}/>
+                            )
+                        }}
+                    </For>
+                }>
                     <For each={all_notifications()}>
                         {(notification: NotificationWithMeta) => {
                             return (
@@ -142,8 +152,47 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
                             )
                         }}
                     </For>
-                </div>
-            </Show>
+                </Show>
+            </div>
         </div>
+    )
+}
+
+export const NotificationPopupHolder = (props: {notification_controller: NotificationController, notifications: NotificationWithMeta[], pos: Vector2}) => {
+    const [show, setShow] = createSignal(false);
+    const [changingState, setChangingState] = createSignal(false);
+
+    const unread = createMemo(() => props.notifications.filter(n => !n.read));
+    // const history = createMemo(() => all_notifications().filter(n => n.read));
+
+    return (
+        <Show when={unread().length > 0}>
+            <div
+                onPointerDown={(e) => {e.stopPropagation();}}
+                onWheel={(e) => {e.stopPropagation();}}
+                class="fill container sidebar-notification-holder"
+                style={{
+                    "pointer-events": "auto",
+                    position: "absolute",
+                    transform: `translate(${props.pos.x}px, ${props.pos.y}px)`,
+                    "z-index": 2
+                }}
+            >
+                <div class="fill popup-notifications container modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
+                    <For each={unread()}>
+                        {(notification: NotificationWithMeta) => {
+                            return (
+                                <NotificationCard 
+                                    is_popup={true} 
+                                    notification={notification} 
+                                    notification_controller={props.notification_controller}
+                                />
+                            )
+                        }}
+                    </For>
+                </div>
+            </div>
+        </Show>
+
     )
 }

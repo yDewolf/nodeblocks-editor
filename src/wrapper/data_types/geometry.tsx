@@ -24,6 +24,20 @@ export class Rect {
     get offset() { return this._offset(); }
     get size() { return this._size(); }
 
+    get center() {
+        return {
+            x: (this.offset.x + this.size.x) / 2,
+            y: (this.offset.y + this.size.y) / 2,
+        }
+    }
+
+    get relative_center() {
+        return {
+            x: (this.size.x) / 2,
+            y: (this.size.y) / 2,
+        }
+    }
+
     set offset(offset: Vector2) { this._setOffset(offset); }
     set size(size: Vector2) { this._setSize(size); }
 

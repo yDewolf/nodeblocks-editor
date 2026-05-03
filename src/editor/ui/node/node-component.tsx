@@ -7,11 +7,16 @@ import { EditorCamera } from "~/editor/internal/editor-space";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeOutput } from './output/node-output';
 import { UserWorkspace } from "~/network/session/user-workspace";
+import { NotificationPopupHolder } from '../misc/notification/notification-badges';
+import { NotificationController } from "~/network/controllers/notification_controller";
+import { NotificationLevel, NotificationTarget } from "~/network/websocket/requests/notifications";
+import { ServerMessages } from "~/network/websocket/websocket-protocol";
 
 export const NodeComponent = (props: { 
     node: GraphNode, 
     camera: EditorCamera,
-    workspace: UserWorkspace, 
+    workspace: UserWorkspace,
+    notification_controller: NotificationController,
     onClick: (node: GraphNode) => void, 
     onClickOnSlot: (slot: NodeSlot) => void, 
     onHoverNode: (node: GraphNode) => void, 
@@ -62,7 +67,12 @@ export const NodeComponent = (props: {
                         "current-step": props.node.is_current_step
                     }}
                     class="node"
-                >
+                >   
+                    <NotificationPopupHolder 
+                        notification_controller={props.notification_controller}
+                        notifications={props.notification_controller.forNode(props.node.id)}
+                        pos={{x: 0, y: props.node.rect.size.y}}
+                    />
                     <div class="node-slots">
                         <NodeAnchor anchor_pos={{x: 0, y: -1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
                         <div class="side-anchors">

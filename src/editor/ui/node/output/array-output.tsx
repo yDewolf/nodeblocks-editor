@@ -7,6 +7,10 @@ const ArrayCanvas = (props: { data: any[], shape: number[] }) => {
         if (!canvasRef) return;
         const ctx = canvasRef.getContext('2d');
         if (!ctx) return;
+        if (!(props.data instanceof Array)) {
+            console.log(props.shape);
+            return;
+        }
 
         const [h, w, c] = props.shape.length === 1 ? [1, props.shape[0], 1] : 
                           props.shape.length === 2 ? [props.shape[0], props.shape[1], 1] :
@@ -78,10 +82,12 @@ export const ArrayView = (props: { output_value: any | undefined }) => {
             <div class="array-info">Shape: ({shape().join(", ")})</div>
             
             <Switch fallback={<div class="text-preview">{JSON.stringify(props.output_value).slice(0, 100)}...</div>}>
+                <Match when={dims() == 0}>
+                    <span>{props.output_value}</span>
+                </Match>
                 <Match when={dims() <= 3}>
                     <ArrayCanvas data={props.output_value} shape={shape()} />
                 </Match>
-                
                 <Match when={dims() > 3}>
                     <div class="simplified-view">
                         High-dimensional tensor. 

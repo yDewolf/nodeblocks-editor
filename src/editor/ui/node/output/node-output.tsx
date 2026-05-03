@@ -3,7 +3,7 @@ import { DataTypes } from "~/wrapper/nodes/data/node-data-type";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { ArrayView } from "./array-output";
 
-const ScalarView = (props: { output_value: any | undefined }) => {
+export const ScalarView = (props: { output_value: any | undefined }) => {
     // console.log("Scalar: ", props.value_map);
     return (<span class="node-output output-text">{String(props.output_value)}</span>)
 };

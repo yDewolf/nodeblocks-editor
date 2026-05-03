@@ -4,10 +4,6 @@ div {
     border-radius: var(--default-border-radius);
 }
 
-.fill {
-    width: 100%;
-}
-
 .row-container, .container {
     gap: 4px;
     display: flex;
@@ -94,6 +90,10 @@ img.small-icon {
 
 .expand-icon.expanded {
     transform: scaleY(-1);
+}
+
+.fill {
+    width: 100%;
 }
 
 @media only screen and (max-width: 768px) {

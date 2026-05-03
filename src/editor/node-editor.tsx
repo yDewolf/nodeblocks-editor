@@ -267,6 +267,7 @@ export class NodeEditor {
             this.scene_controller.node_controller.nodes.forEach((node: GraphNode) => {
                 node.is_current_step = false;
             })
+            // console.log(message);
             const node = this.scene_controller.node_controller.get_node(message.node_id);
             if (node == undefined) {
                 console.error("ERROR: Couldn't find node with id ", message.node_id);
@@ -383,6 +384,7 @@ export class NodeEditor {
                         <For each={this.scene_controller.node_controller.nodes}>
                             {(node) => <NodeComponent 
                                     node={node}
+                                    notification_controller={this._session_controller.notification_controller}
                                     workspace={this._session_controller.user_workspace}
                                     camera={this.editor_space.camera}
                                     onClick={(node: GraphNode) => {
