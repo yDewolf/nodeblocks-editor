@@ -59,16 +59,18 @@ export const NotificationCard = (props: {notification: NotificationWithMeta, not
                     </Show>
                 </div>
                 <div class="row-container">
-                    <Show when={props.notification.target != NotificationTarget.UNSPECIFIED} 
-                        fallback={
-                            <button class="icon-button small-icon" onclick={mark_as_read}>
-                                <img src="public/assets/icons/checkmark.svg" alt="Read" />
+                    <Show when={!props.notification.read}>
+                        <Show when={props.notification.target != NotificationTarget.UNSPECIFIED} 
+                            fallback={
+                                <button class="icon-button small-icon" onclick={mark_as_read}>
+                                    <img src="public/assets/icons/checkmark.svg" alt="Read" />
+                                </button>
+                            }
+                            >
+                            <button class="icon-button small-icon" onclick={goto_root}>
+                                <img src="public/assets/icons/arrow-right.svg" alt=">" />
                             </button>
-                        }
-                    >
-                        <button class="icon-button small-icon" onclick={goto_root}>
-                            <img src="public/assets/icons/arrow-right.svg" alt=">" />
-                        </button>
+                        </Show>
                     </Show>
                     <Show when={props.notification.description != undefined}>
                         <button class="icon-button small-icon" onclick={() => {if (!expanded()) setExpanded(true); else {setExpanded(false)}}}>

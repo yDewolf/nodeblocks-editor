@@ -26,7 +26,7 @@ export const ServerPanel = (props: {editor: NodeEditor, state_controller: StateC
     return (
         <div class="container">
             <div class="container">
-                <div class="keep row-container">
+                <div class="keep row-container space-between">
                     <div class="keep row-container">
                         <StatePanel state_controller={props.state_controller}/>
                         <Switch>
@@ -40,8 +40,8 @@ export const ServerPanel = (props: {editor: NodeEditor, state_controller: StateC
                             <Match when={
                                 props.state_controller.loop_state == LoopStates.WAIT_RESUME && props.state_controller.instance_state == InstanceStates.RUNNING
                             }>
-                                <button class="icon-button" onclick={() => {props.editor._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.STEP}})}}>
-                                    <img src="assets/icons/skip-forward.svg" alt="Step" title="Step"/>
+                                <button class="icon-button" onclick={() => {props.editor._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.RESUME}})}}>
+                                    <img src="assets/icons/skip-forward.svg" alt="Resume" title="Resume"/>
                                 </button>
                             </Match>
                         </Switch>
@@ -49,6 +49,16 @@ export const ServerPanel = (props: {editor: NodeEditor, state_controller: StateC
                     <ServerStatus status_controller={props.editor._status_controller}/>
                 </div>
                 <div class="control-panel keep row-container">
+                    <select name="" id="" onInput={(e) => {
+                        props.editor._editor_client.sendCommand({
+                            type: ClientMessages.SET_INSTANCE_LOOP_STATE,
+                            payload: {state: e.currentTarget.value as LoopStates}
+                        });
+                    }}>
+                        <option value={LoopStates.WAIT_STEP}>Step</option>
+                        <option value={LoopStates.WAIT_RESUME}>Resume</option>
+                        <option value={LoopStates.AUTO_LOOP}>Auto Loop</option>
+                    </select>
                     <button class="icon-button" onclick={() => {props.editor._sync_controller.send_local_scene()}}>
                         <img src="assets/icons/send-file.svg" alt="Upload Scene" title="Upload Scene"/>
                     </button>

@@ -277,7 +277,7 @@ export class NodeEditor {
                     return [slot_name, slot_output];
                 })
             );
-            console.log(message);
+            // console.log(message);
             node_output.forEach((value, slot_name) => {
                 const slot = node.get_slot(slot_name);
                 if (slot) {
