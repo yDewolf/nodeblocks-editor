@@ -407,7 +407,7 @@ export class NodeEditor {
                     </div>
                 </div>
                 
-                <div class="editor-ui keep row-container" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
+                <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
                     <div class="left-tab-holder container">
                         <EditorLeftTab selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
                         <FileExplorer workspace={this._session_controller.user_workspace}/>
@@ -420,7 +420,7 @@ export class NodeEditor {
                             {this.tool_controller.View()}
                         </div>
                     </div>
-                    <div class="right-tab container">
+                    <div class="right-tab container padded">
                         <ServerPanel editor={this} state_controller={this._state_controller}/>
                     </div>
                 </div>

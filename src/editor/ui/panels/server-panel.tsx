@@ -24,7 +24,7 @@ export const ServerStatus = (props: {status_controller: WebsocketStatusControlle
 
 export const ServerPanel = (props: {editor: NodeEditor, state_controller: StateController}) => {
     return (
-        <div class="container padded">
+        <div class="container">
             <div class="container">
                 <div class="keep row-container">
                     <div class="keep row-container">

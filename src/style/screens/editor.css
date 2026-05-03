@@ -13,19 +13,21 @@
 
   pointer-events: none;
 
+  display: grid;
+  grid-template-columns: auto 3fr 1fr;
   position: absolute;
   width: 100vw;
   height: 100vh;
 }
 
 .left-tab, .right-tab, .middle-tab {
+  width: auto;
   pointer-events: auto;
 }
 
 
 .right-tab {
   align-items: end;
-  width: 30%;
   pointer-events: none;
 
   * {
@@ -37,9 +39,7 @@
 .left-tab-holder {
   padding: 10px;
   gap: 10px;
-
-  width: fit-content;
-  min-width: 300px;
+  width: 300px;
 }
 
 .left-tab {
@@ -51,8 +51,7 @@
 
 .middle-tab-holder {
     display: grid;
-    width: 80%;
-    padding: 20px;
+    padding: 20px 5px;
 }
 
 .middle-tab {
