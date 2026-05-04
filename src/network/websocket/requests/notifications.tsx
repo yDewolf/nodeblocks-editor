@@ -31,6 +31,13 @@ export interface ServerNotification {
     extra_data?: Record<string, any>;
 }
 
+export type NotificationWithMeta = ServerNotification & {
+    read: boolean,
+    timestamp: number,
+    count: number,
+    is_virtual: boolean
+}
+
 // export type ServerNotification = 
 //     | { type: ServerMessages.NOTIFICATION; target: NotificationTarget.UNSPECIFIED; uid: string; level: NotificationLevel, message: string, extra_data?: {[key: string]: any}}
 //     | { type: ServerMessages.NOTIFICATION; target: NotificationTarget.NODE; node_uid: string; uid: string; level: NotificationLevel, message: string, extra_data?: {[key: string]: any}}

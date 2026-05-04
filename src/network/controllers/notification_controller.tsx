@@ -1,16 +1,10 @@
 import { NodeServerClient } from "../websocket/websocket-handler";
-import { ServerMessages } from "../websocket/websocket-protocol";
-import { isConnNotify, isNodeNotify, isParamNotify, isSlotNotify, NotificationLevel, NotificationTarget, ServerNotification } from '../websocket/requests/notifications';
+import { ClientMessages, ServerMessages } from "../websocket/websocket-protocol";
+import { isConnNotify, isNodeNotify, isParamNotify, isSlotNotify, NotificationLevel, NotificationTarget, NotificationWithMeta, ServerNotification } from '../websocket/requests/notifications';
 import { createStore, produce, SetStoreFunction } from "solid-js/store";
 import { NodeEditor } from "~/editor/node-editor";
-import { Rect, Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/wrapper/data_types/geometry";
 
-export type NotificationWithMeta = ServerNotification & {
-    read: boolean,
-    timestamp: number,
-    count: number,
-    is_virtual: boolean
-}
 
 type NotificationStore = {
     nodes: Record<string, NotificationWithMeta[]>;
@@ -40,8 +34,19 @@ export class NotificationController {
         this._set_notifications = setNotifications;
 
         this._client = client;
-        this._client.add_handler(ServerMessages.NOTIFICATION, this.handle_notification);
-        
+        this._client.add_handler(ServerMessages.HANDSHAKE_SYNC, (message) => {
+            if ("reconnection" in message) {
+                if (message.reconnection) this._client.sendCommand({type: ClientMessages.SYNC_NOTIFICATIONS});
+            }
+        })
+
+        this._client.add_handler(ServerMessages.NOTIFICATION, this._handle_notification);
+        this._client.add_handler(ServerMessages.SYNC_NOTIFICATIONS, (message) => {
+            message.notifications.forEach((notification) => {
+                this._handle_notification(notification);
+            });
+        });
+
         this._setup_virtual_notifications();
     }
 
@@ -68,10 +73,11 @@ export class NotificationController {
     }
 
     public send_virtual_notification = (msg: ServerNotification) => {
-        this.handle_notification(msg, true);
+        this._handle_notification(msg, true);
     }
 
-    private handle_notification = (msg: ServerNotification, is_virtual: boolean = false) => {
+    
+    private _handle_notification = (msg: ServerNotification, is_virtual: boolean = false) => {
         if (this.ignored_level.includes(msg.level)) return;
         
         this._set_notifications(produce((state) => {
@@ -125,36 +131,6 @@ export class NotificationController {
         }));
     }
 
-    public forNode(node_uid: string) {
-        return this._notifications.nodes[node_uid] || [];
-    }
-
-    public forSlot(node_uid: string, slot_name: string) {
-        return this._notifications.slots[`${node_uid}:${slot_name}`] || [];
-    }
-
-    public forParam(node_uid: string, param_name: string) {
-        return this._notifications.parameters[`${node_uid}:${param_name}`] || [];
-    }
-    
-    public forConn(conn_uid: string) {
-        return this._notifications.connections[conn_uid] || [];
-    }
-
-    public forGlobal() {
-        return this._notifications.global || [];
-    }
-
-    public forAll() {
-        return [
-            ...this.forGlobal(),
-            ...Object.values(this._notifications.nodes).flat(),
-            ...Object.values(this._notifications.slots).flat(),
-            ...Object.values(this._notifications.parameters).flat(),
-            ...Object.values(this._notifications.connections).flat(),
-        ]
-    }
-
     public clear_notifications() {
         this._set_notifications({ nodes: {}, slots: {}, parameters: {}, connections: {}, global: [] });
     }
@@ -167,6 +143,7 @@ export class NotificationController {
             notification.target == NotificationTarget.CONNECTION ? "connections" :
             notification.target == NotificationTarget.PARAMETER ? "parameters" : "global"
         ;
+        
         if (target_mapping == "global") {
             this._set_notifications(
                 target_mapping, 
@@ -175,11 +152,15 @@ export class NotificationController {
                     n.read = true;
                 })
             );
-            return;
+        } else {
+            this._set_notifications(
+                target_mapping, this.get_notification_key(notification), (n) => n.uid === notification.uid, "read", true
+            )
         }
-        this._set_notifications(
-            target_mapping, this.get_notification_key(notification), (n) => n.uid === notification.uid, "read", true
-        )
+
+        this._client.sendCommand({type: ClientMessages.UPDATE_NOTIFICATION,
+            payload: notification
+        });
     }
 
     public markAllAsRead() {
@@ -189,6 +170,7 @@ export class NotificationController {
         }));
     }
 
+    
     public get_notification_key(notification: ServerNotification): string {
         if (isNodeNotify(notification)) return notification.node_uid!;
         if (isSlotNotify(notification)) return `${notification.node_uid}:${notification.slot_name}`;
@@ -228,5 +210,35 @@ export class NotificationController {
                 this._editor.editor_space.teleport_to_pos(medium);
             }
         }
+    }
+
+    public forNode(node_uid: string) {
+        return this._notifications.nodes[node_uid] || [];
+    }
+
+    public forSlot(node_uid: string, slot_name: string) {
+        return this._notifications.slots[`${node_uid}:${slot_name}`] || [];
+    }
+
+    public forParam(node_uid: string, param_name: string) {
+        return this._notifications.parameters[`${node_uid}:${param_name}`] || [];
+    }
+    
+    public forConn(conn_uid: string) {
+        return this._notifications.connections[conn_uid] || [];
+    }
+
+    public forGlobal() {
+        return this._notifications.global || [];
+    }
+
+    public forAll() {
+        return [
+            ...this.forGlobal(),
+            ...Object.values(this._notifications.nodes).flat(),
+            ...Object.values(this._notifications.slots).flat(),
+            ...Object.values(this._notifications.parameters).flat(),
+            ...Object.values(this._notifications.connections).flat(),
+        ]
     }
 }

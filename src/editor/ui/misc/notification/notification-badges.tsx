@@ -1,6 +1,6 @@
-import { Accessor, createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
-import { NotificationController, NotificationWithMeta } from "~/network/controllers/notification_controller";
-import { NotificationLevel, NotificationTarget, ServerNotification } from "~/network/websocket/requests/notifications";
+import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
+import { NotificationController } from "~/network/controllers/notification_controller";
+import { NotificationLevel, NotificationTarget, NotificationWithMeta, ServerNotification } from "~/network/websocket/requests/notifications";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 
 const NotificationIcon = (props: {level: NotificationLevel}) => {
@@ -159,9 +159,6 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
 }
 
 export const NotificationPopupHolder = (props: {notification_controller: NotificationController, notifications: NotificationWithMeta[], pos: Vector2}) => {
-    const [show, setShow] = createSignal(false);
-    const [changingState, setChangingState] = createSignal(false);
-
     const unread = createMemo(() => props.notifications.filter(n => !n.read));
     // const history = createMemo(() => all_notifications().filter(n => n.read));
 
@@ -178,7 +175,7 @@ export const NotificationPopupHolder = (props: {notification_controller: Notific
                     "z-index": 2
                 }}
             >
-                <div class="fill popup-notifications container modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
+                <div class="fill popup-notifications container modal-content">
                     <For each={unread()}>
                         {(notification: NotificationWithMeta) => {
                             return (
@@ -193,6 +190,5 @@ export const NotificationPopupHolder = (props: {notification_controller: Notific
                 </div>
             </div>
         </Show>
-
     )
 }
