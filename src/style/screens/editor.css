@@ -1,6 +1,6 @@
 @import url("~/style/panels/import.css");
 @import url("~/style/misc/misc.css");
-@import url("~/style/notifications.css");
+@import url("~/style/components/notifications.css");
 
 .viewport {
   z-index: 1;
@@ -41,6 +41,7 @@
   padding: 10px;
   gap: 10px;
   width: 300px;
+  max-height: calc(100vh - 20px);
 }
 
 .left-tab {
