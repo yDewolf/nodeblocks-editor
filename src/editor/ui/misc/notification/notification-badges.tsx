@@ -1,4 +1,5 @@
 import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
+import { timeSignal } from "~/editor/utils/time-ticker";
 import { NotificationController } from "~/network/controllers/notification_controller";
 import { NotificationLevel, NotificationTarget, NotificationWithMeta, ServerNotification } from "~/network/websocket/requests/notifications";
 import { Vector2 } from "~/wrapper/data_types/geometry";
@@ -76,9 +77,11 @@ export const NotificationCard = (props: {notification: NotificationWithMeta, not
                                 </Show>
                             }
                             >
-                            <button class="icon-button small-icon" onclick={goto_root}>
-                                <img src="public/assets/icons/arrow-right.svg" alt=">" />
-                            </button>
+                            <Show when={!props.is_popup}>
+                                <button class="icon-button small-icon" onclick={goto_root}>
+                                    <img src="public/assets/icons/arrow-right.svg" alt=">" />
+                                </button>
+                            </Show>
                         </Show>
                         <Show when={props.notification.description != undefined}>
                             <button class="icon-button small-icon" onclick={() => {if (!expanded()) setExpanded(true); else {setExpanded(false)}}}>
@@ -116,9 +119,10 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
         ].sort((a, b) => b.timestamp - a.timestamp);
     });
 
-    const unread = createMemo(() => all_notifications().filter(n => !n.read));
-    // const history = createMemo(() => all_notifications().filter(n => n.read));
-
+    const time_to_disappear_ms: number = 15 * 1000
+    const recent_notifications = createMemo(() => all_notifications().filter(
+        n => n.timestamp > timeSignal() - time_to_disappear_ms
+    ));
     return (
         <div class="keep container sidebar-notification-holder">
             <div class="keep row-container" style={{"align-items": "center"}}>
@@ -126,8 +130,8 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
                     <button classList={{"active": show()}} class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => {if (!show()) setShow(true); else delayed_set_show(false);}}>
                         <img src="assets/icons/notification/notification-bell.svg" alt="Open" />
                     </button>
-                    <Show when={unread().length > 0}>
-                        <span>{unread().length}</span>
+                    <Show when={recent_notifications().length > 0}>
+                        <span>{recent_notifications().length}</span>
                     </Show>
                 </div>
                 <Show when={show()}>
@@ -137,7 +141,7 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
             {/* Notification List */}
             <div class="sidebar-notifications container scrollable modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
                 <Show when={show()} fallback={
-                    <For each={unread()}>
+                    <For each={recent_notifications()}>
                         {(notification: NotificationWithMeta) => {
                             return (
                                 <NotificationCard notification={notification} notification_controller={props.notification_controller}/>
