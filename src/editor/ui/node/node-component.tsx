@@ -115,7 +115,6 @@ export const NodeComponent = (props: {
                                 </For>
                                 {/* <div class="node-internal-data"> ... </div> */}
                             </div>
-
                             <NodeOutput node={props.node}/>
                         </div>
                     </div>

@@ -1,6 +1,22 @@
+.output-displayer {
+    margin-top: 10px;
+    gap: 5px;
+}
+
+.output-selector {
+
+}
+
+.output-select-button {
+    border: none;
+    background-color: var(--light-main-color);
+}
+
+.output-select-button.active {
+    background-color: var(--main-color);
+}
 
 .node-output-container {
-    margin-top: 10px;
     display: flex;
     justify-content: center;
 }
@@ -13,9 +29,19 @@
 }
 
 .slot-output {
-    margin-bottom: 10px;
+    /* width: 100px; */
     display: none;
 }
+
+/* .slot-output:hover {
+    display: block;
+}
+
+.slot-dot:hover {
+    .slot-output {
+        display: block;
+    }
+} */
 
 .output-array-container {
     width: 100%;

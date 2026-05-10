@@ -18,9 +18,11 @@ export class GraphNode extends BaseNode {
     private _last_output: () => Map<string, Map<string, any>>;
     private _set_last_output: (out: Map<string, Map<string, any>>) => void;
 
+    private _target_slot_output: () => string | undefined;
+    private _set_target_slot_output: (slot_name: string) => void;
+
     private _is_current_step: () => boolean;
     private _set_current_step: (v: boolean) => void;
-
 
     private raw_pos: Vector2;
     private _slots: Map<SuperSlotTypes, NodeSlot[]> = new Map<SuperSlotTypes, NodeSlot[]>;
@@ -50,6 +52,10 @@ export class GraphNode extends BaseNode {
         this._last_output = lastOutput;
         this._set_last_output = setLastOutput;
 
+        const [targetSlotOutput, setTargetSlotOutput] = createSignal(undefined);
+        this._target_slot_output = targetSlotOutput;
+        this._set_target_slot_output = setTargetSlotOutput;
+
         const [currentStep, setCurrentStep] = createSignal(false);
         this._is_current_step = currentStep;
         this._set_current_step = setCurrentStep
@@ -73,8 +79,18 @@ export class GraphNode extends BaseNode {
     get is_current_step() { return this._is_current_step() }
     set is_current_step(v: boolean) { this._set_current_step(v) }
 
+    get target_slot_output() { return this._target_slot_output() }
+    set target_slot_output(out: any) { this._set_target_slot_output(out); }
+
     get last_output() { return this._last_output() }
-    set last_output(output: Map<string, Map<string, any>>) { this._set_last_output(output) }
+    set last_output(output: Map<string, Map<string, any>>) { 
+        this._set_last_output(output) 
+        if (this.target_slot_output == undefined) {
+            const output_slots = this.slots.get(SuperSlotTypes.OUTPUT);
+            if (!output_slots) return;
+            this.target_slot_output = output_slots[0].slot_name;
+        }
+    }
 
     get node_data() { return this._node_data(); }
     set node_data(data: NodeData) { this._set_node_data(data); }

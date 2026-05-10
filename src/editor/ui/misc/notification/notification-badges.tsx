@@ -135,25 +135,27 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
                 </Show>
             </div>
             {/* Notification List */}
-            <div class="sidebar-notifications container scrollable modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
-                <Show when={show()} fallback={
-                    <For each={recent_notifications()}>
-                        {(notification: NotificationWithMeta) => {
-                            return (
-                                <NotificationCard notification={notification} notification_controller={props.notification_controller}/>
-                            )
-                        }}
-                    </For>
-                }>
-                    <For each={all_notifications()}>
-                        {(notification: NotificationWithMeta) => {
-                            return (
-                                <NotificationCard notification={notification} notification_controller={props.notification_controller}/>
-                            )
-                        }}
-                    </For>
-                </Show>
-            </div>
+            <Show when={recent_notifications().length > 0 || all_notifications().length > 0 && show()}>
+                <div class="sidebar-notifications container scrollable modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
+                    <Show when={show()} fallback={
+                        <For each={recent_notifications()}>
+                            {(notification: NotificationWithMeta) => {
+                                return (
+                                    <NotificationCard notification={notification} notification_controller={props.notification_controller}/>
+                                )
+                            }}
+                        </For>
+                    }>
+                        <For each={all_notifications()}>
+                            {(notification: NotificationWithMeta) => {
+                                return (
+                                    <NotificationCard notification={notification} notification_controller={props.notification_controller}/>
+                                )
+                            }}
+                        </For>
+                    </Show>
+                </div>
+            </Show>
         </div>
     )
 }
