@@ -2,12 +2,7 @@ import { createMemo, Match, Switch } from "solid-js";
 import { DataTypes } from "~/wrapper/nodes/data/node-data-type";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { ArrayView } from "./array-output";
-
-export const ScalarView = (props: { output_value: any | undefined }) => {
-    // console.log("Scalar: ", props.value_map);
-    return (<span class="node-output output-text">{String(props.output_value)}</span>)
-};
-
+import { ScalarView } from "./scalar-output";
 
 export const NodeOutput = (props: {node: GraphNode}) => {
     // Output do node: props.node.last_output (Map<NodeSlot, any>)
