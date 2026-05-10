@@ -68,20 +68,16 @@ export const NotificationCard = (props: {notification: NotificationWithMeta, not
                 </div>
                 <Show when={!is_compressed()}>
                     <div class="row-container">
-                        <Show when={props.notification.target != NotificationTarget.UNSPECIFIED} 
-                            fallback={
-                                <Show when={!props.notification.read}>
-                                    <button class="icon-button small-icon" onclick={mark_as_read}>
-                                        <img src="public/assets/icons/checkmark.svg" alt="Read" />
-                                    </button>
-                                </Show>
-                            }
-                            >
-                            <Show when={!props.is_popup}>
-                                <button class="icon-button small-icon" onclick={goto_root}>
-                                    <img src="public/assets/icons/arrow-right.svg" alt=">" />
+                        <Show when={!props.is_popup && props.notification.target != NotificationTarget.UNSPECIFIED} fallback={
+                            <Show when={!props.notification.read}>
+                                <button class="icon-button small-icon" onclick={mark_as_read}>
+                                    <img src="public/assets/icons/checkmark.svg" alt="Read" />
                                 </button>
                             </Show>
+                        }>
+                            <button class="icon-button small-icon" onclick={goto_root}>
+                                <img src="public/assets/icons/arrow-right.svg" alt=">" />
+                            </button>
                         </Show>
                         <Show when={props.notification.description != undefined}>
                             <button class="icon-button small-icon" onclick={() => {if (!expanded()) setExpanded(true); else {setExpanded(false)}}}>
@@ -121,7 +117,7 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
 
     const time_to_disappear_ms: number = 15 * 1000
     const recent_notifications = createMemo(() => all_notifications().filter(
-        n => n.timestamp > timeSignal() - time_to_disappear_ms
+        n => n.timestamp > timeSignal() - time_to_disappear_ms && !n.read
     ));
     return (
         <div class="keep container sidebar-notification-holder">

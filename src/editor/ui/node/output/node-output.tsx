@@ -23,7 +23,7 @@ export const NodeOutput = (props: {node: GraphNode}) => {
 
     const outputType = createMemo(() => {
         const out = firstOutput();
-        if (!out) return DataTypes.UNKNOWN;
+        if (!out) return undefined;
         const slot = props.node.get_slot(out[0])
 
         return slot?.data_type.super_type ?? DataTypes.UNKNOWN;
@@ -46,6 +46,9 @@ export const NodeOutput = (props: {node: GraphNode}) => {
 
                 <Match when={outputType() === DataTypes.CUSTOM}>
                     <div class="custom-view">JSON: {JSON.stringify(firstOutput()?.[1])}</div>
+                </Match>
+                <Match when={outputType() === DataTypes.UNKNOWN}>
+                    <span>Can't render Unknown Type</span>
                 </Match>
             </Switch>
         </div>
