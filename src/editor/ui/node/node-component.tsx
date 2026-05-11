@@ -9,8 +9,6 @@ import { NodeOutput } from './output/node-output';
 import { UserWorkspace } from "~/network/session/user-workspace";
 import { NotificationPopupHolder } from '../misc/notification/notification-badges';
 import { NotificationController } from "~/network/controllers/notification_controller";
-import { NotificationLevel, NotificationTarget } from "~/network/websocket/requests/notifications";
-import { ServerMessages } from "~/network/websocket/websocket-protocol";
 
 export const NodeComponent = (props: { 
     node: GraphNode, 
@@ -23,23 +21,23 @@ export const NodeComponent = (props: {
     onHoverSlot: (slot: NodeSlot) => void,
     syncParameter: (node: GraphNode, parameter: NodeParameter) => void
 }) => {
-    let ro: ResizeObserver | undefined;
-    const handleRef = (el: HTMLDivElement) => {
-        const rect = el.getBoundingClientRect();
-        props.node.updateSize(rect.width / props.camera.zoom, rect.height / props.camera.zoom);
-
-        ro = new ResizeObserver((entries) => {
-            const entry = entries[0];
-            if (entry) {
+    const ro = new ResizeObserver((entries) => {
+        const entry = entries[0];
+        if (entry) {
+            setTimeout(() => {
                 props.node.updateSize(
                     entry.contentRect.width, 
                     entry.contentRect.height
                 );
-            }
-        });
+            }, 0)
+        }
+    });
+    const handleRef = (el: HTMLDivElement) => {
+        const rect = el.getBoundingClientRect();
+        props.node.updateSize(rect.width / props.camera.zoom, rect.height / props.camera.zoom);
+
         ro.observe(el);
     };
-
     onCleanup(() => ro?.disconnect());
 
     const isVisible = createMemo(() => {
@@ -49,7 +47,7 @@ export const NodeComponent = (props: {
     return (
             <Show when={isVisible()}>
                 <div 
-                    ref={handleRef}
+                    ref={(el) => handleRef(el)}
                     onMouseOver={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
