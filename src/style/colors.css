@@ -1,5 +1,10 @@
 :root {
-  --selection-color: #7bb4ff;
+  --main-color: #7bb4ff;
+  --light-main-color: #dcebfd;
+  --light-third-color: rgb(19, 21, 22);
+  --secondary-color: rgba(255, 255, 255, 0.651);
+
+  --selection-color: var(--main-color);
   --selection-color-alpha: #7bb4ff4d;
-  --node-selected-color: #dcebfd;
+  --node-selected-color: var(--light-main-color);
 }

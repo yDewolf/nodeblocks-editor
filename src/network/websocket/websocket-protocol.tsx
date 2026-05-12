@@ -30,16 +30,23 @@ export enum ClientMessages {
     NODE_ACTION = "NODE",
     CONNECTION_ACTION = "CONNECTION",
 
+    UPDATE_NOTIFICATION = "UPDATE_NOTIFICATION",
+    SYNC_NOTIFICATIONS = "SYNC_NOTIFICATIONS",
+
     INSTANCE_COMMAND = "INSTANCE"
 }
 
 export enum ServerMessages {
     HANDSHAKE_SYNC = "handshake_sync",
     NODE_OUTPUT = "node_output",
+    NOTIFICATION = "notification",
     SYNC_CLIENT_SCENE = "sync_client_scene",
     SYNC_INSTANCE_STATE = "sync_instance_state",
     SYNC_ACTION = "sync_action",
-    SYNC_FILES = "sync_files"
+    SYNC_FILES = "sync_files",
+    SYNC_NOTIFICATIONS = "sync_notifications",
+
+    CLOSE_SOCKET = "disconnect"
 }
 
 export enum WebsocketStatus {
@@ -54,9 +61,9 @@ export enum SceneActionTypes {
     UPDATE = "UPDATE"
 }
 
-// TODO: Implement this on server
 export enum EditorActionStatus {
     SUCCESSFULL = "SUCCESSFULL",
     UNSYNCED = "UNSYNCED",
     FAILED = "FAILED"
 }
+

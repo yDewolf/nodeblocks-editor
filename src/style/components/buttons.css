@@ -16,6 +16,10 @@
     padding: 4px;
 }
 
+.modal-button.active {
+    transform: scale(1.2);
+}
+
 .modal-content {
     overflow: hidden;
 }

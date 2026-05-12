@@ -132,6 +132,8 @@ export class NodeServerClient {
         console.log("Closing Socket")
         this.socket?.close(1000, "Closed Workspace");
         this.socket = null;
+        
+        this.handleMessage({type: ServerMessages.CLOSE_SOCKET});
     }
 
     public is_connected() {

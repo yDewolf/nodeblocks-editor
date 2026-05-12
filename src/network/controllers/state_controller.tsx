@@ -37,7 +37,6 @@ export class StateController {
     get loop_state() {return this._loop_state(); }
 
     public request_play() {
-        console.log(this._client);
         if (this._client) {
             this._client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.RUN}})
         }

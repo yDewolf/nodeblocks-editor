@@ -1,5 +1,5 @@
 import { EditorSpace } from "./internal/editor-space";
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { GraphNode } from "../wrapper/nodes/graph-node";
 import { NodeSlot } from '../wrapper/nodes/slot/node-slot';
 import { Vector2 } from '../wrapper/data_types/geometry';
@@ -26,6 +26,7 @@ import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { FileExplorer } from "./ui/panels/file/file-explorer";
 import { EditorLeftTab } from "./ui/panels/left-tab";
 import { SessionController } from "~/network/session/session-controller";
+import { SidebarNotifications } from "./ui/misc/notification/notification-badges";
 import "~/style/screens/editor.css";
 
 export class NodeEditor {
@@ -51,6 +52,7 @@ export class NodeEditor {
 
     constructor (session_controller: SessionController) {
         this._session_controller = session_controller;
+        this._session_controller.notification_controller._editor = this;
 
         this._state_controller = new StateController(this._editor_client);
         this._status_controller = new WebsocketStatusController(this._editor_client);
@@ -69,8 +71,9 @@ export class NodeEditor {
         this.editor_grid = new Grid({x: 32, y: 32});
 
         this.selection_controller = new SelectionController(this.editor_space, this.editor_grid, this);
-        
         this.tool_controller = new ToolController(this);
+
+        
         this.setup_event_handlers();
         this.setup_keybinds();
         this.setup_message_handlers();
@@ -125,7 +128,7 @@ export class NodeEditor {
             {just_activated: (data) => {
                 const e = data.event;
                 if (e instanceof PointerEvent) {
-                    const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
+                    // const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
     
                     this.tool_controller.current_tool?.onPointerDown(e);
@@ -264,6 +267,7 @@ export class NodeEditor {
             this.scene_controller.node_controller.nodes.forEach((node: GraphNode) => {
                 node.is_current_step = false;
             })
+            // console.log(message);
             const node = this.scene_controller.node_controller.get_node(message.node_id);
             if (node == undefined) {
                 console.error("ERROR: Couldn't find node with id ", message.node_id);
@@ -274,7 +278,7 @@ export class NodeEditor {
                     return [slot_name, slot_output];
                 })
             );
-            console.log(message);
+            // console.log(message);
             node_output.forEach((value, slot_name) => {
                 const slot = node.get_slot(slot_name);
                 if (slot) {
@@ -288,6 +292,22 @@ export class NodeEditor {
 
     public View() {
         let viewportRef: HTMLDivElement | undefined;
+        onMount(() => {
+            if (viewportRef) {
+                const rect = viewportRef.getBoundingClientRect();
+                this.editor_space.camera.size = { x: rect.width, y: rect.height };
+                const resizeObserver = new ResizeObserver((entries) => {
+                    for (let entry of entries) {
+                        const { width, height } = entry.contentRect;
+                        this.editor_space.camera.size = { x: width, y: height };
+                    }
+                });
+
+                resizeObserver.observe(viewportRef);
+                onCleanup(() => resizeObserver.disconnect());
+            }
+        });
+
         const selector = new NodeTypeSelector();
         return (
             <div 
@@ -295,6 +315,7 @@ export class NodeEditor {
                 onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
             >
                 <div 
+                    ref={viewportRef} 
                     class="viewport"
                     style={{
                         position: "absolute", 
@@ -331,11 +352,10 @@ export class NodeEditor {
                     
                     <div 
                         class="world-space"
-                        ref={viewportRef} 
                         style={{
-                            transform: `scale(${this.editor_space.camera.zoom}) translate(${-this.editor_space.camera.offset.x}px, ${-this.editor_space.camera.offset.y}px)`,
+                            "transform-origin": "0 0",
+                            transform: `translate(${-this.editor_space.camera.offset.x * this.editor_space.camera.zoom}px, ${-this.editor_space.camera.offset.y * this.editor_space.camera.zoom}px) scale(${this.editor_space.camera.zoom})`,
                             position: "absolute",
-                            "transform-origin": "0 0"
                         }}
                     >
                         <Show when={this.selection_controller.selection_rect.active}>
@@ -364,6 +384,7 @@ export class NodeEditor {
                         <For each={this.scene_controller.node_controller.nodes}>
                             {(node) => <NodeComponent 
                                     node={node}
+                                    notification_controller={this._session_controller.notification_controller}
                                     workspace={this._session_controller.user_workspace}
                                     camera={this.editor_space.camera}
                                     onClick={(node: GraphNode) => {
@@ -388,15 +409,20 @@ export class NodeEditor {
                     </div>
                 </div>
                 
-                <div class="editor-ui keep row-container" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
+                <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
                     <div class="left-tab-holder container">
                         <EditorLeftTab selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
                         <FileExplorer workspace={this._session_controller.user_workspace}/>
                     </div>
-                    <div class="middle-tab container">
-                        {this.tool_controller.View()}
+                    <div class="middle-tab-holder">
+                        <div class="middle-tab-overlay container">
+                            <SidebarNotifications notification_controller={this._session_controller.notification_controller}/>
+                        </div>
+                        <div class="middle-tab container">
+                            {this.tool_controller.View()}
+                        </div>
                     </div>
-                    <div class="right-tab container">
+                    <div class="right-tab container padded">
                         <ServerPanel editor={this} state_controller={this._state_controller}/>
                     </div>
                 </div>

@@ -1,0 +1,134 @@
+.sidebar-notification-holder {
+    user-select: none;
+}
+
+.sidebar-notifications {
+    gap: 8px;
+
+    pointer-events: auto;
+    width: 316px;
+    height: 100px;
+    animation: none;
+}
+
+@keyframes sidebarNotificationOpen {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.sidebar-notifications.modal-content.open {
+    animation: sidebarNotificationOpen 200ms !important;
+}
+
+.sidebar-notifications.modal-content.closing {
+    width: 0;
+    opacity: 0;
+    height: 100px !important;
+}
+
+.sidebar-notifications.modal-content.closing > .notification-badge {
+    transition: width 200ms;
+}
+
+@keyframes spawnNotification {
+    0% { width: 0; }
+    100% { width: 300px; }
+}
+
+@keyframes fadeOutFade {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+.notification-badge {
+    justify-content: space-between;
+    overflow-x: clip;
+    gap: 10px;
+    
+    width: -webkit-fill-available;
+    align-items: center;
+    background-color: #140f0f23;
+
+    .row-container {
+        gap: 0;
+    }
+}
+
+.notification-badge:hover {
+    opacity: 1 !important;
+}
+
+.notification-badge.popup {
+    width: fit-content;
+    animation: none !important;
+}
+
+.notification-header {
+}
+
+.notification-content {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 4px;
+
+    align-items: center;
+    
+    p {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        -webkit-line-break: 1;
+    }
+}
+
+.popup-notifications {
+    max-height: 80px;
+    overflow-y: scroll;
+
+    .icon-button {
+        img {
+            height: 20px;
+            width: 20px;
+        }
+    }
+}
+
+.notification-description {
+    color: rgb(51, 51, 54);
+}
+
+
+.notification-badge.error {
+    background-color: red;
+}
+
+.notification-badge.warning {
+    background-color: orange;
+}
+
+.notification-badge.debug {
+    background-color: green;
+}
+
+.notification-badge.info {
+    background-color: rgba(187, 187, 209, 0.205);
+}
+
+.notification-badge.read {
+    opacity: 1;
+    transform: scale(0.9);
+}
+
+.notification-badge.unread {
+    animation: fadeOutFade 30s forwards, spawnNotification 200ms linear;
+}
+
+.notification-badge.unread.fade-fast {
+    animation: fadeOutFade 10s forwards, spawnNotification 200ms linear;
+}
+
+.stack-counter {
+    font-size: 0.9rem;
+    font-weight: bold;
+}

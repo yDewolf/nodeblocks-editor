@@ -24,6 +24,20 @@ export class Rect {
     get offset() { return this._offset(); }
     get size() { return this._size(); }
 
+    get center() {
+        return {
+            x: (this.offset.x + this.size.x) / 2,
+            y: (this.offset.y + this.size.y) / 2,
+        }
+    }
+
+    get relative_center() {
+        return {
+            x: (this.size.x) / 2,
+            y: (this.size.y) / 2,
+        }
+    }
+
     set offset(offset: Vector2) { this._setOffset(offset); }
     set size(size: Vector2) { this._setSize(size); }
 
@@ -45,4 +59,20 @@ export class Rect {
         );
     }
     
+    
+    public static get_minimal_rect(rect_a: Rect, rect_b: Rect): Rect {
+        const top_left = {
+            x: rect_a.offset.x < rect_b.offset.x ? rect_a.offset.x : rect_b.offset.x,
+            y: rect_a.offset.y < rect_b.offset.y ? rect_a.offset.y : rect_b.offset.y
+        }
+        const rect_a_bottom_right = {x: (rect_a.offset.x + rect_a.size.x), y: (rect_a.offset.y + rect_a.size.y)}
+        const rect_b_bottom_right = {x: (rect_b.offset.x + rect_b.size.x), y: (rect_b.offset.y + rect_b.size.y)}
+
+        const bottom_right = {
+            x: rect_a_bottom_right.x > rect_b_bottom_right.x ? rect_a_bottom_right.x : rect_b_bottom_right.x, 
+            y: rect_a_bottom_right.y > rect_b_bottom_right.y ? rect_a_bottom_right.y : rect_b_bottom_right.y
+        }
+        
+        return new Rect(top_left, bottom_right);
+    }
 }

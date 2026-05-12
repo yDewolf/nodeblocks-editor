@@ -1,5 +1,6 @@
 @import url("~/style/panels/import.css");
 @import url("~/style/misc/misc.css");
+@import url("~/style/components/notifications.css");
 
 .viewport {
   z-index: 1;
@@ -12,19 +13,22 @@
 
   pointer-events: none;
 
+  display: grid;
+  grid-template-columns: auto 3fr 1fr;
   position: absolute;
   width: 100vw;
   height: 100vh;
+  max-height: 100vh;
 }
 
 .left-tab, .right-tab, .middle-tab {
+  width: auto;
   pointer-events: auto;
 }
 
 
 .right-tab {
   align-items: end;
-  width: 30%;
   pointer-events: none;
 
   * {
@@ -36,9 +40,8 @@
 .left-tab-holder {
   padding: 10px;
   gap: 10px;
-
-  width: fit-content;
-  min-width: 300px;
+  width: 300px;
+  max-height: calc(100vh - 20px);
 }
 
 .left-tab {
@@ -48,13 +51,28 @@
   background-color: rgba(28, 29, 37, 0.521);
 }
 
+.middle-tab-holder {
+    display: grid;
+    padding: 20px 5px;
+}
+
 .middle-tab {
   pointer-events: none;
 
-  padding: 20px;
-  width: 80%;
+  width: 100%;
+  height: 100%;
   flex-direction: column-reverse;
 }
+
+.middle-tab, .middle-tab-overlay {
+    grid-area: 1 / 1;
+}
+
+.middle-tab-overlay {
+    z-index: 3;
+    width: 100%;
+}
+
 
 .tool-selector {
   width: 100%;

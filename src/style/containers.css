@@ -4,10 +4,6 @@ div {
     border-radius: var(--default-border-radius);
 }
 
-.fill {
-    width: 100%;
-}
-
 .row-container, .container {
     gap: 4px;
     display: flex;
@@ -37,6 +33,20 @@ div {
 
     img {
         width: 100%;
+    }
+}
+
+.medium-icon {
+    width: 32px;
+}
+
+img.small-icon {
+    width: 28px;
+}
+
+.small-icon {
+    img {
+        width: 28px !important;
     }
 }
 
@@ -74,6 +84,17 @@ div {
     background-color: var(--selection-color);
 }
 
+.expand-icon {
+    transition: transform 100ms;
+}
+
+.expand-icon.expanded {
+    transform: scaleY(-1);
+}
+
+.fill {
+    width: 100%;
+}
 
 @media only screen and (max-width: 768px) {
     .row-container {

@@ -102,7 +102,7 @@ export class ConnectionController {
         const node_a = node_controller.get_node(node_a_path.node_id);
         const node_b = node_controller.get_node(node_b_path.node_id);
         if (!node_a || !node_b) {
-            console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
+            console.error("Couldn't find nodes. Paths:", node_a_path, node_b_path);
             return;
         }
 

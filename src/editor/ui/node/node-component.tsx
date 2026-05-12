@@ -7,34 +7,37 @@ import { EditorCamera } from "~/editor/internal/editor-space";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeOutput } from './output/node-output';
 import { UserWorkspace } from "~/network/session/user-workspace";
+import { NotificationPopupHolder } from '../misc/notification/notification-badges';
+import { NotificationController } from "~/network/controllers/notification_controller";
 
 export const NodeComponent = (props: { 
     node: GraphNode, 
     camera: EditorCamera,
-    workspace: UserWorkspace, 
+    workspace: UserWorkspace,
+    notification_controller: NotificationController,
     onClick: (node: GraphNode) => void, 
     onClickOnSlot: (slot: NodeSlot) => void, 
     onHoverNode: (node: GraphNode) => void, 
     onHoverSlot: (slot: NodeSlot) => void,
     syncParameter: (node: GraphNode, parameter: NodeParameter) => void
 }) => {
-    let ro: ResizeObserver | undefined;
-    const handleRef = (el: HTMLDivElement) => {
-        const rect = el.getBoundingClientRect();
-        props.node.updateSize(rect.width / props.camera.zoom, rect.height / props.camera.zoom);
-
-        ro = new ResizeObserver((entries) => {
-            const entry = entries[0];
-            if (entry) {
+    const ro = new ResizeObserver((entries) => {
+        const entry = entries[0];
+        if (entry) {
+            setTimeout(() => {
                 props.node.updateSize(
                     entry.contentRect.width, 
                     entry.contentRect.height
                 );
-            }
-        });
+            }, 0)
+        }
+    });
+    const handleRef = (el: HTMLDivElement) => {
+        const rect = el.getBoundingClientRect();
+        props.node.updateSize(rect.width / props.camera.zoom, rect.height / props.camera.zoom);
+
         ro.observe(el);
     };
-
     onCleanup(() => ro?.disconnect());
 
     const isVisible = createMemo(() => {
@@ -44,7 +47,7 @@ export const NodeComponent = (props: {
     return (
             <Show when={isVisible()}>
                 <div 
-                    ref={handleRef}
+                    ref={(el) => handleRef(el)}
                     onMouseOver={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -62,7 +65,12 @@ export const NodeComponent = (props: {
                         "current-step": props.node.is_current_step
                     }}
                     class="node"
-                >
+                >   
+                    <NotificationPopupHolder 
+                        notification_controller={props.notification_controller}
+                        notifications={props.notification_controller.forNode(props.node.id)}
+                        pos={{x: 0, y: props.node.rect.size.y}}
+                    />
                     <div class="node-slots">
                         <NodeAnchor anchor_pos={{x: 0, y: -1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
                         <div class="side-anchors">
@@ -105,7 +113,6 @@ export const NodeComponent = (props: {
                                 </For>
                                 {/* <div class="node-internal-data"> ... </div> */}
                             </div>
-
                             <NodeOutput node={props.node}/>
                         </div>
                     </div>

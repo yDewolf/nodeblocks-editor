@@ -2,6 +2,13 @@
 
 .node {
   width: fit-content;
+  min-width: 150px;
+  
+  display: grid;
+}
+
+.internal-node, .node-slots {
+  grid-area: 1 / 1;
 }
 
 .internal-node {
@@ -28,10 +35,8 @@
 }
 
 .node-slots {
+  z-index: 1;
   pointer-events: none;
-  position: absolute;
-  left: 0;
-  top: 0;
 
   justify-content: space-between;
   display: grid;

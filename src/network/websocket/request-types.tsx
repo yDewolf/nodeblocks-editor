@@ -1,5 +1,6 @@
 import { ConnectionSceneData, MinimalNodeSceneData } from "~/wrapper/helpers/node-scene-file";
 import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, EditorActionStatus, SceneActionTypes, ServerMessages, WebsocketStatus } from "./websocket-protocol";
+import { ServerNotification, NotificationWithMeta } from './requests/notifications';
 
 export type NodeSceneRequestData = {[uid: string]: MinimalNodeSceneData};
 export type ConnSceneRequestData = {[uid: string]: ConnectionSceneData};
@@ -17,12 +18,16 @@ export type ConnectionActionPayload =
     
 export type ServerMessage = 
     | { type: ServerMessages.NODE_OUTPUT; node_id: string; value: any }
+    // FIXME: handshake_sync is not fully type safe
     | { type: ServerMessages.HANDSHAKE_SYNC; status: number; session: string, type_data: any, reconnection: boolean}
     | { type: ServerMessages.HANDSHAKE_SYNC; status: number; message: string }
     | { type: ServerMessages.SYNC_CLIENT_SCENE; payload: any }
     | { type: ServerMessages.SYNC_INSTANCE_STATE; payload: {loop_state: any, instance_state: any} }
     | { type: ServerMessages.SYNC_ACTION; action_statuses: { [uid: string]: EditorActionStatus; }}
     | { type: ServerMessages.SYNC_FILES;}
+    | { type: ServerMessages.SYNC_NOTIFICATIONS; notifications: ServerNotification[]}
+    | { type: ServerMessages.CLOSE_SOCKET}
+    | ServerNotification
     
 
 export type ClientMessage = ClientCommand | ClientAction;
@@ -32,7 +37,9 @@ export type ClientCommand =
     | { type: ClientMessages.LOAD_SCENE; payload: any }
     | { type: ClientMessages.SYNC_CLIENT_SCENE }
     | { type: ClientMessages.SET_INSTANCE_LOOP_STATE; payload: { state: LoopStates } }
-    | { type: ClientMessages.SET_INSTANCE_STATE; payload: { state: InstanceStates } };
+    | { type: ClientMessages.SET_INSTANCE_STATE; payload: { state: InstanceStates } }
+    | { type: ClientMessages.UPDATE_NOTIFICATION; payload: NotificationWithMeta }
+    | { type: ClientMessages.SYNC_NOTIFICATIONS};
     
 export type ClientAction = 
     | { type: ClientMessages.NODE_ACTION, payload: NodeActionPayload, action_uid: string }
