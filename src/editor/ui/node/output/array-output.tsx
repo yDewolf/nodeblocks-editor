@@ -21,7 +21,7 @@ const ArrayCanvas = (props: { data: any[], shape: number[] }) => {
         canvasRef.width = w;
         canvasRef.height = h;
         
-        console.log([c, h, w], props.shape, props.data)
+        // console.log([c, h, w], props.shape, props.data)
         const imageData = ctx.createImageData(w, h);
         const data = c == 1 ? props.data[0] : props.data;
 

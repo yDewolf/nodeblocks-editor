@@ -100,12 +100,13 @@ export const NotificationCard = (props: {notification: NotificationWithMeta, not
 export const SidebarNotifications = (props: {notification_controller: NotificationController}) => {
     const [show, setShow] = createSignal(false);
     const [changingState, setChangingState] = createSignal(false);
+    const set_show_delay = 300;
     const delayed_set_show = (value: boolean) => {
         setChangingState(true);
         setTimeout(() => {
             setShow(value);
             setChangingState(false);
-        }, 300);
+        }, set_show_delay);
     }
 
     const all_notifications = createMemo(() => {
@@ -136,7 +137,11 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
             </div>
             {/* Notification List */}
             <Show when={recent_notifications().length > 0 || all_notifications().length > 0 && show()}>
-                <div class="sidebar-notifications container scrollable modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
+                <div 
+                    class="sidebar-notifications container scrollable modal-content" 
+                    classList={{"open": show(), "closing": show() && changingState()}}
+                    style={{"transition": `width ${set_show_delay}ms, opacity ${set_show_delay}ms;`}}
+                >
                     <Show when={show()} fallback={
                         <For each={recent_notifications()}>
                             {(notification: NotificationWithMeta) => {
