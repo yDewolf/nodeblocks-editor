@@ -4,6 +4,7 @@ import { batch, createSignal } from "solid-js";
 import { SceneData } from "./node-scene-file";
 import { BaseSlotType } from "../nodes/data/node-data-type";
 import { CustomSlotType } from "../nodes/data/custom-data-types";
+import { NodeMetadata } from "../nodes/data/node-metadata";
 
 interface TypeFile {
     version: number,
@@ -32,7 +33,7 @@ export interface NodeDataModel {
 }
 
 interface NodeTypesData {
-    description: string,
+    metadata: NodeMetadata,
     parameters: Map<string, NodeDataModel>
     slots: Map<string, SlotData>
 }
@@ -165,6 +166,7 @@ export class NodeTypeFile {
                 const node_data: NodeData = new NodeData(type_data.parameters);
                 const custom_type_constructor = new CustomNodeConstructor(
                     type_name,
+                    type_data.metadata,
                     node_data,
                     type_data.slots,
                     this.slot_types
@@ -189,7 +191,7 @@ export class NodeTypeFile {
 
             node_types: new Map(Object.entries(json_data.node_types || {}).map(([id, data]: [string, any]) => {
                 return [id, {
-                    description: data.description || "",
+                    metadata: data.metadata,
                     parameters: new Map(Object.entries(data.parameters || {}).map(([param_id, param_data]: [string, any]) => {
                         return [param_id, {
                             type: param_data.type,

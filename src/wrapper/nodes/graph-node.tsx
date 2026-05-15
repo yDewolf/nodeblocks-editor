@@ -5,12 +5,14 @@ import { NodeSlot } from './slot/node-slot';
 import { NodeData } from './data/node-data';
 import { SuperSlotTypes } from './data/node-data-type';
 import { BaseNode } from './scene-element';
+import { NodeMetadata } from './data/node-metadata';
 
 export class GraphNode extends BaseNode {
     id: string;
     node_name: string;
     type_name: string;
 
+    metadata: NodeMetadata
     // Used to set node parameters etc.
     private _node_data: () => NodeData;
     private _set_node_data:  (data: NodeData) => void;
@@ -36,9 +38,10 @@ export class GraphNode extends BaseNode {
     private _size: () => Vector2;
     private _setSize: (v: Vector2) => void;
 
-    constructor(node_name: string, node_data: NodeData, position: Vector2, id: string = "", type_name: string = "BaseNode") {
+    constructor(node_name: string, metadata: NodeMetadata, node_data: NodeData, position: Vector2, id: string = "", type_name: string = "BaseNode") {
         super();
         
+        this.metadata = metadata;
         this.type_name = type_name;
         this.id = id;
         this.node_name = node_name;

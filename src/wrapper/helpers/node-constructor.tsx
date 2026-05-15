@@ -4,18 +4,25 @@ import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeData } from "~/wrapper/nodes/data/node-data";
 import { BaseSlotType, DataTypeUtils, UNKNOWN_TYPE } from "~/wrapper/nodes/data/node-data-type";
+import { NodeMetadata, UNSET_CATEGORY } from "../nodes/data/node-metadata";
 
 
 export class BaseNodeConstructor {
     type_name: string;
 
+    _metadata: NodeMetadata
     _data_model: NodeData
     _slots: Map<string, SlotData>;
     _slot_types: Map<string, BaseSlotType>;
 
     constructor(type_name: string) {
         this.type_name = type_name
-
+        
+        this._metadata = {
+            category: UNSET_CATEGORY,
+            capitalized_type: this.type_name,
+            tags: []
+        };
         this._data_model = new NodeData(new Map());
         this._slots = new Map();
         this._slot_types = new Map();
@@ -23,7 +30,7 @@ export class BaseNodeConstructor {
 
     public make_node(node_name: string, position: Vector2, id: string = "", node_data: Map<string, any> | undefined = undefined): GraphNode {
         const node = new GraphNode(
-            node_name, new NodeData(this._data_model.raw_parameters), position, id, this.type_name
+            node_name, this._metadata, new NodeData(this._data_model.raw_parameters), position, id, this.type_name
         );
         if (node_data) {
             node_data.entries().forEach(([key, value]) => {
@@ -78,9 +85,10 @@ export class BaseNodeConstructor {
 }
 
 export class CustomNodeConstructor extends BaseNodeConstructor {
-    constructor(type_name: string, data: NodeData, slots: Map<string, SlotData>, slot_types: Map<string, BaseSlotType>) {
+    constructor(type_name: string, metadata: NodeMetadata, data: NodeData, slots: Map<string, SlotData>, slot_types: Map<string, BaseSlotType>) {
         super(type_name);
         
+        this._metadata = metadata;
         this._data_model = data;
         this._slots = slots;
         this._slot_types = slot_types;
