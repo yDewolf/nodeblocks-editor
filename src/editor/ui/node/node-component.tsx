@@ -97,7 +97,7 @@ export const NodeComponent = (props: {
                         }}
                     >
                         <div class="node-body">
-                            <div class="node-header">{props.node.node_name}</div>
+                            <div class="node-header">{props.node.metadata.capitalized_type}</div>
                             
                             <div class="node-content container">
                                 <For each={props.node.node_data.parameters.values().toArray()}>

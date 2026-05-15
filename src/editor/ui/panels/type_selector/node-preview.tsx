@@ -1,5 +1,5 @@
 import { CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
-import { NodeAnchor } from "./node-anchors";
+import { NodeAnchor } from "../../misc/node-anchors";
 import { createSignal, For } from "solid-js";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { NodeField } from "~/editor/ui/node/node-field";
@@ -49,7 +49,7 @@ export class NodePreview {
                     class="internal-node"
                 >
                     <div class="node-body">
-                        <div class="node-header">{ref_node.node_name}</div>
+                        <div class="node-header">{ref_node.metadata.capitalized_type}</div>
                         
                         <div class="node-content remove-input">
                             <For each={this.node_constructor._data_model.parameters.values().toArray()}>

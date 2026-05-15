@@ -6,7 +6,7 @@ import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { ConnectionController } from "../../wrapper/controllers/connection-controller";
 import { NodeController } from "~/wrapper/controllers/node-controller";
 import { SelectionController } from "~/editor/controllers/selection-controller";
-import { NodePreview } from "../ui/misc/node-preview";
+import { NodePreview } from "../ui/panels/type_selector/node-preview";
 
 export class SelectionTool extends BaseEditorTool {
     selection_controller: SelectionController

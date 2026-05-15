@@ -9,7 +9,7 @@ import { EventHandler, InputEvents } from "./internal/input_manager/event-handli
 import { SceneController } from "../wrapper/controllers/scene-controller";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
-import { NodeTypeSelector } from "./ui/misc/node-type-selector";
+import { NodeTypeSelector } from "./ui/panels/type_selector/node-type-selector";
 import { ConnectionLines, ConnectionPreview } from "./ui/misc/connection-lines";
 import { Grid } from "./ui/misc/grid";
 import { NodeComponent } from './ui/node/node-component';
