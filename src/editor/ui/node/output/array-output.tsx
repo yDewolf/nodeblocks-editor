@@ -21,19 +21,19 @@ const ArrayCanvas = (props: { data: any[], shape: number[] }) => {
         canvasRef.width = w;
         canvasRef.height = h;
         
-        // console.log([c, h, w], props.shape, props.data)
         const imageData = ctx.createImageData(w, h);
-        const data = c == 1 ? props.data[0] : props.data;
-
+        const data = c == 1 ? props.data[0] : c > 1 ? props.data[0] : props.data;
+        const shape = get_array_shape(data)
+        
         for (let i = 0; i < h; i++) {
             for (let j = 0; j < w; j++) {
                 const idx = (i * w + j) * 4;
                 let r, g, b;
                 let a = 255;
 
-                if (props.shape.length === 1) { // 1D
+                if (shape.length === 1) { // 1D
                     r = g = b = data[j];
-                } else if (props.shape.length === 2 || c == 1) { // 2D
+                } else if (shape.length === 2 || c == 1) { // 2D
                     r = g = b = data[i][j];
                 } else { // 3D
                     r = data[i][j][0] || 0;
