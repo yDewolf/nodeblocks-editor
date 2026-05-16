@@ -1,4 +1,4 @@
-import { createMemo, For, Match, Switch } from "solid-js";
+import { createMemo, createSignal, For, Match, Switch } from "solid-js";
 import { DataTypes, SuperSlotTypes } from "~/wrapper/nodes/data/node-data-type";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { ArrayView } from "./array-output";
@@ -16,7 +16,7 @@ export const OutputSelector = (props: {output_type: DataTypes | undefined, outpu
             </Match>
 
             <Match when={props.output_type === DataTypes.ARRAY}>
-                <ArrayView output_value={props.output_value?.[1]} />
+                <ArrayView output_value={props.output_value?.[1]}/>
             </Match>
 
             <Match when={props.output_type === DataTypes.CUSTOM}>
