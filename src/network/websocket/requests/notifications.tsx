@@ -1,11 +1,12 @@
 import { ServerMessages } from "../websocket-protocol";
 
 export enum NotificationLevel {
-    INFO = "info",
-    WARNING = "warning",
     ERROR = "error",
+    WARNING = "warning",
+    INFO = "info",
     DEBUG = "debug"
 }
+export const NotificationLevelOrder = Object.values(NotificationLevel)
 
 export enum NotificationTarget {
     NODE = "node",

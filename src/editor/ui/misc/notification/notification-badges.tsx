@@ -1,7 +1,7 @@
 import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
 import { timeSignal } from "~/editor/utils/time-ticker";
 import { NotificationController } from "~/network/controllers/notification_controller";
-import { NotificationLevel, NotificationTarget, NotificationWithMeta, ServerNotification } from "~/network/websocket/requests/notifications";
+import { NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta, ServerNotification } from "~/network/websocket/requests/notifications";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 
 const NotificationIcon = (props: {level: NotificationLevel}) => {
@@ -113,7 +113,7 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
         const c = props.notification_controller;
         return [
             ...c.forAll(),
-        ].sort((a, b) => b.timestamp - a.timestamp);
+        ].sort((a, b) => (b.timestamp - a.timestamp)).sort((a, b) => NotificationLevelOrder.indexOf(a.level) - NotificationLevelOrder.indexOf(b.level));
     });
 
     const time_to_disappear_ms: number = 15 * 1000
