@@ -70,7 +70,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
                 <div>
                     <input
                         ref={inputRef}
-                        name={field_id} 
+                        id={field_id} 
                         type={input_type}
                         value={props.parameter.value ?? ""} 
                         onInput={(event) => {

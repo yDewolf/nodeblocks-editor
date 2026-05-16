@@ -33,6 +33,10 @@ export class ConnectionController {
             return undefined;
         }
 
+        if (!slot_b.can_connect_to(slot_a)) {
+            return undefined;
+        }
+
         const connection = new NodeConnection(slot_a, slot_b, conn_uid);
         if (connection.causes_recursion()) {
             return undefined;

@@ -65,7 +65,8 @@ export class BaseNodeConstructor {
             parent_node, 
             slot_type, 
             slot_name,
-            slot_data_type === UNKNOWN_TYPE ? null : slot_data_type
+            slot_data_type === UNKNOWN_TYPE ? null : slot_data_type,
+            slot_data.max_connections
         )
     }
 

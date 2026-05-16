@@ -5,6 +5,7 @@ import { Vector2 } from "~/wrapper/data_types/geometry";
 import { NodeSlotStyle } from "./slot-style";
 import { BaseNodeType, BaseSlotType, SuperSlotTypes } from "../data/node-data-type";
 import { SlotOutput } from '../../../editor/ui/node/slot-output';
+import { ReactiveMap } from "@solid-primitives/map";
 
 export class NodeSlot {
     private _element: HTMLDivElement | undefined; // FIXME: SlotComponent
@@ -13,22 +14,23 @@ export class NodeSlot {
 
     slot_name: string;
 
+    max_connections: number = 0;
     data_type: BaseNodeType;
     type: BaseSlotType;
     _selected: () => boolean;
     _set_selected: (v: boolean) => void;
 
-    _connections: () => Map<NodeSlot, NodeConnection>;
-    _set_connections: (v: Map<NodeSlot, NodeConnection>) => void;
+    _connections: ReactiveMap<NodeSlot, NodeConnection>;
 
     private _last_output: () => Map<string, any>;
     private _set_last_output: (out: Map<string, any>) => void;
 
     _last_world_pos: Vector2 = {x: 0, y: 0};
 
-    constructor(parent: GraphNode, slot_type: BaseSlotType, slot_name: string, data_type: BaseNodeType | null = null) {
+    constructor(parent: GraphNode, slot_type: BaseSlotType, slot_name: string, data_type: BaseNodeType | null = null, max_connections: number = 0) {
         this.style = new NodeSlotStyle(slot_type);
 
+        this.max_connections = max_connections;
         this.data_type = data_type == null ? slot_type.data_type : data_type;
         this.slot_name = slot_name;
 
@@ -40,9 +42,8 @@ export class NodeSlot {
         this._selected = selected;
         this._set_selected = setSelected
 
-        const [connections, setConnections] = createSignal(new Map<NodeSlot, NodeConnection>);
+        const connections = new ReactiveMap<NodeSlot, NodeConnection>();
         this._connections = connections;
-        this._set_connections = setConnections;
 
         this.parent_node = parent;
         this.type = slot_type
@@ -54,33 +55,25 @@ export class NodeSlot {
     get selected() { return this._selected() }
     set selected(value: boolean) { this._set_selected(value); }
 
-    get connections() { return this._connections() }
-    set connections(value: Map<NodeSlot, NodeConnection>) { this._set_connections(value); }
-    
+    get connections() { return this._connections }
+
     get raw_connections() {
-        return this._connections().values().toArray();
+        return this._connections.values().toArray();
     }
 
     public add_connection(connection: NodeConnection) {
-        // Workaround on SolidJS signals
-        const newMap = new Map(this.connections);
-        
-        newMap.set(connection.get_other_node(this), connection);
-        this.connections = newMap;
+        this.connections.set(connection.get_other_node(this), connection);
     }
 
     public remove_connection(connection: NodeConnection) {
-        const newMap = new Map(this.connections);
-        
-        newMap.delete(connection.get_other_node(this));
-        this.connections = newMap;
+        this.connections.delete(connection.get_other_node(this));
     }
 
     public can_connect_to(slot: NodeSlot) {
         if (slot == this) {
             return false;
         }
-
+        
         if (!this.data_type.is_compatible_with(slot.data_type)) {
             return false;
         }
@@ -89,7 +82,9 @@ export class NodeSlot {
             return false;
         }
 
-        // TODO: Check recursion
+        if (this.connections.size >= this.max_connections && this.max_connections != 0) {
+            return false;
+        }
 
         return true;
     }

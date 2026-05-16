@@ -47,6 +47,10 @@ export class GraphNode extends BaseNode {
         this.node_name = node_name;
         this.raw_pos = position;
 
+        if (this.metadata.capitalized_type) {
+            this.metadata.capitalized_type = this.type_name;
+        }
+
         const [nodeData, setNodeData] = createSignal(node_data);
         this._node_data = nodeData;
         this._set_node_data = setNodeData;

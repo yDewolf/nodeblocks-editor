@@ -21,6 +21,7 @@ interface SlotTypeData {
 
 export interface SlotData {
     type: string,
+    max_connections: number,
     data_type: string | null,
     tooltip: string
 }
@@ -204,6 +205,7 @@ export class NodeTypeFile {
                     slots: new Map(Object.entries(data.slots || {}).map(([slot_id, slot_data]: [string, any]) => {
                         return [slot_id, {
                             type: slot_data.type,
+                            max_connections: slot_data.max_connections,
                             data_type: slot_data.data_type ?? null,
                             tooltip: slot_data.tooltip || ""
                         }];
