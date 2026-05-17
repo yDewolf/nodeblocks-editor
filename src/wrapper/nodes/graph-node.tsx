@@ -47,7 +47,7 @@ export class GraphNode extends BaseNode {
         this.node_name = node_name;
         this.raw_pos = position;
 
-        if (this.metadata.capitalized_type) {
+        if (!this.metadata.capitalized_type) {
             this.metadata.capitalized_type = this.type_name;
         }
 
