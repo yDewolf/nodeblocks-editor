@@ -60,7 +60,7 @@ export const NodeOutput = (props: {node: GraphNode}) => {
                     {([slot_name, _]) => {
                         return (
                             <button 
-                                class="icon-button output-select-button" 
+                                class="icon-button selectable-button" 
                                 classList={{"active": props.node.target_slot_output == slot_name}}
                                 onclick={() => props.node.target_slot_output = slot_name}
                             >

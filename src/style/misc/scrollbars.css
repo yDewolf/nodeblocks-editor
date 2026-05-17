@@ -5,6 +5,8 @@
 
 .scrollable.row-container {
     overflow-x: scroll;
+    overflow-y: hidden;
+    height: fit-content;
     max-width: 100%;
 }
 

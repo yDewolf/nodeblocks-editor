@@ -7,15 +7,6 @@
 
 }
 
-.output-select-button {
-    border: none;
-    background-color: var(--light-main-color);
-}
-
-.output-select-button.active {
-    background-color: var(--main-color);
-}
-
 .node-output-container {
     display: flex;
     justify-content: center;

@@ -31,25 +31,37 @@ export class NodeTypeSelector {
         })
 
         return (
-            <div class="container node-type-selector" style={{
-                width: "100%"
+            <div class="container padded" style={{
+                "overflow-x": "hidden",
+                width: "auto"
             }}>
-                <div class="keep fill row-container">
-                    <For each={categories().entries().toArray()}>
-                        {([name, category]) => {
-                            return <button onclick={() => setCategoryFilter(name)}>
-                                {name}
-                            </button>
-                        }}
-                    </For>
+                <div class="container fill" style={{color: "white"}}>
+                    <div class="keep row-container">
+                        <h3>Categories</h3>
+                    </div>
+                    <div class="keep row-container scrollable" style={{width: "auto"}}>
+                        <For each={categories().entries().toArray()}>
+                            {([name, category]) => {
+                                return <button 
+                                    class="selectable-button"
+                                    classList={{"active": categoryFilter() == name}}
+                                    onclick={() => setCategoryFilter(name)}
+                                >
+                                    {name}
+                                </button>
+                            }}
+                        </For>
+                    </div>
                 </div>
-                <div class="keep fill row-container">
+                <div class="keep fill row-container space-between" style={{"align-items": "center"}}>
+                    <h3 style={{color: "white"}}>
+                        {categoryFilter() ?? "All"} Nodes
+                    </h3>
                     <Show when={categoryFilter() != undefined}>
-                        <button onclick={() => setCategoryFilter(undefined)}>
-                            x
+                        <button class="icon-button" onclick={() => setCategoryFilter(undefined)}>
+                            <img src="public/assets/icons/close.svg" />
                         </button>
                     </Show>
-                    {categoryFilter() ?? "All"} Nodes
                 </div>
                 <div class="node-type-selector">
                     <For each={filtered_previews()}>

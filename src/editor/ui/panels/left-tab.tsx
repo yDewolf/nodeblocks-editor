@@ -29,7 +29,7 @@ export const EditorLeftTab = (props: {selector: NodeTypeSelector, scene_controll
             }
         >
             <div class="left-tab container modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
-                <div class="button-tab keep row-container">
+                <div class="button-tab keep row-container" style={{height: "fit-content"}}>
                     <ul class="tabs">
                         <li>
                             <input class="visually-hidden" type="file" accept=".json" id="scene-input" onChange={
