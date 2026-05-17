@@ -175,7 +175,10 @@ export class NodeSlot {
                         "output-slot": this.type.super_type == SuperSlotTypes.OUTPUT,
                     }}
                 >
-                    <SlotOutput slot={this}/>
+                    <div class="slot-dot-content">
+                        {this.slot_name}
+                        {/* <SlotOutput slot={this}/> */}
+                    </div>
                 </div>
             </div>
         )

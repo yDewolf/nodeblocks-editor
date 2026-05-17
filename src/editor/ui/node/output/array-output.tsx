@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, For, Index, Match, Switch } from "solid-js";
+import { createEffect, createMemo, createSignal, For, Index, Match, Show, Switch } from "solid-js";
 import { ScalarView } from './scalar-output';
 
 const ArrayCanvas = (props: { data: any[], shape: number[], target_channel: number }) => {
@@ -86,25 +86,27 @@ export const ArrayView = (props: { output_value: any | undefined }) => {
     return (
         <Switch fallback={
             <div class="output-array-container">
-                <div class="array-info row-container fill">
+                <div class="array-info row-container fill space-between">
                     <span>Shape: ({shape().join(", ")})</span>
 
-                    <div class="row-container">
-                        <label for="target-channels">Channel:</label>
-                        <select value={0} id="target-channels" onchange={(e) => {
-                            setTargetChannel(Number.parseInt(e.currentTarget.value));
-                        }}>
-                            <For each={Array.from({length: shape()[0]}, (_, i) => i)} >
-                                {(shape_size, idx) => {
-                                    return (
-                                        <option value={idx()}>
-                                            {idx()}
-                                        </option>   
-                                    )
-                                }}
-                            </For>
-                        </select>
-                    </div>
+                    <Show when={dims() > 2 && shape()[0] > 1}>
+                        <div class="row-container">
+                            <label for="target-channels">Channel:</label>
+                            <select value={0} id="target-channels" onchange={(e) => {
+                                setTargetChannel(Number.parseInt(e.currentTarget.value));
+                            }}>
+                                <For each={Array.from({length: shape()[0]}, (_, i) => i)} >
+                                    {(shape_size, idx) => {
+                                        return (
+                                            <option value={idx()}>
+                                                {idx()}
+                                            </option>   
+                                        )
+                                    }}
+                                </For>
+                            </select>
+                        </div>
+                    </Show>
                 </div>
                 <Switch fallback={<div class="text-preview">{JSON.stringify(props.output_value).slice(0, 100)}...</div>}>
                     <Match when={dims() <= 3}>
