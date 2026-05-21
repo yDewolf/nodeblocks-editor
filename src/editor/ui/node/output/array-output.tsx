@@ -121,7 +121,10 @@ export const ArrayView = (props: { output_value: any | undefined }) => {
                 </Switch>
             </div>
         }>
-            <Match when={dims() < 1 || dims() == 1 && props.output_value.length == 1}>
+            <Match when={
+                dims() < 1 || 
+                (shape().every((dim_size) => dim_size == 1))
+            }>
                 <ScalarView output_value={props.output_value}/>
             </Match>
         </Switch>

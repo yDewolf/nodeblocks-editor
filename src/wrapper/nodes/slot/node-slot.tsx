@@ -3,9 +3,9 @@ import { GraphNode } from "../graph-node";
 import { NodeConnection } from "../node-connection";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { NodeSlotStyle } from "./slot-style";
-import { BaseNodeType, BaseSlotType, SuperSlotTypes } from "../data/node-data-type";
-import { SlotOutput } from '../../../editor/ui/node/slot-output';
 import { ReactiveMap } from "@solid-primitives/map";
+import { BaseDataType } from "../data/node-data-type";
+import { BaseSlotType } from "../data/slot-types";
 
 export class NodeSlot {
     private _element: HTMLDivElement | undefined; // FIXME: SlotComponent
@@ -15,8 +15,10 @@ export class NodeSlot {
     slot_name: string;
 
     max_connections: number = 0;
-    data_type: BaseNodeType;
+    data_type: BaseDataType;
     type: BaseSlotType;
+    is_input: boolean;
+
     _selected: () => boolean;
     _set_selected: (v: boolean) => void;
 
@@ -27,10 +29,11 @@ export class NodeSlot {
 
     _last_world_pos: Vector2 = {x: 0, y: 0};
 
-    constructor(parent: GraphNode, slot_type: BaseSlotType, slot_name: string, data_type: BaseNodeType | null = null, max_connections: number = 0) {
-        this.style = new NodeSlotStyle(slot_type);
+    constructor(parent: GraphNode, slot_type: BaseSlotType, slot_name: string, is_input: boolean, data_type: BaseDataType | null = null, max_connections: number = 0) {
+        this.style = new NodeSlotStyle(slot_type, is_input);
 
         this.max_connections = max_connections;
+        this.is_input = is_input;
         this.data_type = data_type == null ? slot_type.data_type : data_type;
         this.slot_name = slot_name;
 
@@ -78,10 +81,6 @@ export class NodeSlot {
             return false;
         }
 
-        if (!this.type.is_compatible_with(slot.type)) {
-            return false;
-        }
-
         if (this.connections.size >= this.max_connections && this.max_connections != 0) {
             return false;
         }
@@ -100,7 +99,7 @@ export class NodeSlot {
 
         if (!this._element) {
             const world_pos = {
-                x: this.parent_node.x + (this.type.super_type === SuperSlotTypes.OUTPUT ? this.parent_node.width : 0),
+                x: this.parent_node.x + (this.is_input == false ? this.parent_node.width : 0),
                 y: this.parent_node.y + (this.parent_node.height / 2)
             };
             this._last_world_pos = world_pos;
@@ -171,8 +170,8 @@ export class NodeSlot {
                     classList={{
                         "connected-slot": this.connections.size > 0,
                         "selected-slot": this.selected,
-                        "input-slot": this.type.super_type == SuperSlotTypes.INPUT,
-                        "output-slot": this.type.super_type == SuperSlotTypes.OUTPUT,
+                        "input-slot": this.is_input,
+                        "output-slot": !this.is_input,
                     }}
                 >
                     <div class="slot-dot-content">

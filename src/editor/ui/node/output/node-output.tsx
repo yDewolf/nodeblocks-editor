@@ -1,28 +1,28 @@
 import { createMemo, createSignal, For, Match, Switch } from "solid-js";
-import { DataTypes, SuperSlotTypes } from "~/wrapper/nodes/data/node-data-type";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { ArrayView } from "./array-output";
 import { ScalarView } from "./scalar-output";
+import { DefaultDataTypes } from "~/wrapper/nodes/data/node-data-type";
 
-export const OutputSelector = (props: {output_type: DataTypes | undefined, output_value: any | undefined}) => {
+export const OutputSelector = (props: {output_type: DefaultDataTypes | undefined, output_value: any | undefined}) => {
     return (
         <Switch fallback={<span class="none">No Output</span>}>
             <Match when={
-                props.output_type === DataTypes.FLOAT || 
-                props.output_type === DataTypes.INT || 
-                props.output_type === DataTypes.UINT
+                props.output_type === DefaultDataTypes.FLOAT || 
+                props.output_type === DefaultDataTypes.INT || 
+                props.output_type === DefaultDataTypes.UINT
             }>
                 <ScalarView output_value={props.output_value?.[1]} />
             </Match>
 
-            <Match when={props.output_type === DataTypes.ARRAY}>
+            <Match when={props.output_type === DefaultDataTypes.ARRAY}>
                 <ArrayView output_value={props.output_value?.[1]}/>
             </Match>
 
-            <Match when={props.output_type === DataTypes.CUSTOM}>
+            <Match when={props.output_type === DefaultDataTypes.CUSTOM}>
                 <div class="custom-view">JSON: {JSON.stringify(props.output_value?.[1])}</div>
             </Match>
-            <Match when={props.output_type === DataTypes.UNKNOWN}>
+            <Match when={props.output_type === DefaultDataTypes.UNKNOWN}>
                 <span>Can't render Unknown Type</span>
             </Match>
         </Switch>
@@ -45,7 +45,7 @@ export const NodeOutput = (props: {node: GraphNode}) => {
         if (!out) return undefined;
         const slot = props.node.get_slot(out[0])
 
-        return slot?.data_type.super_type ?? DataTypes.UNKNOWN;
+        return slot?.data_type.base ?? DefaultDataTypes.UNKNOWN;
     });
 
     return (

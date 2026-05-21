@@ -3,8 +3,9 @@ import { SlotData } from "./node-type-file";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeData } from "~/wrapper/nodes/data/node-data";
-import { BaseSlotType, DataTypeUtils, UNKNOWN_TYPE } from "~/wrapper/nodes/data/node-data-type";
 import { NodeMetadata, UNSET_CATEGORY } from "../nodes/data/node-metadata";
+import { DataTypeUtils, UNKNOWN_TYPE } from "../nodes/data/node-data-type";
+import { BaseSlotType } from "../nodes/data/slot-types";
 
 
 export class BaseNodeConstructor {
@@ -12,6 +13,7 @@ export class BaseNodeConstructor {
 
     _metadata: NodeMetadata
     _data_model: NodeData
+    
     _slots: Map<string, SlotData>;
     _slot_types: Map<string, BaseSlotType>;
 
@@ -60,11 +62,12 @@ export class BaseNodeConstructor {
             return null;
         }
         
-        const slot_data_type = DataTypeUtils._match_node_data_type(slot_data.data_type == null ? "" : slot_data.data_type) 
+        const slot_data_type = DataTypeUtils._match_default_data_type(slot_data.data_type == null ? "" : slot_data.data_type) 
         return new NodeSlot(
             parent_node, 
             slot_type, 
             slot_name,
+            slot_data.is_input,
             slot_data_type === UNKNOWN_TYPE ? null : slot_data_type,
             slot_data.max_connections
         )

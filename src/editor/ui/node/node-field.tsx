@@ -1,6 +1,6 @@
 import { GraphNode } from "../../../wrapper/nodes/graph-node";
 import { NodeParameter } from "../../../wrapper/nodes/data/node-data";
-import { DataTypes } from "../../../wrapper/nodes/data/node-data-type";
+import { DefaultDataTypes } from "../../../wrapper/nodes/data/node-data-type";
 import { For, Match, Show, Switch } from "solid-js";
 import { debounce } from "~/editor/utils/debounce-utils";
 import { UserWorkspace } from "~/network/session/user-workspace";
@@ -20,20 +20,20 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
     };
 
     switch (props.parameter.type.super_type) {
-        case DataTypes.FLOAT: 
+        case DefaultDataTypes.FLOAT: 
             input_type = "number"; 
             step = step != undefined ? step : 0.1;
             break
-        case DataTypes.INT: 
+        case DefaultDataTypes.INT: 
             input_type = "number";
             break
 
-        case DataTypes.UINT: 
+        case DefaultDataTypes.UINT: 
             input_type = "number"; 
             min = min != undefined ? min : 0;
             break
         
-        case DataTypes.FILE:
+        case DefaultDataTypes.FILE:
             input_type = "file";
             break
     }
@@ -46,7 +46,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
 
         let new_value: any = raw_value;
         if (input_type === "number" || input_type === "range") {
-            let parsed = props.parameter.type.super_type === DataTypes.FLOAT ? parseFloat(raw_value) : parseInt(raw_value);
+            let parsed = props.parameter.type.super_type === DefaultDataTypes.FLOAT ? parseFloat(raw_value) : parseInt(raw_value);
             if (isNaN(parsed)) return;
 
             new_value = clamp(parsed, min, max);

@@ -3,7 +3,6 @@ import { Rect, Vector2 } from '../data_types/geometry';
 import { NodeConnection } from './node-connection';
 import { NodeSlot } from './slot/node-slot';
 import { NodeData } from './data/node-data';
-import { SuperSlotTypes } from './data/node-data-type';
 import { BaseNode } from './scene-element';
 import { NodeMetadata } from './data/node-metadata';
 
@@ -27,7 +26,7 @@ export class GraphNode extends BaseNode {
     private _set_current_step: (v: boolean) => void;
 
     private raw_pos: Vector2;
-    private _slots: Map<SuperSlotTypes, NodeSlot[]> = new Map<SuperSlotTypes, NodeSlot[]>;
+    private _slots: NodeSlot[] = [];
 
     private _pos: () => Vector2;
     private _setPos: (v: Vector2) => void;
@@ -93,7 +92,7 @@ export class GraphNode extends BaseNode {
     set last_output(output: Map<string, Map<string, any>>) { 
         this._set_last_output(output) 
         if (this.target_slot_output == undefined) {
-            const output_slots = this.slots.get(SuperSlotTypes.OUTPUT);
+            const output_slots = this.output_slots;
             if (!output_slots) return;
             this.target_slot_output = output_slots[0].slot_name;
         }
@@ -109,15 +108,13 @@ export class GraphNode extends BaseNode {
     get width() { return this._size().x; }
     get height() { return this._size().y; }
 
-    get slots() { return this._slots; }
-    get all_slots() {
-        let combined: NodeSlot[] = [];
-        this._slots.values().forEach((slot_array) => {
-            combined = combined.concat(slot_array);
-        });
-
-        return combined;
+    get input_slots() {
+        return this._slots.filter((slot) => slot.is_input == true);
     }
+    get output_slots() {
+        return this._slots.filter((slot) => slot.is_input == false);
+    }
+    get all_slots() { return this._slots; }
 
     get rect() {
         return new Rect(this.pos, this._size());
@@ -128,37 +125,26 @@ export class GraphNode extends BaseNode {
 
     public get_slot(slot_name: string): NodeSlot | undefined {
         let target_slot: NodeSlot | undefined = undefined;
-        this._slots.forEach((slots, slot_type) => {
-            if (target_slot != undefined) {
-                return;
-            }
-            const slot_found = slots.filter((slot) => slot.slot_name == slot_name);
-            if (slot_found.length > 0) {
-                target_slot = slot_found[0];
-            }
-        });
+        const found_slots = this._slots.filter((slot) => slot.slot_name == slot_name);
+        if (found_slots) {
+            target_slot = found_slots[0];
+        }
 
         return target_slot
     }
 
     public get_connections() {
         let combined: NodeConnection[] = [];
-        this.slots.values().forEach(slots => {
-            slots.forEach((slot) => {
-                combined = combined.concat(slot.raw_connections)
-            })
-        });
+        this._slots.forEach((slot) => {
+            combined = combined.concat(slot.raw_connections)
+        })
 
         return combined;
     }
 
     public _add_slot(slot: NodeSlot) {
-        let target_slots = this.slots.get(slot.type.super_type);
-        if (target_slots == undefined) {
-            target_slots = [];
-        }
-
-        this._slots.set(slot.type.super_type, [...target_slots, slot]);
+        // this._slots = [...this._slots, slot];
+        this._slots.push(slot);
     }
 
     // FIXME: Should these be on NodeComponent? 

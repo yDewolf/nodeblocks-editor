@@ -1,9 +1,9 @@
 import { NodeDataModel } from "~/wrapper/helpers/node-type-file";
-import { DataTypeUtils, BaseNodeType } from "./node-data-type";
 import { createSignal } from "solid-js";
+import { BaseDataType, DataTypeUtils } from "./node-data-type";
 
 export class NodeParameter {
-    type: BaseNodeType;
+    type: BaseDataType;
     _step: number | null = null;
     _range: number[] | null = null;
     _extension_filter: string[] | null = null;
@@ -31,7 +31,7 @@ export class NodeParameter {
         this._value = getValue;
         this._set_value = setValue;
 
-        const field_type: BaseNodeType = DataTypeUtils._match_node_data_type(field_data.type);
+        const field_type: BaseDataType = DataTypeUtils._match_default_data_type(field_data.type);
         this.type = field_type;
     }
 

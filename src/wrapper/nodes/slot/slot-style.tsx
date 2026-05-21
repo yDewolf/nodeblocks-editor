@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 import { Vector2 } from "~/wrapper/data_types/geometry";
-import { BaseSlotType, SuperSlotTypes } from "../data/node-data-type";
+import { BaseSlotType } from "../data/slot-types";
 
 // FIXME: Move this to editor/ui/node
 export class NodeSlotStyle {
@@ -11,8 +11,8 @@ export class NodeSlotStyle {
     _version: () => number;
     _set_version: (v: number) => void;  
 
-    constructor(slot_type: BaseSlotType) {
-        this.default_anchor = {x: slot_type.super_type == SuperSlotTypes.INPUT ? -1 : 1, y: 0}
+    constructor(slot_type: BaseSlotType, is_input: boolean) {
+        this.default_anchor = {x: is_input ? -1 : 1, y: 0}
 
         // Gambiarra
         const [version, setVersion] = createSignal(0);

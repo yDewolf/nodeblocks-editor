@@ -1,6 +1,5 @@
 import { createSignal } from "solid-js";
 import { NodeSlot } from "./slot/node-slot";
-import { SuperSlotTypes } from "./data/node-data-type";
 import { BaseConnection } from "./scene-element";
 
 
@@ -58,7 +57,7 @@ export class NodeConnection extends BaseConnection {
     }
 
     get input_slot() {
-        if (this.slot_a.type.super_type == SuperSlotTypes.INPUT) {
+        if (this.slot_a.is_input) {
             return this.slot_a;
         }
 
@@ -66,7 +65,7 @@ export class NodeConnection extends BaseConnection {
     }
 
     get output_slot() {
-        if (this.slot_a.type.super_type == SuperSlotTypes.OUTPUT) {
+        if (!this.slot_a.is_input) {
             return this.slot_a;
         }
 
