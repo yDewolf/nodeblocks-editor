@@ -34,11 +34,16 @@ export interface SlotData {
     tooltip: string
 }
 
+// TODO: find a better way of adding parameter stuff
+// maybe use Typescript type annotation like we use for requests
 export interface NodeDataModel {
     type: string,
-    step: number | null,
-    range: any | null,
-    extension_filter: string[] | null
+    default?: any,
+    step?: number,
+    range?: any,
+    extension_filter?: string[],
+    options?: Array<any>,
+    option_type?: DefaultDataTypes
 }
 
 interface NodeTypesData {
@@ -218,9 +223,12 @@ export class NodeTypeFile {
                     parameters: new Map(Object.entries(data.parameters || {}).map(([param_id, param_data]: [string, any]) => {
                         return [param_id, {
                             type: param_data.type,
+                            default: param_data.default ?? null,
                             step: param_data.step ?? null,
                             range: param_data.range ?? null,
-                            extension_filter: param_data.extension_filter ?? null
+                            extension_filter: param_data.extension_filter ?? null,
+                            options: param_data.options ?? null,
+                            option_type: param_data.option_type ?? null,
                         }];
                     })),
 

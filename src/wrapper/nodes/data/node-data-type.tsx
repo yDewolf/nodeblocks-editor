@@ -5,6 +5,8 @@ export enum DefaultDataTypes {
     ARRAY = "array",
     CUSTOM = "custom",
     FILE = "file",
+    TEXT = "text",
+    OPTIONS = "options",
     UNKNOWN = "unknown"
 }
 
@@ -57,6 +59,8 @@ export const INT_TYPE = new BaseDataType("int", DefaultDataTypes.INT, [DefaultDa
 export const UINT_TYPE = new BaseDataType("uint", DefaultDataTypes.UINT, [DefaultDataTypes.UINT, DefaultDataTypes.INT]);
 export const ARRAY_TYPE = new BaseDataType("array", DefaultDataTypes.ARRAY, [DefaultDataTypes.ARRAY]);
 export const FILE_TYPE = new BaseDataType("file", DefaultDataTypes.FILE, [DefaultDataTypes.FILE]);
+export const TEXT_TYPE = new BaseDataType("text", DefaultDataTypes.TEXT, [DefaultDataTypes.TEXT]);
+export const OPTIONS_TYPE = new BaseDataType("options", DefaultDataTypes.OPTIONS, [DefaultDataTypes.OPTIONS]);
 export const UNKNOWN_TYPE = new BaseDataType("unknown", DefaultDataTypes.UNKNOWN, [DefaultDataTypes.UNKNOWN]);
 const DEFAULT_TYPES = new Map<string, BaseDataType>([
     [FLOAT_TYPE.type_id, FLOAT_TYPE],
@@ -64,6 +68,8 @@ const DEFAULT_TYPES = new Map<string, BaseDataType>([
     [UINT_TYPE.type_id, UINT_TYPE],
     [ARRAY_TYPE.type_id, ARRAY_TYPE],
     [FILE_TYPE.type_id, FILE_TYPE],
+    [TEXT_TYPE.type_id, TEXT_TYPE],
+    [OPTIONS_TYPE.type_id, OPTIONS_TYPE],
     [UNKNOWN_TYPE.type_id, UNKNOWN_TYPE]
 ]);
 

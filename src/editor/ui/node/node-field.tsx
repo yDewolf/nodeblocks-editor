@@ -36,6 +36,10 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
         case DefaultDataTypes.FILE:
             input_type = "file";
             break
+
+        case DefaultDataTypes.OPTIONS:
+            input_type = "options";
+            break
     }
 
     if (props.parameter._range) { input_type = "range" }
@@ -106,6 +110,22 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
                                 return (
                                     <option value={file.name}>
                                         {file.name}
+                                    </option>
+                                )
+                            }}
+                        </For>
+                    </select>
+                </Match>
+                <Match when={input_type == "options"}>
+                    <select value={props.parameter.value} onchange={(e) => {
+                        onInputValueChanged(e.currentTarget.value);
+                    }}>
+                        <option value=""></option>
+                        <For each={props.parameter._options ?? []}>
+                            {(option_value) => {
+                                return (
+                                    <option value={option_value}>
+                                        {option_value}
                                     </option>
                                 )
                             }}
