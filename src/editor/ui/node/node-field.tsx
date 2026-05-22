@@ -19,6 +19,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
         return val;
     };
 
+    // TODO: Refactor this switch
     switch (props.parameter.type.base) {
         case DefaultDataTypes.FLOAT: 
             input_type = "number"; 
@@ -39,6 +40,10 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
 
         case DefaultDataTypes.OPTIONS:
             input_type = "options";
+            break
+        
+        case DefaultDataTypes.BOOLEAN:
+            input_type = "boolean";
             break
     }
 
@@ -92,9 +97,13 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
                 </div>
             }>
                 <Match when={input_type == "file"}>
-                    <select value={props.parameter.value} onchange={(e) => {
-                        onInputValueChanged(e.currentTarget.value);
-                    }}>
+                    <select 
+                        value={props.parameter.value} 
+                        onchange={(e) => {
+                            onInputValueChanged(e.currentTarget.value);
+                        }}
+                        id={field_id}
+                    >
                         <option value="">
                             
                         </option>
@@ -117,9 +126,13 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
                     </select>
                 </Match>
                 <Match when={input_type == "options"}>
-                    <select value={props.parameter.value} onchange={(e) => {
-                        onInputValueChanged(e.currentTarget.value);
-                    }}>
+                    <select 
+                        value={props.parameter.value} 
+                        onchange={(e) => {
+                            onInputValueChanged(e.currentTarget.value);
+                        }}
+                        id={field_id}
+                    >
                         <option value=""></option>
                         <For each={props.parameter._options ?? []}>
                             {(option_value) => {
@@ -131,6 +144,19 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
                             }}
                         </For>
                     </select>
+                </Match>
+                <Match when={input_type == "boolean"}>
+                    <input 
+                        type="checkbox" 
+                        checked={props.parameter._default ?? false} 
+                        id={field_id}
+                        onPointerDown={(e) => {
+                            e.stopPropagation();
+                        }}
+                        onchange={(e) => {
+                            onInputValueChanged(e.currentTarget.checked);
+                        }}
+                    />
                 </Match>
             </Switch>
         </div>

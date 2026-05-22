@@ -8,7 +8,6 @@ export class CustomDataType extends BaseDataType {
             parsed_data_type = DataTypeUtils._match_default_data_type(data_type);
         }
 
-        console.log(renderer)
         super(
             type_id, 
             parsed_data_type.base, 

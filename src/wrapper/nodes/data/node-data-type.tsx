@@ -2,6 +2,7 @@ export enum DefaultDataTypes {
     FLOAT = "float",
     UINT = "uint",
     INT = "int",
+    BOOLEAN = "boolean",
     ARRAY = "array",
     CUSTOM = "custom",
     FILE = "file",
@@ -57,6 +58,7 @@ export class BaseDataType {
 export const FLOAT_TYPE = new BaseDataType("float", DefaultDataTypes.FLOAT, [DefaultDataTypes.FLOAT]);
 export const INT_TYPE = new BaseDataType("int", DefaultDataTypes.INT, [DefaultDataTypes.INT, DefaultDataTypes.UINT]);
 export const UINT_TYPE = new BaseDataType("uint", DefaultDataTypes.UINT, [DefaultDataTypes.UINT, DefaultDataTypes.INT]);
+export const BOOLEAN_TYPE = new BaseDataType("boolean", DefaultDataTypes.BOOLEAN, [DefaultDataTypes.BOOLEAN]);
 export const ARRAY_TYPE = new BaseDataType("array", DefaultDataTypes.ARRAY, [DefaultDataTypes.ARRAY]);
 export const FILE_TYPE = new BaseDataType("file", DefaultDataTypes.FILE, [DefaultDataTypes.FILE]);
 export const TEXT_TYPE = new BaseDataType("text", DefaultDataTypes.TEXT, [DefaultDataTypes.TEXT]);
@@ -66,6 +68,7 @@ const DEFAULT_TYPES = new Map<string, BaseDataType>([
     [FLOAT_TYPE.type_id, FLOAT_TYPE],
     [INT_TYPE.type_id, INT_TYPE],
     [UINT_TYPE.type_id, UINT_TYPE],
+    [BOOLEAN_TYPE.type_id, BOOLEAN_TYPE],
     [ARRAY_TYPE.type_id, ARRAY_TYPE],
     [FILE_TYPE.type_id, FILE_TYPE],
     [TEXT_TYPE.type_id, TEXT_TYPE],
