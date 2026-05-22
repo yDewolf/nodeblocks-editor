@@ -19,7 +19,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
         return val;
     };
 
-    switch (props.parameter.type.super_type) {
+    switch (props.parameter.type.base) {
         case DefaultDataTypes.FLOAT: 
             input_type = "number"; 
             step = step != undefined ? step : 0.1;
@@ -46,7 +46,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
 
         let new_value: any = raw_value;
         if (input_type === "number" || input_type === "range") {
-            let parsed = props.parameter.type.super_type === DefaultDataTypes.FLOAT ? parseFloat(raw_value) : parseInt(raw_value);
+            let parsed = props.parameter.type.base === DefaultDataTypes.FLOAT ? parseFloat(raw_value) : parseInt(raw_value);
             if (isNaN(parsed)) return;
 
             new_value = clamp(parsed, min, max);
@@ -73,7 +73,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
                         id={field_id} 
                         type={input_type}
                         value={props.parameter.value ?? ""} 
-                        onInput={(event) => {
+                        onchange={(event) => {
                             event.preventDefault();
                             onInputValueChanged(event.currentTarget.value)}
                         }
@@ -88,7 +88,9 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
                 </div>
             }>
                 <Match when={input_type == "file"}>
-                    <select>
+                    <select value={props.parameter.value} onchange={(e) => {
+                        onInputValueChanged(e.currentTarget.value);
+                    }}>
                         <option value="">
                             
                         </option>

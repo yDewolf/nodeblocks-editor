@@ -161,10 +161,12 @@ export class NodeTypeFile {
         this.node_types_id = json_data.id;
 
         json_data.data_types.forEach((type_data, type_id) => {
+            console.log(type_data);
             const custom_data_type = new CustomDataType(
                 type_id,
                 type_data.base,
-                type_data.whitelist
+                type_data.default_renderer,
+                type_data.whitelist,
             )
             this.data_types.set(type_id, custom_data_type);
         });
@@ -200,9 +202,9 @@ export class NodeTypeFile {
             id: json_data.id ?? "unknown",
             data_types: new Map(Object.entries(json_data.data_types || {}).map(([id, data]: [string, any]) => {
                 return [id, {
-                    base: json_data.base,
-                    default_renderer: json_data.default_renderer,
-                    whitelist: json_data.whitelist
+                    base: data.base,
+                    default_renderer: data.default_renderer,
+                    whitelist: data.whitelist
                 }];
             })),
             slot_types: new Map(Object.entries(json_data.slot_types || {}).map(([id, data]: [string, any]) => {

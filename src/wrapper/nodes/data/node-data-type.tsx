@@ -15,13 +15,32 @@ export enum DefaultRenderers {
     NOT_IMPLEMENTED = "not_implemented"
 }
 
+export function _match_renderer(base_type: DefaultDataTypes): DefaultRenderers {
+    switch (base_type) {
+        case DefaultDataTypes.ARRAY: return DefaultRenderers.ARRAY;
+        case DefaultDataTypes.FLOAT: return DefaultRenderers.SCALAR;
+        case DefaultDataTypes.INT: return DefaultRenderers.SCALAR;
+        case DefaultDataTypes.UINT: return DefaultRenderers.SCALAR;
+        default:
+            return DefaultRenderers.NOT_IMPLEMENTED
+    }
+}
+
 export class BaseDataType {
+    renderer: DefaultRenderers;
     constructor(
         public type_id: string,
         public base: DefaultDataTypes,
         public type_whitelist: DefaultDataTypes[] = [],
-        public name_whitelist: string[] = []
-    ) {}
+        public name_whitelist: string[] = [],
+        renderer: DefaultRenderers | undefined  = undefined,
+    ) {
+        if (renderer == undefined) {
+            renderer = _match_renderer(this.base)
+        }
+
+        this.renderer = renderer
+    }
 
     public is_compatible_with(other: BaseDataType): boolean {
         if (this.type_whitelist.includes(other.base)) return true;

@@ -16,7 +16,7 @@ export const SlotOutput = (props: {slot: NodeSlot}) => {
     return (
         <Show when={slot_output() != null}>
             <div class="slot-output">
-                <OutputSelector output_type={props.slot.data_type.super_type} output_value={slot_output()}/>
+                <OutputSelector output_renderer={props.slot.data_type.super_type} output_value={slot_output()}/>
             </div>
         </Show>
     )
