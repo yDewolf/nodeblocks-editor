@@ -49,7 +49,7 @@ export class NodePreview {
                     class="internal-node"
                 >
                     <div class="node-body">
-                        <div class="node-header">{ref_node.metadata.capitalized_type}</div>
+                        <div class="node-header">{ref_node.type_name}</div>
                         
                         <div class="node-content remove-input">
                             <For each={this.node_constructor._data_model.parameters.values().toArray()}>

@@ -47,7 +47,7 @@ export interface NodeDataModel {
 }
 
 interface NodeTypesData {
-    metadata: NodeMetadata,
+    metadata?: NodeMetadata,
     parameters: Map<string, NodeDataModel>
     slots: Map<string, SlotData>
 }
@@ -189,7 +189,6 @@ export class NodeTypeFile {
                 const node_data: NodeData = new NodeData(type_data.parameters);
                 const custom_type_constructor = new CustomNodeConstructor(
                     type_name,
-                    type_data.metadata,
                     node_data,
                     type_data.slots,
                     this.slot_types

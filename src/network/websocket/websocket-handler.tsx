@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
-import { ClientMessage, ServerMessage } from "./request-types";
-import { ServerMessages, WebsocketStatus } from "./websocket-protocol";
+import { ClientCommand, ClientMessage, ClientVersionSync, ServerMessage } from "./request-types";
+import { ClientMessages, ServerMessages, WebsocketStatus } from "./websocket-protocol";
 import { setStore, sessionStorage } from "../session/session-store";
 import { createSignal } from "solid-js";
 import { UserSession } from "../session/user-session";
@@ -17,6 +17,7 @@ export class NodeServerClient {
     
     private is_connecting: boolean = false;
     private message_handlers: Map<ServerMessages, Map<string, ((message: any) => void)>>
+    private command_queue: Array<ClientMessage>;
 
     constructor(session: UserSession, host: string = "localhost", port: number = 3001) {
         this.session = session;
@@ -28,6 +29,7 @@ export class NodeServerClient {
         this._base_socket_url = `ws://${host}:${port}`;
         this._base_http_url = `http://${host}:${port}`;
         this.message_handlers = new Map();
+        this.command_queue = new Array();
 
         this._setup_default_handlers();
     }
@@ -68,6 +70,7 @@ export class NodeServerClient {
 
                 this.socket.onopen = (event) => {
                     this.is_connecting = false;
+                    this.requestSyncVersions();
                     console.log(`[Connected] to ${url.toString()}`, event);
                     resolve();
                 };
@@ -121,11 +124,42 @@ export class NodeServerClient {
         }
     }
 
-    public sendCommand(command: ClientMessage) {
+    public sendCommand(command: ClientMessage): boolean {
         if (this.socket?.readyState === WebSocket.OPEN) {
             console.log("Sending", command)
             this.socket.send(JSON.stringify(command));
+            return true;
         }
+        this.queueCommand(command);
+        return false;
+    }
+
+    protected queueCommand(command: ClientMessage) {
+        if (this.command_queue.includes(command)) {
+            return;
+        }        
+        this.command_queue.push(command);
+    }
+
+    protected sendQueuedCommands() {
+        let sent_commands: Array<ClientMessage> = new Array();
+        this.command_queue.forEach((command) => {
+            const sent = this.sendCommand(command);
+            if (sent) {
+                sent_commands.push(command);
+            }
+        });
+        this.command_queue = this.command_queue.filter((command) => !sent_commands.includes(command))
+    }
+
+    protected requestSyncVersions() {
+        const version_sync: ClientCommand = {
+            type: ClientMessages.SYNC_VERSIONS,
+            types_id: undefined,
+            types_version: undefined,
+            meta_version: undefined
+        }
+        this.socket?.send(JSON.stringify(version_sync));
     }
 
     public disconnect() {

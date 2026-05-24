@@ -35,9 +35,7 @@ export class NotificationController {
 
         this._client = client;
         this._client.add_handler(ServerMessages.HANDSHAKE_SYNC, (message) => {
-            if ("reconnection" in message) {
-                if (message.reconnection) this._client.sendCommand({type: ClientMessages.SYNC_NOTIFICATIONS});
-            }
+            this._client.sendCommand({type: ClientMessages.SYNC_NOTIFICATIONS});
         })
 
         this._client.add_handler(ServerMessages.NOTIFICATION, this._handle_notification);

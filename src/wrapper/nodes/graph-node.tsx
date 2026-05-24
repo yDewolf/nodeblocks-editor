@@ -11,7 +11,9 @@ export class GraphNode extends BaseNode {
     node_name: string;
     type_name: string;
 
-    metadata: NodeMetadata
+    // TODO: Grab metadata from a global metadata controller
+    // metadata: NodeMetadata | undefined;
+
     // Used to set node parameters etc.
     private _node_data: () => NodeData;
     private _set_node_data:  (data: NodeData) => void;
@@ -37,18 +39,13 @@ export class GraphNode extends BaseNode {
     private _size: () => Vector2;
     private _setSize: (v: Vector2) => void;
 
-    constructor(node_name: string, metadata: NodeMetadata, node_data: NodeData, position: Vector2, id: string = "", type_name: string = "BaseNode") {
+    constructor(node_name: string, node_data: NodeData, position: Vector2, id: string = "", type_name: string = "BaseNode") {
         super();
         
-        this.metadata = metadata;
         this.type_name = type_name;
         this.id = id;
         this.node_name = node_name;
         this.raw_pos = position;
-
-        if (!this.metadata.capitalized_type) {
-            this.metadata.capitalized_type = this.type_name;
-        }
 
         const [nodeData, setNodeData] = createSignal(node_data);
         this._node_data = nodeData;

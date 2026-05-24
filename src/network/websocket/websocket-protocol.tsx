@@ -18,6 +18,7 @@ export enum InstanceCommands {
 
 
 export enum ClientMessages {
+    SYNC_VERSIONS = "VERSION_SYNC",
     LOAD_SCENE = "LOAD_SCENE",
     SYNC_CLIENT_SCENE = "SYNC_CLIENT_SCENE",
     GET_TYPES = "GET_TYPES",
@@ -37,6 +38,7 @@ export enum ClientMessages {
 }
 
 export enum ServerMessages {
+    SYNC_VERSIONS = "version_sync",
     HANDSHAKE_SYNC = "handshake_sync",
     NODE_OUTPUT = "node_output",
     NOTIFICATION = "notification",

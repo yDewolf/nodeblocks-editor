@@ -252,17 +252,16 @@ export class NodeEditor {
     }
 
     public setup_message_handlers() {
-        this._editor_client.add_handler(ServerMessages.HANDSHAKE_SYNC, (message) => {
-            if ("type_data" in message) {
-                console.log("DEBUG: Parsing Type Data: ", message.type_data);
-                this.scene_controller.load_node_type_data(message.type_data);
+        this._editor_client.add_handler(ServerMessages.SYNC_VERSIONS, (message) => {
+            console.log("DEBUG: Parsing Type Data: ", message.types);
+            if (message.types) {
+                this.scene_controller.load_node_type_data(message.types);
             }
 
-            if ("reconnection" in message) {
-                if (message.reconnection) this._sync_controller.sync_with_server_scene()
-            }
+            // Sync after the types are loaded btw
+            this._sync_controller.sync_with_server_scene()
         });
-
+            
         this._editor_client.add_handler(ServerMessages.NODE_OUTPUT, (message) => {
             this.scene_controller.node_controller.nodes.forEach((node: GraphNode) => {
                 node.is_current_step = false;
