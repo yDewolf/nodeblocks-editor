@@ -1,9 +1,8 @@
-import { onMount } from "solid-js";
 import "./app.css";
+import { onMount } from "solid-js";
 import { NodeEditor } from "./editor/node-editor";
-import { SessionController } from './network/session/session-controller';
+import { session_controller } from "./singletons/user_session";
 
-const session_controller = new SessionController("localhost", 3001)
 const node_editor = new NodeEditor(session_controller);
 
 async function testHandleConnection() {

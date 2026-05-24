@@ -3,6 +3,7 @@ import { NodeAnchor } from "../../misc/node-anchors";
 import { createSignal, For } from "solid-js";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { NodeField } from "~/editor/ui/node/node-field";
+import { metadata } from "~/singletons/metadata";
 
 
 export class NodePreview {
@@ -49,7 +50,7 @@ export class NodePreview {
                     class="internal-node"
                 >
                     <div class="node-body">
-                        <div class="node-header">{ref_node.type_name}</div>
+                        <div class="node-header">{metadata.get_node_meta(ref_node.type_name).capitalized_name}</div>
                         
                         <div class="node-content remove-input">
                             <For each={this.node_constructor._data_model.parameters.values().toArray()}>

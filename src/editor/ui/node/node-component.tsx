@@ -9,6 +9,7 @@ import { NodeOutput } from './output/node-output';
 import { UserWorkspace } from "~/network/session/user-workspace";
 import { NotificationPopupHolder } from '../misc/notification/notification-badges';
 import { NotificationController } from "~/network/controllers/notification_controller";
+import { metadata } from "~/singletons/metadata";
 
 export const NodeComponent = (props: { 
     node: GraphNode, 
@@ -97,7 +98,7 @@ export const NodeComponent = (props: {
                         }}
                     >
                         <div class="node-body">
-                            <div class="node-header">{props.node.type_name}</div>
+                            <div class="node-header">{metadata.get_node_meta(props.node.type_name).capitalized_name}</div>
                             
                             <div class="node-content container">
                                 <For each={props.node.node_data.parameters.values().toArray()}>
