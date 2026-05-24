@@ -2,7 +2,6 @@ import { BaseNodeConstructor, CustomNodeConstructor } from "./node-constructor";
 import { NodeData } from "~/wrapper/nodes/data/node-data";
 import { batch, createSignal } from "solid-js";
 import { SceneData } from "./node-scene-file";
-import { NodeMetadata } from "../nodes/data/node-metadata";
 import { BaseDataType, DefaultDataTypes, DefaultRenderers, UNKNOWN_TYPE } from "../nodes/data/node-data-type";
 import { BaseSlotType } from "../nodes/data/slot-types";
 import { CustomDataType } from "../nodes/data/custom-data-types";
@@ -47,7 +46,6 @@ export interface NodeDataModel {
 }
 
 interface NodeTypesData {
-    metadata?: NodeMetadata,
     parameters: Map<string, NodeDataModel>
     slots: Map<string, SlotData>
 }

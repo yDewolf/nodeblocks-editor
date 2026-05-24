@@ -47,6 +47,7 @@ export enum ServerMessages {
     SYNC_ACTION = "sync_action",
     SYNC_FILES = "sync_files",
     SYNC_NOTIFICATIONS = "sync_notifications",
+    METADATA_UPDATED = "metadata_updated",
 
     CLOSE_SOCKET = "disconnect"
 }

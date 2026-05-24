@@ -1,3 +1,8 @@
+export interface MetadataVersion {
+    meta_version: number,
+    types_version: number
+}
+
 export interface NodeTag {
     tag_name: string,
     description?: string

@@ -68,6 +68,16 @@ export class NotificationController {
                 uid: "socket_closed"
             })
         });
+
+        this._client.add_handler(ServerMessages.METADATA_UPDATED, () => {
+            this.send_virtual_notification({
+                type: ServerMessages.NOTIFICATION,
+                level: NotificationLevel.INFO,
+                target: NotificationTarget.UNSPECIFIED,
+                message: "Metadata Updated",
+                uid: "metadata_updated"
+            })
+        });
     }
 
     public send_virtual_notification = (msg: ServerNotification) => {

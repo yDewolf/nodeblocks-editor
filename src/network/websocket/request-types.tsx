@@ -2,6 +2,7 @@ import { ConnectionSceneData, MinimalNodeSceneData } from "~/wrapper/helpers/nod
 import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, EditorActionStatus, SceneActionTypes, ServerMessages, WebsocketStatus } from "./websocket-protocol";
 import { ServerNotification, NotificationWithMeta } from './requests/notifications';
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
+import { MetadataVersion } from "~/wrapper/metadata/metadata_interfaces";
 
 // First message client sends after connecting
 export type ClientVersionSync = {
@@ -33,6 +34,7 @@ export type ConnectionActionPayload =
     
 export type ServerMessage = 
     | (ServerVersionSync & { type: ServerMessages.SYNC_VERSIONS })
+    | { type: ServerMessages.METADATA_UPDATED; metadata_version: MetadataVersion}
     | { type: ServerMessages.NODE_OUTPUT; node_id: string; value: any }
     // FIXME: handshake_sync is not fully type safe
     | { type: ServerMessages.HANDSHAKE_SYNC; status: number; session: string}

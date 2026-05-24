@@ -1,7 +1,6 @@
 import { createMemo, createSignal, For, mapArray, Show } from "solid-js";
 import { NodePreview } from "./node-preview";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
-import { NodeCategory } from "~/wrapper/nodes/data/node-metadata";
 
 export class NodeTypeSelector {
     public View(scene_controller: SceneController, onClickOnPreview: (node_preview: NodePreview) => void) {

@@ -3,7 +3,6 @@ import { SlotData } from "./node-type-file";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeData } from "~/wrapper/nodes/data/node-data";
-import { NodeMetadata, UNSET_CATEGORY } from "../nodes/data/node-metadata";
 import { DataTypeUtils, UNKNOWN_TYPE } from "../nodes/data/node-data-type";
 import { BaseSlotType } from "../nodes/data/slot-types";
 
