@@ -8,7 +8,7 @@ export const SlotOutput = (props: {slot: NodeSlot}) => {
             if (props.slot.last_output.size == 0) {
                 return undefined;
             }
-            return [props.slot.slot_name, props.slot.last_output];
+            return [props.slot.slot_id, props.slot.last_output];
         }
         return undefined;
     });
@@ -16,7 +16,7 @@ export const SlotOutput = (props: {slot: NodeSlot}) => {
     return (
         <Show when={slot_output() != null}>
             <div class="slot-output">
-                <OutputSelector output_type={props.slot.data_type.super_type} output_value={slot_output()}/>
+                <OutputSelector output_renderer={props.slot.data_type.renderer} output_value={slot_output()}/>
             </div>
         </Show>
     )

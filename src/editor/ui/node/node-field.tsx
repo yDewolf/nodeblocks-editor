@@ -1,6 +1,6 @@
 import { GraphNode } from "../../../wrapper/nodes/graph-node";
 import { NodeParameter } from "../../../wrapper/nodes/data/node-data";
-import { DataTypes } from "../../../wrapper/nodes/data/node-data-type";
+import { DefaultDataTypes } from "../../../wrapper/nodes/data/node-data-type";
 import { For, Match, Show, Switch } from "solid-js";
 import { debounce } from "~/editor/utils/debounce-utils";
 import { UserWorkspace } from "~/network/session/user-workspace";
@@ -8,7 +8,7 @@ import { UserWorkspace } from "~/network/session/user-workspace";
 export const NodeField = (props: {node: GraphNode | null, parameter: NodeParameter, workspace: UserWorkspace | undefined, parameter_sync: ((node: GraphNode, parameter: NodeParameter) => void) | undefined}) => {
     let inputRef!: HTMLInputElement;
     
-    const field_id = props.node?.id.toString() + props.parameter._field_name;
+    const field_id = props.node?.id.toString() + props.parameter._field_id;
     let input_type = "text";
     let step = props.parameter._step ?? undefined;
     let min = props.parameter._range?.at(0);
@@ -19,22 +19,31 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
         return val;
     };
 
-    switch (props.parameter.type.super_type) {
-        case DataTypes.FLOAT: 
+    // TODO: Refactor this switch
+    switch (props.parameter.type.base) {
+        case DefaultDataTypes.FLOAT: 
             input_type = "number"; 
             step = step != undefined ? step : 0.1;
             break
-        case DataTypes.INT: 
+        case DefaultDataTypes.INT: 
             input_type = "number";
             break
 
-        case DataTypes.UINT: 
+        case DefaultDataTypes.UINT: 
             input_type = "number"; 
             min = min != undefined ? min : 0;
             break
         
-        case DataTypes.FILE:
+        case DefaultDataTypes.FILE:
             input_type = "file";
+            break
+
+        case DefaultDataTypes.OPTIONS:
+            input_type = "options";
+            break
+        
+        case DefaultDataTypes.BOOLEAN:
+            input_type = "boolean";
             break
     }
 
@@ -46,7 +55,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
 
         let new_value: any = raw_value;
         if (input_type === "number" || input_type === "range") {
-            let parsed = props.parameter.type.super_type === DataTypes.FLOAT ? parseFloat(raw_value) : parseInt(raw_value);
+            let parsed = props.parameter.type.base === DefaultDataTypes.FLOAT ? parseFloat(raw_value) : parseInt(raw_value);
             if (isNaN(parsed)) return;
 
             new_value = clamp(parsed, min, max);
@@ -65,15 +74,15 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
 
     return (
         <div class="node-field row-container" classList={{"remove-input": props.node == null}}>
-            <label for={field_id}>{props.parameter._field_name}</label>
+            <label for={field_id}>{props.parameter._field_id}</label>
             <Switch fallback={
                 <div>
                     <input
                         ref={inputRef}
-                        name={field_id} 
+                        id={field_id} 
                         type={input_type}
                         value={props.parameter.value ?? ""} 
-                        onInput={(event) => {
+                        onchange={(event) => {
                             event.preventDefault();
                             onInputValueChanged(event.currentTarget.value)}
                         }
@@ -88,7 +97,13 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
                 </div>
             }>
                 <Match when={input_type == "file"}>
-                    <select>
+                    <select 
+                        value={props.parameter.value} 
+                        onchange={(e) => {
+                            onInputValueChanged(e.currentTarget.value);
+                        }}
+                        id={field_id}
+                    >
                         <option value="">
                             
                         </option>
@@ -109,6 +124,39 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
                             }}
                         </For>
                     </select>
+                </Match>
+                <Match when={input_type == "options"}>
+                    <select 
+                        value={props.parameter.value} 
+                        onchange={(e) => {
+                            onInputValueChanged(e.currentTarget.value);
+                        }}
+                        id={field_id}
+                    >
+                        <option value=""></option>
+                        <For each={props.parameter._options ?? []}>
+                            {(option_value) => {
+                                return (
+                                    <option value={option_value}>
+                                        {option_value}
+                                    </option>
+                                )
+                            }}
+                        </For>
+                    </select>
+                </Match>
+                <Match when={input_type == "boolean"}>
+                    <input 
+                        type="checkbox" 
+                        checked={props.parameter._default ?? false} 
+                        id={field_id}
+                        onPointerDown={(e) => {
+                            e.stopPropagation();
+                        }}
+                        onchange={(e) => {
+                            onInputValueChanged(e.currentTarget.checked);
+                        }}
+                    />
                 </Match>
             </Switch>
         </div>

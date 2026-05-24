@@ -46,11 +46,12 @@ export const ConnectionPreview = (props: { start_slot: NodeSlot | null, hovered_
 };
 
 export const ConnectionLines = (props: { connection: NodeConnection, onDisconnect: (connection: NodeConnection) => void }) => {
+    const pathId = `path-${props.connection.uid}`;
     const path = createMemo(() => {
-        const start = props.connection.slot_a.get_world_position();
-        const end = props.connection.slot_b.get_world_position();
-        const anchor_a = props.connection.slot_a.style.anchor;
-        const anchor_b = props.connection.slot_b.style.anchor;
+        const start = props.connection.output_slot.get_world_position();
+        const end = props.connection.input_slot.get_world_position();
+        const anchor_a = props.connection.output_slot.style.anchor;
+        const anchor_b = props.connection.input_slot.style.anchor;
 
         return make_simple_curved_path(start, end, anchor_a, anchor_b);
     });
@@ -81,7 +82,18 @@ export const ConnectionLines = (props: { connection: NodeConnection, onDisconnec
             />
             <path class="connection-path"
                 d={path()}
+                marker-end="url(#arrowhead)"
+                id={pathId}
             />
+            <text class="connection-arrow-text" dy="3.5"> 
+                <textPath 
+                    href={`#${pathId}`} 
+                    startOffset="50%" 
+                    text-anchor="middle"
+                >
+                    ▶
+                </textPath>
+            </text>
         </g>
     );
 };

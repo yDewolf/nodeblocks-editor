@@ -54,7 +54,7 @@ export class NodeController {
 
         const node_id = uid == undefined ? crypto.randomUUID() : uid;
         const new_node = construct.make_node(
-            name != "" ? name : construct.type_name, 
+            name != "" ? name : construct.type_id, 
             pos, 
             node_id,
             node_data

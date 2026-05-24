@@ -3,6 +3,7 @@ import { NodeServerClient } from "../websocket/websocket-handler";
 import { UserSession } from "./user-session";
 import { UserWorkspace } from "./user-workspace";
 import { NotificationController } from "../controllers/notification_controller";
+import { MetadataController } from "../controllers/metadata/metadata_controller";
 
 export class SessionController {
     client: NodeServerClient;
@@ -10,7 +11,8 @@ export class SessionController {
     user_session: UserSession;
     user_workspace: UserWorkspace;
 
-    notification_controller: NotificationController
+    notification_controller: NotificationController;
+    metadata_controller: MetadataController;
 
     constructor(host: string = "localhost", port: number = 3001) {
         this.user_session = new UserSession(sessionStorage.username);
@@ -18,5 +20,6 @@ export class SessionController {
 
         this.user_workspace = new UserWorkspace(this.client);
         this.notification_controller = new NotificationController(this.client);
+        this.metadata_controller = new MetadataController(this.client);
     }
 }

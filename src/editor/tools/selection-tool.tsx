@@ -6,7 +6,7 @@ import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { ConnectionController } from "../../wrapper/controllers/connection-controller";
 import { NodeController } from "~/wrapper/controllers/node-controller";
 import { SelectionController } from "~/editor/controllers/selection-controller";
-import { NodePreview } from "../ui/misc/node-preview";
+import { NodePreview } from "../ui/panels/type_selector/node-preview";
 
 export class SelectionTool extends BaseEditorTool {
     selection_controller: SelectionController
@@ -72,7 +72,7 @@ export class SelectionTool extends BaseEditorTool {
     }
 
     onClickOnNodePreview(node_preview: NodePreview): void {
-        this.selection_controller.selected_node_type = node_preview.node_constructor.type_name;
+        this.selection_controller.selected_node_type = node_preview.node_constructor.type_id;
         
         if (this._selected_preview != null) {
             this._selected_preview.selected = false

@@ -2,37 +2,50 @@ import { BaseNodeConstructor, CustomNodeConstructor } from "./node-constructor";
 import { NodeData } from "~/wrapper/nodes/data/node-data";
 import { batch, createSignal } from "solid-js";
 import { SceneData } from "./node-scene-file";
-import { BaseSlotType } from "../nodes/data/node-data-type";
-import { CustomSlotType } from "../nodes/data/custom-data-types";
+import { BaseDataType, DefaultDataTypes, DefaultRenderers, UNKNOWN_TYPE } from "../nodes/data/node-data-type";
+import { BaseSlotType } from "../nodes/data/slot-types";
+import { CustomDataType } from "../nodes/data/custom-data-types";
 
 interface TypeFile {
+    format: number,
     version: number,
     id: string,
+    data_types: Map<string, DataTypeData>,
     slot_types: Map<string, SlotTypeData>,
     node_types: Map<string, NodeTypesData>
 }
 
+interface DataTypeData {
+    base?: DefaultDataTypes,
+    default_renderer: DefaultRenderers,
+    whitelist: Array<string>
+}
+
 interface SlotTypeData {
-    extends: string,
-    conn_whitelist: string[],
-    default_data_type: string
+    data_type_id: string
 }
 
 export interface SlotData {
     type: string,
+    max_connections: number,
     data_type: string | null,
+    is_input: boolean,
     tooltip: string
 }
 
+// TODO: find a better way of adding parameter stuff
+// maybe use Typescript type annotation like we use for requests
 export interface NodeDataModel {
     type: string,
-    step: number | null,
-    range: any | null,
-    extension_filter: string[] | null
+    default?: any,
+    step?: number,
+    range?: any,
+    extension_filter?: string[],
+    options?: Array<any>,
+    option_type?: DefaultDataTypes
 }
 
 interface NodeTypesData {
-    description: string,
     parameters: Map<string, NodeDataModel>
     slots: Map<string, SlotData>
 }
@@ -43,6 +56,7 @@ export class NodeTypeFile {
     raw_data: Object | null = null;
     node_types_id: string | null = null;
     
+    data_types: Map<string, BaseDataType>;
     slot_types: Map<string, BaseSlotType>;
     node_constructors: Map<string, CustomNodeConstructor>;
 
@@ -54,6 +68,7 @@ export class NodeTypeFile {
         this._version = changedState;
         this._set_version = setChangedState;
 
+        this.data_types = new Map();
         this.slot_types = new Map();
         this.node_constructors = new Map();
     }
@@ -83,8 +98,8 @@ export class NodeTypeFile {
     }
 
 
-    protected set_constructor(type_name: string, constructor: BaseNodeConstructor) {
-        this.node_constructors.set(type_name, constructor);
+    protected set_constructor(type_id: string, constructor: BaseNodeConstructor) {
+        this.node_constructors.set(type_id, constructor);
     }
 
     public keep_track() { this._version() }
@@ -93,8 +108,8 @@ export class NodeTypeFile {
     }
 
 
-    public get_constructor(type_name: string) {
-        const constructor = this.node_constructors.get(type_name);
+    public get_constructor(type_id: string) {
+        const constructor = this.node_constructors.get(type_id);
         if (constructor == undefined) {
             return null;
         }
@@ -148,28 +163,34 @@ export class NodeTypeFile {
         this.node_types_version = json_data.version;
         this.node_types_id = json_data.id;
 
+        json_data.data_types.forEach((type_data, type_id) => {
+            const custom_data_type = new CustomDataType(
+                type_id,
+                type_data.base,
+                type_data.default_renderer,
+                type_data.whitelist,
+            )
+            this.data_types.set(type_id, custom_data_type);
+        });
         // Parse Slot Types
-        json_data.slot_types.forEach((type_data, type_name) => {
-            const custom_type = new CustomSlotType(
-                type_name,
-                type_data.default_data_type,
-                type_data.extends,
-                type_data.conn_whitelist
+        json_data.slot_types.forEach((type_data, type_id) => {
+            const custom_type = new BaseSlotType(
+                this.data_types.get(type_data.data_type_id) || UNKNOWN_TYPE
             );
-            this.slot_types.set(type_name, custom_type);
+            this.slot_types.set(type_id, custom_type);
         });
 
         // Parse Node Types
         batch(() => {
-            json_data.node_types.forEach((type_data, type_name) => {
+            json_data.node_types.forEach((type_data, type_id) => {
                 const node_data: NodeData = new NodeData(type_data.parameters);
                 const custom_type_constructor = new CustomNodeConstructor(
-                    type_name,
+                    type_id,
                     node_data,
                     type_data.slots,
                     this.slot_types
                 );
-                this.set_constructor(type_name, custom_type_constructor);
+                this.set_constructor(type_id, custom_type_constructor);
             });
             this.notify()
         })
@@ -177,31 +198,41 @@ export class NodeTypeFile {
 
     static json_to_type_file(json_data: any): TypeFile {
         return {
+            format: json_data.format,
             version: json_data.version ?? -1,
             id: json_data.id ?? "unknown",
-            slot_types: new Map(Object.entries(json_data.slot_types || {}).map(([id, data]: [string, any]) => {
+            data_types: new Map(Object.entries(json_data.data_types || {}).map(([id, data]: [string, any]) => {
                 return [id, {
-                    extends: data.extends,
-                    conn_whitelist: data.conn_whitelist || [],
-                    default_data_type: data.default_data_type
+                    base: data.base,
+                    default_renderer: data.default_renderer,
+                    whitelist: data.whitelist
                 }];
             })),
-
+            slot_types: new Map(Object.entries(json_data.slot_types || {}).map(([id, data]: [string, any]) => {
+                return [id, {
+                    data_type_id: data.data_type_id
+                }];
+            })),
             node_types: new Map(Object.entries(json_data.node_types || {}).map(([id, data]: [string, any]) => {
                 return [id, {
-                    description: data.description || "",
+                    metadata: data.metadata,
                     parameters: new Map(Object.entries(data.parameters || {}).map(([param_id, param_data]: [string, any]) => {
                         return [param_id, {
                             type: param_data.type,
+                            default: param_data.default ?? null,
                             step: param_data.step ?? null,
                             range: param_data.range ?? null,
-                            extension_filter: param_data.extension_filter ?? null
+                            extension_filter: param_data.extension_filter ?? null,
+                            options: param_data.options ?? null,
+                            option_type: param_data.option_type ?? null,
                         }];
                     })),
 
                     slots: new Map(Object.entries(data.slots || {}).map(([slot_id, slot_data]: [string, any]) => {
                         return [slot_id, {
                             type: slot_data.type,
+                            max_connections: slot_data.max_connections,
+                            is_input: slot_data.is_input,
                             data_type: slot_data.data_type ?? null,
                             tooltip: slot_data.tooltip || ""
                         }];

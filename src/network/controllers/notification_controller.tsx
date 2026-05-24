@@ -25,7 +25,7 @@ export class NotificationController {
     constructor(client: NodeServerClient) {
         const [notifications, setNotifications] = createStore<NotificationStore>({
             nodes: {} as Record<string, NotificationWithMeta[]>,
-            slots: {} as Record<string, NotificationWithMeta[]>, // node_uid:slot_name
+            slots: {} as Record<string, NotificationWithMeta[]>, // node_uid:slot_id
             parameters: {} as Record<string, NotificationWithMeta[]>, // node_uid:param_name
             connections: {} as Record<string, NotificationWithMeta[]>,
             global: [] as NotificationWithMeta[]
@@ -35,9 +35,7 @@ export class NotificationController {
 
         this._client = client;
         this._client.add_handler(ServerMessages.HANDSHAKE_SYNC, (message) => {
-            if ("reconnection" in message) {
-                if (message.reconnection) this._client.sendCommand({type: ClientMessages.SYNC_NOTIFICATIONS});
-            }
+            this._client.sendCommand({type: ClientMessages.SYNC_NOTIFICATIONS});
         })
 
         this._client.add_handler(ServerMessages.NOTIFICATION, this._handle_notification);
@@ -70,6 +68,16 @@ export class NotificationController {
                 uid: "socket_closed"
             })
         });
+
+        this._client.add_handler(ServerMessages.METADATA_UPDATED, () => {
+            this.send_virtual_notification({
+                type: ServerMessages.NOTIFICATION,
+                level: NotificationLevel.INFO,
+                target: NotificationTarget.UNSPECIFIED,
+                message: "Metadata Updated",
+                uid: "metadata_updated"
+            })
+        });
     }
 
     public send_virtual_notification = (msg: ServerNotification) => {
@@ -88,12 +96,12 @@ export class NotificationController {
                     target_list = state.nodes[msg.node_uid!];
                     break;
                 case NotificationTarget.SLOT:
-                    const slot_key = `${msg.node_uid}:${msg.slot_name}`;
+                    const slot_key = `${msg.node_uid}:${msg.slot_id}`;
                     if (!state.slots[slot_key]) state.slots[slot_key] = [];
                     target_list = state.slots[slot_key];
                     break;
                 case NotificationTarget.PARAMETER:
-                    const param_key = `${msg.node_uid}:${msg.param_name}`;
+                    const param_key = `${msg.node_uid}:${msg.param_id}`;
                     if (!state.parameters[param_key]) state.parameters[param_key] = [];
                     target_list = state.parameters[param_key];
                     break;
@@ -109,8 +117,8 @@ export class NotificationController {
                 notification.message == msg.message && 
                 notification.level == msg.level &&
                 notification.node_uid == msg.node_uid &&
-                notification.param_name == msg.param_name &&
-                notification.slot_name == msg.slot_name &&
+                notification.param_id == msg.param_id &&
+                notification.slot_id == msg.slot_id &&
                 notification.conn_uid == msg.conn_uid &&
                 !notification.read
             );
@@ -173,8 +181,8 @@ export class NotificationController {
     
     public get_notification_key(notification: ServerNotification): string {
         if (isNodeNotify(notification)) return notification.node_uid!;
-        if (isSlotNotify(notification)) return `${notification.node_uid}:${notification.slot_name}`;
-        if (isParamNotify(notification)) return `${notification.node_uid}:${notification.param_name}`;
+        if (isSlotNotify(notification)) return `${notification.node_uid}:${notification.slot_id}`;
+        if (isParamNotify(notification)) return `${notification.node_uid}:${notification.param_id}`;
         if (isConnNotify(notification)) return notification.conn_uid!;
         
         return notification.uid;
@@ -187,8 +195,8 @@ export class NotificationController {
         if (notification.node_uid != undefined) {
             const node = this._editor.scene_controller.node_controller.get_node(notification.node_uid);
             if (node) {
-                if (notification.slot_name != undefined) {
-                    const slot = node.get_slot(notification.slot_name);
+                if (notification.slot_id != undefined) {
+                    const slot = node.get_slot(notification.slot_id);
                     if (slot) this._editor.editor_space.teleport_to_pos(slot._last_world_pos)
                 }
 
@@ -216,12 +224,12 @@ export class NotificationController {
         return this._notifications.nodes[node_uid] || [];
     }
 
-    public forSlot(node_uid: string, slot_name: string) {
-        return this._notifications.slots[`${node_uid}:${slot_name}`] || [];
+    public forSlot(node_uid: string, slot_id: string) {
+        return this._notifications.slots[`${node_uid}:${slot_id}`] || [];
     }
 
-    public forParam(node_uid: string, param_name: string) {
-        return this._notifications.parameters[`${node_uid}:${param_name}`] || [];
+    public forParam(node_uid: string, param_id: string) {
+        return this._notifications.parameters[`${node_uid}:${param_id}`] || [];
     }
     
     public forConn(conn_uid: string) {

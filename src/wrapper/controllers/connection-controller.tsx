@@ -33,6 +33,10 @@ export class ConnectionController {
             return undefined;
         }
 
+        if (!slot_b.can_connect_to(slot_a)) {
+            return undefined;
+        }
+
         const connection = new NodeConnection(slot_a, slot_b, conn_uid);
         if (connection.causes_recursion()) {
             return undefined;
@@ -94,7 +98,7 @@ export class ConnectionController {
     public static get_slots_from_path_data(conn_data: ConnectionSceneData, node_controller: NodeController) {
         const node_a_path = NodeSceneFile.parse_node_path(conn_data.from_slot);
         const node_b_path = NodeSceneFile.parse_node_path(conn_data.to_slot);
-        if (node_a_path.slot_name == undefined || node_b_path.slot_name == undefined) {
+        if (node_a_path.slot_id == undefined || node_b_path.slot_id == undefined) {
             console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
             return;
         }
@@ -106,8 +110,8 @@ export class ConnectionController {
             return;
         }
 
-        const slot_a = node_a.get_slot(node_a_path.slot_name);
-        const slot_b = node_b.get_slot(node_b_path.slot_name);
+        const slot_a = node_a.get_slot(node_a_path.slot_id);
+        const slot_b = node_b.get_slot(node_b_path.slot_id);
         if (slot_a == undefined || slot_b == undefined) {
             console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
             return;

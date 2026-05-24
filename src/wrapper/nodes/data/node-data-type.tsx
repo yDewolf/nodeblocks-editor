@@ -1,115 +1,102 @@
-export enum DataTypes {
+export enum DefaultDataTypes {
     FLOAT = "float",
     UINT = "uint",
     INT = "int",
+    BOOLEAN = "boolean",
     ARRAY = "array",
     CUSTOM = "custom",
     FILE = "file",
+    TEXT = "text",
+    OPTIONS = "options",
     UNKNOWN = "unknown"
 }
 
-export enum SuperSlotTypes {
-    INPUT = "input_slot",
-    OUTPUT = "output_slot",
-    UNKNOWN = "unknown"
+export enum DefaultRenderers {
+    SCALAR = "scalar",
+    ARRAY = "array",
+    TEXT = "text",
+    NOT_IMPLEMENTED = "not_implemented"
 }
 
-export enum DataGroup {
-    NODE = "node",
-    SLOT = "slot"
+export function _match_renderer(base_type: DefaultDataTypes): DefaultRenderers {
+    switch (base_type) {
+        case DefaultDataTypes.ARRAY: return DefaultRenderers.ARRAY;
+        case DefaultDataTypes.FLOAT: return DefaultRenderers.SCALAR;
+        case DefaultDataTypes.INT: return DefaultRenderers.SCALAR;
+        case DefaultDataTypes.UINT: return DefaultRenderers.SCALAR;
+        default:
+            return DefaultRenderers.NOT_IMPLEMENTED
+    }
 }
 
-export abstract class BaseDataType<Group extends DataGroup, SuperType> {
+export class BaseDataType {
+    renderer: DefaultRenderers;
     constructor(
-        public type_name: string,
-        private _data_group: Group,
-        public super_type: SuperType,
-        public type_whitelist: SuperType[] = [],
-        public name_whitelist: string[] = []
-    ) {}
+        public type_id: string,
+        public base: DefaultDataTypes,
+        public type_whitelist: DefaultDataTypes[] = [],
+        public name_whitelist: string[] = [],
+        renderer: DefaultRenderers | undefined  = undefined,
+    ) {
+        if (renderer == undefined) {
+            renderer = _match_renderer(this.base)
+        }
 
-    public is_compatible_with(other: BaseDataType<Group, SuperType>): boolean {
-        if (this._data_group !== other._data_group) return false;
+        this.renderer = renderer
+    }
 
-        if (this.type_whitelist.includes(other.super_type)) return true;
-        if (this.name_whitelist.includes(other.type_name)) return true;
+    public is_compatible_with(other: BaseDataType): boolean {
+        if (this.type_whitelist.includes(other.base)) return true;
+        if (this.name_whitelist.includes(other.type_id)) return true;
 
         return false;
     }
 }
 
-export class BaseNodeType extends BaseDataType<DataGroup.NODE, DataTypes> {
-    constructor(type_name: string, super_type: DataTypes, type_whitelist: DataTypes[], name_whitelist: string[] = []) {
-        super(type_name, DataGroup.NODE, super_type, type_whitelist, name_whitelist);
-    }
-}
-
-export class BaseSlotType extends BaseDataType<DataGroup.SLOT, SuperSlotTypes> {
-    data_type: BaseNodeType
-    constructor(type_name: string, data_type: BaseNodeType, super_type: SuperSlotTypes, type_whitelist: SuperSlotTypes[], name_whitelist: string[] = []) {
-        super(type_name, DataGroup.SLOT, super_type, type_whitelist, name_whitelist);
-        this.data_type = data_type; //== UNKNOWN_TYPE ? ;
-    }
-}
-
 // Default Types:
 
-export const FLOAT_TYPE = new BaseNodeType("float", DataTypes.FLOAT, [DataTypes.FLOAT]);
-export const INT_TYPE = new BaseNodeType("int", DataTypes.INT, [DataTypes.INT, DataTypes.UINT]);
-export const UINT_TYPE = new BaseNodeType("uint", DataTypes.UINT, [DataTypes.UINT, DataTypes.INT]);
-export const ARRAY_TYPE = new BaseNodeType("array", DataTypes.ARRAY, [DataTypes.ARRAY]);
-export const FILE_TYPE = new BaseNodeType("file", DataTypes.FILE, [DataTypes.FILE]);
-export const UNKNOWN_TYPE = new BaseNodeType("unknown", DataTypes.UNKNOWN, [DataTypes.UNKNOWN]);
-const DEFAULT_NODE_TYPES = new Map<string, BaseNodeType>([
-    [FLOAT_TYPE.type_name, FLOAT_TYPE],
-    [INT_TYPE.type_name, INT_TYPE],
-    [UINT_TYPE.type_name, UINT_TYPE],
-    [ARRAY_TYPE.type_name, ARRAY_TYPE],
-    [FILE_TYPE.type_name, FILE_TYPE],
-    [UNKNOWN_TYPE.type_name, UNKNOWN_TYPE]
-]);
-
-export const INPUT_SLOT  = new BaseSlotType("input_slot", UNKNOWN_TYPE, SuperSlotTypes.INPUT, [SuperSlotTypes.OUTPUT]);
-export const OUTPUT_SLOT = new BaseSlotType("output_slot", UNKNOWN_TYPE, SuperSlotTypes.OUTPUT, [SuperSlotTypes.INPUT]);
-export const UNKNOWN_SLOT_TYPE = new BaseSlotType("unknown_slot", UNKNOWN_TYPE, SuperSlotTypes.UNKNOWN, [SuperSlotTypes.UNKNOWN]);
-const DEFAULT_SLOT_TYPES = new Map<string, BaseSlotType>([
-    [INPUT_SLOT.type_name, INPUT_SLOT],
-    [OUTPUT_SLOT.type_name, OUTPUT_SLOT],
+export const FLOAT_TYPE = new BaseDataType("float", DefaultDataTypes.FLOAT, [DefaultDataTypes.FLOAT]);
+export const INT_TYPE = new BaseDataType("int", DefaultDataTypes.INT, [DefaultDataTypes.INT, DefaultDataTypes.UINT]);
+export const UINT_TYPE = new BaseDataType("uint", DefaultDataTypes.UINT, [DefaultDataTypes.UINT, DefaultDataTypes.INT]);
+export const BOOLEAN_TYPE = new BaseDataType("boolean", DefaultDataTypes.BOOLEAN, [DefaultDataTypes.BOOLEAN]);
+export const ARRAY_TYPE = new BaseDataType("array", DefaultDataTypes.ARRAY, [DefaultDataTypes.ARRAY]);
+export const FILE_TYPE = new BaseDataType("file", DefaultDataTypes.FILE, [DefaultDataTypes.FILE]);
+export const TEXT_TYPE = new BaseDataType("text", DefaultDataTypes.TEXT, [DefaultDataTypes.TEXT]);
+export const OPTIONS_TYPE = new BaseDataType("options", DefaultDataTypes.OPTIONS, [DefaultDataTypes.OPTIONS]);
+export const UNKNOWN_TYPE = new BaseDataType("unknown", DefaultDataTypes.UNKNOWN, [DefaultDataTypes.UNKNOWN]);
+const DEFAULT_TYPES = new Map<string, BaseDataType>([
+    [FLOAT_TYPE.type_id, FLOAT_TYPE],
+    [INT_TYPE.type_id, INT_TYPE],
+    [UINT_TYPE.type_id, UINT_TYPE],
+    [BOOLEAN_TYPE.type_id, BOOLEAN_TYPE],
+    [ARRAY_TYPE.type_id, ARRAY_TYPE],
+    [FILE_TYPE.type_id, FILE_TYPE],
+    [TEXT_TYPE.type_id, TEXT_TYPE],
+    [OPTIONS_TYPE.type_id, OPTIONS_TYPE],
+    [UNKNOWN_TYPE.type_id, UNKNOWN_TYPE]
 ]);
 
 export class DataTypeUtils {
-    static _match_node_data_type(str: string): BaseNodeType {
+    static _match_default_data_type(str: string): BaseDataType {
         if (!str) return UNKNOWN_TYPE;
         const super_str = str.toLowerCase();
-        const node_type = DEFAULT_NODE_TYPES.get(super_str);
+        const node_type = DEFAULT_TYPES.get(super_str);
         
         return node_type != undefined ? node_type : UNKNOWN_TYPE;
     }
 
-     static _match_slot_type(str: string): BaseSlotType {
-        const super_str = str.toLowerCase();
-        const node_type = DEFAULT_SLOT_TYPES.get(super_str);
-        
-        return node_type != undefined ? node_type : UNKNOWN_SLOT_TYPE;
-    }
-
-    static parse_data_type(str: string): DataTypes {
+    static parse_data_type(str: string): DefaultDataTypes {
         const lower_str = str.toLowerCase();
-        return (Object.values(DataTypes) as string[]).includes(lower_str) ? lower_str as DataTypes : DataTypes.UNKNOWN;
+        return (Object.values(DefaultDataTypes) as string[]).includes(lower_str) ? lower_str as DefaultDataTypes : DefaultDataTypes.UNKNOWN;
     }
 
-    static parse_slot_super_type(str: string): SuperSlotTypes {
-        const lower_str = str.toLowerCase();
-        return (Object.values(SuperSlotTypes) as string[]).includes(lower_str) ? lower_str as SuperSlotTypes : SuperSlotTypes.UNKNOWN;
-    }
-
-    static parse_whitelist<SuperType>(list: string[], parser: (str: string) => SuperType): [SuperType[], string[]] {
+    static parse_whitelist<SuperType>(list: string[], default_type_parser: (str: string) => SuperType): [SuperType[], string[]] {
         const type_whitelist: SuperType[] = [];
         const name_whitelist: string[] = [];
         list.forEach(item => {
             if (!item) return;
             if (item.startsWith("#")) {
-                type_whitelist.push(parser(item.slice(1)));
+                type_whitelist.push(default_type_parser(item.slice(1)));
                 return;
             }
             name_whitelist.push(item);

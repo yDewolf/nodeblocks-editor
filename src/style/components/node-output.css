@@ -7,15 +7,6 @@
 
 }
 
-.output-select-button {
-    border: none;
-    background-color: var(--light-main-color);
-}
-
-.output-select-button.active {
-    background-color: var(--main-color);
-}
-
 .node-output-container {
     display: flex;
     justify-content: center;
@@ -28,20 +19,23 @@
     padding: 5px;
 }
 
-.slot-output {
-    /* width: 100px; */
-    display: none;
-}
-
-/* .slot-output:hover {
+.slot-output:hover {
     display: block;
 }
 
+.slot-dot-content {
+    background-color: rgba(255, 255, 255, 0.705);
+    padding: 5px;
+    bottom: 12px;
+    position: absolute;
+    display: none;
+}
+
 .slot-dot:hover {
-    .slot-output {
+    .slot-dot-content {
         display: block;
     }
-} */
+}
 
 .output-array-container {
     width: 100%;

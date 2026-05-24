@@ -1,37 +1,38 @@
 import { NodeDataModel } from "~/wrapper/helpers/node-type-file";
-import { DataTypeUtils, BaseNodeType } from "./node-data-type";
 import { createSignal } from "solid-js";
+import { BaseDataType, DataTypeUtils, DefaultDataTypes } from "./node-data-type";
 
 export class NodeParameter {
-    type: BaseNodeType;
+    type: BaseDataType;
+    _default: any | null = null;
+    _field_id: string;
+
     _step: number | null = null;
     _range: number[] | null = null;
     _extension_filter: string[] | null = null;
-    _field_name: string;
+    _options: Array<any> | null = null
+    _options_type: DefaultDataTypes | null = null;
 
     _raw_field_data: NodeDataModel;
 
     _set_value: (value: any) => void;
     _value: () => any;
 
-    constructor(field_data: NodeDataModel, field_name: string) {
-        this._field_name = field_name;
+    constructor(field_data: NodeDataModel, field_id: string) {
+        this._field_id = field_id;
         this._raw_field_data = field_data;
-        if (field_data.step) {
-            this._step = field_data.step;
-        }
-        if (field_data.range) {
-            this._range = field_data.range;
-        }
-        if (field_data.extension_filter) {
-            this._extension_filter = field_data.extension_filter;
-        }
+        if (field_data.default) { this._default = field_data.default; }
+        if (field_data.step) { this._step = field_data.step; }
+        if (field_data.range) { this._range = field_data.range; }
+        if (field_data.extension_filter) { this._extension_filter = field_data.extension_filter; }
+        if (field_data.options) { this._options = field_data.options }
+        if (field_data.option_type) { this._options_type = field_data.option_type as DefaultDataTypes}
 
-        const [getValue, setValue] = createSignal(null);
+        const [getValue, setValue] = createSignal(this._default);
         this._value = getValue;
         this._set_value = setValue;
 
-        const field_type: BaseNodeType = DataTypeUtils._match_node_data_type(field_data.type);
+        const field_type: BaseDataType = DataTypeUtils._match_default_data_type(field_data.type);
         this.type = field_type;
     }
 
@@ -50,11 +51,11 @@ export class NodeData {
 
     static parse_parameters(fields: Map<string, NodeDataModel>): Map<string, NodeParameter> {
         let parsed_fields: Map<string, NodeParameter> = new Map(); 
-        fields.forEach((field_data, field_name) => {
+        fields.forEach((field_data, field_id) => {
             const obj = new NodeParameter(
-                field_data, field_name
+                field_data, field_id
             );
-            parsed_fields.set(field_name, obj);
+            parsed_fields.set(field_id, obj);
         });
 
         return parsed_fields;

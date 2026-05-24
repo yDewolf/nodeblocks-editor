@@ -62,3 +62,11 @@
     transform: inherit;
 }
 
+.selectable-button {
+    border: none;
+    background-color: var(--light-main-color);
+}
+
+.selectable-button.active {
+    background-color: var(--main-color);
+}

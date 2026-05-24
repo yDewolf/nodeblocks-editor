@@ -14,6 +14,11 @@
   stroke: black;
 }
 
+.connection-arrow-text {
+  font-size: 10px;
+  pointer-events: none;
+}
+
 .clickable-path {
   pointer-events: stroke;
   cursor: pointer;

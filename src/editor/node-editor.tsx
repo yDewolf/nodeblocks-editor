@@ -9,7 +9,7 @@ import { EventHandler, InputEvents } from "./internal/input_manager/event-handli
 import { SceneController } from "../wrapper/controllers/scene-controller";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
-import { NodeTypeSelector } from "./ui/misc/node-type-selector";
+import { NodeTypeSelector } from "./ui/panels/type_selector/node-type-selector";
 import { ConnectionLines, ConnectionPreview } from "./ui/misc/connection-lines";
 import { Grid } from "./ui/misc/grid";
 import { NodeComponent } from './ui/node/node-component';
@@ -252,17 +252,16 @@ export class NodeEditor {
     }
 
     public setup_message_handlers() {
-        this._editor_client.add_handler(ServerMessages.HANDSHAKE_SYNC, (message) => {
-            if ("type_data" in message) {
-                console.log("DEBUG: Parsing Type Data: ", message.type_data);
-                this.scene_controller.load_node_type_data(message.type_data);
+        this._editor_client.add_handler(ServerMessages.SYNC_VERSIONS, (message) => {
+            console.log("DEBUG: Parsing Type Data: ", message.types);
+            if (message.types) {
+                this.scene_controller.load_node_type_data(message.types);
             }
 
-            if ("reconnection" in message) {
-                if (message.reconnection) this._sync_controller.sync_with_server_scene()
-            }
+            // Sync after the types are loaded btw
+            this._sync_controller.sync_with_server_scene()
         });
-
+            
         this._editor_client.add_handler(ServerMessages.NODE_OUTPUT, (message) => {
             this.scene_controller.node_controller.nodes.forEach((node: GraphNode) => {
                 node.is_current_step = false;
@@ -274,13 +273,13 @@ export class NodeEditor {
                 return;
             }
             const node_output: Map<string, Map<string, any>> = new Map(
-                Object.entries(message.value).map(([slot_name, slot_output]: [string, any]) => {
-                    return [slot_name, slot_output];
+                Object.entries(message.value).map(([slot_id, slot_output]: [string, any]) => {
+                    return [slot_id, slot_output];
                 })
             );
             // console.log(message);
-            node_output.forEach((value, slot_name) => {
-                const slot = node.get_slot(slot_name);
+            node_output.forEach((value, slot_id) => {
+                const slot = node.get_slot(slot_id);
                 if (slot) {
                     slot.last_output = value;
                 }

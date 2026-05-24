@@ -1,28 +1,26 @@
-import { createMemo, For, Match, Switch } from "solid-js";
-import { DataTypes, SuperSlotTypes } from "~/wrapper/nodes/data/node-data-type";
+import { createMemo, createSignal, For, Match, Switch } from "solid-js";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { ArrayView } from "./array-output";
 import { ScalarView } from "./scalar-output";
+import { DefaultRenderers } from "~/wrapper/nodes/data/node-data-type";
 
-export const OutputSelector = (props: {output_type: DataTypes | undefined, output_value: any | undefined}) => {
+export const OutputSelector = (props: {output_renderer: DefaultRenderers | undefined, output_value: any | undefined}) => {
     return (
         <Switch fallback={<span class="none">No Output</span>}>
             <Match when={
-                props.output_type === DataTypes.FLOAT || 
-                props.output_type === DataTypes.INT || 
-                props.output_type === DataTypes.UINT
+                props.output_renderer === DefaultRenderers.SCALAR
             }>
                 <ScalarView output_value={props.output_value?.[1]} />
             </Match>
 
-            <Match when={props.output_type === DataTypes.ARRAY}>
-                <ArrayView output_value={props.output_value?.[1]} />
+            <Match when={props.output_renderer === DefaultRenderers.ARRAY}>
+                <ArrayView output_value={props.output_value?.[1]}/>
             </Match>
 
-            <Match when={props.output_type === DataTypes.CUSTOM}>
+            <Match when={props.output_renderer === DefaultRenderers.TEXT}>
                 <div class="custom-view">JSON: {JSON.stringify(props.output_value?.[1])}</div>
             </Match>
-            <Match when={props.output_type === DataTypes.UNKNOWN}>
+            <Match when={props.output_renderer === DefaultRenderers.NOT_IMPLEMENTED}>
                 <span>Can't render Unknown Type</span>
             </Match>
         </Switch>
@@ -40,12 +38,12 @@ export const NodeOutput = (props: {node: GraphNode}) => {
         return [props.node.target_slot_output, props.node.last_output.get(props.node.target_slot_output)];
     });
 
-    const outputType = createMemo(() => {
+    const output_renderer = createMemo(() => {
         const out = targetOutput();
         if (!out) return undefined;
         const slot = props.node.get_slot(out[0])
 
-        return slot?.data_type.super_type ?? DataTypes.UNKNOWN;
+        return slot?.data_type.renderer ?? DefaultRenderers.NOT_IMPLEMENTED;
     });
 
     return (
@@ -57,21 +55,21 @@ export const NodeOutput = (props: {node: GraphNode}) => {
                 class="fill keep row-container output-selector" style={{"pointer-events": "auto"}}
             >
                 <For each={props.node.last_output.entries().toArray()}>
-                    {([slot_name, _]) => {
+                    {([slot_id, _]) => {
                         return (
                             <button 
-                                class="icon-button output-select-button" 
-                                classList={{"active": props.node.target_slot_output == slot_name}}
-                                onclick={() => props.node.target_slot_output = slot_name}
+                                class="icon-button selectable-button" 
+                                classList={{"active": props.node.target_slot_output == slot_id}}
+                                onclick={() => props.node.target_slot_output = slot_id}
                             >
-                                {slot_name}
+                                {slot_id}
                             </button>
                         )
                     }}
                 </For>
             </div>
             <div class="node-output node-output-container">
-                <OutputSelector output_type={outputType()} output_value={targetOutput()}/>
+                <OutputSelector output_renderer={output_renderer()} output_value={targetOutput()}/>
             </div>
         </div>
     );

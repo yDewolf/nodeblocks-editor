@@ -1,8 +1,8 @@
 import { Accessor, createSignal, onCleanup, Show } from "solid-js";
 import { ToolController } from "~/editor/controllers/tool-controller";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
-import { NodeTypeSelector } from "../misc/node-type-selector";
-import { NodePreview } from "../misc/node-preview";
+import { NodeTypeSelector } from "./type_selector/node-type-selector";
+import { NodePreview } from "./type_selector/node-preview";
 
 
 export const EditorLeftTab = (props: {selector: NodeTypeSelector, scene_controller: SceneController, tool_controller: ToolController}) => {
@@ -29,7 +29,7 @@ export const EditorLeftTab = (props: {selector: NodeTypeSelector, scene_controll
             }
         >
             <div class="left-tab container modal-content" classList={{"open": show(), "closing": show() && changingState()}}>
-                <div class="button-tab keep row-container">
+                <div class="button-tab keep row-container" style={{height: "fit-content"}}>
                     <ul class="tabs">
                         <li>
                             <input class="visually-hidden" type="file" accept=".json" id="scene-input" onChange={
