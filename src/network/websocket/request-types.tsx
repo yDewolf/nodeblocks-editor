@@ -2,7 +2,7 @@ import { ConnectionSceneData, MinimalNodeSceneData } from "~/wrapper/helpers/nod
 import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, EditorActionStatus, SceneActionTypes, ServerMessages, WebsocketStatus } from "./websocket-protocol";
 import { ServerNotification, NotificationWithMeta } from './requests/notifications';
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
-import { MetadataVersion } from "~/wrapper/metadata/metadata_interfaces";
+import { MetadataVersion } from "~/wrapper/metadata/header_metadata";
 
 // First message client sends after connecting
 export type ClientVersionSync = {

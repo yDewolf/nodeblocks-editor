@@ -164,7 +164,6 @@ export class NodeTypeFile {
         this.node_types_id = json_data.id;
 
         json_data.data_types.forEach((type_data, type_id) => {
-            console.log(type_data);
             const custom_data_type = new CustomDataType(
                 type_id,
                 type_data.base,

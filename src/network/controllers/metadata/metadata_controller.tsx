@@ -1,8 +1,8 @@
 import { createStore, reconcile } from "solid-js/store";
 import { NodeServerClient } from "~/network/websocket/websocket-handler";
-import { MetadataVersion } from "~/wrapper/metadata/metadata_interfaces";
-import { DataTypeMeta, MetadataHeader, NodeTypeMeta } from "./type_metadata";
 import { makePersisted } from "@solid-primitives/storage";
+import { MetadataHeader, MetadataVersion } from "../../../wrapper/metadata/header_metadata";
+import { NodeTypeMeta, DataTypeMeta } from "../../../wrapper/metadata/type_metadata";
 
 const METADATA_CACHE_KEY = "type_metadata_cache"
 export interface MetadataStoreData {
@@ -25,10 +25,11 @@ export class MetadataController {
             header: null,
             node_types: {},
             data_types: {}
-        }));
+        }), {name: METADATA_CACHE_KEY});
         
         this.store = store;
         this.setStore = setStore;
+        console.log("Metadata content:", store.header, store.data_types, store.node_types);
         if (this.store.header) {
             this.metadata_version = {
                 meta_version: this.store.header.meta_version,
@@ -67,7 +68,6 @@ export class MetadataController {
             this.setStore("header", reconcile(headerRes));
             this.setStore("node_types", reconcile(nodesRes));
             this.setStore("data_types", reconcile(datatypesRes));
-            console.log(headerRes, nodesRes, datatypesRes)
             // this.save_to_cache();
 
         } catch (error) {
@@ -80,6 +80,14 @@ export class MetadataController {
         return this.store.header;
     }
 
+    public get_categories() {
+        return this.store.header?.categories;
+    }
+
+    public get_tags() {
+        return this.store.header?.tags;
+    }
+    
     public get_node_meta(type_id: string) {
         return this.store.node_types[type_id];
     }
