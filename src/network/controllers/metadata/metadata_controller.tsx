@@ -3,6 +3,7 @@ import { NodeServerClient } from "~/network/websocket/websocket-handler";
 import { makePersisted } from "@solid-primitives/storage";
 import { MetadataHeader, MetadataVersion } from "../../../wrapper/metadata/header_metadata";
 import { NodeTypeMeta, DataTypeMeta } from "../../../wrapper/metadata/type_metadata";
+import { ServerMessages } from "~/network/websocket/websocket-protocol";
 
 const METADATA_CACHE_KEY = "type_metadata_cache"
 export interface MetadataStoreData {
@@ -39,6 +40,10 @@ export class MetadataController {
             console.warn("Couldn't load metadata from cache. Fetching metadata from server")
             this.update_metadata({meta_version: 0, types_version: 0})
         }
+
+        this._client.add_handler(ServerMessages.METADATA_UPDATED, (message) => {
+            this.update_metadata(message.metadata_version);
+        });
     }
 
     public update_metadata = async (new_version: MetadataVersion) => {
