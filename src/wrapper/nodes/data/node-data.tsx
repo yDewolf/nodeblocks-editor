@@ -5,7 +5,7 @@ import { BaseDataType, DataTypeUtils, DefaultDataTypes } from "./node-data-type"
 export class NodeParameter {
     type: BaseDataType;
     _default: any | null = null;
-    _field_name: string;
+    _field_id: string;
 
     _step: number | null = null;
     _range: number[] | null = null;
@@ -18,8 +18,8 @@ export class NodeParameter {
     _set_value: (value: any) => void;
     _value: () => any;
 
-    constructor(field_data: NodeDataModel, field_name: string) {
-        this._field_name = field_name;
+    constructor(field_data: NodeDataModel, field_id: string) {
+        this._field_id = field_id;
         this._raw_field_data = field_data;
         if (field_data.default) { this._default = field_data.default; }
         if (field_data.step) { this._step = field_data.step; }
@@ -51,11 +51,11 @@ export class NodeData {
 
     static parse_parameters(fields: Map<string, NodeDataModel>): Map<string, NodeParameter> {
         let parsed_fields: Map<string, NodeParameter> = new Map(); 
-        fields.forEach((field_data, field_name) => {
+        fields.forEach((field_data, field_id) => {
             const obj = new NodeParameter(
-                field_data, field_name
+                field_data, field_id
             );
-            parsed_fields.set(field_name, obj);
+            parsed_fields.set(field_id, obj);
         });
 
         return parsed_fields;

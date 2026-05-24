@@ -27,7 +27,7 @@ export interface SceneData {
 
 export interface NodePathData {
     node_id: string,
-    slot_name?: string
+    slot_id?: string
 }
 
 export class NodeSceneFile {
@@ -222,7 +222,7 @@ export class NodeSceneFile {
         if (match) {
             return {
                 node_id: match[1],
-                slot_name: match.length > 1 ? match[2] : undefined
+                slot_id: match.length > 1 ? match[2] : undefined
             }
         }
 
@@ -232,6 +232,6 @@ export class NodeSceneFile {
     }
 
     static make_slot_path(slot: NodeSlot): string {
-        return `nodes:${slot.parent_node.id}:slots:${slot.slot_name}`
+        return `nodes:${slot.parent_node.id}:slots:${slot.slot_id}`
     }
 }

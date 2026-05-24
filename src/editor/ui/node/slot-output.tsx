@@ -8,7 +8,7 @@ export const SlotOutput = (props: {slot: NodeSlot}) => {
             if (props.slot.last_output.size == 0) {
                 return undefined;
             }
-            return [props.slot.slot_name, props.slot.last_output];
+            return [props.slot.slot_id, props.slot.last_output];
         }
         return undefined;
     });

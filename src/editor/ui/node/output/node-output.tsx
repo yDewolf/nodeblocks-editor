@@ -55,14 +55,14 @@ export const NodeOutput = (props: {node: GraphNode}) => {
                 class="fill keep row-container output-selector" style={{"pointer-events": "auto"}}
             >
                 <For each={props.node.last_output.entries().toArray()}>
-                    {([slot_name, _]) => {
+                    {([slot_id, _]) => {
                         return (
                             <button 
                                 class="icon-button selectable-button" 
-                                classList={{"active": props.node.target_slot_output == slot_name}}
-                                onclick={() => props.node.target_slot_output = slot_name}
+                                classList={{"active": props.node.target_slot_output == slot_id}}
+                                onclick={() => props.node.target_slot_output = slot_id}
                             >
-                                {slot_name}
+                                {slot_id}
                             </button>
                         )
                     }}

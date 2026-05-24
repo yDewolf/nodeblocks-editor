@@ -98,8 +98,8 @@ export class NodeTypeFile {
     }
 
 
-    protected set_constructor(type_name: string, constructor: BaseNodeConstructor) {
-        this.node_constructors.set(type_name, constructor);
+    protected set_constructor(type_id: string, constructor: BaseNodeConstructor) {
+        this.node_constructors.set(type_id, constructor);
     }
 
     public keep_track() { this._version() }
@@ -108,8 +108,8 @@ export class NodeTypeFile {
     }
 
 
-    public get_constructor(type_name: string) {
-        const constructor = this.node_constructors.get(type_name);
+    public get_constructor(type_id: string) {
+        const constructor = this.node_constructors.get(type_id);
         if (constructor == undefined) {
             return null;
         }
@@ -182,15 +182,15 @@ export class NodeTypeFile {
 
         // Parse Node Types
         batch(() => {
-            json_data.node_types.forEach((type_data, type_name) => {
+            json_data.node_types.forEach((type_data, type_id) => {
                 const node_data: NodeData = new NodeData(type_data.parameters);
                 const custom_type_constructor = new CustomNodeConstructor(
-                    type_name,
+                    type_id,
                     node_data,
                     type_data.slots,
                     this.slot_types
                 );
-                this.set_constructor(type_name, custom_type_constructor);
+                this.set_constructor(type_id, custom_type_constructor);
             });
             this.notify()
         })

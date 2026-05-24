@@ -8,7 +8,7 @@ import { UserWorkspace } from "~/network/session/user-workspace";
 export const NodeField = (props: {node: GraphNode | null, parameter: NodeParameter, workspace: UserWorkspace | undefined, parameter_sync: ((node: GraphNode, parameter: NodeParameter) => void) | undefined}) => {
     let inputRef!: HTMLInputElement;
     
-    const field_id = props.node?.id.toString() + props.parameter._field_name;
+    const field_id = props.node?.id.toString() + props.parameter._field_id;
     let input_type = "text";
     let step = props.parameter._step ?? undefined;
     let min = props.parameter._range?.at(0);
@@ -74,7 +74,7 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
 
     return (
         <div class="node-field row-container" classList={{"remove-input": props.node == null}}>
-            <label for={field_id}>{props.parameter._field_name}</label>
+            <label for={field_id}>{props.parameter._field_id}</label>
             <Switch fallback={
                 <div>
                     <input

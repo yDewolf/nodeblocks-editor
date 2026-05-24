@@ -98,7 +98,7 @@ export const NodeComponent = (props: {
                         }}
                     >
                         <div class="node-body">
-                            <div class="node-header">{metadata.get_node_meta(props.node.type_name).capitalized_name}</div>
+                            <div class="node-header">{metadata.get_node_meta(props.node.type_id).capitalized_name}</div>
                             
                             <div class="node-content container">
                                 <For each={props.node.node_data.parameters.values().toArray()}>

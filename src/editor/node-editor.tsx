@@ -273,13 +273,13 @@ export class NodeEditor {
                 return;
             }
             const node_output: Map<string, Map<string, any>> = new Map(
-                Object.entries(message.value).map(([slot_name, slot_output]: [string, any]) => {
-                    return [slot_name, slot_output];
+                Object.entries(message.value).map(([slot_id, slot_output]: [string, any]) => {
+                    return [slot_id, slot_output];
                 })
             );
             // console.log(message);
-            node_output.forEach((value, slot_name) => {
-                const slot = node.get_slot(slot_name);
+            node_output.forEach((value, slot_id) => {
+                const slot = node.get_slot(slot_id);
                 if (slot) {
                     slot.last_output = value;
                 }

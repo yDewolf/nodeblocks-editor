@@ -4,12 +4,11 @@ import { NodeConnection } from './node-connection';
 import { NodeSlot } from './slot/node-slot';
 import { NodeData } from './data/node-data';
 import { BaseNode } from './scene-element';
-import { NodeMetadata } from './data/node-metadata';
 
 export class GraphNode extends BaseNode {
     id: string;
     node_name: string;
-    type_name: string;
+    type_id: string;
 
     // TODO: Grab metadata from a global metadata controller
     // metadata: NodeMetadata | undefined;
@@ -22,7 +21,7 @@ export class GraphNode extends BaseNode {
     private _set_last_output: (out: Map<string, Map<string, any>>) => void;
 
     private _target_slot_output: () => string | undefined;
-    private _set_target_slot_output: (slot_name: string) => void;
+    private _set_target_slot_output: (slot_id: string) => void;
 
     private _is_current_step: () => boolean;
     private _set_current_step: (v: boolean) => void;
@@ -39,10 +38,10 @@ export class GraphNode extends BaseNode {
     private _size: () => Vector2;
     private _setSize: (v: Vector2) => void;
 
-    constructor(node_name: string, node_data: NodeData, position: Vector2, id: string = "", type_name: string = "BaseNode") {
+    constructor(node_name: string, node_data: NodeData, position: Vector2, id: string = "", type_id: string = "BaseNode") {
         super();
         
-        this.type_name = type_name;
+        this.type_id = type_id;
         this.id = id;
         this.node_name = node_name;
         this.raw_pos = position;
@@ -91,7 +90,7 @@ export class GraphNode extends BaseNode {
         if (this.target_slot_output == undefined) {
             const output_slots = this.output_slots;
             if (!output_slots) return;
-            this.target_slot_output = output_slots[0].slot_name;
+            this.target_slot_output = output_slots[0].slot_id;
         }
     }
 
@@ -120,9 +119,9 @@ export class GraphNode extends BaseNode {
     get selected() { return this._selected() }
     set selected(value: boolean) { this._setSelected(value) }
 
-    public get_slot(slot_name: string): NodeSlot | undefined {
+    public get_slot(slot_id: string): NodeSlot | undefined {
         let target_slot: NodeSlot | undefined = undefined;
-        const found_slots = this._slots.filter((slot) => slot.slot_name == slot_name);
+        const found_slots = this._slots.filter((slot) => slot.slot_id == slot_id);
         if (found_slots) {
             target_slot = found_slots[0];
         }

@@ -12,7 +12,7 @@ export class NodeSlot {
     parent_node: GraphNode;
     style: NodeSlotStyle; // FIXME: SlotComponent
 
-    slot_name: string;
+    slot_id: string;
 
     max_connections: number = 0;
     data_type: BaseDataType;
@@ -29,13 +29,13 @@ export class NodeSlot {
 
     _last_world_pos: Vector2 = {x: 0, y: 0};
 
-    constructor(parent: GraphNode, slot_type: BaseSlotType, slot_name: string, is_input: boolean, data_type: BaseDataType | null = null, max_connections: number = 0) {
+    constructor(parent: GraphNode, slot_type: BaseSlotType, slot_id: string, is_input: boolean, data_type: BaseDataType | null = null, max_connections: number = 0) {
         this.style = new NodeSlotStyle(slot_type, is_input);
 
         this.max_connections = max_connections;
         this.is_input = is_input;
         this.data_type = data_type == null ? slot_type.data_type : data_type;
-        this.slot_name = slot_name;
+        this.slot_id = slot_id;
 
         const [lastOutput, setLastOutput] = createSignal(new Map());
         this._last_output = lastOutput;
@@ -175,7 +175,7 @@ export class NodeSlot {
                     }}
                 >
                     <div class="slot-dot-content">
-                        {this.slot_name}
+                        {this.slot_id}
                         {/* <SlotOutput slot={this}/> */}
                     </div>
                 </div>

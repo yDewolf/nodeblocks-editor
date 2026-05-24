@@ -72,7 +72,7 @@ export class SelectionTool extends BaseEditorTool {
     }
 
     onClickOnNodePreview(node_preview: NodePreview): void {
-        this.selection_controller.selected_node_type = node_preview.node_constructor.type_name;
+        this.selection_controller.selected_node_type = node_preview.node_constructor.type_id;
         
         if (this._selected_preview != null) {
             this._selected_preview.selected = false
