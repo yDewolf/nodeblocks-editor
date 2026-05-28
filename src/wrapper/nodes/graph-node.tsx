@@ -89,7 +89,7 @@ export class GraphNode extends BaseNode {
         this._set_last_output(output) 
         if (this.target_slot_output == undefined) {
             const output_slots = this.output_slots;
-            if (!output_slots) return;
+            if (output_slots.length == 0) return;
             this.target_slot_output = output_slots[0].slot_id;
         }
     }

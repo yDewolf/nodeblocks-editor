@@ -25,7 +25,8 @@ export class NodePreview {
         const onClickOnSlot = () => {};
         const onHoverSlot = () => {};
         const ref_node = this.node_constructor.make_node(this.node_constructor.type_id, {x: 0, y: 0}, "");
-    
+        const node_meta = metadata.get_node_meta(this.node_constructor.type_id)
+
         return (
             <div 
                 onPointerDown={() => onPointerDown(this)}
@@ -50,7 +51,7 @@ export class NodePreview {
                     class="internal-node"
                 >
                     <div class="node-body">
-                        <div class="node-header">{metadata.get_node_meta(ref_node.type_id).capitalized_name}</div>
+                        <div class="node-header">{node_meta != undefined ? node_meta.capitalized_name : this.node_constructor.type_id}</div>
                         
                         <div class="node-content remove-input">
                             <For each={this.node_constructor._data_model.parameters.values().toArray()}>

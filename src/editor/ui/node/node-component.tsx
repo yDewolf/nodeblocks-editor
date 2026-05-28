@@ -44,6 +44,7 @@ export const NodeComponent = (props: {
     const isVisible = createMemo(() => {
         return props.camera.camera_rect.overlaps(props.node.rect);
     });
+    const node_meta = metadata.get_node_meta(props.node.type_id);
 
     return (
             <Show when={isVisible()}>
@@ -98,7 +99,7 @@ export const NodeComponent = (props: {
                         }}
                     >
                         <div class="node-body">
-                            <div class="node-header">{metadata.get_node_meta(props.node.type_id).capitalized_name}</div>
+                            <div class="node-header">{node_meta != undefined ? node_meta.capitalized_name : props.node.type_id}</div>
                             
                             <div class="node-content container">
                                 <For each={props.node.node_data.parameters.values().toArray()}>
