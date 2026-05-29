@@ -10,6 +10,10 @@ import { UserWorkspace } from "~/network/session/user-workspace";
 import { NotificationPopupHolder } from '../misc/notification/notification-badges';
 import { NotificationController } from "~/network/controllers/notification_controller";
 import { metadata } from "~/singletons/metadata";
+import { SlotComponent } from "./slot-components";
+import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
+import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
+import { DropdownSection } from "../panels/base-panels";
 
 export const NodeComponent = (props: { 
     node: GraphNode, 
@@ -139,3 +143,87 @@ export const NodeComponent = (props: {
             </Show>
         );
 };
+
+
+export const NodeComponentV2 = (props: {node?: GraphNode, constructor?: BaseNodeConstructor}) => {
+    const ref_node = props.node ? props.node : props.constructor?.make_node("",{x: 0, y: 0});
+    if (!ref_node) {
+        throw new Error("Reference node can't be undefined on NodeComponent. 'node' field or 'constructor' should be set");
+    }
+    const node_meta = metadata.get_node_meta(ref_node.type_id);
+    const [isExpanded, setIsExpanded] = createSignal(false);
+    const [isHovered, setIsHovered] = createSignal(false);
+
+    return (
+        <div
+            class="nodev2 node"
+            classList={{
+                "expanded": isExpanded(),
+                "hovered": isHovered()
+            }}
+        >
+            <NodeHeader node={ref_node}/>
+            <NodeBody 
+                show_slots={isExpanded() || isHovered()} 
+                show_sections={isExpanded()} 
+                node={ref_node}
+                node_meta={node_meta}
+            />
+        </div>
+    )  
+}
+
+const NodeHeader = (props: {node: GraphNode, node_meta?: NodeTypeMeta}) => {
+    return (
+        <div
+            class="node-header"
+        >
+            <span>{props.node_meta?.capitalized_name ?? props.node.type_id}</span>
+        </div>
+    )
+}
+
+const NodeBody = (props: {node: GraphNode, node_meta?: NodeTypeMeta, show_slots: boolean, show_sections: boolean}) => {
+    return (
+        <div
+            class="node-body"
+        >
+            <Show when={props.show_slots}>
+                <SlotGrid node={props.node} node_meta={props.node_meta}/>
+            </Show>
+            <Show when={props.show_sections}>
+                <NodeBodySections node={props.node} node_meta={props.node_meta}/>
+            </Show>
+        </div>
+    )
+}
+
+const SlotGrid = (props: {node: GraphNode, node_meta?: NodeTypeMeta}) => {
+    return (
+        <div class="slot-grid">
+            <For each={props.node.input_slots}>
+                {(slot) => {
+                    return (
+                        <SlotComponent slot={slot} show_label={true} node_meta={props.node_meta}/>
+                    )
+                }}
+            </For>
+            <For each={props.node.output_slots}>
+                {(slot) => {
+                    return (
+                        <SlotComponent slot={slot} show_label={true} node_meta={props.node_meta}/>
+                    )
+                }}
+            </For>
+        </div>
+    )
+}
+
+const NodeBodySections = (props: {node: GraphNode, node_meta?: NodeTypeMeta}) => {
+    return (
+        // TODO
+        <div class="node-body-sections">
+            <DropdownSection header="Parameters" content={}/>
+        </div>
+    )
+}
