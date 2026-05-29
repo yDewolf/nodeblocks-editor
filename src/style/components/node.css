@@ -24,11 +24,18 @@
   background-color: white;
 }
 
+.node-button {
+  img {
+    width: 20px;
+  }
+}
+
 .node-header {
+  padding: 0 5px;
+  align-items: center;
 }
 
 .node-body {
-  margin: 5px 10px;
 }
 
 .node-content {

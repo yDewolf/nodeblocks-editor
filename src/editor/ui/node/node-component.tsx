@@ -1,4 +1,4 @@
-import { createMemo, For, onCleanup, Show } from "solid-js";
+import { createMemo, createSignal, For, onCleanup, Show } from "solid-js";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { NodeField } from "~/editor/ui/node/node-field";
@@ -45,6 +45,8 @@ export const NodeComponent = (props: {
         return props.camera.camera_rect.overlaps(props.node.rect);
     });
     const node_meta = metadata.get_node_meta(props.node.type_id);
+    const [is_compacted, setIsCompacted] = createSignal(true);
+    const [is_hovered, setIsHovered] = createSignal(true);
 
     return (
             <Show when={isVisible()}>
@@ -55,6 +57,7 @@ export const NodeComponent = (props: {
                         e.stopPropagation();
 
                         props.onHoverNode(props.node);
+                        // setIsHovered(true);
                     }}
                     style={{
                         position: "absolute",
@@ -73,18 +76,19 @@ export const NodeComponent = (props: {
                         notifications={props.notification_controller.forNode(props.node.id)}
                         pos={{x: 0, y: props.node.rect.size.y}}
                     />
-                    <div class="node-slots">
-                        <NodeAnchor anchor_pos={{x: 0, y: -1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
-                        <div class="side-anchors">
-                            <NodeAnchor anchor_pos={{x: -1, y: 0}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
-                            <div></div>
-                            <NodeAnchor anchor_pos={{x: 1, y: 0}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
+                    <Show when={is_compacted() && !is_hovered()}>
+                        <div class="node-slots">
+                            <NodeAnchor anchor_pos={{x: 0, y: -1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
+                            <div class="side-anchors">
+                                <NodeAnchor anchor_pos={{x: -1, y: 0}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
+                                <div></div>
+                                <NodeAnchor anchor_pos={{x: 1, y: 0}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
+                            </div>
+                            <NodeAnchor anchor_pos={{x: 0, y: 1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
                         </div>
-                        <NodeAnchor anchor_pos={{x: 0, y: 1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
-                    </div>
-                     <div
+                    </Show>
+                    <div
                         class="internal-node"
-                        data-node-id={props.node.id}
                         onPointerDown={(e) => {
                             if (e.button != 0) {
                                 return;
@@ -98,9 +102,22 @@ export const NodeComponent = (props: {
                             "selected-mode": props.node.selected
                         }}
                     >
+                        <div class="keep row-container space-between node-header" onpointerdown={(e) => {e.preventDefault()}}>
+                            {node_meta != undefined ? node_meta.capitalized_name : props.node.type_id}
+                            <span class="icon-span">
+                                <button class="icon-button node-button" onclick={() => {
+
+                                }}>
+                                    <img src="public/assets/icons/arrow-down.svg" alt="" />
+                                </button>
+                            </span>
+                        </div>
                         <div class="node-body">
-                            <div class="node-header">{node_meta != undefined ? node_meta.capitalized_name : props.node.type_id}</div>
-                            
+                            <Show when={is_compacted() && is_hovered()}>
+                                <div class="internal-node-slots">
+                                    <NodeAnchor anchor_pos={{x: 0, y: 1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
+                                </div>
+                            </Show>
                             <div class="node-content container">
                                 <For each={props.node.node_data.parameters.values().toArray()}>
                                     {(parameter: NodeParameter) => <NodeField
