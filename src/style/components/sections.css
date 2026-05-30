@@ -8,10 +8,13 @@
     justify-content: space-between;
     
     height: fit-content;
+
+    border: solid 1px var(--stroke-color);
+    padding: 0 5px;
 }
 
 .section-body {
-
+    padding: 5px 5px;
 }
 
 .dropdown-icon {

@@ -2,18 +2,17 @@ import { createMemo, createSignal, For, onCleanup, Show } from "solid-js";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { NodeField } from "~/editor/ui/node/node-field";
-import { NodeAnchor } from "../misc/node-anchors";
 import { EditorCamera } from "~/editor/internal/editor-space";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { NodeOutput } from './output/node-output';
+import { NodeOutput, OutputSelector } from './output/node-output';
 import { UserWorkspace } from "~/network/session/user-workspace";
-import { NotificationPopupHolder } from '../misc/notification/notification-badges';
 import { NotificationController } from "~/network/controllers/notification_controller";
 import { metadata } from "~/singletons/metadata";
 import { SlotComponent } from "./slot-components";
 import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 import { DropdownIcon, DropdownSection } from "../panels/base-panels";
+import { NotificationPopupHolder } from "../misc/notification/notification-badges";
 
 export const NodeComponent = (props: { 
     node: GraphNode, 
@@ -67,70 +66,22 @@ export const NodeComponent = (props: {
                     }}
                     class="node"
                 >   
-                    <NodeComponentV2 node={props.node} constructor={undefined} onClick={props.onClick} onHover={props.onHoverNode} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
-                    {/* <NotificationPopupHolder 
+                    <NodeComponentV2 
+                        node={props.node} 
+                        constructor={undefined} 
+                        workspace={props.workspace}
+
+                        syncParameter={props.syncParameter}
+                        onClick={props.onClick} 
+                        onHover={props.onHoverNode} 
+                        onClickSlot={props.onClickSlot} 
+                        onHoverSlot={props.onHoverSlot}
+                    />
+                    <NotificationPopupHolder 
                         notification_controller={props.notification_controller}
                         notifications={props.notification_controller.forNode(props.node.id)}
                         pos={{x: 0, y: props.node.rect.size.y}}
                     />
-                    <Show when={is_compacted() && !is_hovered()}>
-                        <div class="node-slots">
-                            <NodeAnchor anchor_pos={{x: 0, y: -1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
-                            <div class="side-anchors">
-                                <NodeAnchor anchor_pos={{x: -1, y: 0}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
-                                <div></div>
-                                <NodeAnchor anchor_pos={{x: 1, y: 0}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
-                            </div>
-                            <NodeAnchor anchor_pos={{x: 0, y: 1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
-                        </div>
-                    </Show>
-                    <div
-                        class="internal-node"
-                        onPointerDown={(e) => {
-                            if (e.button != 0) {
-                                return;
-                            }
-                            // FIXME: Stop Propagation shouldn't break PointerDown Cleanup
-                            // e.stopPropagation();
-                            (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
-                            props.onClick(props.node);
-                        }}
-                        classList={{
-                            "selected-mode": props.node.selected
-                        }}
-                    >
-                        <div class="keep row-container space-between node-header" onpointerdown={(e) => {e.preventDefault()}}>
-                            {node_meta != undefined ? node_meta.capitalized_name : props.node.type_id}
-                            <span class="icon-span">
-                                <button class="icon-button node-button" onclick={() => {
-
-                                }}>
-                                    <img src="public/assets/icons/arrow-down.svg" alt="" />
-                                </button>
-                            </span>
-                        </div>
-                        <div class="node-body">
-                            <Show when={is_compacted() && is_hovered()}>
-                                <div class="internal-node-slots">
-                                    <NodeAnchor anchor_pos={{x: 0, y: 1}} all_slots={props.node.all_slots} onClickOnSlot={props.onClickOnSlot} onHoverSlot={props.onHoverSlot}/>
-                                </div>
-                            </Show>
-                            <div class="node-content container">
-                                <For each={props.node.node_data.parameters.values().toArray()}>
-                                    {(parameter: NodeParameter) => <NodeField
-                                            node={props.node}
-                                            workspace={props.workspace}
-                                            parameter={parameter}
-                                            parameter_sync={() => {
-                                                props.syncParameter(props.node, parameter)
-                                            }}
-                                        />
-                                    }
-                                </For>
-                            </div>
-                            <NodeOutput node={props.node}/>
-                        </div>
-                    </div> */}
                 </div>
             </Show>
         );
@@ -139,10 +90,12 @@ export const NodeComponent = (props: {
 
 export const NodeComponentV2 = (props: {
     node?: GraphNode, constructor?: BaseNodeConstructor, 
+    workspace: UserWorkspace,
     onClick: (node: GraphNode) => void, 
     onHover: (node: GraphNode) => void,
     onClickSlot: (slot: NodeSlot) => void, 
-    onHoverSlot: (slot: NodeSlot) => void
+    onHoverSlot: (slot: NodeSlot) => void,
+    syncParameter: (node: GraphNode, parameter: NodeParameter) => void,
 }) => {
     const ref_node = props.node ? props.node : props.constructor?.make_node("",{x: 0, y: 0});
     if (!ref_node) {
@@ -180,13 +133,18 @@ export const NodeComponentV2 = (props: {
                 show_slots={isExpanded() || isHovered()} 
                 show_sections={isExpanded()} 
                 node={ref_node}
+                workspace={props.workspace}
                 node_meta={node_meta}
+                syncParameter={props.syncParameter}
                 onClickSlot={props.onClickSlot}
                 onHoverSlot={(slot: NodeSlot) => {
                     setIsHovered(true);
                     props.onHoverSlot(slot);
                 }}
             />
+            <Show when={!isExpanded() && ref_node.last_output}>
+                <NodeOutput node={ref_node}/>
+            </Show>
         </div>
     )  
 }
@@ -235,6 +193,8 @@ const NodeBody = (props: {
     node_meta?: NodeTypeMeta, 
     show_slots: boolean, 
     show_sections: boolean,
+    workspace: UserWorkspace,
+    syncParameter: (node: GraphNode, parameter: NodeParameter) => void,
     onClickSlot: (slot: NodeSlot) => void, 
     onHoverSlot: (slot: NodeSlot) => void
 }) => {
@@ -246,7 +206,7 @@ const NodeBody = (props: {
                 <SlotGrid slot_label={true} node={props.node} node_meta={props.node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
             </Show>
             <Show when={props.show_sections}>
-                <NodeBodySections node={props.node} node_meta={props.node_meta}/>
+                <NodeBodySections workspace={props.workspace} node={props.node} node_meta={props.node_meta} syncParameter={props.syncParameter}/>
             </Show>
         </div>
     )
@@ -281,15 +241,37 @@ const SlotGrid = (props: {
     )
 }
 
-const NodeBodySections = (props: {node: GraphNode, node_meta?: NodeTypeMeta}) => {
+const NodeBodySections = (props: {
+    node: GraphNode, 
+    workspace: UserWorkspace,
+    syncParameter: (node: GraphNode, parameter: NodeParameter) => void,
+    node_meta?: NodeTypeMeta
+}) => {
     return (
         // TODO
         <div class="node-body-sections">
             <DropdownSection header="Parameters" content={
                 <div>
-
+                    <For each={props.node.node_data.parameters.values().toArray()}>
+                        {(parameter: NodeParameter) => <NodeField
+                                node={props.node}
+                                workspace={props.workspace}
+                                parameter={parameter}
+                                parameter_sync={() => {
+                                    props.syncParameter(props.node, parameter)
+                                }}
+                            />
+                        }
+                    </For>    
                 </div>
             }/>
+            <DropdownSection 
+                header="Output" 
+                content={
+                    <NodeOutput node={props.node}/>
+                }
+                default_expanded={true}
+            />
         </div>
     )
 }
