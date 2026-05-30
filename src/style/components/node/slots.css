@@ -1,0 +1,61 @@
+.node-slot {
+    padding: 2px 0;
+    align-items: center;
+    height: fit-content;
+    display: flex;
+    gap: 5px;
+}
+.slot-label {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.slot-dot {
+  pointer-events: auto;
+  width: 12px;
+  height: 12px;
+  background: #444;
+
+  border: 2px solid #888;
+  border-radius: 50%;
+}
+
+.slot-dot.output-slot {
+  border-radius: 0;
+}
+
+.slot-dot:hover {
+  transform: scale(1.3);
+  cursor: crosshair;
+}
+
+.input-slot {
+  .slot-dot {
+    background: #fff;
+  }
+}
+
+.output-slot {
+  flex-direction: row-reverse;
+  .slot-dot {
+    background: #444;
+  }
+}
+
+.connected-slot {
+  .slot-dot {
+    background: #91ff00;
+  }
+}
+
+.connected-slot.input-slot {
+  .slot-dot {
+    background: #e5ffc4;
+  }
+}
+
+.selected-slot {
+  .slot-dot {
+    background: var(--node-selected-color);
+  }
+}

@@ -28,6 +28,7 @@ import { EditorLeftTab } from "./ui/panels/left-tab";
 import { SessionController } from "~/network/session/session-controller";
 import { SidebarNotifications } from "./ui/misc/notification/notification-badges";
 import "~/style/screens/editor.css";
+import { SlotComponent } from "./ui/node/slot-components";
 
 export class NodeEditor {
     scene_controller: SceneController;
@@ -219,7 +220,7 @@ export class NodeEditor {
         this.input_manager.set_event_handler(
             InputEvents.CLICK_ON_NODE_SLOT,
             new EventHandler("onClickOnSlot", (data) => {
-                if (data.slot != null) {
+                if (data.slot) {
                     this.tool_controller.current_tool?.onClickOnNodeSlot(data.slot);
                 }
             })
@@ -237,7 +238,7 @@ export class NodeEditor {
         this.input_manager.set_event_handler(
             InputEvents.HOVER_SLOT,
             new EventHandler("onHoverSlot", (data) => {
-                if (data.slot != null) {
+                if (data.slot) {
                     this.tool_controller.current_tool?.onHoverSlot(data.slot);
                 }
             })
@@ -389,14 +390,14 @@ export class NodeEditor {
                                     onClick={(node: GraphNode) => {
                                         this.input_manager.generalizedEventHandler({node: node}, InputEvents.CLICK_ON_NODE)
                                     }}
-                                    onClickOnSlot={(slot: NodeSlot) => {
+                                    onClickSlot={(slot: NodeSlot) => {
                                         this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.CLICK_ON_NODE_SLOT)
-                                    }}
-                                    onHoverNode={(node: GraphNode) => {
-                                        this.input_manager.generalizedEventHandler({node: node}, InputEvents.HOVER_NODE)
                                     }}
                                     onHoverSlot={(slot: NodeSlot) => {
                                         this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.HOVER_SLOT)
+                                    }}
+                                    onHoverNode={(node: GraphNode) => {
+                                        this.input_manager.generalizedEventHandler({node: node}, InputEvents.HOVER_NODE)
                                     }}
                                     syncParameter={(node: GraphNode, parameter: NodeParameter) => {
                                         // TODO: Update only this parameter

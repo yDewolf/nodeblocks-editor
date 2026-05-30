@@ -1,0 +1,22 @@
+.dropdown-section {
+    
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    height: fit-content;
+}
+
+.section-body {
+
+}
+
+.dropdown-icon {
+    width: 20px !important;
+}
+.dropdown-icon.expanded {
+    transform: rotate(-90deg);
+}

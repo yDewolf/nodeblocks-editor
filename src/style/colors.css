@@ -1,3 +1,19 @@
+/* Raw colors (default theme) */
+:root {
+  --font-color: #24262A;
+  --secondary-font-color: #3C3D3F;
+
+  --node-color: #f4f6fada;
+  --stroke-color: #D4D4D4;
+  
+  --group-color: #f9f9f9;
+  --group-header-color: #D7E4EB;
+  
+  --overlay-font-color: var(var(--font-color));
+  --overlay-highlight: #BBCBD9;
+  --dark-overlay-highlight: #DAE6F0;
+}
+
 :root {
   --main-color: #7bb4ff;
   --light-main-color: #dcebfd;

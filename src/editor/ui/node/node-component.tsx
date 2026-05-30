@@ -13,7 +13,7 @@ import { metadata } from "~/singletons/metadata";
 import { SlotComponent } from "./slot-components";
 import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
-import { DropdownSection } from "../panels/base-panels";
+import { DropdownIcon, DropdownSection } from "../panels/base-panels";
 
 export const NodeComponent = (props: { 
     node: GraphNode, 
@@ -21,8 +21,8 @@ export const NodeComponent = (props: {
     workspace: UserWorkspace,
     notification_controller: NotificationController,
     onClick: (node: GraphNode) => void, 
-    onClickOnSlot: (slot: NodeSlot) => void, 
     onHoverNode: (node: GraphNode) => void, 
+    onClickSlot: (slot: NodeSlot) => void, 
     onHoverSlot: (slot: NodeSlot) => void,
     syncParameter: (node: GraphNode, parameter: NodeParameter) => void
 }) => {
@@ -49,20 +49,11 @@ export const NodeComponent = (props: {
         return props.camera.camera_rect.overlaps(props.node.rect);
     });
     const node_meta = metadata.get_node_meta(props.node.type_id);
-    const [is_compacted, setIsCompacted] = createSignal(true);
-    const [is_hovered, setIsHovered] = createSignal(true);
 
     return (
             <Show when={isVisible()}>
                 <div 
                     ref={(el) => handleRef(el)}
-                    onMouseOver={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        props.onHoverNode(props.node);
-                        // setIsHovered(true);
-                    }}
                     style={{
                         position: "absolute",
                         transform: `translate(${props.node.x}px, ${props.node.y}px)`,
@@ -71,11 +62,13 @@ export const NodeComponent = (props: {
                     classList={{
                         "unsynced": !props.node.is_synced,
                         "failed": props.node.has_failed_action,
-                        "current-step": props.node.is_current_step
+                        "current-step": props.node.is_current_step,
+                        "selected-mode": props.node.selected,
                     }}
                     class="node"
                 >   
-                    <NotificationPopupHolder 
+                    <NodeComponentV2 node={props.node} constructor={undefined} onClick={props.onClick} onHover={props.onHoverNode} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+                    {/* <NotificationPopupHolder 
                         notification_controller={props.notification_controller}
                         notifications={props.notification_controller.forNode(props.node.id)}
                         pos={{x: 0, y: props.node.rect.size.y}}
@@ -134,18 +127,23 @@ export const NodeComponent = (props: {
                                         />
                                     }
                                 </For>
-                                {/* <div class="node-internal-data"> ... </div> */}
                             </div>
                             <NodeOutput node={props.node}/>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </Show>
         );
 };
 
 
-export const NodeComponentV2 = (props: {node?: GraphNode, constructor?: BaseNodeConstructor}) => {
+export const NodeComponentV2 = (props: {
+    node?: GraphNode, constructor?: BaseNodeConstructor, 
+    onClick: (node: GraphNode) => void, 
+    onHover: (node: GraphNode) => void,
+    onClickSlot: (slot: NodeSlot) => void, 
+    onHoverSlot: (slot: NodeSlot) => void
+}) => {
     const ref_node = props.node ? props.node : props.constructor?.make_node("",{x: 0, y: 0});
     if (!ref_node) {
         throw new Error("Reference node can't be undefined on NodeComponent. 'node' field or 'constructor' should be set");
@@ -162,34 +160,70 @@ export const NodeComponentV2 = (props: {node?: GraphNode, constructor?: BaseNode
                 "hovered": isHovered()
             }}
         >
-            <NodeHeader node={ref_node}/>
+            <NodeHeader node={ref_node} isExpanded={isExpanded()} setExpanded={setIsExpanded} onClick={props.onClick} onHover={props.onHover}/>
             <NodeBody 
                 show_slots={isExpanded() || isHovered()} 
                 show_sections={isExpanded()} 
                 node={ref_node}
                 node_meta={node_meta}
+                onClickSlot={props.onClickSlot}
+                onHoverSlot={props.onHoverSlot}
             />
         </div>
     )  
 }
 
-const NodeHeader = (props: {node: GraphNode, node_meta?: NodeTypeMeta}) => {
+const NodeHeader = (props: {
+    node: GraphNode, 
+    node_meta?: NodeTypeMeta, 
+    isExpanded: boolean, 
+    setExpanded: (value: boolean) => void, 
+    onClick: (node: GraphNode) => void, 
+    onHover: (node: GraphNode) => void
+}) => {
     return (
         <div
-            class="node-header"
+            class="node-header space-between"
+            onPointerDown={(e) => {
+                if (e.button != 0) {
+                    return;
+                }
+                (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+                props.onClick(props.node);
+            }}
+            onMouseOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                props.onHover(props.node);
+            }}
         >
             <span>{props.node_meta?.capitalized_name ?? props.node.type_id}</span>
+            <button 
+                class="icon-button" 
+                onPointerDown={(e) => e.stopPropagation()}
+                onclick={() => {if (props.isExpanded) {props.setExpanded(false)} else {props.setExpanded(true)}}}
+            >
+                <DropdownIcon expanded={props.isExpanded}/>
+            </button>
         </div>
     )
 }
 
-const NodeBody = (props: {node: GraphNode, node_meta?: NodeTypeMeta, show_slots: boolean, show_sections: boolean}) => {
+const NodeBody = (props: {
+    node: GraphNode, 
+    node_meta?: NodeTypeMeta, 
+    show_slots: boolean, 
+    show_sections: boolean,
+    onClickSlot: (slot: NodeSlot) => void, 
+    onHoverSlot: (slot: NodeSlot) => void
+}) => {
     return (
         <div
             class="node-body"
         >
             <Show when={props.show_slots}>
-                <SlotGrid node={props.node} node_meta={props.node_meta}/>
+                <SlotGrid node={props.node} node_meta={props.node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
             </Show>
             <Show when={props.show_sections}>
                 <NodeBodySections node={props.node} node_meta={props.node_meta}/>
@@ -198,23 +232,30 @@ const NodeBody = (props: {node: GraphNode, node_meta?: NodeTypeMeta, show_slots:
     )
 }
 
-const SlotGrid = (props: {node: GraphNode, node_meta?: NodeTypeMeta}) => {
+const SlotGrid = (props: {
+    node: GraphNode, 
+    node_meta?: NodeTypeMeta,
+    onClickSlot: (slot: NodeSlot) => void, 
+    onHoverSlot: (slot: NodeSlot) => void
+}) => {
     return (
         <div class="slot-grid">
-            <For each={props.node.input_slots}>
-                {(slot) => {
-                    return (
-                        <SlotComponent slot={slot} show_label={true} node_meta={props.node_meta}/>
-                    )
-                }}
-            </For>
-            <For each={props.node.output_slots}>
-                {(slot) => {
-                    return (
-                        <SlotComponent slot={slot} show_label={true} node_meta={props.node_meta}/>
-                    )
-                }}
-            </For>
+            <div class="slot-grid-column">
+                <For each={props.node.input_slots}>
+                    {(slot) => {
+                        const component = new SlotComponent(slot, props.node_meta);
+                        return component.View(true, true, props.onClickSlot, props.onHoverSlot);
+                    }}
+                </For>
+            </div>
+            <div class="slot-grid-column">
+                <For each={props.node.output_slots}>
+                    {(slot) => {
+                        const component = new SlotComponent(slot, props.node_meta);
+                        return component.View(true, true, props.onClickSlot, props.onHoverSlot);
+                    }}
+                </For>
+            </div>
         </div>
     )
 }
@@ -223,7 +264,11 @@ const NodeBodySections = (props: {node: GraphNode, node_meta?: NodeTypeMeta}) =>
     return (
         // TODO
         <div class="node-body-sections">
-            <DropdownSection header="Parameters" content={}/>
+            <DropdownSection header="Parameters" content={
+                <div>
+
+                </div>
+            }/>
         </div>
     )
 }

@@ -1,3 +1,4 @@
+import { SlotComponent } from "~/editor/ui/node/slot-components";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 

@@ -8,7 +8,7 @@ import { BaseDataType } from "../data/node-data-type";
 import { BaseSlotType } from "../data/slot-types";
 
 export class NodeSlot {
-    private _element: HTMLDivElement | undefined; // FIXME: SlotComponent
+    _element: HTMLDivElement | undefined; // FIXME: SlotComponent
     parent_node: GraphNode;
     style: NodeSlotStyle; // FIXME: SlotComponent
 
