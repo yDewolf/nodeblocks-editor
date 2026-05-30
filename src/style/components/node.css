@@ -17,6 +17,7 @@
 }
 
 .node-header {
+  height: fit-content;
   display: flex;
   padding: 0 5px;
   align-items: center;
@@ -25,6 +26,16 @@
 .slot-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+}
+
+.slot-grid-overlay, .node-header {
+  grid-area: 1 / 1;
+}
+
+.slot-grid-overlay {
+  pointer-events: none;
+  margin: 0 -15px;
+  align-content: center;
 }
 
 .slot-grid-column {

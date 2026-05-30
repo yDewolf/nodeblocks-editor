@@ -155,19 +155,37 @@ export const NodeComponentV2 = (props: {
     return (
         <div
             class="nodev2 node"
+            onMouseLeave={(e) => {
+                setIsHovered(false);
+            }}
             classList={{
                 "expanded": isExpanded(),
                 "hovered": isHovered()
             }}
         >
-            <NodeHeader node={ref_node} isExpanded={isExpanded()} setExpanded={setIsExpanded} onClick={props.onClick} onHover={props.onHover}/>
+            <NodeHeader 
+                node={ref_node} 
+                isExpanded={isExpanded()} 
+                setExpanded={setIsExpanded}
+                setIsHovered={setIsHovered}
+                onClick={props.onClick}
+                onHover={props.onHover}
+            />
+            <Show when={!isExpanded() && !isHovered()}>
+                <div class="slot-grid-overlay">
+                    <SlotGrid node={ref_node} slot_label={false} node_meta={node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+                </div>
+            </Show>
             <NodeBody 
                 show_slots={isExpanded() || isHovered()} 
                 show_sections={isExpanded()} 
                 node={ref_node}
                 node_meta={node_meta}
                 onClickSlot={props.onClickSlot}
-                onHoverSlot={props.onHoverSlot}
+                onHoverSlot={(slot: NodeSlot) => {
+                    setIsHovered(true);
+                    props.onHoverSlot(slot);
+                }}
             />
         </div>
     )  
@@ -178,6 +196,7 @@ const NodeHeader = (props: {
     node_meta?: NodeTypeMeta, 
     isExpanded: boolean, 
     setExpanded: (value: boolean) => void, 
+    setIsHovered: (value: boolean) => void,
     onClick: (node: GraphNode) => void, 
     onHover: (node: GraphNode) => void
 }) => {
@@ -194,7 +213,8 @@ const NodeHeader = (props: {
             onMouseOver={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-
+                
+                props.setIsHovered(true);
                 props.onHover(props.node);
             }}
         >
@@ -223,7 +243,7 @@ const NodeBody = (props: {
             class="node-body"
         >
             <Show when={props.show_slots}>
-                <SlotGrid node={props.node} node_meta={props.node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+                <SlotGrid slot_label={true} node={props.node} node_meta={props.node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
             </Show>
             <Show when={props.show_sections}>
                 <NodeBodySections node={props.node} node_meta={props.node_meta}/>
@@ -233,7 +253,8 @@ const NodeBody = (props: {
 }
 
 const SlotGrid = (props: {
-    node: GraphNode, 
+    node: GraphNode,
+    slot_label: boolean,
     node_meta?: NodeTypeMeta,
     onClickSlot: (slot: NodeSlot) => void, 
     onHoverSlot: (slot: NodeSlot) => void
@@ -244,7 +265,7 @@ const SlotGrid = (props: {
                 <For each={props.node.input_slots}>
                     {(slot) => {
                         const component = new SlotComponent(slot, props.node_meta);
-                        return component.View(true, true, props.onClickSlot, props.onHoverSlot);
+                        return component.View(true, props.slot_label, props.onClickSlot, props.onHoverSlot);
                     }}
                 </For>
             </div>
@@ -252,7 +273,7 @@ const SlotGrid = (props: {
                 <For each={props.node.output_slots}>
                     {(slot) => {
                         const component = new SlotComponent(slot, props.node_meta);
-                        return component.View(true, true, props.onClickSlot, props.onHoverSlot);
+                        return component.View(true, props.slot_label, props.onClickSlot, props.onHoverSlot);
                     }}
                 </For>
             </div>
