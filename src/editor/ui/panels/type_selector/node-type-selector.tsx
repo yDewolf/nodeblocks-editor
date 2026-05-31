@@ -1,9 +1,9 @@
 import { createMemo, createSignal, For, mapArray, Show } from "solid-js";
-import { NodePreview } from "./node-preview";
+import { NodeTypePreview } from "./node-preview";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 
 export class NodeTypeSelector {
-    public View(scene_controller: SceneController, onClickOnPreview: (node_preview: NodePreview) => void) {
+    public View(scene_controller: SceneController, onClickOnPreview: (node_preview: NodeTypePreview) => void) {
         const [categoryFilter, setCategoryFilter] = createSignal<string | undefined>(undefined);
         const constructors = createMemo(() => {
             scene_controller.node_type_reader.keep_track();
@@ -23,7 +23,7 @@ export class NodeTypeSelector {
         // });
         
         const node_previews = mapArray(constructors, (constructor) => {
-            return new NodePreview(constructor);
+            return new NodeTypePreview(constructor);
         });
         // const filtered_previews = createMemo(() => {
         //     return node_previews().filter((preview) => categoryFilter() === undefined || preview.node_constructor._metadata.category.name == categoryFilter())

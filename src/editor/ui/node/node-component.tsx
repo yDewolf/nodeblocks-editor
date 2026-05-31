@@ -87,10 +87,23 @@ export const NodeComponent = (props: {
         );
 };
 
+export const NodePreview = (props: {constructor: BaseNodeConstructor}) => {
+    return (
+        <NodeComponentV2
+            constructor={props.constructor}
+            workspace={undefined}
+            onClick={(node) => undefined}
+            onHover={(node) => undefined}
+            onClickSlot={(slot) => undefined}
+            onHoverSlot={(slot) => undefined}
+            syncParameter={(node, parameter) => undefined}
+        />
+    )
+}
 
 export const NodeComponentV2 = (props: {
     node?: GraphNode, constructor?: BaseNodeConstructor, 
-    workspace: UserWorkspace,
+    workspace: UserWorkspace | undefined,
     onClick: (node: GraphNode) => void, 
     onHover: (node: GraphNode) => void,
     onClickSlot: (slot: NodeSlot) => void, 
@@ -193,7 +206,7 @@ const NodeBody = (props: {
     node_meta?: NodeTypeMeta, 
     show_slots: boolean, 
     show_sections: boolean,
-    workspace: UserWorkspace,
+    workspace: UserWorkspace | undefined,
     syncParameter: (node: GraphNode, parameter: NodeParameter) => void,
     onClickSlot: (slot: NodeSlot) => void, 
     onHoverSlot: (slot: NodeSlot) => void
@@ -243,7 +256,7 @@ const SlotGrid = (props: {
 
 const NodeBodySections = (props: {
     node: GraphNode, 
-    workspace: UserWorkspace,
+    workspace: UserWorkspace | undefined,
     syncParameter: (node: GraphNode, parameter: NodeParameter) => void,
     node_meta?: NodeTypeMeta
 }) => {

@@ -4,9 +4,10 @@ import { createSignal, For } from "solid-js";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { NodeField } from "~/editor/ui/node/node-field";
 import { metadata } from "~/singletons/metadata";
+import { NodeComponentV2, NodePreview } from '../../node/node-component';
 
 
-export class NodePreview {
+export class NodeTypePreview {
     node_constructor: CustomNodeConstructor
     private _set_selected: (v: boolean) => void;
     private _selected: () => boolean;
@@ -21,12 +22,7 @@ export class NodePreview {
 
     set selected(value: boolean) { this._set_selected(value) }
 
-    public View(onPointerDown: (node_preview: NodePreview) => void) {
-        const onClickOnSlot = () => {};
-        const onHoverSlot = () => {};
-        const ref_node = this.node_constructor.make_node(this.node_constructor.type_id, {x: 0, y: 0}, "");
-        const node_meta = metadata.get_node_meta(this.node_constructor.type_id)
-
+    public View(onPointerDown: (node_preview: NodeTypePreview) => void) {
         return (
             <div 
                 onPointerDown={() => onPointerDown(this)}
@@ -38,35 +34,7 @@ export class NodePreview {
                     cursor: "pointer"
                 }}
             >
-                <div class="node-slots">
-                    <NodeAnchor anchor_pos={{x: 0, y: -1}} all_slots={ref_node.all_slots} onClickOnSlot={onClickOnSlot} onHoverSlot={onHoverSlot}/>
-                    <div class="side-anchors">
-                        <NodeAnchor anchor_pos={{x: -1, y: 0}} all_slots={ref_node.all_slots} onClickOnSlot={onClickOnSlot} onHoverSlot={onHoverSlot}/>
-                        <div></div>
-                        <NodeAnchor anchor_pos={{x: 1, y: 0}} all_slots={ref_node.all_slots} onClickOnSlot={onClickOnSlot} onHoverSlot={onHoverSlot}/>
-                    </div>
-                    <NodeAnchor anchor_pos={{x: 0, y: 1}} all_slots={ref_node.all_slots} onClickOnSlot={onClickOnSlot} onHoverSlot={onHoverSlot}/>
-                </div>
-                    <div
-                    class="internal-node"
-                >
-                    <div class="node-body">
-                        <div class="node-header">{node_meta != undefined ? node_meta.capitalized_name : this.node_constructor.type_id}</div>
-                        
-                        <div class="node-content remove-input">
-                            <For each={this.node_constructor._data_model.parameters.values().toArray()}>
-                                {(parameter: NodeParameter) => <NodeField 
-                                    node={null}
-                                    parameter={parameter}
-                                    parameter_sync={undefined}
-                                    workspace={undefined}
-                                />
-                                }
-                            </For>
-                            <div class="node-internal-data"> ... </div>
-                        </div>
-                    </div>
-                </div>
+                <NodePreview constructor={this.node_constructor}/>
             </div>
         );
     };

@@ -2,7 +2,7 @@ import { Accessor, createSignal, onCleanup, Show } from "solid-js";
 import { ToolController } from "~/editor/controllers/tool-controller";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { NodeTypeSelector } from "./type_selector/node-type-selector";
-import { NodePreview } from "./type_selector/node-preview";
+import { NodeTypePreview } from "./type_selector/node-preview";
 
 
 export const EditorLeftTab = (props: {selector: NodeTypeSelector, scene_controller: SceneController, tool_controller: ToolController}) => {
@@ -52,7 +52,7 @@ export const EditorLeftTab = (props: {selector: NodeTypeSelector, scene_controll
                     </button>
                 </div>
                 
-                {props.selector.View(props.scene_controller, (node_preview: NodePreview) => props.tool_controller.current_tool?.onClickOnNodePreview(node_preview))}
+                {props.selector.View(props.scene_controller, (node_preview: NodeTypePreview) => props.tool_controller.current_tool?.onClickOnNodePreview(node_preview))}
             </div>
         </Show>
     )

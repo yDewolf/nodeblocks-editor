@@ -13,7 +13,10 @@ export class SlotComponent {
     constructor(slot: NodeSlot, node_meta?: NodeTypeMeta) {
         this.slot = slot;
         this.node_meta = node_meta ? node_meta : metadata.get_node_meta(this.slot.parent_node.type_id);;
-        this.slot_meta = node_meta != undefined ? node_meta.slot_meta.get(this.slot.slot_id) : undefined;
+        this.slot_meta = undefined;
+        if (this.node_meta) {
+            this.slot_meta = this.node_meta.slot_meta[this.slot.slot_id]
+        }
         
         // const components = SlotComponentReferences.get(this.slot) ?? [];
         // SlotComponentReferences.set(this.slot, [...components, this]);
@@ -64,7 +67,7 @@ export const _SlotComponent = (props: {
     onHover: (slot: NodeSlot) => void,
 }) => {
     const node_meta = props.node_meta ? props.node_meta : metadata.get_node_meta(props.slot.parent_node.type_id);
-    const slot_meta = node_meta != undefined ? node_meta.slot_meta.get(props.slot.slot_id) : undefined;
+    const slot_meta = node_meta != undefined ? node_meta.slot_meta[props.slot.slot_id] : undefined;
     return (
         <div
             onMouseOver={(e) => {
