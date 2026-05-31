@@ -1,10 +1,6 @@
 import { CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
-import { NodeAnchor } from "../../misc/node-anchors";
 import { createSignal, For } from "solid-js";
-import { NodeParameter } from "~/wrapper/nodes/data/node-data";
-import { NodeField } from "~/editor/ui/node/node-field";
-import { metadata } from "~/singletons/metadata";
-import { NodeComponentV2, NodePreview } from '../../node/node-component';
+import { NodePreview } from '../../node/node-component';
 
 
 export class NodeTypePreview {
@@ -26,7 +22,7 @@ export class NodeTypePreview {
         return (
             <div 
                 onPointerDown={() => onPointerDown(this)}
-                class="node node-type-preview remove-input"
+                class="node node-type-preview"
                 classList={{
                     "selected-node-type": this._selected()
                 }}
@@ -34,7 +30,9 @@ export class NodeTypePreview {
                     cursor: "pointer"
                 }}
             >
-                <NodePreview constructor={this.node_constructor}/>
+                <div class="remove-input">
+                    <NodePreview constructor={this.node_constructor}/>
+                </div>
             </div>
         );
     };
