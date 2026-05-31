@@ -97,6 +97,8 @@ export const NodePreview = (props: {constructor: BaseNodeConstructor}) => {
             onClickSlot={(slot) => undefined}
             onHoverSlot={(slot) => undefined}
             syncParameter={(node, parameter) => undefined}
+            default_show_output={false}
+            default_show_slot_labels={true}
         />
     )
 }
@@ -109,6 +111,8 @@ export const NodeComponentV2 = (props: {
     onClickSlot: (slot: NodeSlot) => void, 
     onHoverSlot: (slot: NodeSlot) => void,
     syncParameter: (node: GraphNode, parameter: NodeParameter) => void,
+    default_show_output?: boolean
+    default_show_slot_labels?: boolean
 }) => {
     const ref_node = props.node ? props.node : props.constructor?.make_node("",{x: 0, y: 0});
     if (!ref_node) {
@@ -116,8 +120,9 @@ export const NodeComponentV2 = (props: {
     }
     const node_meta = metadata.get_node_meta(ref_node.type_id);
     const [isExpanded, setIsExpanded] = createSignal(false);
-    const [isHovered, setIsHovered] = createSignal(false);
+    const [isHovered, setIsHovered] = createSignal(props.default_show_slot_labels ?? false);
 
+    props.default_show_output = props.default_show_output ?? true;
     return (
         <div
             class="nodev2 node"
@@ -155,7 +160,7 @@ export const NodeComponentV2 = (props: {
                     props.onHoverSlot(slot);
                 }}
             />
-            <Show when={!isExpanded() && ref_node.last_output}>
+            <Show when={(!isExpanded() && ref_node.last_output.size != 0) || props.default_show_output}>
                 <NodeOutput node={ref_node}/>
             </Show>
         </div>
