@@ -160,7 +160,7 @@ export const NodeComponentV2 = (props: {
                     props.onHoverSlot(slot);
                 }}
             />
-            <Show when={(!isExpanded() && ref_node.last_output.size != 0) || props.default_show_output}>
+            <Show when={(!isExpanded() && ref_node.last_output.size != 0) || props.default_show_output && !isExpanded()}>
                 <NodeOutput node={ref_node}/>
             </Show>
         </div>

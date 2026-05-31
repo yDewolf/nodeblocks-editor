@@ -1,9 +1,4 @@
 .file-explorer {
-    border: solid 1px black;
-
-    background-color: rgba(28, 29, 37, 0.521);
-    
-    color: white;
     height: 50%;
 }
 
@@ -19,8 +14,6 @@
 
 .file-item {
     justify-content: space-between;
-    background-color: rgb(255, 255, 255);
-    color: black;
     padding: 0 5px;
 
     span {
@@ -37,9 +30,6 @@
 
 
 .file-explorer-actions {
-    background-color: white;
-    color: black;
-
     align-items: center;
     justify-content: space-between;
 

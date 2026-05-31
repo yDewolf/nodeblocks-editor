@@ -1,5 +1,5 @@
 @import url("node-output.css");
-@import url("node/slots.css");
+@import url("slots.css");
 
 .node {
   width: fit-content;

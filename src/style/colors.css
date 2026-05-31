@@ -9,6 +9,7 @@
   --group-color: #f9f9f9;
   --group-header-color: #D7E4EB;
   
+  --overlay-background: #fff;
   --overlay-font-color: var(var(--font-color));
   --overlay-highlight: #BBCBD9;
   --dark-overlay-highlight: #DAE6F0;

@@ -1,0 +1,22 @@
+.section-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-section, .tab-container {
+    display: grid;
+    grid-template-rows: 35px calc(100% - 35px);
+    height: 100%;
+}
+
+.tab-displayer {
+    display: contents;
+}
+
+.dropdown-content {
+    position: absolute;
+    padding: 2px 5px;
+    
+    border: 1px solid var(--stroke-color);
+    background-color: var(--overlay-background);
+}

@@ -22,23 +22,23 @@ export const FileExplorer = (props: {workspace: UserWorkspace}) => {
     }
 
     return (
-        <Show
-            when={show()}
-            fallback={
-                <div class="tab-modal keep row-container space-between side-padded">
-                    <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => setShow(true)}>
-                        <img src="assets/icons/menu.svg" alt="Open" />
-                    </button>
-                    <span>Workspace</span>
-                </div>
-            }
-        >
+        // <Show
+        //     when={show()}
+        //     fallback={
+        //         <div class="tab-modal keep row-container space-between side-padded">
+        //             <button class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => setShow(true)}>
+        //                 <img src="assets/icons/menu.svg" alt="Open" />
+        //             </button>
+        //             <span>Workspace</span>
+        //         </div>
+        //     }
+        // >
         
         <div class="file-explorer modal-content" classList={{"open": show(), "closing": show() && changingState()}} style={{"pointer-events": "auto"}}>
             <div class="file-explorer-actions keep row-container side-padded">
-                <button class="icon-button modal-button" style={{"pointer-events": "auto"}} onClick={(e) => delayed_set_show(false)}>
+                {/* <button class="icon-button modal-button" style={{"pointer-events": "auto"}} onClick={(e) => delayed_set_show(false)}>
                     <img src="assets/icons/menu.svg" alt="Open" />
-                </button>
+                </button> */}
                 <div class="keep row-container">
                     <button class="icon-button refresh-button" onclick={() => props.workspace.update_files()}>
                         <img src="assets/icons/refresh.svg" alt="Refresh"/>
@@ -64,6 +64,6 @@ export const FileExplorer = (props: {workspace: UserWorkspace}) => {
                 </For>
             </div>
         </div>
-        </Show>
+        // </Show>
     );
 };

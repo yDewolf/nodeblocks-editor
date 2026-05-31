@@ -1,6 +1,7 @@
 import { createMemo, createSignal, For, mapArray, Show } from "solid-js";
-import { NodeTypePreview } from "./node-preview";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
+import { CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
+import { NodePreview } from "../../node/node-component";
 
 export class NodeTypeSelector {
     public View(scene_controller: SceneController, onClickOnPreview: (node_preview: NodeTypePreview) => void) {
@@ -53,7 +54,7 @@ export class NodeTypeSelector {
                     </div>
                 </div> */}
                 <div class="keep fill row-container space-between" style={{"align-items": "center"}}>
-                    <h3 style={{color: "white"}}>
+                    <h3>
                         {categoryFilter() ?? "All"} Nodes
                     </h3>
                     <Show when={categoryFilter() != undefined}>
@@ -70,4 +71,40 @@ export class NodeTypeSelector {
             </div>
         );
     }
+}
+
+
+export class NodeTypePreview {
+    node_constructor: CustomNodeConstructor
+    private _set_selected: (v: boolean) => void;
+    private _selected: () => boolean;
+
+    constructor(node_constructor: CustomNodeConstructor) {
+        this.node_constructor = node_constructor;
+        
+        const [selected, setSelected] = createSignal(false);
+        this._set_selected = setSelected;
+        this._selected = selected;
+    }
+
+    set selected(value: boolean) { this._set_selected(value) }
+
+    public View(onPointerDown: (node_preview: NodeTypePreview) => void) {
+        return (
+            <div 
+                onPointerDown={() => onPointerDown(this)}
+                class="node node-type-preview"
+                classList={{
+                    "selected-node-type": this._selected()
+                }}
+                style={{
+                    cursor: "pointer"
+                }}
+            >
+                <div class="remove-input">
+                    <NodePreview constructor={this.node_constructor}/>
+                </div>
+            </div>
+        );
+    };
 }

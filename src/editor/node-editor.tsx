@@ -24,7 +24,7 @@ import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { FileExplorer } from "./ui/panels/file/file-explorer";
-import { EditorLeftTab } from "./ui/panels/left-tab";
+import { EditorLeftTab, EditorLeftTabHolder } from './ui/panels/left-tab';
 import { SessionController } from "~/network/session/session-controller";
 import { SidebarNotifications } from "./ui/misc/notification/notification-badges";
 import "~/style/screens/editor.css";
@@ -410,10 +410,8 @@ export class NodeEditor {
                 </div>
                 
                 <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
-                    <div class="left-tab-holder container">
-                        <EditorLeftTab selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
-                        <FileExplorer workspace={this._session_controller.user_workspace}/>
-                    </div>
+                    
+                    <EditorLeftTabHolder node_type_selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
                     <div class="middle-tab-holder">
                         <div class="middle-tab-overlay container">
                             <SidebarNotifications notification_controller={this._session_controller.notification_controller}/>
