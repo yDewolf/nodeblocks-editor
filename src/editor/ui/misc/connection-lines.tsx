@@ -76,15 +76,6 @@ export const ConnectionLines = (props: { connection: NodeConnection, onDisconnec
                 "current-step": is_current_step()
             }}
         >
-            <path class="clickable-path"
-                onContextMenu={handleContextMenu}
-                d={path()}
-            />
-            <path class="connection-path"
-                d={path()}
-                marker-end="url(#arrowhead)"
-                id={pathId}
-            />
             <text class="connection-arrow-text" dy="3.5"> 
                 <textPath 
                     href={`#${pathId}`} 
@@ -94,6 +85,15 @@ export const ConnectionLines = (props: { connection: NodeConnection, onDisconnec
                     ▶
                 </textPath>
             </text>
+            <path class="clickable-path"
+                onContextMenu={handleContextMenu}
+                d={path()}
+            />
+            <path class="connection-path"
+                d={path()}
+                marker-end="url(#arrowhead)"
+                id={pathId}
+            />
         </g>
     );
 };

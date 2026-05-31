@@ -93,7 +93,7 @@ export class NodeTypePreview {
         return (
             <div 
                 onPointerDown={() => onPointerDown(this)}
-                class="node node-type-preview"
+                class="node-type-preview"
                 classList={{
                     "selected-node-type": this._selected()
                 }}

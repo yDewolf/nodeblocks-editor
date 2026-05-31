@@ -13,6 +13,10 @@ import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 import { DropdownIcon, DropdownSection } from "../panels/base-panels";
 import { NotificationPopupHolder } from "../misc/notification/notification-badges";
+import { NodeAnchor } from "../misc/node-anchors";
+
+// TODO: create a setting for this
+const USE_ANCHORED_NODES: boolean = true;
 
 export const NodeComponent = (props: { 
     node: GraphNode, 
@@ -43,11 +47,9 @@ export const NodeComponent = (props: {
         ro.observe(el);
     };
     onCleanup(() => ro?.disconnect());
-
     const isVisible = createMemo(() => {
         return props.camera.camera_rect.overlaps(props.node.rect);
     });
-    const node_meta = metadata.get_node_meta(props.node.type_id);
 
     return (
             <Show when={isVisible()}>
@@ -64,7 +66,6 @@ export const NodeComponent = (props: {
                         "current-step": props.node.is_current_step,
                         "selected-mode": props.node.selected,
                     }}
-                    class="node"
                 >   
                     <NodeComponentV2 
                         node={props.node} 
@@ -125,7 +126,7 @@ export const NodeComponentV2 = (props: {
     props.default_show_output = props.default_show_output ?? true;
     return (
         <div
-            class="nodev2 node"
+            class="node"
             onMouseLeave={(e) => {
                 setIsHovered(false);
             }}
@@ -134,35 +135,41 @@ export const NodeComponentV2 = (props: {
                 "hovered": isHovered()
             }}
         >
-            <NodeHeader 
-                node={ref_node} 
-                isExpanded={isExpanded()} 
-                setExpanded={setIsExpanded}
-                setIsHovered={setIsHovered}
-                onClick={props.onClick}
-                onHover={props.onHover}
-            />
             <Show when={!isExpanded() && !isHovered()}>
                 <div class="slot-grid-overlay">
-                    <SlotGrid node={ref_node} slot_label={false} node_meta={node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+                    <Show when={USE_ANCHORED_NODES} fallback={
+                        <SlotGrid node={ref_node} slot_label={false} node_meta={node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+                    }>
+                        <AnchoredSlotGrid node={ref_node} node_meta={node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+                    </Show>
                 </div>
             </Show>
-            <NodeBody 
-                show_slots={isExpanded() || isHovered()} 
-                show_sections={isExpanded()} 
-                node={ref_node}
-                workspace={props.workspace}
-                node_meta={node_meta}
-                syncParameter={props.syncParameter}
-                onClickSlot={props.onClickSlot}
-                onHoverSlot={(slot: NodeSlot) => {
-                    setIsHovered(true);
-                    props.onHoverSlot(slot);
-                }}
-            />
-            <Show when={(!isExpanded() && ref_node.last_output.size != 0) || props.default_show_output && !isExpanded()}>
-                <NodeOutput node={ref_node}/>
-            </Show>
+            <div class="node-contents">
+                <NodeHeader 
+                    node={ref_node} 
+                    isExpanded={isExpanded()} 
+                    setExpanded={setIsExpanded}
+                    setIsHovered={setIsHovered}
+                    onClick={props.onClick}
+                    onHover={props.onHover}
+                />
+                <NodeBody 
+                    show_slots={isExpanded() || isHovered()} 
+                    show_sections={isExpanded()} 
+                    node={ref_node}
+                    workspace={props.workspace}
+                    node_meta={node_meta}
+                    syncParameter={props.syncParameter}
+                    onClickSlot={props.onClickSlot}
+                    onHoverSlot={(slot: NodeSlot) => {
+                        setIsHovered(true);
+                        props.onHoverSlot(slot);
+                    }}
+                />
+                <Show when={(!isExpanded() && ref_node.last_output.size != 0) || props.default_show_output && !isExpanded()}>
+                    <NodeOutput node={ref_node}/>
+                </Show>
+            </div>
         </div>
     )  
 }
@@ -255,6 +262,25 @@ const SlotGrid = (props: {
                     }}
                 </For>
             </div>
+        </div>
+    )
+}
+
+const AnchoredSlotGrid = (props: {
+    node: GraphNode,
+    node_meta: NodeTypeMeta,
+    onClickSlot: (slot: NodeSlot) => void, 
+    onHoverSlot: (slot: NodeSlot) => void}
+) => {
+    return (
+        <div class="anchored-slot-grid">
+            <NodeAnchor anchor_pos={{x: 0, y: -1}} all_slots={props.node.all_slots} node_meta={props.node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+            <div class="side-anchors">
+                <NodeAnchor anchor_pos={{x: -1, y: 0}} all_slots={props.node.all_slots} node_meta={props.node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+                <div></div>
+                <NodeAnchor anchor_pos={{x: 1, y: 0}} all_slots={props.node.all_slots} node_meta={props.node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+            </div>
+            <NodeAnchor anchor_pos={{x: 0, y: 1}} all_slots={props.node.all_slots} node_meta={props.node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
         </div>
     )
 }

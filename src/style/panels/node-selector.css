@@ -5,20 +5,13 @@
   justify-content: left;
   display: flex;
   flex-direction: column;
+  gap: 5px;
 }
 
 .node-type-preview {
-  border-radius: 8px;
-  padding: 2px;
-
-  transform: scale(0.75);
-  max-width: auto;
-
-  .node-field {
-    input {
-      width: 100%;
-    }
-  }
+  transform-origin: center;
+  transform: scale(0.8);
+  width: fit-content;
 }
 
 .node-type-preview * {
@@ -26,7 +19,7 @@
 }
 
 .node-type-preview:hover {
-  transform: scale(0.8);
+  transform: scale(0.85);
 }
 
 .selected-node-type {
@@ -34,5 +27,5 @@
 }
 
 .selected-node-type:hover {
-  transform: scale(1.0);
+  transform: scale(0.95);
 }

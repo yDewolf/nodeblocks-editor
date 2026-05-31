@@ -1,5 +1,6 @@
 /* Raw colors (default theme) */
 :root {
+  --editor-background-color: #F8F8F8;
   --font-color: #24262A;
   --secondary-font-color: #3C3D3F;
 
@@ -13,6 +14,14 @@
   --overlay-font-color: var(var(--font-color));
   --overlay-highlight: #BBCBD9;
   --dark-overlay-highlight: #DAE6F0;
+}
+
+/* TODO: Implement DataType color schemes */
+:root {
+  --input-color: #70AEB0;
+  --dark-input-color: #152425;
+  --output-color: #FE8263;
+  --dark-output-color: #251715;
 }
 
 :root {

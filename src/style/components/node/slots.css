@@ -31,31 +31,27 @@
 
 .input-slot {
   .slot-dot {
-    background: #fff;
+    background-color: var(--dark-input-color);
+    border-color: var(--input-color);
   }
 }
 
 .output-slot {
   flex-direction: row-reverse;
   .slot-dot {
-    background: #444;
+    background: var(--dark-output-color);
+    border-color: var(--output-color);
   }
 }
 
-.connected-slot {
+.connected-slot.output-slot, .selected-slot.output-slot {
   .slot-dot {
-    background: #91ff00;
+    background: var(--output-color);
   }
 }
 
-.connected-slot.input-slot {
+.connected-slot.input-slot, .selected-slot.input-slot {
   .slot-dot {
-    background: #e5ffc4;
-  }
-}
-
-.selected-slot {
-  .slot-dot {
-    background: var(--node-selected-color);
+    background: var(--input-color);
   }
 }
