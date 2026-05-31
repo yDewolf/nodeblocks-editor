@@ -21,6 +21,7 @@
   display: flex;
   padding: 0 5px;
   align-items: center;
+  cursor: default;
 }
 
 .slot-grid {
@@ -126,8 +127,10 @@
 
 
 .selected-mode {
-  cursor: grab;
   background-color: var(--node-selected-color);
+  .node-header {
+    cursor: grab;
+  }
 }
 
 /* Slots */

@@ -48,10 +48,10 @@
     border: none;
 
     cursor: pointer;
-    img {
-        width: 32px;
-        height: 32px;
-    }
+}
+.icon-button > img:not(.small-icon, .medium-icon, .dropdown-icon) {
+    width: 32px;
+    height: 32px;
 }
 
 .icon-button:hover {

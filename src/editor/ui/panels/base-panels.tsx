@@ -1,11 +1,12 @@
 import { createSignal, For, JSXElement, Show } from "solid-js"
 
-export const DropdownIcon = (props: {expanded: boolean, icon_path?: string}) => {
+export const DropdownIcon = (props: {expanded: boolean, icon_path?: string, css_class?: string}) => {
     const icon_path = props.icon_path ?? "public/assets/icons/arrow-down.svg";
     return (
         <img 
-            class="dropdown-icon"
+            class={`dropdown-icon ${props.css_class}`}
             classList={{
+                "default-icon": !props.icon_path,
                 "expanded": props.expanded
             }}
             src={icon_path} alt="drop" 
@@ -22,6 +23,7 @@ export const DropdownSection = (props: {
     header_content?: () => JSXElement, 
     default_expanded?: boolean, 
     icon_path?: string
+    icon_class?: string
 }) => {
     const [expanded, setExpanded] = createSignal(props?.default_expanded ?? false);
     return (
@@ -33,7 +35,7 @@ export const DropdownSection = (props: {
                 <button class="icon-button section-dropdown-icon" onclick={() => {
                     setExpanded(!expanded());
                 }}>
-                    <DropdownIcon expanded={expanded()} icon_path={props.icon_path}/>
+                    <DropdownIcon expanded={expanded()} icon_path={props.icon_path} css_class={props.icon_class}/>
                 </button>
             </div>
             <Show when={expanded()}>

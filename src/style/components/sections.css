@@ -7,8 +7,6 @@
     align-items: center;
     justify-content: space-between;
     
-    height: fit-content;
-
     border: solid 1px var(--stroke-color);
     padding: 0 5px;
 }
@@ -18,8 +16,8 @@
 }
 
 .dropdown-icon {
-    width: 20px !important;
+    width: 20px;
 }
-.dropdown-icon.expanded {
+.dropdown-icon.default-icon.expanded {
     transform: rotate(-90deg);
 }

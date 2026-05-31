@@ -21,7 +21,7 @@
   }
 }
 
-.node-type-preview > *,.slot-dot {
+.node-type-preview * {
   pointer-events: none !important;
 }
 

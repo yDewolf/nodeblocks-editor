@@ -36,8 +36,14 @@ div {
     }
 }
 
-.medium-icon {
+img.medium-icon {
     width: 32px;
+}
+
+.medium-icon {
+    img {
+        width: 32px;
+    }
 }
 
 img.small-icon {
@@ -46,7 +52,7 @@ img.small-icon {
 
 .small-icon {
     img {
-        width: 28px !important;
+        width: 28px;
     }
 }
 

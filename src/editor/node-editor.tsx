@@ -23,12 +23,10 @@ import { NodeSceneRequestData } from "~/network/websocket/request-types";
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
-import { FileExplorer } from "./ui/panels/file/file-explorer";
-import { EditorLeftTab, EditorLeftTabHolder } from './ui/panels/left-tab';
+import { EditorLeftTabHolder } from './ui/panels/left-tab';
 import { SessionController } from "~/network/session/session-controller";
 import { SidebarNotifications } from "./ui/misc/notification/notification-badges";
 import "~/style/screens/editor.css";
-import { SlotComponent } from "./ui/node/slot-components";
 
 export class NodeEditor {
     scene_controller: SceneController;
