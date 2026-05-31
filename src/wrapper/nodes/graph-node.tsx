@@ -10,9 +10,6 @@ export class GraphNode extends BaseNode {
     node_name: string;
     type_id: string;
 
-    // TODO: Grab metadata from a global metadata controller
-    // metadata: NodeMetadata | undefined;
-
     // Used to set node parameters etc.
     private _node_data: () => NodeData;
     private _set_node_data:  (data: NodeData) => void;

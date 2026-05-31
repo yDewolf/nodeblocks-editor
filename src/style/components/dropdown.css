@@ -5,12 +5,16 @@
 
 .dropdown-section, .tab-container {
     display: grid;
-    grid-template-rows: 35px calc(100% - 35px);
+    grid-template-rows: min-content max-content;
     height: 100%;
 }
 
 .tab-displayer {
     display: contents;
+}
+
+.tab-displayer > div {
+    padding: 8px 12px;
 }
 
 .dropdown-content {

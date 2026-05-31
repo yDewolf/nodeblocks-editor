@@ -9,14 +9,15 @@ import { FileExplorer } from "./file/file-explorer";
 
 export const EditorLeftTabHolder = (props: {node_type_selector: NodeTypeSelector, scene_controller: SceneController, tool_controller: ToolController}) => {
     const tabs: Record<string, () => JSXElement> = {
-        "nodes": () => props.node_type_selector.View(props.scene_controller, (node_preview: NodeTypePreview) => props.tool_controller.current_tool?.onClickOnNodePreview(node_preview)),
-        "workspace": () => <FileExplorer workspace={session_controller.user_workspace}/>
+        "Nodes": () => props.node_type_selector.View(props.scene_controller, (node_preview: NodeTypePreview) => props.tool_controller.current_tool?.onClickOnNodePreview(node_preview)),
+        "Workspace": () => <FileExplorer workspace={session_controller.user_workspace}/>
     }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
     return (
         <div class="left-tab-holder">
             <DropdownSection
                 icon_path="public/assets/icons/left-tab.svg"
+                dropdown_class="left-tab-dropdown"                
                 header_class="left-tab-header"
                 body_class="left-tab-content"
                 icon_class="medium-icon"

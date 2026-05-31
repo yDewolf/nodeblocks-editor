@@ -8,8 +8,8 @@ import { BaseDataType } from "../data/node-data-type";
 import { BaseSlotType } from "../data/slot-types";
 
 export class NodeSlot {
-    _element: HTMLDivElement | undefined; // FIXME: SlotComponent
     parent_node: GraphNode;
+    _element: HTMLDivElement | undefined; // FIXME: SlotComponent
     style: NodeSlotStyle; // FIXME: SlotComponent
 
     slot_id: string;
@@ -74,6 +74,10 @@ export class NodeSlot {
 
     public can_connect_to(slot: NodeSlot) {
         if (slot == this) {
+            return false;
+        }
+
+        if (this.is_input == slot.is_input) {
             return false;
         }
         
@@ -143,43 +147,5 @@ export class NodeSlot {
         }
 
         this.style.update_anchor({ x: 0, y: average_pos.y > 0 ? 1 : -1 });
-    }
-
-    public View(onClickOnSlot: (slot: NodeSlot) => void, onHoverSlot: (slot: NodeSlot) => void) {
-        return (
-            <div 
-                ref={this._element}
-                class="slot-container container"
-                
-                onPointerDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    onClickOnSlot(this);
-                }}
-
-                onMouseOver={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    onHoverSlot(this);
-                }}
-            >
-                <div 
-                    class="slot-dot"
-                    classList={{
-                        "connected-slot": this.connections.size > 0,
-                        "selected-slot": this.selected,
-                        "input-slot": this.is_input,
-                        "output-slot": !this.is_input,
-                    }}
-                >
-                    <div class="slot-dot-content">
-                        {this.slot_id}
-                        {/* <SlotOutput slot={this}/> */}
-                    </div>
-                </div>
-            </div>
-        )
     }
 }

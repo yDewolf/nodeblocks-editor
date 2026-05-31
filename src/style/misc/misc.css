@@ -54,7 +54,7 @@
 }
 
 .current-step {
-  background-color: var(--selection-color-alpha);
+  background-color: var(--selection-color);
   .connection-path {
     stroke: var(--selection-color);
   }

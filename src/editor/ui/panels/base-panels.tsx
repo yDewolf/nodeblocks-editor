@@ -16,7 +16,8 @@ export const DropdownIcon = (props: {expanded: boolean, icon_path?: string, css_
 
 export const DropdownSection = (props: {
     header?: string, 
-    header_class?: string, 
+    header_class?: string,
+    dropdown_class?: string, 
     body_class?: string, 
 
     content: JSXElement, 
@@ -27,8 +28,8 @@ export const DropdownSection = (props: {
 }) => {
     const [expanded, setExpanded] = createSignal(props?.default_expanded ?? false);
     return (
-        <div class="dropdown-section" classList={{"expanded": expanded()}}>
-            <div class={`section-header ${props.header_class}`} classList={{"expanded": expanded()}}>
+        <div class={`dropdown-section ${props.dropdown_class ?? ""}`} classList={{"expanded": expanded()}}>
+            <div class={`section-header ${props.header_class ?? ""}`} classList={{"expanded": expanded()}}>
                 <Show when={props.header_content} fallback={<span>{props.header}</span>}>
                     {props.header_content?.()}
                 </Show>
@@ -39,7 +40,7 @@ export const DropdownSection = (props: {
                 </button>
             </div>
             <Show when={expanded()}>
-                <div class={`section-body ${props.body_class}`}>
+                <div class={`section-body ${props.body_class ?? ""}`}>
                     {props.content}
                 </div>
             </Show>
@@ -94,7 +95,7 @@ export const TabSelector = (props: {
                     {(tab) => {
                         return (
                             <button 
-                            class="tab-button"
+                                class="tab-button"
                                 classList={{
                                     "selected": props.selected_tab() == tab
                                 }}

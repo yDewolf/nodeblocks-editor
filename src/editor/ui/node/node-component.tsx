@@ -135,15 +135,6 @@ export const NodeComponentV2 = (props: {
                 "hovered": isHovered()
             }}
         >
-            <Show when={!isExpanded() && !isHovered()}>
-                <div class="slot-grid-overlay">
-                    <Show when={USE_ANCHORED_NODES} fallback={
-                        <SlotGrid node={ref_node} slot_label={false} node_meta={node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
-                    }>
-                        <AnchoredSlotGrid node={ref_node} node_meta={node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
-                    </Show>
-                </div>
-            </Show>
             <div class="node-contents">
                 <NodeHeader 
                     node={ref_node} 
@@ -170,6 +161,15 @@ export const NodeComponentV2 = (props: {
                     <NodeOutput node={ref_node}/>
                 </Show>
             </div>
+            <Show when={!isExpanded() && !isHovered()}>
+                <div class="slot-grid-overlay">
+                    <Show when={USE_ANCHORED_NODES} fallback={
+                        <SlotGrid node={ref_node} slot_label={false} node_meta={node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+                    }>
+                        <AnchoredSlotGrid node={ref_node} node_meta={node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+                    </Show>
+                </div>
+            </Show>
         </div>
     )  
 }
@@ -293,7 +293,7 @@ const NodeBodySections = (props: {
 }) => {
     return (
         // TODO
-        <div class="node-body-sections">
+        <div class="node-body-sections container fill">
             <DropdownSection header="Parameters" content={
                 <div>
                     <For each={props.node.node_data.parameters.values().toArray()}>

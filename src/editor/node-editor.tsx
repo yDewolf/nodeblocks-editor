@@ -408,7 +408,6 @@ export class NodeEditor {
                 </div>
                 
                 <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
-                    
                     <EditorLeftTabHolder node_type_selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
                     <div class="middle-tab-holder">
                         <div class="middle-tab-overlay container">

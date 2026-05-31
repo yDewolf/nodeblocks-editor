@@ -3,7 +3,7 @@
 
 .node {
   width: fit-content;
-  min-width: 150px;
+  min-width: 200px;
   
   display: grid;
   user-select: none;
@@ -19,6 +19,13 @@
   padding: 0 5px;
   align-items: center;
   cursor: default;
+}
+
+.node-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px 10px;
 }
 
 .slot-grid {
@@ -104,12 +111,6 @@
   .node-header {
     cursor: grab;
   }
-}
-
-/* Slots */
-
-
-.slot-container {
 }
 
 .node-field {

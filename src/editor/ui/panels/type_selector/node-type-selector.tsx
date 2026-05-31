@@ -31,7 +31,7 @@ export class NodeTypeSelector {
         // })
 
         return (
-            <div class="container padded" style={{
+            <div class="container" style={{
                 "overflow-x": "hidden",
                 width: "auto"
             }}>
