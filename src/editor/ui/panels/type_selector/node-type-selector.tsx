@@ -32,7 +32,6 @@ export class NodeTypeSelector {
 
         return (
             <div class="container" style={{
-                "grid-row-start": "none",
                 "overflow-x": "hidden",
                 width: "auto"
             }}>

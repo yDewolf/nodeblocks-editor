@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { createSignal } from "solid-js";
 import { Action } from "~/network/controllers/actions/action-controller";
-import { ConnectionActionPayload, ConnSceneRequestData } from "~/network/websocket/request-types";
+import { ConnSceneRequestData } from "~/network/websocket/request-types";
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { ConnectionSceneData, NodeSceneFile } from "../helpers/node-scene-file";

@@ -1,7 +1,7 @@
 
 .dropdown-section, .tab-container {
     display: grid;
-    grid-template-rows: min-content max-content;
+    grid-template-rows: min-content 1fr;
 }
 
 .dropdown-section.expanded {
