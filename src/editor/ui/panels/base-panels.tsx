@@ -25,9 +25,10 @@ export const DropdownSection = (props: {
     default_expanded?: boolean, 
     icon_path?: string,
     icon_class?: string,
-    no_button?: boolean
+    no_button?: boolean,
+    expanded_states?: [() => boolean, (value: boolean) => void]
 }) => {
-    const [expanded, setExpanded] = createSignal(props?.default_expanded ?? false);
+    const [expanded, setExpanded] = props.expanded_states ?? createSignal(props?.default_expanded ?? false);
     const no_button = props.no_button ?? false;
     return (
         <div class={`dropdown-section ${props.dropdown_class ?? ""}`} classList={{"expanded": expanded()}}>

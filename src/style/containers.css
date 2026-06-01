@@ -96,7 +96,7 @@ img.small-icon {
 }
 
 .fill {
-    width: 100%;
+    width: stretch;
 }
 
 @media only screen and (max-width: 768px) {

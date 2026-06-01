@@ -285,7 +285,7 @@ const AnchoredSlotGrid = (props: {
     )
 }
 
-const NodeBodySections = (props: {
+export const NodeBodySections = (props: {
     node: GraphNode, 
     workspace: UserWorkspace | undefined,
     syncParameter: (node: GraphNode, parameter: NodeParameter) => void,

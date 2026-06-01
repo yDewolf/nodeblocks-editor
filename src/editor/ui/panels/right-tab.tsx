@@ -1,19 +1,60 @@
 import { StateController } from "~/network/controllers/state_controller"
 import { ServerPanel } from "./server-panel"
 import { NodeEditor } from "~/editor/node-editor"
-import { createSignal, JSXElement } from "solid-js"
+import { createMemo, createSignal, JSXElement, Show } from "solid-js"
 import { DropdownSection, TabSelector } from "./base-panels"
 import { SidebarNotifications } from "../misc/notification/notification-badges"
 import { session_controller } from "~/singletons/user_session"
+import { GraphNode } from "~/wrapper/nodes/graph-node"
+import { NodeBodySections } from "../node/node-component"
+import { NodeActionUtils } from "~/network/controllers/actions/node-actions"
+import { NodeParameter } from "~/wrapper/nodes/data/node-data"
+import { metadata } from "~/singletons/metadata"
+
+const NodeAttributes = (props: {editor: NodeEditor, node?: GraphNode}) => {
+    if (!props.node) {
+        return <div>Select a node</div>
+    }
+    const node_meta = metadata.get_node_meta(props.node.type_id);
+    return (
+        <div class="fill container">
+            <span>{node_meta?.capitalized_name ?? props.node.type_id}</span>
+            <div class="fill container">
+                <span>Position:</span>
+                <div class="field-grid">
+                    <span>x: {props.node.pos.x.toFixed(2)}</span>
+                    <span>y: {props.node.pos.y.toFixed(2)}</span>
+                </div>
+            </div>
+            <NodeBodySections
+                node_meta={node_meta}
+                node={props.node} 
+                workspace={session_controller.user_workspace}
+                syncParameter={(node: GraphNode, parameter: NodeParameter) => {
+                    if (!props.node) return
+                    NodeActionUtils.request_update_nodes([props.node], props.editor._action_controller);
+                }}
+            />
+        </div>
+    )
+}
 
 export const EditorRightPanel = (props: {editor: NodeEditor, state_controller: StateController}) => {
+    const [expanded, setExpanded] = createSignal(false);
+    const selectedNode = createMemo<GraphNode | undefined>(() => {
+        const node = props.editor.selection_controller.selected_nodes.at(-1);
+        setExpanded(node != undefined);
+        return node;
+    });
     const tabs: Record<string, () => JSXElement> = {
-        "Attributes": () => <div></div>
+        "Attributes": () => <NodeAttributes editor={props.editor} node={selectedNode()}/>
     }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
     return (
+        // TODO: listen to click outside
         <div class="right-tab-holder">
             <DropdownSection
+                expanded_states={[expanded, setExpanded]}
                 dropdown_class="right-tab-dropdown"                
                 header_class="right-tab-header"
                 body_class="right-tab-content"
@@ -35,7 +76,9 @@ export const EditorRightPanel = (props: {editor: NodeEditor, state_controller: S
                     />
                 }
             />
-            <SidebarNotifications notification_controller={session_controller.notification_controller}/>
+            <Show when={!expanded()}>
+                <SidebarNotifications notification_controller={session_controller.notification_controller}/>
+            </Show>
         </div>
     )
 }
