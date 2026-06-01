@@ -121,9 +121,9 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
         n => n.timestamp > timeSignal() - time_to_disappear_ms && !n.read
     ));
     return (
-        <div class="keep container sidebar-notification-holder">
-            <div class="keep row-container" style={{"align-items": "center"}}>
-                <div class="keep row-container">
+        <div class="fill keep row-container sidebar-notification-holder" style={{"flex-direction": "row-reverse"}}>
+            <div class="keep container">
+                <div class="keep row-container" style={{"justify-content": "right"}}>
                     <button classList={{"active": show()}} class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => {if (!show()) setShow(true); else delayed_set_show(false);}}>
                         <img src="assets/icons/notification/notification-bell.svg" alt="Open" />
                     </button>
@@ -136,12 +136,12 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
                 </Show>
             </div>
             {/* Notification List */}
-            <Show when={recent_notifications().length > 0 || all_notifications().length > 0 && show()}>
-                <div 
-                    class="sidebar-notifications container scrollable modal-content" 
-                    classList={{"open": show(), "closing": show() && changingState()}}
-                    style={{"transition": `width ${set_show_delay}ms, opacity ${set_show_delay}ms;`}}
-                >
+            <div 
+                class="sidebar-notifications container scrollable modal-content" 
+                classList={{"open": show(), "closing": show() && changingState()}}
+                style={{"transition": `width ${set_show_delay}ms, opacity ${set_show_delay}ms;`}}
+            >
+                <Show when={recent_notifications().length > 0 || all_notifications().length > 0 && show()}>
                     <Show when={show()} fallback={
                         <For each={recent_notifications()}>
                             {(notification: NotificationWithMeta) => {
@@ -159,8 +159,8 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
                             }}
                         </For>
                     </Show>
-                </div>
-            </Show>
+                </Show>
+            </div>
         </div>
     )
 }

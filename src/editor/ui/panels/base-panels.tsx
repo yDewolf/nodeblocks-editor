@@ -23,21 +23,25 @@ export const DropdownSection = (props: {
     content: JSXElement, 
     header_content?: () => JSXElement, 
     default_expanded?: boolean, 
-    icon_path?: string
-    icon_class?: string
+    icon_path?: string,
+    icon_class?: string,
+    no_button?: boolean
 }) => {
     const [expanded, setExpanded] = createSignal(props?.default_expanded ?? false);
+    const no_button = props.no_button ?? false;
     return (
         <div class={`dropdown-section ${props.dropdown_class ?? ""}`} classList={{"expanded": expanded()}}>
             <div class={`section-header ${props.header_class ?? ""}`} classList={{"expanded": expanded()}}>
                 <Show when={props.header_content} fallback={<span>{props.header}</span>}>
                     {props.header_content?.()}
                 </Show>
-                <button class="icon-button section-dropdown-icon" onclick={() => {
-                    setExpanded(!expanded());
-                }}>
-                    <DropdownIcon expanded={expanded()} icon_path={props.icon_path} css_class={props.icon_class}/>
-                </button>
+                <Show when={!no_button}>
+                    <button class="icon-button section-dropdown-icon" onclick={() => {
+                        setExpanded(!expanded());
+                    }}>
+                        <DropdownIcon expanded={expanded()} icon_path={props.icon_path} css_class={props.icon_class}/>
+                    </button>
+                </Show>
             </div>
             <Show when={expanded()}>
                 <div class={`section-body ${props.body_class ?? ""}`}>

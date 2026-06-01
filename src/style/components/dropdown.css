@@ -6,6 +6,9 @@
 .dropdown-section, .tab-container {
     display: grid;
     grid-template-rows: min-content max-content;
+}
+
+.dropdown-section.expanded {
     height: 100%;
 }
 

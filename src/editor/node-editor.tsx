@@ -27,6 +27,7 @@ import { EditorLeftTabHolder } from './ui/panels/left-tab';
 import { SessionController } from "~/network/session/session-controller";
 import { SidebarNotifications } from "./ui/misc/notification/notification-badges";
 import "~/style/screens/editor.css";
+import { EditorRightPanel } from "./ui/panels/right-tab";
 
 export class NodeEditor {
     scene_controller: SceneController;
@@ -411,15 +412,12 @@ export class NodeEditor {
                     <EditorLeftTabHolder node_type_selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
                     <div class="middle-tab-holder">
                         <div class="middle-tab-overlay container">
-                            <SidebarNotifications notification_controller={this._session_controller.notification_controller}/>
                         </div>
                         <div class="middle-tab container">
                             {this.tool_controller.View()}
                         </div>
                     </div>
-                    <div class="right-tab container padded">
-                        <ServerPanel editor={this} state_controller={this._state_controller}/>
-                    </div>
+                    <EditorRightPanel editor={this} state_controller={this._state_controller}/>
                 </div>
             </div>
         );
