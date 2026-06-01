@@ -75,12 +75,12 @@
   border-bottom: none;
 }
 
-.left-tab-content, .right-tab-content {
+.left-tab-content > div, .right-tab-content > div {
+  background-color: var(--overlay-background);
   border: solid 1px var(--stroke-color);
   border-top: none;
   padding: 0;
 }
-
 
 .left-tab-selector, .right-tab-selector {
   border: solid 1px var(--stroke-color);

@@ -43,11 +43,11 @@ export const DropdownSection = (props: {
                     </button>
                 </Show>
             </div>
+            <div class={`section-body ${props.body_class ?? ""}`}>
             <Show when={expanded()}>
-                <div class={`section-body ${props.body_class ?? ""}`}>
                     {props.content}
-                </div>
             </Show>
+            </div>
         </div>
     )
 }

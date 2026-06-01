@@ -32,14 +32,14 @@ export const ServerPanel = (props: {editor: NodeEditor, state_controller: StateC
                         props.state_controller.loop_state == LoopStates.WAIT_STEP && props.state_controller.instance_state == InstanceStates.RUNNING
                     }>
                         <button class="icon-button" onclick={() => {props.editor._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.STEP}})}}>
-                            <img src="assets/icons/skip-forward.svg" alt="Step" title="Step"/>
+                            <img class="small-icon" src="assets/icons/skip-forward.svg" alt="Step" title="Step"/>
                         </button>
                     </Match>
                     <Match when={
                         props.state_controller.loop_state == LoopStates.WAIT_RESUME && props.state_controller.instance_state == InstanceStates.RUNNING
                     }>
                         <button class="icon-button" onclick={() => {props.editor._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.RESUME}})}}>
-                            <img src="assets/icons/skip-forward.svg" alt="Resume" title="Resume"/>
+                            <img class="small-icon" src="assets/icons/skip-forward.svg" alt="Resume" title="Resume"/>
                         </button>
                     </Match>
                 </Switch>

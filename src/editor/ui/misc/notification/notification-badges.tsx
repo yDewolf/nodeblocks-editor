@@ -136,12 +136,12 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
                 </Show>
             </div>
             {/* Notification List */}
-            <div 
-                class="sidebar-notifications container scrollable modal-content" 
-                classList={{"open": show(), "closing": show() && changingState()}}
-                style={{"transition": `width ${set_show_delay}ms, opacity ${set_show_delay}ms;`}}
-            >
-                <Show when={recent_notifications().length > 0 || all_notifications().length > 0 && show()}>
+            <Show when={recent_notifications().length > 0 || all_notifications().length > 0 && show()}>
+                <div 
+                    class="sidebar-notifications container scrollable modal-content" 
+                    classList={{"open": show(), "closing": show() && changingState()}}
+                    style={{"transition": `width ${set_show_delay}ms, opacity ${set_show_delay}ms;`}}
+                >
                     <Show when={show()} fallback={
                         <For each={recent_notifications()}>
                             {(notification: NotificationWithMeta) => {
@@ -159,8 +159,8 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
                             }}
                         </For>
                     </Show>
-                </Show>
-            </div>
+                </div>
+            </Show>
         </div>
     )
 }

@@ -12,12 +12,9 @@
 }
 
 .section-body {
-    padding: 8px 12px;
+    display: contents;
 }
 
-.dropdown-icon {
-    width: 20px;
-}
-.dropdown-icon.default-icon.expanded {
-    transform: rotate(-90deg);
+.section-body > div {
+    padding: 8px 12px;
 }
