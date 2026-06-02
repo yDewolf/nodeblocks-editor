@@ -10,24 +10,30 @@ import { NodeBodySections } from "../node/node-component"
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions"
 import { NodeParameter } from "~/wrapper/nodes/data/node-data"
 import { metadata } from "~/singletons/metadata"
+import { FieldSection, FieldValueDisplayer, SimpleField } from '../components/input-fields';
+import { VectorField } from "../components/default-fields"
 
 const NodeAttributes = (props: {editor: NodeEditor, node?: GraphNode}) => {
     if (!props.node) {
         return <div>Select a node</div>
     }
-    const node_meta = metadata.get_node_meta(props.node.type_id);
+    const node_meta = createMemo(() => {
+        if (!props.node) {
+            return undefined;
+        }
+        return metadata.get_node_meta(props.node.type_id);
+    })
     return (
         <div class="fill container">
-            <span>{node_meta?.capitalized_name ?? props.node.type_id}</span>
-            <div class="fill container">
-                <span>Position:</span>
-                <div class="field-grid">
-                    <span>x: {props.node.pos.x.toFixed(2)}</span>
-                    <span>y: {props.node.pos.y.toFixed(2)}</span>
-                </div>
-            </div>
+            <span>{node_meta()?.capitalized_name ?? props.node.type_id}</span>
+            <SimpleField field_name="Type" field_displayer={
+                () => <FieldValueDisplayer value_element={() => <span>{props.node?.type_id}</span>}/>
+            }/>
+            <FieldSection field_name="Position" field_displayer={
+                () => <VectorField value={props.node!.pos}/>
+            }/>
             <NodeBodySections
-                node_meta={node_meta}
+                node_meta={node_meta()}
                 node={props.node} 
                 workspace={session_controller.user_workspace}
                 syncParameter={(node: GraphNode, parameter: NodeParameter) => {

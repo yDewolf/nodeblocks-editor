@@ -1,63 +1,46 @@
 import { GraphNode } from "../../../wrapper/nodes/graph-node";
 import { NodeParameter } from "../../../wrapper/nodes/data/node-data";
 import { DefaultDataTypes } from "../../../wrapper/nodes/data/node-data-type";
-import { For, Match, Show, Switch } from "solid-js";
+import { createMemo, For, Match, Show, Switch } from "solid-js";
 import { debounce } from "~/editor/utils/debounce-utils";
 import { UserWorkspace } from "~/network/session/user-workspace";
+import { clamp } from '../../utils/parameter-utils';
+import { session_controller } from "~/singletons/user_session";
 
-export const NodeField = (props: {node: GraphNode | null, parameter: NodeParameter, workspace: UserWorkspace | undefined, parameter_sync: ((node: GraphNode, parameter: NodeParameter) => void) | undefined}) => {
+const TYPE_CONFIGS: Record<string, { type: string; step?: number; min?: number }> = {
+    [DefaultDataTypes.FLOAT]: { type: "number", step: 0.1 },
+    [DefaultDataTypes.INT]: { type: "number" },
+    [DefaultDataTypes.UINT]: { type: "number", min: 0 },
+    [DefaultDataTypes.FILE]: { type: "file" },
+    [DefaultDataTypes.OPTIONS]: { type: "options" },
+    [DefaultDataTypes.BOOLEAN]: { type: "boolean" },
+};
+
+export const NodeFieldSelector = (props: {
+    node: GraphNode | null;
+    parameter: NodeParameter;
+    workspace: UserWorkspace | undefined;
+    parameter_sync: ((node: GraphNode, parameter: NodeParameter) => void) | undefined;
+}) => {
     let inputRef!: HTMLInputElement;
-    
-    const field_id = props.node?.id.toString() + props.parameter._field_id;
-    let input_type = "text";
-    let step = props.parameter._step ?? undefined;
-    let min = props.parameter._range?.at(0);
+    const field_id = `${props.node?.id}${props.parameter._field_id}`;
+    const baseConfig = TYPE_CONFIGS[props.parameter.type.base] || { type: "text" };
+
+    const is_range = props.parameter._range != null
+    const input_type = baseConfig.type;
+    const step = props.parameter._step ?? baseConfig.step;
+    const min = props.parameter._range?.at(0) ?? baseConfig.min;
     const max = props.parameter._range?.at(1);
-    const clamp = (val: number, min?: number, max?: number) => {
-        if (min !== undefined && val < min) return min;
-        if (max !== undefined && val > max) return max;
-        return val;
-    };
-
-    // TODO: Refactor this switch
-    switch (props.parameter.type.base) {
-        case DefaultDataTypes.FLOAT: 
-            input_type = "number"; 
-            step = step != undefined ? step : 0.1;
-            break
-        case DefaultDataTypes.INT: 
-            input_type = "number";
-            break
-
-        case DefaultDataTypes.UINT: 
-            input_type = "number"; 
-            min = min != undefined ? min : 0;
-            break
-        
-        case DefaultDataTypes.FILE:
-            input_type = "file";
-            break
-
-        case DefaultDataTypes.OPTIONS:
-            input_type = "options";
-            break
-        
-        case DefaultDataTypes.BOOLEAN:
-            input_type = "boolean";
-            break
-    }
-
-    if (props.parameter._range) { input_type = "range" }
-
-    const debouncedSync = debounce(props.parameter_sync!, 250);
+    
+    const debouncedSync = debounce((n: GraphNode, p: NodeParameter) => props.parameter_sync?.(n, p), 250);
     const onInputValueChanged = (raw_value: any) => {
         if (raw_value === "") return;
 
-        let new_value: any = raw_value;
-        if (input_type === "number" || input_type === "range") {
-            let parsed = props.parameter.type.base === DefaultDataTypes.FLOAT ? parseFloat(raw_value) : parseInt(raw_value);
+        let new_value = raw_value;
+        if (input_type === "number" && is_range) {
+            const isFloat = props.parameter.type.base === DefaultDataTypes.FLOAT;
+            const parsed = isFloat ? parseFloat(raw_value) : parseInt(raw_value);
             if (isNaN(parsed)) return;
-
             new_value = clamp(parsed, min, max);
         }
 
@@ -65,100 +48,125 @@ export const NodeField = (props: {node: GraphNode | null, parameter: NodeParamet
             props.parameter.value = new_value;
         }
 
-        debouncedSync();
-
-        if (inputRef) {
-            inputRef.value = props.parameter.value.toString()
-        }
-    }
+        if (props.node) debouncedSync(props.node, props.parameter);
+        if (inputRef) inputRef.value = props.parameter.value.toString();
+    };
 
     return (
-        <div class="node-field row-container" classList={{"remove-input": props.node == null}}>
+        <div class="field row-container">
             <label for={field_id}>{props.parameter._field_id}</label>
             <Switch fallback={
-                <div>
-                    <input
-                        ref={inputRef}
-                        id={field_id} 
-                        type={input_type}
-                        value={props.parameter.value ?? ""} 
-                        onchange={(event) => {
-                            event.preventDefault();
-                            onInputValueChanged(event.currentTarget.value)}
-                        }
-                        onPointerDown={(event) => {
-                            event.stopPropagation();
-                        }}
-                        step={step}
-                        min={min}
-                        max={max}
-                    />
-                    <Show when={input_type == "range"}>{props.parameter.value}</Show>
-                </div>
+                <NumberField 
+                    step={step}
+                    min={min}
+                    max={max}
+                    is_range={is_range}
+                    onInputValueChanged={onInputValueChanged} inputRef={inputRef} field_id={field_id} parameter={props.parameter}
+                />
             }>
-                <Match when={input_type == "file"}>
-                    <select 
-                        value={props.parameter.value} 
-                        onchange={(e) => {
-                            onInputValueChanged(e.currentTarget.value);
-                        }}
-                        id={field_id}
-                    >
-                        <option value="">
-                            
-                        </option>
-                        <For each={props.workspace ? props.workspace.files : []}>
-                            {(file) => {
-                                if (props.parameter._extension_filter && props.parameter._extension_filter.length > 0) {
-                                    if (file.name) {
-                                        if (!props.parameter._extension_filter.some((extension) => file.name.endsWith(extension))) {
-                                            return;
-                                        }
-                                    }
-                                }
-                                return (
-                                    <option value={file.name}>
-                                        {file.name}
-                                    </option>
-                                )
-                            }}
-                        </For>
-                    </select>
-                </Match>
-                <Match when={input_type == "options"}>
-                    <select 
-                        value={props.parameter.value} 
-                        onchange={(e) => {
-                            onInputValueChanged(e.currentTarget.value);
-                        }}
-                        id={field_id}
-                    >
-                        <option value=""></option>
-                        <For each={props.parameter._options ?? []}>
-                            {(option_value) => {
-                                return (
-                                    <option value={option_value}>
-                                        {option_value}
-                                    </option>
-                                )
-                            }}
-                        </For>
-                    </select>
-                </Match>
-                <Match when={input_type == "boolean"}>
-                    <input 
-                        type="checkbox" 
-                        checked={props.parameter._default ?? false} 
-                        id={field_id}
-                        onPointerDown={(e) => {
-                            e.stopPropagation();
-                        }}
-                        onchange={(e) => {
-                            onInputValueChanged(e.currentTarget.checked);
-                        }}
+                <Match when={input_type === "options"}>
+                    <OptionField options={() => {
+                            return props.parameter._options?.values().toArray() ?? [];
+                        }} onInputValueChanged={onInputValueChanged} inputRef={inputRef} field_id={field_id} parameter={props.parameter}
                     />
+                </Match>
+                <Match when={input_type === "file"}>
+                    <FileOptions onInputValueChanged={onInputValueChanged} inputRef={inputRef} field_id={field_id} parameter={props.parameter}/>
+                </Match>
+                <Match when={input_type === "boolean"}>
+                    <BooleanField onInputValueChanged={onInputValueChanged} inputRef={inputRef} field_id={field_id} parameter={props.parameter}/>
                 </Match>
             </Switch>
         </div>
-    );
+    )
+}
+
+const OptionField = (props: {
+    inputRef: HTMLInputElement,
+    field_id: string,
+    parameter: NodeParameter,
+    onInputValueChanged: (value: any) => void,
+    options: () => Array<any>
+}) => {
+    return (
+        <select 
+            id={props.field_id} 
+            value={props.parameter.value} 
+            onchange={(e) => props.onInputValueChanged(e.currentTarget.value)}
+        >
+            <option value="" />
+            <For each={props.options()}>
+                {(item) => (
+                    <option value={item}>
+                        {item}
+                    </option>
+                )}
+            </For>
+        </select>
+    )
+}
+
+const FileOptions = (props: {
+    inputRef: HTMLInputElement,
+    field_id: string,
+    parameter: NodeParameter,
+    onInputValueChanged: (value: any) => void,
+}) => {
+    const filteredFiles = createMemo(() => {
+        const files = session_controller.user_workspace.files || [];
+        const filters = props.parameter._extension_filter;
+        
+        if (!filters || filters.length === 0) return files;
+        return files.filter(f => f.name && filters.some(ext => f.name.endsWith(ext)));
+    });
+    return (
+        <OptionField options={filteredFiles} 
+            onInputValueChanged={props.onInputValueChanged} inputRef={props.inputRef} field_id={props.field_id} parameter={props.parameter}
+        />
+    )
+}
+
+const NumberField = (props: {
+    inputRef: HTMLInputElement,
+    field_id: string,
+    parameter: NodeParameter,
+    onInputValueChanged: (value: any) => void,
+    step?: number,
+    min?: number,
+    max?: number,
+    is_range: boolean
+}) => {
+    return (
+        <div>
+            <input
+                type="number"
+                ref={props.inputRef}
+                id={props.field_id}
+                value={props.parameter.value ?? ""}
+                step={props.step}
+                min={props.min}
+                max={props.max}
+                onchange={(e) => { e.preventDefault(); props.onInputValueChanged(e.currentTarget.value); }}
+                onPointerDown={(e) => e.stopPropagation()}
+            />
+            <Show when={props.is_range}>{props.parameter.value}</Show>
+        </div>
+    )
+}
+
+const BooleanField = (props: {
+    inputRef: HTMLInputElement,
+    field_id: string,
+    parameter: NodeParameter,
+    onInputValueChanged: (value: any) => void,
+}) => {
+    return (
+        <input
+            id={props.field_id}
+            type="checkbox"
+            checked={props.parameter.value ?? props.parameter._default ?? false}
+            onPointerDown={(e) => e.stopPropagation()}
+            onchange={(e) => props.onInputValueChanged(e.currentTarget.checked)}
+        />
+    )
 }

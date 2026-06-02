@@ -1,7 +1,6 @@
 import { createMemo, createSignal, For, onCleanup, Show } from "solid-js";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
-import { NodeField } from "~/editor/ui/node/node-field";
 import { EditorCamera } from "~/editor/internal/editor-space";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeOutput, OutputSelector } from './output/node-output';
@@ -14,6 +13,7 @@ import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 import { DropdownIcon, DropdownSection } from "../panels/base-panels";
 import { NotificationPopupHolder } from "../misc/notification/notification-badges";
 import { NodeAnchor } from "../misc/node-anchors";
+import { NodeFieldSelector } from "./node-field";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -297,7 +297,7 @@ export const NodeBodySections = (props: {
             <DropdownSection header="Parameters" content={
                 <div>
                     <For each={props.node.node_data.parameters.values().toArray()}>
-                        {(parameter: NodeParameter) => <NodeField
+                        {(parameter: NodeParameter) => <NodeFieldSelector
                                 node={props.node}
                                 workspace={props.workspace}
                                 parameter={parameter}

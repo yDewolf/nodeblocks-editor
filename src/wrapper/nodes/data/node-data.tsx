@@ -37,7 +37,7 @@ export class NodeParameter {
     }
 
     get value() { return this._value(); }
-    set value(new_value: string) { this._set_value(new_value); }
+    set value(new_value: any) { this._set_value(new_value); }
 }
 
 export class NodeData {

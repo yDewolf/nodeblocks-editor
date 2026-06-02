@@ -1,0 +1,49 @@
+select {
+    padding: 2px 4px;
+    border-radius: 4px;
+    border: 1px solid var(--stroke-color);
+}
+select:focus-visible {
+    border-color: var(--overlay-highlight);
+    outline: none;
+}
+
+.field {
+  width: stretch;
+  label {
+    margin-right: 10px;
+  }
+}
+
+.field-section {
+    display: flex;
+    flex-direction: column;
+    
+    label {
+        user-select: none;
+        font-size: 0.8rem;
+    }
+}
+
+.field-grid {
+    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 10px;
+}
+
+.field-holder {
+    display: flex;
+    gap: 10px;
+
+    border-radius: 4px;
+    padding: 4px;
+    background-color: var(--dark-overlay-highlight);
+}
+
+.field-value-label {
+}
+
+.field-value {
+    display: contents;
+}
