@@ -25,11 +25,18 @@ select:focus-visible {
     }
 }
 
-.field-grid {
-    align-items: center;
+.field-grid-holder, .field-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: 10px;
+}
+
+.field-grid {
+    align-items: center;
+}
+
+.field-grid-holder > .field-grid {
+    display: contents;
 }
 
 .field-holder {

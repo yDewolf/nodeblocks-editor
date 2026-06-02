@@ -295,7 +295,7 @@ export const NodeBodySections = (props: {
         // TODO
         <div class="node-body-sections container fill">
             <DropdownSection header="Parameters" content={
-                <div>
+                <div class="field-grid-holder">
                     <For each={props.node.node_data.parameters.values().toArray()}>
                         {(parameter: NodeParameter) => <NodeFieldSelector
                                 node={props.node}

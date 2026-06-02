@@ -53,10 +53,10 @@ export const NodeFieldSelector = (props: {
     };
 
     return (
-        <div class="field row-container">
-            <label for={field_id}>{props.parameter._field_id}</label>
+        <div class="field-grid">
+            <label class="field-label" for={field_id}>{props.parameter._field_id}</label>
             <Switch fallback={
-                <NumberField 
+                <NumberField
                     step={step}
                     min={min}
                     max={max}
