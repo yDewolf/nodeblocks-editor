@@ -27,6 +27,7 @@ import { SessionController } from "~/network/session/session-controller";
 import { EditorRightPanel } from "./ui/panels/right-tab";
 import {} from "./ui/ui-themes";
 import "~/style/screens/editor.css";
+import { EditorToolbar } from './ui/panels/editor-toolbar';
 
 
 export class NodeEditor {
@@ -414,7 +415,7 @@ export class NodeEditor {
                         <div class="middle-tab-overlay container">
                         </div>
                         <div class="middle-tab container">
-                            {this.tool_controller.View()}
+                            <EditorToolbar tool_controller={this.tool_controller}/>
                         </div>
                     </div>
                     <EditorRightPanel editor={this} state_controller={this._state_controller}/>

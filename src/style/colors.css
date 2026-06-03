@@ -14,23 +14,27 @@
   --overlay-font-color: var(var(--font-color));
   --overlay-highlight: #BBCBD9;
   --dark-overlay-highlight: #DAE6F0;
+
+  --dark-overlay-background: #fff;
 }
 
 /* Color Schemes */
 [data-theme="dark"] {
   --editor-background-color: #1e1e24;
-  --font-color: #f5f5f7;
+  --font-color: #F4F6FA;
   --secondary-font-color: #a1a1aa;
 
-  --node-color: #2a2b36da;
-  --stroke-color: #3f3f46;
+  --node-color: #090C14;
+  --stroke-color: #485A88;
   
-  --group-color: #22232a;
-  --group-header-color: #2d3748;
+  --group-color: #923eff;
+  --group-header-color: #923eff;
   
-  --overlay-background: #18181b;
-  --overlay-highlight: #4a5568;
-  --dark-overlay-highlight: #2d3748;
+  --overlay-background: #141B21;
+  --dark-overlay-background: #0C1014;
+
+  --overlay-highlight: #243341;
+  --dark-overlay-highlight: #923eff;
 }
 
 
