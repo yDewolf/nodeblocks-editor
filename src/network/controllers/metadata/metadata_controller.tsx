@@ -4,7 +4,6 @@ import { makePersisted } from "@solid-primitives/storage";
 import { Metadata, MetadataHeader, MetadataVersion, parse_header } from "../../../wrapper/metadata/header_metadata";
 import { NodeTypeMeta, DataTypeMeta, ParameterMeta, SlotMeta, parse_node_types, parse_data_types, parse_node_type } from "../../../wrapper/metadata/type_metadata";
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
-import { NodeCategory, NodeTag } from '../../../wrapper/metadata/node_filters';
 
 const METADATA_CACHE_KEY = "type_metadata_cache"
 export interface MetadataStoreData {

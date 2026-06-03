@@ -46,13 +46,19 @@ img.medium-icon {
     }
 }
 
-img.small-icon {
+svg {
+    width: 32px;
+    height: 32px;
+}
+
+svg.small-icon {
     width: 28px;
 }
 
 .small-icon {
-    img {
+    svg {
         width: 28px;
+        height: 28px;
     }
 }
 

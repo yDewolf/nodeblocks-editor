@@ -5,7 +5,7 @@ import { NodeTypePreview, NodeTypeSelector } from "./type_selector/node-type-sel
 import { Dropdown, DropdownSection, TabSelector } from './base-panels';
 import { session_controller } from "~/singletons/user_session";
 import { FileExplorer } from "./file/file-explorer";
-
+import LeftTabIcon from "~/assets/icons/left-tab.svg";
 
 export const EditorLeftTabHolder = (props: {node_type_selector: NodeTypeSelector, scene_controller: SceneController, tool_controller: ToolController}) => {
     const tabs: Record<string, () => JSXElement> = {
@@ -16,11 +16,10 @@ export const EditorLeftTabHolder = (props: {node_type_selector: NodeTypeSelector
     return (
         <div class="left-tab-holder">
             <DropdownSection
-                icon_path="public/assets/icons/left-tab.svg"
+                icon={() => <LeftTabIcon class="medium-icon"/>}
                 dropdown_class="left-tab-dropdown"                
                 header_class="left-tab-header"
                 body_class="left-tab-content"
-                icon_class="medium-icon"
                 header_content={
                     () => (
                     <div class="keep row-container">

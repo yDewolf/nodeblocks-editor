@@ -16,6 +16,24 @@
   --dark-overlay-highlight: #DAE6F0;
 }
 
+/* Color Schemes */
+[data-theme="dark"] {
+  --editor-background-color: #1e1e24;
+  --font-color: #f5f5f7;
+  --secondary-font-color: #a1a1aa;
+
+  --node-color: #2a2b36da;
+  --stroke-color: #3f3f46;
+  
+  --group-color: #22232a;
+  --group-header-color: #2d3748;
+  
+  --overlay-background: #18181b;
+  --overlay-highlight: #4a5568;
+  --dark-overlay-highlight: #2d3748;
+}
+
+
 /* TODO: Implement DataType color schemes */
 :root {
   --input-color: #70AEB0;

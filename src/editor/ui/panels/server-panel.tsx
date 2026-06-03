@@ -4,6 +4,7 @@ import { StateController } from "~/network/controllers/state_controller";
 import { Match, Switch } from "solid-js";
 import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, WebsocketStatus } from "~/network/websocket/websocket-protocol";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
+import SkipForwardIcon from "~/assets/icons/skip-forward.svg";
 
 export const ServerStatus = (props: {status_controller: WebsocketStatusController}) => {
     return (
@@ -32,14 +33,14 @@ export const ServerPanel = (props: {editor: NodeEditor, state_controller: StateC
                         props.state_controller.loop_state == LoopStates.WAIT_STEP && props.state_controller.instance_state == InstanceStates.RUNNING
                     }>
                         <button class="icon-button" onclick={() => {props.editor._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.STEP}})}}>
-                            <img class="small-icon" src="assets/icons/skip-forward.svg" alt="Step" title="Step"/>
+                            <SkipForwardIcon class="small-icon"/>
                         </button>
                     </Match>
                     <Match when={
                         props.state_controller.loop_state == LoopStates.WAIT_RESUME && props.state_controller.instance_state == InstanceStates.RUNNING
                     }>
                         <button class="icon-button" onclick={() => {props.editor._editor_client.sendCommand({type: ClientMessages.INSTANCE_COMMAND, payload: {action: InstanceCommands.RESUME}})}}>
-                            <img class="small-icon" src="assets/icons/skip-forward.svg" alt="Resume" title="Resume"/>
+                            <SkipForwardIcon class="small-icon"/>
                         </button>
                     </Match>
                 </Switch>

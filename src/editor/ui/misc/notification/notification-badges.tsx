@@ -3,21 +3,29 @@ import { timeSignal } from "~/editor/utils/time-ticker";
 import { NotificationController } from "~/network/controllers/notification_controller";
 import { NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta, ServerNotification } from "~/network/websocket/requests/notifications";
 import { Vector2 } from "~/wrapper/data_types/geometry";
+import InfoIcon from "~/assets/icons/notification/info.svg";
+import DebugIcon from "~/assets/icons/notification/debug.svg";
+import WarningIcon from "~/assets/icons/notification/warning.svg";
+import ErrorIcon from "~/assets/icons/notification/error.svg";
+import CheckMarkIcon from "~/assets/icons/checkmark.svg";
+import ArrowRightIcon from "~/assets/icons/arrow-right.svg";
+import ArrowDownIcon from "~/assets/icons/arrow-down.svg";
+import BellIcon from "~/assets/icons/notification/notification-bell.svg";
 
 const NotificationIcon = (props: {level: NotificationLevel}) => {
     return (
         <Switch fallback={<img src="" alt="Unknown"/>}>
             <Match when={props.level == NotificationLevel.INFO}>
-                <span class="icon-span small-icon"><img src="public/assets/icons/notification/info.svg" alt="Info"/></span>
+                <span class="icon-span small-icon"><InfoIcon /></span>
             </Match>
             <Match when={props.level == NotificationLevel.DEBUG}>
-                <span class="icon-span small-icon"><img src="public/assets/icons/notification/debug.svg" alt="Debug"/></span>
+                <span class="icon-span small-icon"><DebugIcon /></span>
             </Match>
             <Match when={props.level == NotificationLevel.WARNING}>
-                <span class="icon-span small-icon"><img src="public/assets/icons/notification/warning.svg" alt="Warning"/></span>
+                <span class="icon-span small-icon"><WarningIcon /></span>
             </Match>
             <Match when={props.level == NotificationLevel.ERROR}>
-                <span class="icon-span small-icon"><img src="public/assets/icons/notification/error.svg" alt="Error"/></span>
+                <span class="icon-span small-icon"><ErrorIcon /></span>
             </Match>
         </Switch>
     )
@@ -71,17 +79,17 @@ export const NotificationCard = (props: {notification: NotificationWithMeta, not
                         <Show when={!props.is_popup && props.notification.target != NotificationTarget.UNSPECIFIED} fallback={
                             <Show when={!props.notification.read}>
                                 <button class="icon-button small-icon" onclick={mark_as_read}>
-                                    <img src="public/assets/icons/checkmark.svg" alt="Read" />
+                                    <CheckMarkIcon />
                                 </button>
                             </Show>
                         }>
                             <button class="icon-button small-icon" onclick={goto_root}>
-                                <img src="public/assets/icons/arrow-right.svg" alt=">" />
+                                <ArrowRightIcon />
                             </button>
                         </Show>
                         <Show when={props.notification.description != undefined}>
                             <button class="icon-button small-icon" onclick={() => {if (!expanded()) setExpanded(true); else {setExpanded(false)}}}>
-                                <img class="expand-icon" classList={{"expanded": expanded()}} src="public/assets/icons/arrow-down.svg" alt="Expand" />
+                                <ArrowDownIcon class="expand-icon" classList={{"expanded": expanded()}}/>
                             </button>
                         </Show>
                     </div>
@@ -125,7 +133,7 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
             <div class="keep container">
                 <div class="keep row-container" style={{"justify-content": "right"}}>
                     <button classList={{"active": show()}} class="modal-button icon-button" style={{"pointer-events": "auto"}} onClick={(e) => {if (!show()) setShow(true); else delayed_set_show(false);}}>
-                        <img src="assets/icons/notification/notification-bell.svg" alt="Open" />
+                        <BellIcon />
                     </button>
                     <Show when={recent_notifications().length > 0}>
                         <span>{recent_notifications().length}</span>

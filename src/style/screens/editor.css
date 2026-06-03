@@ -12,6 +12,8 @@
 }
 
 .editor-ui {
+  color: var(--font-color);
+  
   z-index: 2;
   inset: 0;
 

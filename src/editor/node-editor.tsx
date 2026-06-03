@@ -13,7 +13,6 @@ import { NodeTypeSelector } from "./ui/panels/type_selector/node-type-selector";
 import { ConnectionLines, ConnectionPreview } from "./ui/misc/connection-lines";
 import { Grid } from "./ui/misc/grid";
 import { NodeComponent } from './ui/node/node-component';
-import { ServerPanel } from "./ui/panels/server-panel";
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 import { StateController } from "~/network/controllers/state_controller";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
@@ -25,9 +24,10 @@ import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { EditorLeftTabHolder } from './ui/panels/left-tab';
 import { SessionController } from "~/network/session/session-controller";
-import { SidebarNotifications } from "./ui/misc/notification/notification-badges";
-import "~/style/screens/editor.css";
 import { EditorRightPanel } from "./ui/panels/right-tab";
+import {} from "./ui/ui-themes";
+import "~/style/screens/editor.css";
+
 
 export class NodeEditor {
     scene_controller: SceneController;

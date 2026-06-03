@@ -2,6 +2,7 @@ import { createMemo, createSignal, For, mapArray, Show } from "solid-js";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodePreview } from "../../node/node-component";
+import CloseIcon from "~/assets/icons/close.svg";
 
 export class NodeTypeSelector {
     public View(scene_controller: SceneController, onClickOnPreview: (node_preview: NodeTypePreview) => void) {
@@ -59,7 +60,7 @@ export class NodeTypeSelector {
                     </h3>
                     <Show when={categoryFilter() != undefined}>
                         <button class="icon-button" onclick={() => setCategoryFilter(undefined)}>
-                            <img src="public/assets/icons/close.svg" />
+                            <CloseIcon />
                         </button>
                     </Show>
                 </div>

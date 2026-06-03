@@ -1,16 +1,20 @@
-import { createSignal, For, JSXElement, Show } from "solid-js"
+import { Component, createSignal, For, JSX, JSXElement, Show } from "solid-js"
+import ArrowDownIcon from "~/assets/icons/arrow-down.svg";
 
-export const DropdownIcon = (props: {expanded: boolean, icon_path?: string, css_class?: string}) => {
-    const icon_path = props.icon_path ?? "public/assets/icons/arrow-down.svg";
+export const DropdownIcon = (props: {expanded: boolean, icon?: () => JSXElement, css_class?: string}) => {
+    const icon_path = props.icon ?? "public/assets/icons/arrow-down.svg";
     return (
-        <img 
-            class={`dropdown-icon ${props.css_class}`}
-            classList={{
-                "default-icon": !props.icon_path,
-                "expanded": props.expanded
-            }}
-            src={icon_path} alt="drop" 
-        />
+        <Show when={props.icon} fallback={
+            <ArrowDownIcon
+                class={`dropdown-icon ${props.css_class}`}
+                classList={{
+                    "default-icon": !props.icon,
+                    "expanded": props.expanded
+                }}
+            />
+        }>
+            {props.icon?.()}
+        </Show>
     )
 }
 
@@ -23,7 +27,7 @@ export const DropdownSection = (props: {
     content: JSXElement, 
     header_content?: () => JSXElement, 
     default_expanded?: boolean, 
-    icon_path?: string,
+    icon?: () => JSXElement,
     icon_class?: string,
     no_button?: boolean,
     expanded_states?: [() => boolean, (value: boolean) => void]
@@ -40,7 +44,7 @@ export const DropdownSection = (props: {
                     <button class="icon-button section-dropdown-icon" onclick={() => {
                         setExpanded(!expanded());
                     }}>
-                        <DropdownIcon expanded={expanded()} icon_path={props.icon_path} css_class={props.icon_class}/>
+                        <DropdownIcon expanded={expanded()} icon={props.icon} css_class={props.icon_class}/>
                     </button>
                 </Show>
             </div>

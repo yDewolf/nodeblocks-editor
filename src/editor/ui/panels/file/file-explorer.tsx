@@ -1,11 +1,14 @@
 import { createSignal, For, onMount, Show } from "solid-js";
 import { UserWorkspace } from "~/network/session/user-workspace";
+import RefreshIcon from "~/assets/icons/refresh.svg";
+import DownloadIcon from "~/assets/icons/download-file.svg";
+import UploadIcon from "~/assets/icons/send-file.svg";
 
 const FileUploader = (props: {workspace: UserWorkspace}) => {
     return (
         <label for="workspace-file-input" class="icon-button">
             <input class="visually-hidden" type="file" onChange={props.workspace.upload_file} id="workspace-file-input" />
-            <img src="assets/icons/send-file.svg" alt="Download"/>
+            <UploadIcon />
         </label>
     );
 };
@@ -16,7 +19,7 @@ export const FileExplorer = (props: {workspace: UserWorkspace}) => {
             <div class="file-explorer-actions keep row-container">
                 <FileUploader workspace={props.workspace}/>
                 <button class="icon-button refresh-button" onclick={() => props.workspace.update_files()}>
-                    <img src="assets/icons/refresh.svg" alt="Refresh"/>
+                    <RefreshIcon />
                 </button>
             </div>
             <div class="file-list container scrollable">
@@ -26,7 +29,7 @@ export const FileExplorer = (props: {workspace: UserWorkspace}) => {
                             <span>{file.name}</span>
                             <div class="file-actions keep row-container">
                                 <button class="icon-button" onClick={() => props.workspace.download_file(file.name)}>
-                                    <img src="assets/icons/download-file.svg" alt="Download"/>
+                                    <DownloadIcon />
                                 </button>
                                 <button class="icon-button" onClick={() => props.workspace.delete_file(file.name)}>
                                     X
