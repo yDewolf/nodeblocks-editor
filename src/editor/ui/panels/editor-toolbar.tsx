@@ -3,12 +3,18 @@ import { ToolController } from "~/editor/controllers/tool-controller";
 import { EditorTool } from "~/editor/tools/base-tool";
 import { SelectionTool } from "~/editor/tools/selection-tool";
 import CursorIcon from "~/assets/icons/cursor.svg";
+import CommentIcon from "~/assets/icons/comment.svg";
+import AskDocsIcon from "~/assets/icons/ask-about.svg";
+import { DocsTool } from "~/editor/tools/docs-tool";
+import { CommentTool } from "~/editor/tools/comment-tool";
 
 interface EditorToolStyle {
     icon: Component,
 }
 const TOOL_ICON_MAP = new Map<string, EditorToolStyle>([
-    [SelectionTool.name, {icon: CursorIcon}]
+    [SelectionTool.name, {icon: CursorIcon}],
+    [DocsTool.name, {icon: AskDocsIcon}],
+    [CommentTool.name, {icon: CommentIcon}]
 ]);
 
 const ToolSelector = (props: {tool: EditorTool, current_tool?: EditorTool, set_selected_tool: (tool: EditorTool) => void, icon?: JSXElement}) => {

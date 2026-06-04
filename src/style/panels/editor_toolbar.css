@@ -21,6 +21,7 @@
 }
 
 .toolbar-tools, .toolbar-scene-states {
+    gap: 5px;
     height: stretch;
     padding: 5px;
     display: flex;
@@ -34,6 +35,7 @@
 }
 
 .tool-selector-container {
+    background-color: transparent;
     display: flex;
     align-items: center;
     width: 32px;

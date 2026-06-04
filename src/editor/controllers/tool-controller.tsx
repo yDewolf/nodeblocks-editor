@@ -4,6 +4,8 @@ import { ConnectionController } from "~/wrapper/controllers/connection-controlle
 import { NodeEditor } from "../node-editor";
 import { SelectionController } from "./selection-controller";
 import { createSignal } from "solid-js";
+import { DocsTool } from "../tools/docs-tool";
+import { CommentTool } from "../tools/comment-tool";
 
 export class ToolController {
     selection_controller: SelectionController
@@ -34,9 +36,10 @@ export class ToolController {
     }
 
     protected add_default_tools() {
-        this.tools.push(
-            new SelectionTool(this.node_editor)
-        );
+        this.tools.push(new SelectionTool(this.node_editor));
+        this.tools.push(new CommentTool(this.node_editor));
+        this.tools.push(new DocsTool(this.node_editor));
+        
         this.change_tool(this.tools[0]);
     }
 
