@@ -70,3 +70,12 @@
 .selectable-button.active {
     background-color: var(--main-color);
 }
+
+.theme-button-holder {
+    display: flex;
+    align-items: center;
+
+    width: fit-content;
+    height: fit-content;
+    pointer-events: auto;
+}

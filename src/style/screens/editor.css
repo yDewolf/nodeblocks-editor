@@ -6,10 +6,16 @@
 .viewport {
   z-index: 1;
   cursor: crosshair;
+  color: var(--font-color);
 }
 
 .grid {
+  position: absolute;
+  margin: 0;
+  height: 100%;
+  width: 100%;
   background-color: var(--editor-background-color);
+  background-image: repeating-linear-gradient(var(--grid-color) 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, var(--grid-color) 0 1px, transparent 1px 100%);
 }
 
 .editor-ui {

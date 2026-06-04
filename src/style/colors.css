@@ -1,6 +1,7 @@
 /* Raw colors (default theme) */
 :root {
   --editor-background-color: #fbffff;
+  --grid-color: #a7a8ac75;
   --font-color: #24262A;
   --secondary-font-color: #3C3D3F;
 
@@ -20,7 +21,8 @@
 
 /* Color Schemes */
 [data-theme="dark"] {
-  --editor-background-color: #1e1e24;
+  --grid-color: #51576e75;
+  --editor-background-color: #040506;
   --font-color: #F4F6FA;
   --secondary-font-color: #a1a1aa;
 
@@ -34,7 +36,7 @@
   --dark-overlay-background: #0C1014;
 
   --overlay-highlight: #243341;
-  --dark-overlay-highlight: #923eff;
+  --dark-overlay-highlight: #273542;
 }
 
 

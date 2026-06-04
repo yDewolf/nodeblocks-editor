@@ -29,4 +29,5 @@ createEffect(() => {
     setTheme("theme", currentTheme);
 });
 
+export const getCurrentTheme = () => themeStore.theme;
 export const toggleTheme = () => setTheme("theme", themeStore.theme === "light" ? "dark" : "light");

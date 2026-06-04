@@ -28,6 +28,8 @@ import { EditorRightPanel } from "./ui/panels/right-tab";
 import {} from "./ui/ui-themes";
 import "~/style/screens/editor.css";
 import { EditorToolbar } from './ui/panels/editor-toolbar';
+import { SceneMinimap } from "./ui/components/scene-minimap";
+import { ThemeButton } from './ui/components/buttons/theme-button';
 
 
 export class NodeEditor {
@@ -413,6 +415,16 @@ export class NodeEditor {
                     <EditorLeftTabHolder node_type_selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
                     <div class="middle-tab-holder">
                         <div class="middle-tab-overlay container">
+                            <div class="keep fill row-container space-between">
+                                {/* <div>
+                                    TODO: Docs Button here
+                                </div> */}
+                                {/* Placeholder: */}
+                                <div class="theme-button-holder">
+                                    <ThemeButton icon_class="medium-icon"/>
+                                </div>
+                                <SceneMinimap editor_space={this.editor_space} nodes={this.scene_controller.node_controller.nodes}/>
+                            </div>
                         </div>
                         <div class="middle-tab container">
                             <EditorToolbar tool_controller={this.tool_controller}/>

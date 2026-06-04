@@ -20,12 +20,7 @@ export class Grid {
         return (
             <div class="grid"
                 style={{
-                    position: "absolute",
-                    margin: 0,
-                    height: "100%",
-                    width: "100%",
                     "background-position": `${-camera.offset.x * camera.zoom}px ${-camera.offset.y * camera.zoom}px `,
-                    "background-image": "repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%)",
                     "background-size": `${this._grid_size().x * camera.zoom}px ${this._grid_size().y * camera.zoom}px`
                 }}
             >
