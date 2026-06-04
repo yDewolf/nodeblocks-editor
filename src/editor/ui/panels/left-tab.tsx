@@ -28,7 +28,11 @@ export const EditorLeftTabHolder = (props: {node_type_selector: NodeTypeSelector
                                 <img src="public/assets/logo/placeholder-logo.png" alt="Nodeblocks" />
                             </span>
                             <Dropdown content={
-                                <div>TODO</div>
+                                <div class="container">
+                                    <button class="">TODO</button>
+                                    <button class="">TODO</button>
+                                    <button class="">TODO</button>
+                                </div>
                             }/>
                         </div>
                         <h4>

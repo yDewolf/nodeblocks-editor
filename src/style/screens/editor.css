@@ -1,6 +1,7 @@
 @import url("~/style/panels/import.css");
 @import url("~/style/misc/misc.css");
 @import url("~/style/components/notifications.css");
+@import url("~/style/misc/animations/import.css");
 
 .viewport {
   z-index: 1;
@@ -75,7 +76,7 @@
 }
 
 .left-tab-header.expanded, .right-tab-header.expanded {
-  border-bottom: none;
+  border-bottom: solid 1px transparent;
 }
 
 .left-tab-content > div, .right-tab-content > div {

@@ -1,0 +1,28 @@
+.slide-fade-enter-active, .slide-fade-exit-active {
+    transition: opacity 200ms, transform 200ms;
+}
+.slide-fade-enter, .slide-fade-exit-to {
+    transform: translateY(-10px);
+    opacity: 0;
+    z-index: -1;
+}
+.slide-fade-enter {
+    transform: translateY(-10px);
+}
+
+
+.dropdown-slide-enter-active {
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dropdown-slide-enter-to {
+    grid-template-rows: 1fr;
+}
+
+.dropdown-slide-exit-active {
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dropdown-slide-exit-to {
+    grid-template-rows: 0fr;
+}

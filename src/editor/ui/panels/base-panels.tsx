@@ -1,4 +1,5 @@
 import { Component, createSignal, For, JSX, JSXElement, Show } from "solid-js"
+import { Transition } from "solid-transition-group";
 import ArrowDownIcon from "~/assets/icons/arrow-down.svg";
 
 export const DropdownIcon = (props: {expanded: boolean, icon?: () => JSXElement, css_class?: string}) => {
@@ -49,18 +50,29 @@ export const DropdownSection = (props: {
                 </Show>
             </div>
             <div class={`section-body ${props.body_class ?? ""}`}>
-            <Show when={expanded()}>
+            <Transition name="slide-fade">
+                <Show when={expanded()}>
                     {props.content}
-            </Show>
+                </Show>
+            </Transition>
             </div>
         </div>
     )
 }
 
-export const Dropdown = (props: {content: JSXElement}) => {
+export const Dropdown = (props: {content: JSXElement, animated?: boolean}) => {
     const [expanded, setExpanded] = createSignal(false);
+    const renderContent = () => (
+        <Show when={expanded()}>
+            <div class="dropdown-wrapper">
+                <div class="dropdown-content">
+                    {props.content}
+                </div>
+            </div>
+        </Show>
+    )
     return (
-        <div class="dropdown" classList={{"expanded": expanded()}}>
+        <div class="dropdown" classList={{"expanded": expanded(), "no-animation": !props.animated}}>
             <div class="dropdown-header" classList={{"expanded": expanded()}}>
                 <button class="icon-button section-dropdown-icon" onclick={() => {
                     if (expanded()) setExpanded(false); else setExpanded(true);
@@ -68,10 +80,12 @@ export const Dropdown = (props: {content: JSXElement}) => {
                     <DropdownIcon expanded={expanded()}/>
                 </button>
             </div>
-            <Show when={expanded()}>
-                <div class="dropdown-content">
-                    {props.content}
-                </div>
+            <Show when={props.animated} fallback={
+                renderContent()
+            }>
+                <Transition name={"dropdown-slide"} >
+                    {renderContent()}
+                </Transition>
             </Show>
         </div>
     )

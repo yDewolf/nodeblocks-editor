@@ -57,7 +57,6 @@ export const EditorRightPanel = (props: {editor: NodeEditor, state_controller: S
     }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
     return (
-        // TODO: listen to click outside
         <div class="right-tab-holder">
             <DropdownSection
                 expanded_states={[expanded, setExpanded]}

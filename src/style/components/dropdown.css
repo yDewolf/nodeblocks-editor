@@ -17,8 +17,16 @@
     padding: 8px 12px;
 }
 
-.dropdown-content {
+.dropdown-wrapper {
     position: absolute;
+    
+    grid-template-rows: 1fr;
+    display: grid;
+    overflow: hidden;
+}
+
+.dropdown-content {
+    min-height: 0;
     padding: 2px 5px;
     
     border: 1px solid var(--stroke-color);
