@@ -132,7 +132,8 @@ export const NodeComponentV2 = (props: {
             }}
             classList={{
                 "expanded": isExpanded(),
-                "hovered": isHovered()
+                "hovered": isHovered(),
+                "selected-mode": ref_node.selected
             }}
         >
             <div class="node-contents">

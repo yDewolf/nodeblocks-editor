@@ -8,6 +8,14 @@
   gap: 5px;
 }
 
+.selected-type-preview {
+  opacity: 0.5;
+}
+
+.selected-type-preview > .node-type-preview {
+  transform: none;
+}
+
 .node-type-preview {
   transform-origin: center;
   transform: scale(0.8);

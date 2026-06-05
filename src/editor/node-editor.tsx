@@ -9,7 +9,7 @@ import { EventHandler, InputEvents } from "./internal/input_manager/event-handli
 import { SceneController } from "../wrapper/controllers/scene-controller";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
-import { NodeTypeSelector } from "./ui/panels/type_selector/node-type-selector";
+import { NodeTypePreview, NodeTypeSelector, SelectedNodeType } from "./ui/panels/type_selector/node-type-selector";
 import { ConnectionLines, ConnectionPreview } from "./ui/misc/connection-lines";
 import { Grid } from "./ui/misc/grid";
 import { NodeComponent } from './ui/node/node-component';
@@ -154,13 +154,18 @@ export class NodeEditor {
                     const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
 
-                    let nodes: NodeSceneRequestData = {};
-                    nodes[crypto.randomUUID()] = {
-                        type: this.selection_controller.selected_node_type, 
-                        position: {x: world_pos.x, y: world_pos.y},
-                        data: new Map()
-                    };
-                    NodeActionUtils.request_add_nodes(nodes, this._action_controller);
+                    if (this.selection_controller.selected_node_type) {
+                        let nodes: NodeSceneRequestData = {};
+                        nodes[crypto.randomUUID()] = {
+                            type: this.selection_controller.selected_node_type, 
+                            position: {x: world_pos.x, y: world_pos.y},
+                            data: new Map()
+                        };
+                        NodeActionUtils.request_add_nodes(nodes, this._action_controller);
+                        if (!e.shiftKey) {
+                            this.selection_controller.selected_node_type = undefined;
+                        }
+                    }
                     // TODO: Warn the user about some node construct error
                     // this.scene_controller.node_controller.add_new_node()
                 }
@@ -382,7 +387,8 @@ export class NodeEditor {
                                 <ConnectionPreview start_slot={this.selection_controller.selected_slot} hovered_slot={this.selection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
                             </Show>
                         </svg>
-
+                        
+                        <SelectedNodeType world_mouse_pos={this.cursor_world_pos} scene_controller={this.scene_controller} selection_controller={this.selection_controller}/>
                         <For each={this.scene_controller.node_controller.nodes}>
                             {(node) => <NodeComponent 
                                     node={node}
@@ -411,7 +417,10 @@ export class NodeEditor {
                     </div>
                 </div>
                 
-                <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
+                <div 
+                    class="editor-ui" 
+                    onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
+                >
                     <EditorLeftTabHolder node_type_selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
                     <div class="middle-tab-holder">
                         <div class="middle-tab-overlay container">

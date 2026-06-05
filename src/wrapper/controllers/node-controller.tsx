@@ -13,14 +13,15 @@ export class NodeController {
 
     private _free_queue: Map<Action<NodeActionPayload>, GraphNode> = new Map();;
 
-    private node_constructors: Map<string, BaseNodeConstructor>;
+    private _node_constructors: Map<string, BaseNodeConstructor>;
 
+    get node_constructors() { return this._node_constructors; }
     get nodes() { return this._nodes() }
     private set nodes(value: GraphNode[]) { this._setNodes(value); }
 
     constructor() {
-        this.node_constructors = new Map();
-        this.node_constructors.set("default", new BaseNodeConstructor("default"))
+        this._node_constructors = new Map();
+        this._node_constructors.set("default", new BaseNodeConstructor("default"))
 
         const [nodes, setNodes] = createSignal<GraphNode[]>([])
         this._nodes = nodes;
@@ -28,7 +29,7 @@ export class NodeController {
     }
 
     public load_node_types(node_file: NodeTypeFile) {
-        this.node_constructors = node_file.node_constructors;
+        this._node_constructors = node_file.node_constructors;
         this.nodes = [];
     }
         
@@ -46,7 +47,7 @@ export class NodeController {
     }
 
     public create_node(name: string, pos: Vector2, node_type: string, uid: string | undefined = undefined, node_data: Map<string, any> | undefined = undefined): GraphNode | null {
-        const construct = this.node_constructors.get(node_type);
+        const construct = this._node_constructors.get(node_type);
         if (!construct) {
             console.error("Couldn't find constructor for", node_type, "type");
             return null;

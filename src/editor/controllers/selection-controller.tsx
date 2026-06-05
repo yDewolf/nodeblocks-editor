@@ -37,7 +37,8 @@ export class SelectionController {
     _setMoving: (value: boolean) => void;
     private debounced_request_update: Function;
     
-    selected_node_type: string = "default"
+    protected _selected_node_type: () => string | undefined;
+    protected _set_selected_node_type: (type: string | undefined) => void;
     
     constructor(editor_space: EditorSpace, editor_grid: Grid, editor: NodeEditor) {
         this._editor = editor;
@@ -47,6 +48,10 @@ export class SelectionController {
         const [selectedNode, setSelectedNode] = createSignal<GraphNode[]>([]);
         this._selected_nodes = selectedNode
         this._set_selected_nodes = setSelectedNode
+
+        const [selectedNodeType, setSelectedNodeType] = createSignal<string | undefined>(undefined);
+        this._selected_node_type = selectedNodeType;
+        this._set_selected_node_type = setSelectedNodeType;
 
         const [hoveredNode, sethoveredNode] = createSignal(null);
         this._hovered_node = hoveredNode;
@@ -85,6 +90,10 @@ export class SelectionController {
 
     get hovered_node() { return this._hovered_node(); }
     set hovered_node(node: GraphNode | null) { this._set_hovered_node(node); }
+
+    get selected_node_type() { return this._selected_node_type(); }
+    set selected_node_type(node_type: string | undefined) { this._set_selected_node_type(node_type); }
+
 
     get selected_nodes() { return this._selected_nodes() }
     private set selected_nodes(value: GraphNode[]) { this._set_selected_nodes(value) }

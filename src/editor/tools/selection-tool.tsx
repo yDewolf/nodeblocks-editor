@@ -7,6 +7,7 @@ import { ConnectionController } from "../../wrapper/controllers/connection-contr
 import { NodeController } from "~/wrapper/controllers/node-controller";
 import { SelectionController } from "~/editor/controllers/selection-controller";
 import { NodeTypePreview } from "../ui/panels/type_selector/node-type-selector";
+import { createSignal } from "solid-js";
 
 export class SelectionTool extends BaseEditorTool {
     selection_controller: SelectionController
@@ -14,10 +15,21 @@ export class SelectionTool extends BaseEditorTool {
     node_controller: NodeController;
     node_editor: NodeEditor
 
-    _selected_preview: NodeTypePreview | null = null;
+    protected _selected_preview: () => NodeTypePreview | null;
+    protected _set_selected_preview: (preview: NodeTypePreview | null) => void;
+    
+    get selected_preview() {return this._selected_preview()}
+    protected set selected_preview(preview: NodeTypePreview | null) {
+        this._set_selected_preview(preview)
+        this.selection_controller.selected_node_type = preview != null ? preview.node_constructor.type_id : undefined;
+    }
 
     constructor(node_editor: NodeEditor) {
         super(node_editor);
+        const [selectedPreview, setSelectedPreview] = createSignal(null);
+        this._selected_preview = selectedPreview;
+        this._set_selected_preview = setSelectedPreview;
+
         this.selection_controller = node_editor.selection_controller;
         this.connection_controller = node_editor.scene_controller.connection_controller;
         this.node_controller = node_editor.scene_controller.node_controller;
@@ -48,6 +60,11 @@ export class SelectionTool extends BaseEditorTool {
         if (this.selection_controller.selecting) {
             this.selection_controller.stopSelection();
         }
+
+        if (this.selected_preview) {
+            this.selected_preview.selected = false;
+            this.selected_preview = null;
+        }
     }
 
     onClickOnNode(node: GraphNode): void {
@@ -72,13 +89,11 @@ export class SelectionTool extends BaseEditorTool {
     }
 
     onClickOnNodePreview(node_preview: NodeTypePreview): void {
-        this.selection_controller.selected_node_type = node_preview.node_constructor.type_id;
-        
-        if (this._selected_preview != null) {
-            this._selected_preview.selected = false
+        if (this.selected_preview != null) {
+            this.selected_preview.selected = false
         }
         node_preview.selected = true;
-        this._selected_preview = node_preview
+        this.selected_preview = node_preview
     }
 
     onHoverSlot(slot: NodeSlot): void {

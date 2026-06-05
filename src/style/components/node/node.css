@@ -106,10 +106,9 @@
 }
 
 
-.selected-mode {
+.node.selected-mode {
   background-color: var(--node-selected-color);
   .node-header {
     cursor: grab;
   }
 }
-

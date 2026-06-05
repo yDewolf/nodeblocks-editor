@@ -3,6 +3,11 @@ import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodePreview } from "../../node/node-component";
 import CloseIcon from "~/assets/icons/close.svg";
+import { Vector2 } from "~/wrapper/data_types/geometry";
+import { EditorTool } from "~/editor/tools/base-tool";
+import { SelectionTool } from "~/editor/tools/selection-tool";
+import { SelectionController } from "~/editor/controllers/selection-controller";
+import { SelectionRect } from '../../misc/selection_rect';
 
 export class NodeTypeSelector {
     public View(scene_controller: SceneController, onClickOnPreview: (node_preview: NodeTypePreview) => void) {
@@ -108,4 +113,39 @@ export class NodeTypePreview {
             </div>
         );
     };
+}
+
+
+export const SelectedNodeType = (props: {world_mouse_pos: Vector2, scene_controller: SceneController, selection_controller: SelectionController}) => {
+    const node_constructor = createMemo(() => {
+        const node_type = props.selection_controller.selected_node_type;
+        if (!node_type) {
+            return undefined;
+        }
+        
+        return props.scene_controller.node_controller.node_constructors.get(node_type);
+    });
+    const PreviewComponent = () => {
+        const constructor = node_constructor();
+        if (constructor) {
+            return <NodePreview constructor={constructor}/>
+        }
+
+        return undefined
+    }
+
+    return (
+        <Show when={PreviewComponent()}>
+            <div
+                class="selected-type-preview"
+                style={{
+                    position: "absolute",
+                    transform: `translate(${props.world_mouse_pos.x}px, ${props.world_mouse_pos.y}px)`,
+                    "pointer-events": "none"
+                }}
+            >
+                {PreviewComponent()}
+            </div>
+        </Show>
+    )
 }
