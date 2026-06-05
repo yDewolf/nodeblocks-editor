@@ -13,6 +13,7 @@
 
 .dropdown-slide-enter-active {
     grid-template-rows: 0fr;
+    overflow: hidden;
     transition: grid-template-rows 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .dropdown-slide-enter-to {
@@ -25,4 +26,5 @@
 }
 .dropdown-slide-exit-to {
     grid-template-rows: 0fr;
+    overflow: hidden;
 }

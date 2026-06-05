@@ -72,7 +72,11 @@ export const Dropdown = (props: {content: JSXElement, animated?: boolean}) => {
         </Show>
     )
     return (
-        <div class="dropdown" classList={{"expanded": expanded(), "no-animation": !props.animated}}>
+        <div 
+            class="dropdown" 
+            classList={{"expanded": expanded(), "no-animation": !props.animated}}
+            onFocusOut={() => setExpanded(false)}
+        >
             <div class="dropdown-header" classList={{"expanded": expanded()}}>
                 <button class="icon-button section-dropdown-icon" onclick={() => {
                     if (expanded()) setExpanded(false); else setExpanded(true);
@@ -90,6 +94,111 @@ export const Dropdown = (props: {content: JSXElement, animated?: boolean}) => {
         </div>
     )
 }
+
+export const DropdownItemButton = (props: {label: string, onClick: () => void, onMouseOver?: () => void}) => {
+    return (
+        <button
+            onclick={() => {props.onClick()}}
+            onMouseOver={() => {props.onMouseOver?.()}}
+            class="dropdown-item dropdown-button dropdown-label space-between"
+        >
+            {props.label}
+        </button>
+    )
+}
+
+export const Dropside = (props: {
+    label_element?: JSXElement,
+    label?: string,
+    content: JSXElement,
+    animated?: boolean,
+    visible?: () => boolean,
+    onMouseEnter?: () => void
+}) => {
+    const [localVisible, setLocalVisible] = createSignal(true);
+    const is_visible = props.visible ?? localVisible;
+
+    const renderContent = () => (
+        <Show when={is_visible()}>
+            <div 
+                class="dropside-wrapper"
+                onMouseLeave={() => setLocalVisible(false)}
+            >
+                <div class="dropside-content">
+                    {props.content}
+                </div>
+            </div>
+        </Show>
+    );
+
+    return (
+        <div 
+            class="dropdown-item"
+            classList={{
+                "expanded": is_visible()
+            }}
+            onMouseEnter={() => {
+                if (props.onMouseEnter) {
+                    props.onMouseEnter();
+                    return;
+                }
+                setLocalVisible(true)
+            }}
+        >
+            <div class="dropdown-label space-between">
+                <Show when={props.label_element} fallback={
+                    <button class="dropdown-button">
+                        {props.label}
+                    </button>
+                }>
+                    {props.label_element}
+                </Show>
+                <ArrowDownIcon class="dropside-icon"/>
+            </div>
+            <Show when={props.animated} fallback={renderContent()}>
+                <Transition name="dropside-fade">
+                    {renderContent()}
+                </Transition>
+            </Show>
+        </div>
+    );
+}
+
+export interface DropsideItemData {
+    label_element?: () => JSXElement,
+    label?: string,
+    content: () => JSXElement,
+    animated?: boolean
+}
+
+export const DropsideManager = (props: {
+    dropsides: Map<string, DropsideItemData>,
+    currentItem?: () => string | undefined,
+    setCurrentItem?: (item: string | undefined) => void,
+}) => {
+    const [currentItem, setCurrentItem] = createSignal<string | undefined>(undefined);
+    const current_item = props.currentItem ?? currentItem;
+    const set_current_item = props.setCurrentItem ?? setCurrentItem;
+
+    return (
+        <div class="dropside-manager-container">
+            <For each={Array.from(props.dropsides.entries())}>
+                {([id, data]) => {
+                    return (
+                        <Dropside 
+                            label_element={data.label_element?.()}
+                            label={data.label}
+                            content={data.content()}
+                            animated={data.animated}
+                            visible={() => current_item() === id}
+                            onMouseEnter={() => set_current_item(id)}
+                        />
+                    );
+                }}
+            </For>
+        </div>
+    );
+};
 
 
 export const TabDisplayer = (props: {

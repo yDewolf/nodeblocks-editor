@@ -79,3 +79,16 @@
     height: fit-content;
     pointer-events: auto;
 }
+
+.dropdown-button {
+    display: flex;
+    align-items: center;
+
+    border: none;
+    background-color: transparent;
+}
+
+.dropdown-button:hover {
+    background-color: var(--overlay-highlight);
+    color: var(--font-color);
+}
