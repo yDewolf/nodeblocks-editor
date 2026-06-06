@@ -4,6 +4,12 @@ div {
     border-radius: var(--default-border-radius);
 }
 
+.view-displayer {
+    pointer-events: auto;
+    height: 100%;
+    width: 100%;
+}
+
 .row-container, .container {
     gap: 4px;
     display: flex;

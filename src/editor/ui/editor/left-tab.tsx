@@ -7,8 +7,13 @@ import LeftTabIcon from "~/assets/icons/left-tab.svg";
 import { DropsideItemData, Dropdown, DropsideManager, DropdownItemButton, DropdownSection } from "../components/panels/dropdown";
 import { TabSelector } from "../components/panels/tab-display";
 import { NodeTypeSelector, NodeTypePreview } from "./subpanels/node-type-selector";
+import { NodeEditor } from "~/editor/node-editor";
+import { PageViewer } from "../components/page-controller";
+import { SettingsView } from "../screens/settings-view";
 
-const LeftTabDropdown = (props: {}) => {
+const LeftTabDropdown = (props: {
+    page_viewer: PageViewer
+}) => {
     const [currentItem, setCurrentItem] = createSignal<string | undefined>(undefined);
     const subsections: Map<string, DropsideItemData> = new Map([
         ["file", {
@@ -19,24 +24,30 @@ const LeftTabDropdown = (props: {}) => {
             </div>
         }],
     ])
+    
+    const SettingsCallback = () => <SettingsView page_viewer={props.page_viewer}/>;
     return (
         <Dropdown content={
             <div
                 class="fill dropdown-item-grid">
                 <DropsideManager dropsides={subsections} currentItem={currentItem} setCurrentItem={setCurrentItem}/>
-                <DropdownItemButton label="Settings" onClick={() => {}} onMouseOver={setCurrentItem(undefined)}/>
+                <DropdownItemButton label="Settings" onClick={() => {
+                    props.page_viewer.current_page = {
+                        element: SettingsCallback
+                    };
+                }} onMouseOver={setCurrentItem(undefined)}/>
             </div>
         }/>
     )
 }
 
 export const EditorLeftTabHolder = (props: {
+    main_page_viewer: PageViewer,
+    editor: NodeEditor,
     node_type_selector: NodeTypeSelector, 
-    scene_controller: SceneController, 
-    tool_controller: ToolController
 }) => {
     const tabs: Record<string, () => JSXElement> = {
-        "Nodes": () => props.node_type_selector.View(props.scene_controller, (node_preview: NodeTypePreview) => props.tool_controller.current_tool?.onClickOnNodePreview(node_preview)),
+        "Nodes": () => props.node_type_selector.View(props.editor.scene_controller, (node_preview: NodeTypePreview) => props.editor.tool_controller.current_tool?.onClickOnNodePreview(node_preview)),
         "Workspace": () => <FileExplorer workspace={session_controller.user_workspace}/>
     }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
@@ -54,7 +65,7 @@ export const EditorLeftTabHolder = (props: {
                             <span class="icon-span">
                                 <img src="public/assets/logo/placeholder-logo.png" alt="Nodeblocks" />
                             </span>
-                            <LeftTabDropdown />
+                            <LeftTabDropdown page_viewer={props.main_page_viewer} />
                         </div>
                         <h4>
                             NodeScene

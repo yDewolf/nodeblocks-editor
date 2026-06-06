@@ -1,4 +1,4 @@
-import { JSXElement, For } from "solid-js"
+import { JSXElement, For, Show } from "solid-js"
 
 export const TabDisplayer = (props: {
     tabs: Record<string, () => JSXElement>, 

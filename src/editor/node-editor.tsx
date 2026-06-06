@@ -31,6 +31,7 @@ import { SceneMinimap } from "./ui/components/scene-minimap";
 import { ThemeButton } from './ui/components/buttons/theme-button';
 import { EditorMidTab } from './ui/editor/mid-tab';
 import { NodeTypeSelector, SelectedNodeType } from "./ui/editor/subpanels/node-type-selector";
+import { PageViewer } from "./ui/components/page-controller";
 
 
 export class NodeEditor {
@@ -51,10 +52,13 @@ export class NodeEditor {
     editor_space: EditorSpace
     editor_grid: Grid
 
+    protected main_page_viewer: PageViewer
+
     private _cursor_world_pos: () => Vector2;
     private _set_cursor_world_pos: (v: Vector2) => void;
 
     constructor (session_controller: SessionController) {
+        this.main_page_viewer = new PageViewer();
         this._session_controller = session_controller;
         this._session_controller.notification_controller._editor = this;
 
@@ -422,8 +426,8 @@ export class NodeEditor {
                     class="editor-ui" 
                     onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
                 >
-                    <EditorLeftTabHolder node_type_selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
-                    <EditorMidTab tool_controller={this.tool_controller} scene_controller={this.scene_controller} editor_space={this.editor_space}/>
+                    <EditorLeftTabHolder node_type_selector={selector} main_page_viewer={this.main_page_viewer} editor={this}/>
+                    <EditorMidTab page_viewer={this.main_page_viewer} editor={this}/>
                     <EditorRightPanel editor={this} state_controller={this._state_controller}/>
                 </div>
             </div>
