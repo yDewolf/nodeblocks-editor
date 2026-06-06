@@ -1,6 +1,8 @@
 import { createEffect, createMemo, createSignal, For, Index, Match, Show, Switch } from "solid-js";
 import { ScalarView } from './scalar-output';
 
+// TODO: add a interpreter option on the UI so the user can select
+// how the array should be interpreted
 const ArrayCanvas = (props: { data: any[], shape: number[], target_channel: number }) => {
     let canvasRef: HTMLCanvasElement | undefined;
 
@@ -22,7 +24,12 @@ const ArrayCanvas = (props: { data: any[], shape: number[], target_channel: numb
         canvasRef.height = h;
         
         const imageData = ctx.createImageData(w, h);
-        const data = c == 1 ? props.data[props.target_channel] : c > 1 ? props.data[props.target_channel] : props.data;
+        let data = props.data;
+        if (c == 1) data = props.data[props.target_channel];
+        if (c >= 3 && c <= 4) data = props.data;
+        else if (c > 4) {
+            data = props.data[props.target_channel];
+        }
         const shape = get_array_shape(data)
 
         for (let i = 0; i < h; i++) {
@@ -35,11 +42,13 @@ const ArrayCanvas = (props: { data: any[], shape: number[], target_channel: numb
                     r = g = b = data[j];
                 } else if (shape.length === 2 || c == 1) { // 2D
                     r = g = b = data[i][j];
-                } else { // 3D
-                    r = data[i][j][0] || 0;
-                    g = data[i][j][1] || 0;
-                    b = data[i][j][2] || 0;
-                    a = data[i][j][3] || 255;
+                } else if (c >= 3 && c <= 4) { // 3D
+                    r = data[0][i][j] || 0;
+                    g = data[1][i][j] || 0;
+                    b = data[2][i][j] || 0;
+                    if (c === 4) {
+                        a = data[3][i][j] || 255;
+                    }
                 }
 
                 imageData.data[idx] = r;
@@ -91,7 +100,7 @@ export const ArrayView = (props: { output_value: any | undefined }) => {
                         <span class="field-value-label">Shape</span>
                         <span class="field-value">({shape().join(", ")})</span>
                     </div>
-                    <Show when={dims() > 2 && shape()[0] > 1}>
+                    <Show when={dims() > 2 && shape()[0] > 4}>
                         <div class="field-grid">
                             <label class="field-value-label" for="target-channels">Channel:</label>
                             <div class="field-value">
