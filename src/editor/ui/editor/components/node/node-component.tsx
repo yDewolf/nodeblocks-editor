@@ -139,6 +139,7 @@ export const NodeComponentV2 = (props: {
             <div class="node-contents">
                 <NodeHeader 
                     node={ref_node} 
+                    node_meta={node_meta}
                     isExpanded={isExpanded()} 
                     setExpanded={setIsExpanded}
                     setIsHovered={setIsHovered}
@@ -149,8 +150,8 @@ export const NodeComponentV2 = (props: {
                     show_slots={isExpanded() || isHovered()} 
                     show_sections={isExpanded()} 
                     node={ref_node}
-                    workspace={props.workspace}
                     node_meta={node_meta}
+                    workspace={props.workspace}
                     syncParameter={props.syncParameter}
                     onClickSlot={props.onClickSlot}
                     onHoverSlot={(slot: NodeSlot) => {
