@@ -8,7 +8,7 @@
   display: grid;
   user-select: none;
 
-  padding: 2px 5px;
+  padding: 5px;
   background-color: var(--node-color);
   border: 1px solid var(--stroke-color);
 }
@@ -39,7 +39,7 @@
 
 .slot-grid-overlay {
   pointer-events: none;
-  margin: -12px -14px;
+  margin: -15px -14px;
   align-content: center;
 }
 

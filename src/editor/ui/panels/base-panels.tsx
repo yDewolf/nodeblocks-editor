@@ -3,7 +3,6 @@ import { Transition } from "solid-transition-group";
 import ArrowDownIcon from "~/assets/icons/arrow-down.svg";
 
 export const DropdownIcon = (props: {expanded: boolean, icon?: () => JSXElement, css_class?: string}) => {
-    const icon_path = props.icon ?? "public/assets/icons/arrow-down.svg";
     return (
         <Show when={props.icon} fallback={
             <ArrowDownIcon
@@ -27,14 +26,21 @@ export const DropdownSection = (props: {
 
     content: JSXElement, 
     header_content?: () => JSXElement, 
-    default_expanded?: boolean, 
+    default_expanded?: boolean,
     icon?: () => JSXElement,
     icon_class?: string,
+    animated?: boolean,
     no_button?: boolean,
     expanded_states?: [() => boolean, (value: boolean) => void]
 }) => {
     const [expanded, setExpanded] = props.expanded_states ?? createSignal(props?.default_expanded ?? false);
     const no_button = props.no_button ?? false;
+    const renderContent = () => (
+        <Show when={expanded()}>
+            {props.content}
+        </Show>
+    )
+    
     return (
         <div class={`dropdown-section ${props.dropdown_class ?? ""}`} classList={{"expanded": expanded()}}>
             <div class={`section-header ${props.header_class ?? ""}`} classList={{"expanded": expanded()}}>
@@ -50,21 +56,32 @@ export const DropdownSection = (props: {
                 </Show>
             </div>
             <div class={`section-body ${props.body_class ?? ""}`}>
-            <Transition name="slide-fade">
-                <Show when={expanded()}>
-                    {props.content}
-                </Show>
-            </Transition>
+            
+            <Show when={props.animated} fallback={renderContent()}>
+                <Transition name="slide-fade">
+                    {renderContent()}
+                </Transition>
+            </Show>
             </div>
         </div>
     )
 }
 
 export const Dropdown = (props: {content: JSXElement, animated?: boolean}) => {
+    let containerRef: HTMLDivElement | undefined;
     const [expanded, setExpanded] = createSignal(false);
+    const handleOnFocusOut = (e: FocusEvent) => {
+        const nextTarget = e.relatedTarget as Node
+        if (nextTarget && !containerRef?.contains(nextTarget)) {
+            setExpanded(false);
+        }
+    }
     const renderContent = () => (
         <Show when={expanded()}>
-            <div class="dropdown-wrapper">
+            <div
+                onFocusOut={handleOnFocusOut}
+                class="dropdown-wrapper"
+            >
                 <div class="dropdown-content">
                     {props.content}
                 </div>
@@ -73,9 +90,10 @@ export const Dropdown = (props: {content: JSXElement, animated?: boolean}) => {
     )
     return (
         <div 
+            ref={containerRef}
+            onFocusOut={handleOnFocusOut}
             class="dropdown" 
             classList={{"expanded": expanded(), "no-animation": !props.animated}}
-            onFocusOut={() => setExpanded(false)}
         >
             <div class="dropdown-header" classList={{"expanded": expanded()}}>
                 <button class="icon-button section-dropdown-icon" onclick={() => {
