@@ -1,7 +1,7 @@
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { For, createMemo } from 'solid-js';
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { SlotComponent } from "../node/slot-components";
+import { SlotComponent } from "./slot-components";
 import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 
 export const NodeAnchor = (props: {

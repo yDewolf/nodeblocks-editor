@@ -1,13 +1,13 @@
 import { createMemo, createSignal, For, mapArray, Show } from "solid-js";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
-import { NodePreview } from "../../node/node-component";
+import { NodePreview } from "../../editor/components/node/node-component";
 import CloseIcon from "~/assets/icons/close.svg";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { EditorTool } from "~/editor/tools/base-tool";
 import { SelectionTool } from "~/editor/tools/selection-tool";
 import { SelectionController } from "~/editor/controllers/selection-controller";
-import { SelectionRect } from '../../misc/selection_rect';
+import { SelectionRect } from '../../editor/components/misc/selection_rect';
 
 export class NodeTypeSelector {
     public View(scene_controller: SceneController, onClickOnPreview: (node_preview: NodeTypePreview) => void) {

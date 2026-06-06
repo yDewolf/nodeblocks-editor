@@ -9,10 +9,9 @@ import { EventHandler, InputEvents } from "./internal/input_manager/event-handli
 import { SceneController } from "../wrapper/controllers/scene-controller";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
-import { NodeTypePreview, NodeTypeSelector, SelectedNodeType } from "./ui/panels/type_selector/node-type-selector";
-import { ConnectionLines, ConnectionPreview } from "./ui/misc/connection-lines";
-import { Grid } from "./ui/misc/grid";
-import { NodeComponent } from './ui/node/node-component';
+import { ConnectionLines, ConnectionPreview } from "./ui/editor/components/misc/connection-lines";
+import { Grid } from "./ui/editor/components/misc/grid";
+import { NodeComponent } from './ui/editor/components/node/node-component';
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 import { StateController } from "~/network/controllers/state_controller";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
@@ -22,14 +21,16 @@ import { NodeSceneRequestData } from "~/network/websocket/request-types";
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
-import { EditorLeftTabHolder } from './ui/panels/left-tab';
+import { EditorLeftTabHolder } from './ui/editor/left-tab';
 import { SessionController } from "~/network/session/session-controller";
-import { EditorRightPanel } from "./ui/panels/right-tab";
+import { EditorRightPanel } from "./ui/editor/right-tab";
 import {} from "./ui/ui-themes";
 import "~/style/screens/editor.css";
-import { EditorToolbar } from './ui/panels/editor-toolbar';
+import { EditorToolbar } from './ui/editor/subpanels/editor-toolbar';
 import { SceneMinimap } from "./ui/components/scene-minimap";
 import { ThemeButton } from './ui/components/buttons/theme-button';
+import { EditorMidTab } from './ui/editor/mid-tab';
+import { NodeTypeSelector, SelectedNodeType } from "./ui/editor/subpanels/node-type-selector";
 
 
 export class NodeEditor {
@@ -422,23 +423,7 @@ export class NodeEditor {
                     onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
                 >
                     <EditorLeftTabHolder node_type_selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
-                    <div class="middle-tab-holder">
-                        <div class="middle-tab-overlay container">
-                            <div class="keep fill row-container space-between">
-                                {/* <div>
-                                    TODO: Docs Button here
-                                </div> */}
-                                {/* Placeholder: */}
-                                <div class="theme-button-holder">
-                                    <ThemeButton icon_class="medium-icon"/>
-                                </div>
-                                <SceneMinimap editor_space={this.editor_space} nodes={this.scene_controller.node_controller.nodes}/>
-                            </div>
-                        </div>
-                        <div class="middle-tab container">
-                            <EditorToolbar tool_controller={this.tool_controller}/>
-                        </div>
-                    </div>
+                    <EditorMidTab tool_controller={this.tool_controller} scene_controller={this.scene_controller} editor_space={this.editor_space}/>
                     <EditorRightPanel editor={this} state_controller={this._state_controller}/>
                 </div>
             </div>

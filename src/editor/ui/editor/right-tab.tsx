@@ -1,17 +1,18 @@
 import { StateController } from "~/network/controllers/state_controller"
-import { ServerPanel } from "./server-panel"
 import { NodeEditor } from "~/editor/node-editor"
 import { createMemo, createSignal, JSXElement, Show } from "solid-js"
-import { DropdownSection, TabSelector } from "./base-panels"
-import { SidebarNotifications } from "../misc/notification/notification-badges"
+import { SidebarNotifications } from "./components/misc/notification/notification-badges"
 import { session_controller } from "~/singletons/user_session"
 import { GraphNode } from "~/wrapper/nodes/graph-node"
-import { NodeBodySections } from "../node/node-component"
+import { NodeBodySections } from "./components/node/node-component"
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions"
 import { NodeParameter } from "~/wrapper/nodes/data/node-data"
 import { metadata } from "~/singletons/metadata"
 import { FieldSection, FieldValueDisplayer, SimpleField } from '../components/input-fields';
 import { VectorField } from "../components/default-fields"
+import { DropdownSection } from "../components/panels/dropdown"
+import { TabSelector } from "../components/panels/tab-display"
+import { ServerPanel } from "./subpanels/server-panel"
 
 const NodeAttributes = (props: {editor: NodeEditor, node?: GraphNode}) => {
     if (!props.node) {

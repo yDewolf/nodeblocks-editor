@@ -1,11 +1,12 @@
 import { Accessor, createRoot, createSignal, JSXElement, onCleanup, Show } from "solid-js";
 import { ToolController } from "~/editor/controllers/tool-controller";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
-import { NodeTypePreview, NodeTypeSelector } from "./type_selector/node-type-selector";
-import { Dropdown, DropdownSection, Dropside, DropsideItemData, DropsideManager, TabSelector, DropdownItemButton } from './base-panels';
 import { session_controller } from "~/singletons/user_session";
-import { FileExplorer } from "./file/file-explorer";
+import { FileExplorer } from "./subpanels/file-explorer";
 import LeftTabIcon from "~/assets/icons/left-tab.svg";
+import { DropsideItemData, Dropdown, DropsideManager, DropdownItemButton, DropdownSection } from "../components/panels/dropdown";
+import { TabSelector } from "../components/panels/tab-display";
+import { NodeTypeSelector, NodeTypePreview } from "./subpanels/node-type-selector";
 
 const LeftTabDropdown = (props: {}) => {
     const [currentItem, setCurrentItem] = createSignal<string | undefined>(undefined);

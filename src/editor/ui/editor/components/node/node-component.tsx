@@ -10,10 +10,10 @@ import { metadata } from "~/singletons/metadata";
 import { SlotComponent } from "./slot-components";
 import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
-import { DropdownIcon, DropdownSection } from "../panels/base-panels";
 import { NotificationPopupHolder } from "../misc/notification/notification-badges";
-import { NodeAnchor } from "../misc/node-anchors";
+import { NodeAnchor } from "./node-anchors";
 import { NodeFieldSelector } from "./node-field";
+import { DropdownIcon, DropdownSection } from "../../../components/panels/dropdown";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
