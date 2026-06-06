@@ -4,10 +4,23 @@
     height: fit-content;
     display: flex;
     gap: 5px;
+
+    min-width: 0;
+    width: 100%;
 }
+
 .slot-label {
-    text-overflow: ellipsis;
-    overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  overflow: hidden;
+}
+
+.slot-label:hover {
+  z-index: 1;
+  text-overflow: clip;
+  overflow: visible;
+  background-color: var(--selection-color-alpha);
 }
 
 .slot-dot {
@@ -18,6 +31,8 @@
 
   border: 2px solid #888;
   border-radius: 50%;
+
+  flex-shrink: 0;
 }
 
 .slot-dot.output-slot {
@@ -38,6 +53,7 @@
 
 .output-slot {
   flex-direction: row-reverse;
+  text-align: right;
   .slot-dot {
     background: var(--dark-output-color);
     border-color: var(--output-color);

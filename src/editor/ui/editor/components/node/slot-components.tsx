@@ -28,34 +28,7 @@ export class SlotComponent {
         onClick: (slot: NodeSlot) => void,
         onHover: (slot: NodeSlot) => void
     ) => {
-        return (
-            <div
-                // FIXME: this might break referencing cause it overrides stuff etc etc
-                onMouseOver={(e) => {
-                    e.stopPropagation();
-                    onHover(this.slot);
-                }}
-                class="node-slot"
-                classList={{
-                    "connected-slot": this.slot.connections.size > 0,
-                    "selected-slot": this.slot.selected,
-                    "input-slot": this.slot.is_input,
-                    "output-slot": !this.slot.is_input,
-                }}
-            >
-                <div 
-                    ref={this.slot._element} 
-                    class="slot-dot"
-                    onPointerDown={(e) => {
-                        e.stopPropagation();
-                        onClick(this.slot);
-                    }}
-                ></div>
-                <Show when={show_label}>
-                    <span class="slot-label">{this.slot_meta ? this.slot_meta.capitalized_name : this.slot.slot_id}</span>
-                </Show>
-            </div>
-        )
+        return <_SlotComponent onHover={onHover} onClick={onClick} show_label={show_label} slot={this.slot}/>
     }
 
 }
@@ -68,12 +41,14 @@ export const _SlotComponent = (props: {
 }) => {
     const node_meta = props.node_meta ? props.node_meta : metadata.get_node_meta(props.slot.parent_node.type_id);
     const slot_meta = node_meta != undefined ? node_meta.slot_meta[props.slot.slot_id] : undefined;
+    const slot_label = slot_meta ? slot_meta.capitalized_name : props.slot.slot_id;
     return (
         <div
             onMouseOver={(e) => {
                 e.stopPropagation();
                 props.onHover(props.slot);
             }}
+            title={slot_label}
             class="node-slot"
             classList={{
                 "connected-slot": props.slot.connections.size > 0,
@@ -90,7 +65,7 @@ export const _SlotComponent = (props: {
                 }}
             ></div>
             <Show when={props.show_label}>
-                <span class="slot-label">{slot_meta ? slot_meta.capitalized_name : props.slot.slot_id}</span>
+                <span class="slot-label">{slot_label}</span>
             </Show>
         </div>
     )
