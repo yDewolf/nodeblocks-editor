@@ -1,7 +1,7 @@
 .selection-rect {
   position: absolute;
   background-color: var(--selection-color-alpha);
-  border: rgba(0, 0, 200, 0.4) solid 1px;
+  border: solid 1px var(--selection-color-alpha);
   user-select: none;
   touch-action: none;
 }

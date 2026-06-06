@@ -9,7 +9,7 @@
   z-index: 1;
   cursor: crosshair;
   color: var(--font-color);
-}
+ }
 
 .grid {
   position: absolute;

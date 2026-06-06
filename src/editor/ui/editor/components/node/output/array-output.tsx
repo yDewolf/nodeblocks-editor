@@ -85,26 +85,30 @@ export const ArrayView = (props: { output_value: any | undefined }) => {
 
     return (
         <Switch fallback={
-            <div class="output-array-container">
-                <div class="array-info row-container fill space-between">
-                    <span>Shape: ({shape().join(", ")})</span>
-
+            <div class="output-array-container container">
+                <div class="field-grid-holder">
+                    <div class="field-grid">
+                        <span class="field-value-label">Shape</span>
+                        <span class="field-value">({shape().join(", ")})</span>
+                    </div>
                     <Show when={dims() > 2 && shape()[0] > 1}>
-                        <div class="row-container">
-                            <label for="target-channels">Channel:</label>
-                            <select value={0} id="target-channels" onchange={(e) => {
-                                setTargetChannel(Number.parseInt(e.currentTarget.value));
-                            }}>
-                                <For each={Array.from({length: shape()[0]}, (_, i) => i)} >
-                                    {(shape_size, idx) => {
-                                        return (
-                                            <option value={idx()}>
-                                                {idx()}
-                                            </option>   
-                                        )
-                                    }}
-                                </For>
-                            </select>
+                        <div class="field-grid">
+                            <label class="field-value-label" for="target-channels">Channel:</label>
+                            <div class="field-value">
+                                <select value={0} id="target-channels" onchange={(e) => {
+                                    setTargetChannel(Number.parseInt(e.currentTarget.value));
+                                }}>
+                                    <For each={Array.from({length: shape()[0]}, (_, i) => i)} >
+                                        {(shape_size, idx) => {
+                                            return (
+                                                <option value={idx()}>
+                                                    {idx()}
+                                                </option>   
+                                            )
+                                        }}
+                                    </For>
+                                </select>
+                            </div>
                         </div>
                     </Show>
                 </div>

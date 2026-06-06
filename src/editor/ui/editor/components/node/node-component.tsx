@@ -295,21 +295,23 @@ export const NodeBodySections = (props: {
     return (
         // TODO
         <div class="node-body-sections container fill">
-            <DropdownSection header="Parameters" content={
-                <div class="field-grid-holder">
-                    <For each={props.node.node_data.parameters.values().toArray()}>
-                        {(parameter: NodeParameter) => <NodeFieldSelector
-                                node={props.node}
-                                workspace={props.workspace}
-                                parameter={parameter}
-                                parameter_sync={() => {
-                                    props.syncParameter(props.node, parameter)
-                                }}
-                            />
-                        }
-                    </For>    
-                </div>
-            }/>
+            <Show when={props.node.node_data.parameters.size > 0}>
+                <DropdownSection header="Parameters" content={
+                    <div class="field-grid-holder">
+                        <For each={props.node.node_data.parameters.values().toArray()}>
+                            {(parameter: NodeParameter) => <NodeFieldSelector
+                                    node={props.node}
+                                    workspace={props.workspace}
+                                    parameter={parameter}
+                                    parameter_sync={() => {
+                                        props.syncParameter(props.node, parameter)
+                                    }}
+                                />
+                            }
+                        </For>    
+                    </div>
+                }/>
+            </Show>
             <DropdownSection 
                 header="Output" 
                 content={

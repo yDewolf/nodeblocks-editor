@@ -29,6 +29,7 @@ select:focus-visible {
     display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: 10px;
+    row-gap: 5px;
 }
 
 .field-grid {
