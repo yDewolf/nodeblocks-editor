@@ -14,6 +14,7 @@ const TYPE_CONFIGS: Record<string, { type: string; step?: number; min?: number }
     [DefaultDataTypes.FILE]: { type: "file" },
     [DefaultDataTypes.OPTIONS]: { type: "options" },
     [DefaultDataTypes.BOOLEAN]: { type: "boolean" },
+    [DefaultDataTypes.UNKNOWN]: { type: "text" }
 };
 
 export const NodeFieldSelector = (props: {
@@ -64,6 +65,9 @@ export const NodeFieldSelector = (props: {
                     onInputValueChanged={onInputValueChanged} inputRef={inputRef} field_id={field_id} parameter={props.parameter}
                 />
             }>
+                <Match when={input_type === "text"}>
+                    <TextField onInputValueChanged={onInputValueChanged} inputRef={inputRef} field_id={field_id} parameter={props.parameter}/>
+                </Match>
                 <Match when={input_type === "options"}>
                     <OptionField options={() => {
                             return props.parameter._options?.values().toArray() ?? [];
@@ -89,7 +93,7 @@ const OptionField = (props: {
     options: () => Array<any>
 }) => {
     return (
-        <select 
+        <select class="field-input"
             id={props.field_id} 
             value={props.parameter.value} 
             onchange={(e) => props.onInputValueChanged(e.currentTarget.value)}
@@ -126,6 +130,24 @@ const FileOptions = (props: {
     )
 }
 
+const TextField = (props: {
+    inputRef: HTMLInputElement,
+    field_id: string,
+    parameter: NodeParameter,
+    onInputValueChanged: (value: any) => void,
+}) => {
+    return (
+        <input class="field-input"
+            type="text"
+            ref={props.inputRef}
+            id={props.field_id}
+            value={props.parameter.value ?? ""}
+            onchange={(e) => { e.preventDefault(); props.onInputValueChanged(e.currentTarget.value); }}
+            onPointerDown={(e) => e.stopPropagation()}
+        />
+    )
+}
+
 const NumberField = (props: {
     inputRef: HTMLInputElement,
     field_id: string,
@@ -138,7 +160,7 @@ const NumberField = (props: {
 }) => {
     return (
         <div>
-            <input
+            <input class="field-input"
                 type="number"
                 ref={props.inputRef}
                 id={props.field_id}
@@ -161,7 +183,7 @@ const BooleanField = (props: {
     onInputValueChanged: (value: any) => void,
 }) => {
     return (
-        <input
+        <input class="field-input"
             id={props.field_id}
             type="checkbox"
             checked={props.parameter.value ?? props.parameter._default ?? false}
