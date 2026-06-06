@@ -6,8 +6,15 @@ div {
 
 .view-displayer {
     pointer-events: auto;
-    height: 100%;
-    width: 100%;
+    background-color: var(--overlay-background);
+    border: 1px solid var(--stroke-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.view-header {
+    display: flex;
+    align-items: center;
 }
 
 .row-container, .container {

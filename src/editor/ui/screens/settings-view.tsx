@@ -1,13 +1,24 @@
 import { PageViewer } from "../components/page-controller"
+import { getCurrentTheme, setTheme, Theme } from "../ui-themes"
 
+// TODO: improve this page
 export const SettingsView = (props: {page_viewer: PageViewer}) => {
     return (
-        <div class="container">
-            <button onclick={() => {props.page_viewer.current_page = undefined}}>
-                x
-            </button>
-            <h3>Settings</h3>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum vel dolorem, eligendi, ratione perspiciatis explicabo libero autem numquam hic tenetur error culpa debitis dolores nesciunt rerum nulla nemo aspernatur veritatis.
+        <div class="container padded settings-page" onFocusOut={() => props.page_viewer.current_page = undefined}>
+            <div class="field-grid-holder">
+                <div class="field-grid">
+                    <span class="field-label">Theme</span>
+                    <select name="theme" id="theme" 
+                        value={getCurrentTheme()} 
+                        onchange={(e) => {
+                            setTheme(e.currentTarget.value as Theme)
+                    }}>
+                        <option value="auto">Auto</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </div>
+            </div>
         </div>
     )
 }

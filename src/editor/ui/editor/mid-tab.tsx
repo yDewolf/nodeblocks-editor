@@ -9,7 +9,7 @@ export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor
     return (
         <div class="middle-tab-holder">
             <Show when={!props.page_viewer.current_page} fallback={
-                <StaticViewDisplayer current_page={props.page_viewer.current_page}/>
+                <StaticViewDisplayer page_viewer={props.page_viewer}/>
             }>
                 <div class="middle-tab-overlay container">
                     <div class="keep fill row-container space-between">
@@ -22,9 +22,9 @@ export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor
                         </div>
                         <SceneMinimap editor_space={props.editor.editor_space} nodes={props.editor.scene_controller.node_controller.nodes}/>
                     </div>
-                </div>
-                <div class="middle-tab container">
-                    <EditorToolbar tool_controller={props.editor.tool_controller}/>
+                    <div class="middle-tab container">
+                        <EditorToolbar tool_controller={props.editor.tool_controller}/>
+                    </div>
                 </div>
             </Show>
         </div>

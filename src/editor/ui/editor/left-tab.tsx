@@ -33,6 +33,8 @@ const LeftTabDropdown = (props: {
                 <DropsideManager dropsides={subsections} currentItem={currentItem} setCurrentItem={setCurrentItem}/>
                 <DropdownItemButton label="Settings" onClick={() => {
                     props.page_viewer.current_page = {
+                        page_title: "Settings",
+                        view_displayer_css: "settings-view",
                         element: SettingsCallback
                     };
                 }} onMouseOver={setCurrentItem(undefined)}/>
