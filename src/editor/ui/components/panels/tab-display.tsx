@@ -16,12 +16,13 @@ export const TabSelector = (props: {
     tabs: Record<string, () => JSXElement>, 
     set_selected_tab: (tab: string) => void, 
     selected_tab: () => string,
+    container_class?: string,
     selector_class?: string,
     tab_displayer_class?: string
 }) => {
     return (
-        <div class={`tab-container`}>
-            <div class={`keep row-container tab-selector ${props.selector_class}`}>
+        <div class={`tab-container ` + (props.container_class ?? "")}>
+            <div class={`keep row-container tab-selector ` + (props.selector_class ?? "")}>
                 <For each={Object.keys(props.tabs)}>
                     {(tab) => {
                         return (

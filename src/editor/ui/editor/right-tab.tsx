@@ -1,47 +1,35 @@
 import { StateController } from "~/network/controllers/state_controller"
 import { NodeEditor } from "~/editor/node-editor"
-import { createMemo, createSignal, JSXElement, Show } from "solid-js"
-import { SidebarNotifications } from "./components/misc/notification/notification-badges"
+import { createMemo, createSignal, For, JSXElement, Show } from "solid-js"
+import { BaseNotification, NotificationCard, SidebarNotifications } from "./components/misc/notification/notification-badges"
 import { session_controller } from "~/singletons/user_session"
 import { GraphNode } from "~/wrapper/nodes/graph-node"
-import { NodeBodySections } from "./components/node/node-component"
-import { NodeActionUtils } from "~/network/controllers/actions/node-actions"
-import { NodeParameter } from "~/wrapper/nodes/data/node-data"
-import { metadata } from "~/singletons/metadata"
-import { FieldSection, FieldValueDisplayer, SimpleField } from '../components/input-fields';
-import { VectorField } from "../components/default-fields"
 import { DropdownSection } from "../components/panels/dropdown"
 import { TabSelector } from "../components/panels/tab-display"
 import { ServerPanel } from "./subpanels/server-panel"
+import { NodeAttributes } from "./subpanels/node-attributes"
 
-const NodeAttributes = (props: {editor: NodeEditor, node?: GraphNode}) => {
-    if (!props.node) {
-        return <div>Select a node</div>
-    }
-    const node_meta = createMemo(() => {
-        if (!props.node) {
-            return undefined;
+const NotificationLog = (props: {node_uid?: string}) => {
+    const notification_controller = session_controller.notification_controller;
+    
+    const all_notifications = createMemo(() => [...notification_controller.forAll(),]);
+    const notifications = createMemo(() => {
+        if (props.node_uid) {
+            return notification_controller.forNode(props.node_uid);
         }
-        return metadata.get_node_meta(props.node.type_id);
+
+        return all_notifications();
     })
+
     return (
-        <div class="fill container">
-            <span>{node_meta()?.capitalized_name ?? props.node.type_id}</span>
-            <SimpleField field_name="Type" field_displayer={
-                () => <FieldValueDisplayer value_element={() => <span>{props.node?.type_id}</span>}/>
-            }/>
-            <FieldSection field_name="Position" field_displayer={
-                () => <VectorField value={props.node!.pos}/>
-            }/>
-            <NodeBodySections
-                node_meta={node_meta()}
-                node={props.node} 
-                workspace={session_controller.user_workspace}
-                syncParameter={(node: GraphNode, parameter: NodeParameter) => {
-                    if (!props.node) return
-                    NodeActionUtils.request_update_nodes([props.node], props.editor._action_controller);
-                }}
-            />
+        <div class="fill container scrollable">
+            <div class="fill container notification-log">
+                <For each={notifications()}>
+                    {(notification) => {
+                        return <BaseNotification notification={notification} notification_controller={notification_controller}/>
+                    }}
+                </For>
+            </div>
         </div>
     )
 }
@@ -56,7 +44,13 @@ export const EditorRightPanel = (props: {editor: NodeEditor, state_controller: S
     const tabs: Record<string, () => JSXElement> = {
         "Attributes": () => <NodeAttributes editor={props.editor} node={selectedNode()}/>
     }
+
+    const bottom_tabs: Record<string, () => JSXElement> = {
+        "Notifications": () => <NotificationLog node_uid={selectedNode()?.id}/>,
+        "History": () => <NotificationLog/>
+    }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
+    const [selectedTab1, setSelectedTab1] = createSignal<string>(Object.keys(bottom_tabs).at(0) ?? "");
     return (
         <div class="right-tab-holder">
             <DropdownSection
@@ -72,14 +66,24 @@ export const EditorRightPanel = (props: {editor: NodeEditor, state_controller: S
                     )
                 }}
                 content={
-                    <TabSelector 
-                        selector_class="left-tab-selector"
-                        tab_displayer_class=""
-
-                        tabs={tabs} 
-                        selected_tab={selectedTab} 
-                        set_selected_tab={setSelectedTab}
-                    />
+                    <div class="fill right-tab-split">
+                        <TabSelector
+                            selector_class="right-tab-selector"
+                            tab_displayer_class=""
+    
+                            tabs={tabs} 
+                            selected_tab={selectedTab} 
+                            set_selected_tab={setSelectedTab}
+                        />
+                        <TabSelector 
+                            selector_class="right-tab-selector"
+                            tab_displayer_class=""
+    
+                            tabs={bottom_tabs} 
+                            selected_tab={selectedTab1} 
+                            set_selected_tab={setSelectedTab1}
+                        />
+                    </div>
                 }
             />
             <Show when={!expanded()}>

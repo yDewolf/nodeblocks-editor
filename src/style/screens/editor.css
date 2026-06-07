@@ -52,6 +52,11 @@
   }
 }
 
+.right-tab-split {
+  display: grid;
+  grid-template-rows: minmax(0, 2fr) minmax(0, 1fr);
+}
+
 .right-tab-holder {
   display: flex;
   flex-direction: column;

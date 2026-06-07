@@ -31,7 +31,77 @@ const NotificationIcon = (props: {level: NotificationLevel}) => {
     )
 }
 
-export const NotificationCard = (props: {notification: NotificationWithMeta, notification_controller: NotificationController, is_popup?: boolean}) => {
+export const BaseNotification = (props: {
+    notification: NotificationWithMeta, 
+    notification_controller: NotificationController
+}) => {
+    const [expanded, setExpanded] = createSignal(false);
+    const mark_as_read = () => {
+        props.notification_controller.mark_as_read(props.notification);
+    }
+    const goto_root = () => {
+        mark_as_read();
+        props.notification_controller.handle_goto(props.notification);
+    }
+
+    return (
+        <div 
+            class="notification-badge container padded space-between"
+            classList={{
+                "read": props.notification.read,
+                "unread": !props.notification.read,
+                
+                "error": props.notification.level == NotificationLevel.ERROR,
+                "warning": props.notification.level == NotificationLevel.WARNING,
+                "debug": props.notification.level == NotificationLevel.DEBUG,
+                "info": props.notification.level == NotificationLevel.INFO,
+            }}
+            style={{"pointer-events": "auto"}}
+        >
+            <div class="fill keep row-container notification-header space-between">
+                <div class="notification-content">
+                    <NotificationIcon level={props.notification.level}/>
+                    <p>{props.notification.message}</p>
+                    <Show when={props.notification.count > 1}>
+                        <span class="stack-counter">
+                            {props.notification.count}x
+                        </span>
+                    </Show>
+                </div>
+                <div class="row-container">
+                    <Show when={props.notification.target != NotificationTarget.UNSPECIFIED} fallback={
+                        <Show when={!props.notification.read}>
+                            <button class="icon-button small-icon" onclick={mark_as_read}>
+                                <CheckMarkIcon />
+                            </button>
+                        </Show>
+                    }>
+                        <button class="icon-button small-icon" onclick={goto_root}>
+                            <ArrowRightIcon />
+                        </button>
+                    </Show>
+                    <Show when={props.notification.description != undefined}>
+                        <button class="icon-button small-icon" onclick={() => {if (!expanded()) setExpanded(true); else {setExpanded(false)}}}>
+                            <ArrowDownIcon class="expand-icon" classList={{"expanded": expanded()}}/>
+                        </button>
+                    </Show>
+                </div>
+            </div>
+            <Show when={expanded()}>
+                <div class="notification-description">
+                    <p>{props.notification.message}</p>
+                    <p>{props.notification.description}</p>
+                </div>
+            </Show>
+        </div>
+    )
+}
+
+export const NotificationCard = (props: {
+    notification: NotificationWithMeta, 
+    notification_controller: NotificationController, 
+    is_popup?: boolean
+}) => {
     const [is_compressed, setCompressed] = createSignal(props.is_popup ?? false);
     const [expanded, setExpanded] = createSignal(false);
 
@@ -45,7 +115,7 @@ export const NotificationCard = (props: {notification: NotificationWithMeta, not
     }
     return (
         <div 
-            class="notification-badge container padded space-between"
+            class="notification-badge animated container padded space-between"
             classList={{
                 "popup": props.is_popup ?? false,
                 "read": props.notification.read,
@@ -184,9 +254,8 @@ export const NotificationPopupHolder = (props: {notification_controller: Notific
                 onWheel={(e) => {e.stopPropagation();}}
                 class="fill container sidebar-notification-holder"
                 style={{
+                    "margin-top": "10px",
                     "pointer-events": "auto",
-                    position: "absolute",
-                    transform: `translate(${props.pos.x}px, ${props.pos.y}px)`,
                     "z-index": 2
                 }}
             >

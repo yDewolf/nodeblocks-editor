@@ -1,12 +1,14 @@
+import { nanoid } from "nanoid"
 import { JSXElement, Show } from "solid-js"
 
 export const SimpleField = (props: {
     field_name: string,
-    field_displayer: () => JSXElement
+    field_displayer: () => JSXElement,
+    field_id?: string
 }) => {
     return (
         <div class="field-grid">
-            <label class="field-label">{props.field_name}</label>
+            <label class="field-label" for={props.field_id}>{props.field_name}</label>
             {props.field_displayer()}
         </div>
     )
@@ -25,13 +27,14 @@ export const FieldSection = (props: {
 }
 
 export const FieldValueDisplayer = (props: {
-    value_label?: string, 
-    value_element: () => JSXElement
+    value_label?: string,
+    value_element: () => JSXElement,
+    field_id?: string,
 }) => {
     return (
         <div class="field-holder">
             <Show when={props.value_label}>
-                <span class="field-value-label">{props.value_label}</span>
+                <label for={props.field_id} class="field-value-label">{props.value_label}</label>
             </Show>
             <div class="field-value">
                 {props.value_element()}

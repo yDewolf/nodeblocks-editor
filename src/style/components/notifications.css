@@ -120,11 +120,11 @@
     transform: scale(0.9);
 }
 
-.notification-badge.unread {
+.notification-badge.animated.unread {
     animation: fadeOutFade 30s forwards, spawnNotification 200ms linear;
 }
 
-.notification-badge.unread.fade-fast {
+.notification-badge.animated.unread.fade-fast {
     animation: fadeOutFade 10s forwards, spawnNotification 200ms linear;
 }
 
