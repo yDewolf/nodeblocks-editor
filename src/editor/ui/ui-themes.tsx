@@ -21,13 +21,14 @@ const [themeStore, _setTheme] = makePersisted(
     }), 
     {name: "app-theme"}
 );
-createEffect(() => {
+
+export const UpdateRootDataTheme = () => {
     const root = document.documentElement;
     const currentTheme = themeStore.theme;
     
     root.setAttribute("data-theme", currentTheme != "auto" ? currentTheme : getSystemTheme());
     _setTheme("theme", currentTheme);
-});
+}
 
 export const getCurrentTheme = () => themeStore.theme;
 export const toggleTheme = () => _setTheme("theme", themeStore.theme === "light" ? "dark" : "light")

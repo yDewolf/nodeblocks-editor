@@ -77,7 +77,7 @@ export const EditorRightPanel = (props: {editor: NodeEditor, state_controller: S
                         />
                         <TabSelector 
                             selector_class="right-tab-selector"
-                            tab_displayer_class=""
+                            tab_displayer_class="sub-displayer"
     
                             tabs={bottom_tabs} 
                             selected_tab={selectedTab1} 

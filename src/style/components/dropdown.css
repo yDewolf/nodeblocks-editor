@@ -17,6 +17,10 @@
     padding: 8px 12px;
 }
 
+.sub-displayer > div {
+    background-color: var(--dark-overlay-background);   
+}
+
 .dropdown-item-grid {
     display: grid;
     row-gap: 5px;
