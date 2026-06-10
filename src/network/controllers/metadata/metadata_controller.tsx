@@ -1,8 +1,8 @@
 import { createStore, reconcile } from "solid-js/store";
 import { NodeServerClient } from "~/network/websocket/websocket-handler";
 import { makePersisted } from "@solid-primitives/storage";
-import { MetadataHeader, MetadataVersion } from "../../../wrapper/metadata/header_metadata";
-import { NodeTypeMeta, DataTypeMeta } from "../../../wrapper/metadata/type_metadata";
+import { Metadata, MetadataHeader, MetadataVersion, parse_header } from "../../../wrapper/metadata/header_metadata";
+import { NodeTypeMeta, DataTypeMeta, ParameterMeta, SlotMeta, parse_node_types, parse_data_types, parse_node_type } from "../../../wrapper/metadata/type_metadata";
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 
 const METADATA_CACHE_KEY = "type_metadata_cache"
@@ -30,7 +30,7 @@ export class MetadataController {
         
         this.store = store;
         this.setStore = setStore;
-        console.log("Metadata content:", store.header, store.data_types, store.node_types);
+        // console.log("Metadata content:", store.header, store.data_types, store.node_types);
         if (this.store.header) {
             this.metadata_version = {
                 meta_version: this.store.header.meta_version,
@@ -56,24 +56,27 @@ export class MetadataController {
 
         this.metadata_version = new_version;
         try {
-            const metadata_url = new URL(`${this._client.base_http_url}/api/metadata`);
-            const node_url = new URL("metadata/nodes", metadata_url);
-            const datatypes_url = new URL("metadata/datatypes", metadata_url);
+            const header_url = new URL(`${this._client.base_http_url}/api/metadata`);
+            const node_url = new URL("metadata/nodes", header_url);
+            const datatypes_url = new URL("metadata/datatypes", header_url);
             if (this._client.session_token) {
-                metadata_url.searchParams.append("token", this._client.session_token);
+                header_url.searchParams.append("token", this._client.session_token);
                 node_url.searchParams.append("token", this._client.session_token);
                 datatypes_url.searchParams.append("token", this._client.session_token);
             }
             const [headerRes, nodesRes, datatypesRes] = await Promise.all([
-                fetch(metadata_url).then(r => r.json()),
+                fetch(header_url).then(r => r.json()),
                 fetch(node_url).then(r => r.json()),
                 fetch(datatypes_url).then(r => r.json())
             ]);
 
-            this.setStore("header", reconcile(headerRes));
-            this.setStore("node_types", reconcile(nodesRes));
-            this.setStore("data_types", reconcile(datatypesRes));
-            // this.save_to_cache();
+            const header_meta: MetadataHeader = parse_header(headerRes);
+            const node_types: Record<string, NodeTypeMeta> = parse_node_types(nodesRes, header_meta.tags, header_meta.categories);
+            const data_types: Record<string, DataTypeMeta> = parse_data_types(datatypesRes);
+            console.log(node_types);
+            this.setStore("header", reconcile(header_meta));
+            this.setStore("node_types", reconcile(node_types));
+            this.setStore("data_types", reconcile(data_types));
 
         } catch (error) {
             console.error("Failed to fetch metadata from server", error);

@@ -9,11 +9,9 @@ import { EventHandler, InputEvents } from "./internal/input_manager/event-handli
 import { SceneController } from "../wrapper/controllers/scene-controller";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
-import { NodeTypeSelector } from "./ui/panels/type_selector/node-type-selector";
-import { ConnectionLines, ConnectionPreview } from "./ui/misc/connection-lines";
-import { Grid } from "./ui/misc/grid";
-import { NodeComponent } from './ui/node/node-component';
-import { ServerPanel } from "./ui/panels/server-panel";
+import { ConnectionLines, ConnectionPreview } from "./ui/editor/components/misc/connection-lines";
+import { Grid } from "./ui/editor/components/misc/grid";
+import { NodeComponent } from './ui/editor/components/node/node-component';
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 import { StateController } from "~/network/controllers/state_controller";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
@@ -23,11 +21,18 @@ import { NodeSceneRequestData } from "~/network/websocket/request-types";
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
-import { FileExplorer } from "./ui/panels/file/file-explorer";
-import { EditorLeftTab } from "./ui/panels/left-tab";
+import { EditorLeftTabHolder } from './ui/editor/left-tab';
 import { SessionController } from "~/network/session/session-controller";
-import { SidebarNotifications } from "./ui/misc/notification/notification-badges";
+import { EditorRightPanel } from "./ui/editor/right-tab";
+import {} from "./ui/ui-themes";
 import "~/style/screens/editor.css";
+import { EditorToolbar } from './ui/editor/subpanels/editor-toolbar';
+import { SceneMinimap } from "./ui/components/scene-minimap";
+import { ThemeButton } from './ui/components/buttons/theme-button';
+import { EditorMidTab } from './ui/editor/mid-tab';
+import { NodeTypeSelector, SelectedNodeType } from "./ui/editor/subpanels/node-type-selector";
+import { PageViewer } from "./ui/components/page-controller";
+
 
 export class NodeEditor {
     scene_controller: SceneController;
@@ -47,10 +52,13 @@ export class NodeEditor {
     editor_space: EditorSpace
     editor_grid: Grid
 
+    protected main_page_viewer: PageViewer
+
     private _cursor_world_pos: () => Vector2;
     private _set_cursor_world_pos: (v: Vector2) => void;
 
     constructor (session_controller: SessionController) {
+        this.main_page_viewer = new PageViewer();
         this._session_controller = session_controller;
         this._session_controller.notification_controller._editor = this;
 
@@ -151,13 +159,18 @@ export class NodeEditor {
                     const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
 
-                    let nodes: NodeSceneRequestData = {};
-                    nodes[crypto.randomUUID()] = {
-                        type: this.selection_controller.selected_node_type, 
-                        position: {x: world_pos.x, y: world_pos.y},
-                        data: new Map()
-                    };
-                    NodeActionUtils.request_add_nodes(nodes, this._action_controller);
+                    if (this.selection_controller.selected_node_type) {
+                        let nodes: NodeSceneRequestData = {};
+                        nodes[crypto.randomUUID()] = {
+                            type: this.selection_controller.selected_node_type, 
+                            position: {x: world_pos.x, y: world_pos.y},
+                            data: new Map()
+                        };
+                        NodeActionUtils.request_add_nodes(nodes, this._action_controller);
+                        if (!e.shiftKey) {
+                            this.selection_controller.selected_node_type = undefined;
+                        }
+                    }
                     // TODO: Warn the user about some node construct error
                     // this.scene_controller.node_controller.add_new_node()
                 }
@@ -219,7 +232,7 @@ export class NodeEditor {
         this.input_manager.set_event_handler(
             InputEvents.CLICK_ON_NODE_SLOT,
             new EventHandler("onClickOnSlot", (data) => {
-                if (data.slot != null) {
+                if (data.slot) {
                     this.tool_controller.current_tool?.onClickOnNodeSlot(data.slot);
                 }
             })
@@ -237,7 +250,7 @@ export class NodeEditor {
         this.input_manager.set_event_handler(
             InputEvents.HOVER_SLOT,
             new EventHandler("onHoverSlot", (data) => {
-                if (data.slot != null) {
+                if (data.slot) {
                     this.tool_controller.current_tool?.onHoverSlot(data.slot);
                 }
             })
@@ -379,7 +392,8 @@ export class NodeEditor {
                                 <ConnectionPreview start_slot={this.selection_controller.selected_slot} hovered_slot={this.selection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
                             </Show>
                         </svg>
-
+                        
+                        <SelectedNodeType world_mouse_pos={this.cursor_world_pos} scene_controller={this.scene_controller} selection_controller={this.selection_controller}/>
                         <For each={this.scene_controller.node_controller.nodes}>
                             {(node) => <NodeComponent 
                                     node={node}
@@ -389,14 +403,14 @@ export class NodeEditor {
                                     onClick={(node: GraphNode) => {
                                         this.input_manager.generalizedEventHandler({node: node}, InputEvents.CLICK_ON_NODE)
                                     }}
-                                    onClickOnSlot={(slot: NodeSlot) => {
+                                    onClickSlot={(slot: NodeSlot) => {
                                         this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.CLICK_ON_NODE_SLOT)
-                                    }}
-                                    onHoverNode={(node: GraphNode) => {
-                                        this.input_manager.generalizedEventHandler({node: node}, InputEvents.HOVER_NODE)
                                     }}
                                     onHoverSlot={(slot: NodeSlot) => {
                                         this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.HOVER_SLOT)
+                                    }}
+                                    onHoverNode={(node: GraphNode) => {
+                                        this.input_manager.generalizedEventHandler({node: node}, InputEvents.HOVER_NODE)
                                     }}
                                     syncParameter={(node: GraphNode, parameter: NodeParameter) => {
                                         // TODO: Update only this parameter
@@ -408,22 +422,13 @@ export class NodeEditor {
                     </div>
                 </div>
                 
-                <div class="editor-ui" onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}>
-                    <div class="left-tab-holder container">
-                        <EditorLeftTab selector={selector} scene_controller={this.scene_controller} tool_controller={this.tool_controller}/>
-                        <FileExplorer workspace={this._session_controller.user_workspace}/>
-                    </div>
-                    <div class="middle-tab-holder">
-                        <div class="middle-tab-overlay container">
-                            <SidebarNotifications notification_controller={this._session_controller.notification_controller}/>
-                        </div>
-                        <div class="middle-tab container">
-                            {this.tool_controller.View()}
-                        </div>
-                    </div>
-                    <div class="right-tab container padded">
-                        <ServerPanel editor={this} state_controller={this._state_controller}/>
-                    </div>
+                <div 
+                    class="editor-ui" 
+                    onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
+                >
+                    <EditorLeftTabHolder node_type_selector={selector} main_page_viewer={this.main_page_viewer} editor={this}/>
+                    <EditorMidTab page_viewer={this.main_page_viewer} editor={this}/>
+                    <EditorRightPanel editor={this} state_controller={this._state_controller}/>
                 </div>
             </div>
         );

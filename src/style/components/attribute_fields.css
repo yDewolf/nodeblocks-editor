@@ -1,0 +1,82 @@
+select {
+    padding: 2px 4px;
+    border-radius: 4px;
+    border: 1px solid var(--stroke-color);
+}
+select:focus-visible {
+    border-color: var(--overlay-highlight);
+    outline: none;
+}
+
+.field {
+  width: stretch;
+  label {
+    margin-right: 10px;
+  }
+}
+
+.field-section {
+    display: flex;
+    flex-direction: column;
+    
+    label {
+        user-select: none;
+        font-size: 0.8rem;
+    }
+}
+
+.field-grid-holder, .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 10px;
+    row-gap: 5px;
+}
+
+.field-grid {
+    align-items: center;
+}
+
+.field-grid-holder > .field-grid {
+    display: contents;
+}
+
+.field-holder {
+    display: flex;
+    gap: 10px;
+
+    border-radius: 4px;
+    padding: 4px;
+    background-color: var(--dark-overlay-highlight);
+}
+
+.field-value-label {
+    display: flex;
+    align-items: center;
+}
+
+.field-input {
+    min-width: 0;
+    width: stretch;
+}
+
+.field-value {
+    display: contents;
+}
+
+.field-value > * {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.field-value > input:read-only {
+    min-width: 0;
+    background-color: transparent;
+    outline: none;
+    border: none;
+}
+
+.field-holder:has(.field-value > input:read-only:focus) {
+    outline: 1px solid var(--selection-color);
+}

@@ -10,9 +10,6 @@ export class GraphNode extends BaseNode {
     node_name: string;
     type_id: string;
 
-    // TODO: Grab metadata from a global metadata controller
-    // metadata: NodeMetadata | undefined;
-
     // Used to set node parameters etc.
     private _node_data: () => NodeData;
     private _set_node_data:  (data: NodeData) => void;
@@ -89,7 +86,7 @@ export class GraphNode extends BaseNode {
         this._set_last_output(output) 
         if (this.target_slot_output == undefined) {
             const output_slots = this.output_slots;
-            if (!output_slots) return;
+            if (output_slots.length == 0) return;
             this.target_slot_output = output_slots[0].slot_id;
         }
     }

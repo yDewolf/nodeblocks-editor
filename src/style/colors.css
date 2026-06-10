@@ -1,3 +1,55 @@
+/* Raw colors (default theme) */
+:root {
+  --editor-background-color: #fbffff;
+  --grid-color: #a7a8ac75;
+  --font-color: #24262A;
+  --secondary-font-color: #3C3D3F;
+
+  --node-color: #f4f6fada;
+  --node-selected-color: #e8eefada;
+  --stroke-color: #D4D4D4;
+  
+  --group-color: #f9f9f9;
+  --group-header-color: #D7E4EB;
+  
+  --overlay-background: #fff;
+  --overlay-font-color: var(var(--font-color));
+  --overlay-highlight: #BBCBD9;
+  --dark-overlay-highlight: #DAE6F0;
+
+  --dark-overlay-background: #e7f1fa;
+}
+
+/* Color Schemes */
+[data-theme="dark"] {
+  --grid-color: #51576e75;
+  --editor-background-color: #040506;
+  --font-color: #F4F6FA;
+  --secondary-font-color: #a1a1aa;
+
+  --node-color: #090C14da;
+  --node-selected-color: #161c2b;
+  --stroke-color: #485A88;
+  
+  --group-color: #923eff;
+  --group-header-color: #923eff;
+  
+  --overlay-background: #141B21;
+  --dark-overlay-background: #0C1014;
+
+  --overlay-highlight: #243341;
+  --dark-overlay-highlight: #273542;
+}
+
+
+/* TODO: Implement DataType color schemes */
+:root {
+  --input-color: #70AEB0;
+  --dark-input-color: #152425;
+  --output-color: #FE8263;
+  --dark-output-color: #251715;
+}
+
 :root {
   --main-color: #7bb4ff;
   --light-main-color: #dcebfd;
@@ -6,5 +58,4 @@
 
   --selection-color: var(--main-color);
   --selection-color-alpha: #7bb4ff4d;
-  --node-selected-color: var(--light-main-color);
 }

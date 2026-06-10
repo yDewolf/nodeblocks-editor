@@ -4,6 +4,19 @@ div {
     border-radius: var(--default-border-radius);
 }
 
+.view-displayer {
+    pointer-events: auto;
+    background-color: var(--overlay-background);
+    border: 1px solid var(--stroke-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.view-header {
+    display: flex;
+    align-items: center;
+}
+
 .row-container, .container {
     gap: 4px;
     display: flex;
@@ -36,17 +49,29 @@ div {
     }
 }
 
-.medium-icon {
+img.medium-icon {
     width: 32px;
 }
 
-img.small-icon {
+.medium-icon {
+    img {
+        width: 32px;
+    }
+}
+
+svg {
+    width: 32px;
+    height: 32px;
+}
+
+svg.small-icon {
     width: 28px;
 }
 
 .small-icon {
-    img {
-        width: 28px !important;
+    svg {
+        width: 28px;
+        height: 28px;
     }
 }
 
@@ -56,32 +81,29 @@ img.small-icon {
     overflow: hidden;
 }
 
-/*  */
-.button-tab {
-    padding: 4px 8px;
-    justify-content: space-between;
-    height: 45px;
-    background-color: white;
-}
-
-.tabs {
+.tab-selector {
+    height: fit-content;
     display: flex;
     align-items: center;
     list-style: none;
-    padding: 0;
+    padding: 8px 12px;
 }
 
-.tab-item {
-    height: 100%;
+.tab-button {
     align-content: center;
 
-    border-right: 2px solid gray;
+    background-color: transparent;
+    padding: 2px 5px;
+    border-radius: 4px;
+    border: none;
 }
 
-.tab-item:hover {
-    transition: all 100ms;
-    color: white;
-    background-color: var(--selection-color);
+.tab-button:hover {
+    background-color: var(--dark-overlay-highlight);
+}
+
+.tab-button.selected {
+    background-color: var(--overlay-highlight);
 }
 
 .expand-icon {
@@ -93,7 +115,7 @@ img.small-icon {
 }
 
 .fill {
-    width: 100%;
+    width: stretch;
 }
 
 @media only screen and (max-width: 768px) {

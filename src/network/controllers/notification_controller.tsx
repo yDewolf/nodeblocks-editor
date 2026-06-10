@@ -1,6 +1,6 @@
 import { NodeServerClient } from "../websocket/websocket-handler";
 import { ClientMessages, ServerMessages } from "../websocket/websocket-protocol";
-import { isConnNotify, isNodeNotify, isParamNotify, isSlotNotify, NotificationLevel, NotificationTarget, NotificationWithMeta, ServerNotification } from '../websocket/requests/notifications';
+import { isConnNotify, isNodeNotify, isParamNotify, isSlotNotify, NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta, ServerNotification } from '../websocket/requests/notifications';
 import { createStore, produce, SetStoreFunction } from "solid-js/store";
 import { NodeEditor } from "~/editor/node-editor";
 import { Vector2 } from "~/wrapper/data_types/geometry";
@@ -220,33 +220,53 @@ export class NotificationController {
         }
     }
 
-    public forNode(node_uid: string) {
-        return this._notifications.nodes[node_uid] || [];
+    public forNode(node_uid: string, ordered: boolean = true) {
+        const notifications = this._notifications.nodes[node_uid] || [];
+        if (ordered) return this.sort_notifications(notifications);
+        return notifications;
     }
 
-    public forSlot(node_uid: string, slot_id: string) {
-        return this._notifications.slots[`${node_uid}:${slot_id}`] || [];
+    public forSlot(node_uid: string, slot_id: string, ordered: boolean = true) {
+        const notifications = this._notifications.slots[`${node_uid}:${slot_id}`] || [];
+        if (ordered) return this.sort_notifications(notifications);
+        return notifications;
     }
 
-    public forParam(node_uid: string, param_id: string) {
-        return this._notifications.parameters[`${node_uid}:${param_id}`] || [];
+    public forParam(node_uid: string, param_id: string, ordered: boolean = true) {
+        const notifications = this._notifications.parameters[`${node_uid}:${param_id}`] || [];
+        if (ordered) return this.sort_notifications(notifications);
+        return notifications;
     }
     
-    public forConn(conn_uid: string) {
-        return this._notifications.connections[conn_uid] || [];
+    public forConn(conn_uid: string, ordered: boolean = true) {
+        const notifications = this._notifications.connections[conn_uid] || [];
+        if (ordered) return this.sort_notifications(notifications);
+        return notifications;
     }
 
-    public forGlobal() {
-        return this._notifications.global || [];
+    public forGlobal(ordered: boolean = true) {
+        const notifications = this._notifications.global || [];
+        if (ordered) return this.sort_notifications(notifications);
+        return notifications;
     }
 
-    public forAll() {
-        return [
+    public forAll(ordered: boolean = true) {
+        const notifications = [
             ...this.forGlobal(),
             ...Object.values(this._notifications.nodes).flat(),
             ...Object.values(this._notifications.slots).flat(),
             ...Object.values(this._notifications.parameters).flat(),
             ...Object.values(this._notifications.connections).flat(),
         ]
+        if (ordered) return this.sort_notifications(notifications);
+        return notifications;
+    }
+
+    public sort_notifications(notifications: Array<NotificationWithMeta>) {
+        return [...notifications].sort(
+            (a, b) => (b.timestamp - a.timestamp)
+        ).sort(
+            (a, b) => (NotificationLevelOrder.indexOf(a.level) - NotificationLevelOrder.indexOf(b.level))
+        )
     }
 }

@@ -1,3 +1,8 @@
+select {
+    background-color: var(--overlay-highlight);
+    border-color: var(--stroke-color);
+}
+
 @keyframes animate_open {
     0% { height: 0; }
     100% {  }
@@ -48,10 +53,10 @@
     border: none;
 
     cursor: pointer;
-    img {
-        width: 32px;
-        height: 32px;
-    }
+}
+.icon-button > img:not(.small-icon, .medium-icon, .dropdown-icon) {
+    width: 32px;
+    height: 32px;
 }
 
 .icon-button:hover {
@@ -69,4 +74,26 @@
 
 .selectable-button.active {
     background-color: var(--main-color);
+}
+
+.theme-button-holder {
+    display: flex;
+    align-items: center;
+
+    width: fit-content;
+    height: fit-content;
+    pointer-events: auto;
+}
+
+.dropdown-button {
+    display: flex;
+    align-items: center;
+
+    border: none;
+    background-color: transparent;
+}
+
+.dropdown-button:hover {
+    background-color: var(--overlay-highlight);
+    color: var(--font-color);
 }

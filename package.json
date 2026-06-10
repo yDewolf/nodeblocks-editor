@@ -12,9 +12,13 @@
     "@solidjs/start": "^1.1.0",
     "nanoid": "^5.1.9",
     "solid-js": "^1.9.5",
+    "solid-transition-group": "^0.3.0",
     "vinxi": "^0.5.7"
   },
   "engines": {
     "node": ">=22"
+  },
+  "devDependencies": {
+    "vite-plugin-solid-svg": "^0.8.1"
   }
 }

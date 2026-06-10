@@ -1,6 +1,7 @@
 @import url("file_explorer.css");
 @import url("node-selector.css");
 @import url("server-panel.css");
+@import url("editor_toolbar.css");
 
 @keyframes keepSpinning {
     0% {transform: rotate(0deg);}

@@ -1,20 +1,36 @@
 @import url("~/style/panels/import.css");
 @import url("~/style/misc/misc.css");
 @import url("~/style/components/notifications.css");
+@import url("~/style/misc/animations/import.css");
+@import url("~/style/screens/settings.css");
 
 .viewport {
+  user-select: none;
   z-index: 1;
   cursor: crosshair;
+  color: var(--font-color);
+ }
+
+.grid {
+  position: absolute;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  background-color: var(--editor-background-color);
+  background-image: repeating-linear-gradient(var(--grid-color) 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, var(--grid-color) 0 1px, transparent 1px 100%);
 }
 
 .editor-ui {
+  color: var(--font-color);
+  stroke: var(--font-color);
+  
   z-index: 2;
   inset: 0;
 
   pointer-events: none;
 
   display: grid;
-  grid-template-columns: auto 3fr 1fr;
+  grid-template-columns: auto 3fr auto;
   position: absolute;
   width: 100vw;
   height: 100vh;
@@ -36,20 +52,59 @@
   }
 }
 
+.right-tab-split {
+  display: grid;
+  grid-template-rows: minmax(0, 2fr) minmax(0, 1fr);
+}
 
-.left-tab-holder {
+.right-tab-holder {
+  display: flex;
+  flex-direction: column;
+  justify-content: right;
+}
+
+.left-tab-holder, .right-tab-holder {
   padding: 10px;
   gap: 10px;
   width: 300px;
   max-height: calc(100vh - 20px);
 }
 
-.left-tab {
-  height: 100%;
-  
-  border: solid 1px black;
-  background-color: rgba(28, 29, 37, 0.521);
+.left-tab-dropdown, .right-tab-dropdown {
+  grid-template-rows: 48px calc(100% - 48px);
 }
+
+.left-tab-selector, .left-tab-content, .left-tab-header, .right-tab-header, .right-tab-header, .right-tab-content {
+  background-color: var(--overlay-background);
+}
+
+.left-tab-header, .left-tab-content, .right-tab-header, .right-tab-content {
+  pointer-events: auto;
+}
+
+.left-tab-header, .right-tab-header {
+  div {
+    align-items: center;
+  }
+}
+
+.left-tab-header.expanded, .right-tab-header.expanded {
+  border-bottom: solid 1px transparent;
+}
+
+.left-tab-content > div, .right-tab-content > div {
+  background-color: var(--overlay-background);
+  border: solid 1px var(--stroke-color);
+  border-top: none;
+  padding: 0;
+}
+
+.left-tab-selector, .right-tab-selector {
+  border: solid 1px var(--stroke-color);
+  border-left: none;
+  border-right: none;
+}
+
 
 .middle-tab-holder {
     display: grid;
@@ -71,22 +126,4 @@
 .middle-tab-overlay {
     z-index: 3;
     width: 100%;
-}
-
-
-.tool-selector {
-  width: 100%;
-  margin: 0 auto;
-  ul {
-    pointer-events: auto;
-    width: fit-content;
-    margin: 0 auto;
-    padding: 0;
-
-    list-style: none;
-
-    li {
-      margin: 0 10px;
-    }
-  }
 }

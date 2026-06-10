@@ -1,7 +1,8 @@
 import "./app.css";
-import { onMount } from "solid-js";
+import { createEffect, onMount } from "solid-js";
 import { NodeEditor } from "./editor/node-editor";
 import { session_controller } from "./singletons/user_session";
+import { UpdateRootDataTheme } from "./editor/ui/ui-themes";
 
 const node_editor = new NodeEditor(session_controller);
 
@@ -26,7 +27,12 @@ export default function App() {
   onMount(() => {
     const handleUnload = () => session_controller.client.disconnect();
     window.addEventListener("beforeunload", handleUnload);
-    testHandleConnection()
+    testHandleConnection();
+    // UpdateRootDataTheme();
+  });
+
+  createEffect(() => {
+      UpdateRootDataTheme();
   });
 
   return (
