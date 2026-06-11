@@ -32,6 +32,7 @@ import { ThemeButton } from './ui/components/buttons/theme-button';
 import { EditorMidTab } from './ui/editor/mid-tab';
 import { NodeTypeSelector, SelectedNodeType } from "./ui/editor/subpanels/node-type-selector";
 import { PageViewer } from "./ui/components/page-controller";
+import { DocsElementIndicator } from "./ui/components/selected-docs-indicator";
 
 
 export class NodeEditor {
@@ -304,6 +305,7 @@ export class NodeEditor {
 
     public View() {
         let viewportRef: HTMLDivElement | undefined;
+        let world_space_ref: HTMLDivElement | undefined;
         onMount(() => {
             if (viewportRef) {
                 const rect = viewportRef.getBoundingClientRect();
@@ -365,6 +367,7 @@ export class NodeEditor {
                     </div>
                     
                     <div 
+                        ref={world_space_ref}
                         class="world-space"
                         style={{
                             "transform-origin": "0 0",
@@ -432,6 +435,7 @@ export class NodeEditor {
                     <EditorMidTab page_viewer={this.main_page_viewer} editor={this}/>
                     <EditorRightPanel editor={this} state_controller={this._state_controller}/>
                 </div>
+                <DocsElementIndicator tool_controller={this.tool_controller} editor_camera={this.editor_space.camera} world_space_ref={world_space_ref}/>
             </div>
         );
     }

@@ -54,6 +54,7 @@ export const NodeComponent = (props: {
     return (
             <Show when={isVisible()}>
                 <div 
+                    has-docs={true}
                     ref={(el) => handleRef(el)}
                     style={{
                         position: "absolute",

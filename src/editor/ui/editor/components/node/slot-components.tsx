@@ -44,18 +44,19 @@ export const _SlotComponent = (props: {
     const slot_label = slot_meta ? slot_meta.capitalized_name : props.slot.slot_id;
     return (
         <div
-        onMouseOver={(e) => {
-            e.stopPropagation();
-            props.onHover(props.slot);
-        }}
-        title={slot_label}
-        class="node-slot"
-        classList={{
-            "connected-slot": props.slot.connections.size > 0,
-            "selected-slot": props.slot.selected,
-            "input-slot": props.slot.is_input,
-            "output-slot": !props.slot.is_input,
-        }}
+            has-docs={true}
+            onMouseOver={(e) => {
+                e.stopPropagation();
+                props.onHover(props.slot);
+            }}
+            title={slot_label}
+            class="node-slot"
+            classList={{
+                "connected-slot": props.slot.connections.size > 0,
+                "selected-slot": props.slot.selected,
+                "input-slot": props.slot.is_input,
+                "output-slot": !props.slot.is_input,
+            }}
         >
             <div 
                 ref={props.slot._element}
