@@ -3,6 +3,7 @@ import { BaseEditorTool } from "./base-tool";
 import { make_datatype_docs_path, make_node_docs_path, make_ui_docs_path } from "~/network/controllers/docs/docs-resolver";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { setCurrentDocsPath, setHoveredDocElement, setSelectedDocElement } from "~/singletons/docs";
+import { NodeTypePreview } from "../ui/editor/subpanels/node-type-selector";
 
 export class DocsTool extends BaseEditorTool {
     protected _selected_docs_path: string | undefined = undefined;
@@ -60,6 +61,10 @@ export class DocsTool extends BaseEditorTool {
     onClickOnNodeSlot(slot: NodeSlot): void {
         // Select DataType type id as path
         this.selected_docs_path = make_datatype_docs_path(undefined, slot)
+    }
+
+    onClickOnNodePreview(node_preview: NodeTypePreview): void {
+        this.selected_docs_path = make_node_docs_path(undefined, node_preview.node_constructor.type_id)    
     }
 
     onClickOnNode(node: GraphNode): void {

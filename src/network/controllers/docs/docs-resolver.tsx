@@ -6,8 +6,8 @@ import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 
 const interfaceModules = import.meta.glob("/src/docs/interface/**/*.json");
-export function make_node_docs_path(node: GraphNode): string | undefined {
-    return DocsPath.NODE + "/" + node.type_id
+export function make_node_docs_path(node?: GraphNode, type_id?: string): string | undefined {
+    return DocsPath.NODE + "/" + (node ? node.type_id : type_id)
 }
 
 export function make_datatype_docs_path(datatype?: BaseDataType, slot?: NodeSlot): string | undefined{
