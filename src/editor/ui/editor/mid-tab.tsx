@@ -4,8 +4,12 @@ import { EditorToolbar } from "./subpanels/editor-toolbar";
 import { NodeEditor } from "~/editor/node-editor";
 import { PageViewer, StaticViewDisplayer } from '../components/page-controller';
 import { Show } from "solid-js";
+import { DocsView } from "../screens/docs-view";
+import DocsIcon from "~/assets/icons/book.svg";
 
 export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor}) => {
+    const DocsCallback = () => <DocsView />;
+
     return (
         <div class="middle-tab-holder">
             <Show when={!props.page_viewer.current_page} fallback={
@@ -18,6 +22,15 @@ export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor
                         </div> */}
                         {/* Placeholder: */}
                         <div class="theme-button-holder">
+                            <button class="icon-button" onclick={() => {
+                                props.page_viewer.current_page = {
+                                    page_title: "Docs",
+                                    view_displayer_css: "docs-view",
+                                    element: DocsCallback
+                                };
+                            }}>
+                                <DocsIcon class="medium-icon"/>
+                            </button>
                             <ThemeButton icon_class="medium-icon"/>
                         </div>
                         <SceneMinimap editor_space={props.editor.editor_space} nodes={props.editor.scene_controller.node_controller.nodes}/>

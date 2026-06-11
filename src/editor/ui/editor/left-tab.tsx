@@ -54,7 +54,7 @@ export const EditorLeftTabHolder = (props: {
     }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
     return (
-        <div class="left-tab-holder">
+        <div class="left-tab-holder" docs-id="editor-left-tab">
             <DropdownSection
                 icon={() => <LeftTabIcon class="medium-icon"/>}
                 dropdown_class="left-tab-dropdown"                

@@ -21,6 +21,7 @@ class KeyHandlers {
     }
 }
 
+// TODO: Refactor InputManager stuff and how we handle tools
 export class KeyEventManager extends BaseEventHandler {
     keybinds: Map<Keybind, KeyHandlers>;
     event_handlers: Map<InputEvents, Array<EventHandler>>;

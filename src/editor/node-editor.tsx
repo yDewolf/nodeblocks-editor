@@ -324,7 +324,9 @@ export class NodeEditor {
         return (
             <div 
                 class="editor-view"
-                onPointerUp={(e) => this.input_manager.onPointerUp(e)} 
+                onPointerUp={(e) => {this.input_manager.onPointerUp(e); this.tool_controller.current_tool?.globalOnPointerUp(e)}}
+                onPointerDown={(e) => {this.tool_controller.current_tool?.globalOnPointerDown(e)}}
+                onPointerMove={(e) => this.tool_controller.current_tool?.globalOnPointerMove(e)}
             >
                 <div 
                     ref={viewportRef} 
