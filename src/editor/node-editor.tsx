@@ -33,9 +33,12 @@ import { EditorMidTab } from './ui/editor/mid-tab';
 import { NodeTypeSelector, SelectedNodeType } from "./ui/editor/subpanels/node-type-selector";
 import { PageViewer } from "./ui/components/page-controller";
 import { DocsElementIndicator } from "./ui/components/selected-docs-indicator";
+import { DocsController, useDocs } from "./controllers/docs-controller";
 
 
 export class NodeEditor {
+    _docs_controller: () => DocsController | undefined;
+    _set_docs_controller: (docs: DocsController | undefined) => void;
     scene_controller: SceneController;
     _session_controller: SessionController;
     
@@ -59,6 +62,10 @@ export class NodeEditor {
     private _set_cursor_world_pos: (v: Vector2) => void;
 
     constructor (session_controller: SessionController) {
+        const [docsController, setDocsController] = createSignal(undefined);
+        this._docs_controller = docsController;
+        this._set_docs_controller = setDocsController;
+        
         this.main_page_viewer = new PageViewer();
         this._session_controller = session_controller;
         this._session_controller.notification_controller._editor = this;
@@ -89,6 +96,7 @@ export class NodeEditor {
     }
 
     get _editor_client() { return this._session_controller.client; }
+    get docs_controller() { return this._docs_controller(); }
 
     get cursor_world_pos() { return this._cursor_world_pos(); }
     set cursor_world_pos(v: Vector2) { this._set_cursor_world_pos(v); }
@@ -304,6 +312,7 @@ export class NodeEditor {
     }
 
     public View() {
+        this._set_docs_controller(useDocs());
         let viewportRef: HTMLDivElement | undefined;
         let world_space_ref: HTMLDivElement | undefined;
         onMount(() => {

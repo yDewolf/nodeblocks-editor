@@ -1,8 +1,10 @@
 import "./app.css";
-import { createEffect, onMount } from "solid-js";
-import { NodeEditor } from "./editor/node-editor";
+import "./singletons/docs";
 import { session_controller } from "./singletons/user_session";
+import { createContext, createEffect, onMount } from "solid-js";
+import { NodeEditor } from "./editor/node-editor";
 import { UpdateRootDataTheme } from "./editor/ui/ui-themes";
+import { DocsController, DocsProvider } from "./editor/controllers/docs-controller";
 
 const node_editor = new NodeEditor(session_controller);
 
@@ -37,7 +39,9 @@ export default function App() {
 
   return (
     <main>
-      {node_editor.View()}
+      <DocsProvider>
+        {node_editor.View()}
+      </DocsProvider>
     </main>
   );
 }

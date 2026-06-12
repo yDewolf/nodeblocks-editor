@@ -2,22 +2,32 @@ import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { BaseEditorTool } from "./base-tool";
 import { make_datatype_docs_path, make_node_docs_path, make_ui_docs_path } from "~/network/controllers/docs/docs-resolver";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { setCurrentDocsPath, setHoveredDocElement, setSelectedDocElement } from "~/singletons/docs";
 import { NodeTypePreview } from "../ui/editor/subpanels/node-type-selector";
+import { NodeEditor } from "../node-editor";
 
 export class DocsTool extends BaseEditorTool {
     protected _selected_docs_path: string | undefined = undefined;
     private lastHoveredElement: HTMLElement | null = null;
 
+    constructor(node_editor: NodeEditor) {
+        super(node_editor);
+    }
+
     protected set selected_docs_path(path: string | undefined) {
+        const docs = this.node_editor.docs_controller;
+        if (!docs) return;
+        
         if (this._selected_docs_path != path) {
             this._selected_docs_path = path;
-            setCurrentDocsPath(this._selected_docs_path);
+            docs.setCurrentDocsPath(this._selected_docs_path);
         }
         console.log(path);
     }
     
-    globalOnPointerMove(e: PointerEvent): void {
+    globalOnPointerMove = (e: PointerEvent): void => {
+        const docs = this.node_editor.docs_controller;
+        if (!docs) return;
+        
         const currentTarget = e.target as HTMLElement;
         if (!currentTarget) {
             this.clearElement();
@@ -30,24 +40,29 @@ export class DocsTool extends BaseEditorTool {
 
             if (docs_element) {
                 this.lastHoveredElement = docs_element;
-                setHoveredDocElement(docs_element);
+                docs.setHoveredDocElement(docs_element);
             }
         }
     }
 
-    public clearElement(): void {
+    public clearElement = (): void => {
+        const docs = this.node_editor.docs_controller;
+        if (!docs) return;
+        
         this.lastHoveredElement = null;
-        setHoveredDocElement(null);
+        docs.setHoveredDocElement(null);
     }
 
-    globalOnPointerDown(e: PointerEvent): void {
+    globalOnPointerDown = (e: PointerEvent): void => {
+        const docs = this.node_editor.docs_controller;
+        if (!docs) return;
         // Select UI element docs path
         const clickedElement = e.target as HTMLElement;
         if (!clickedElement) return;
         
         let docs_element = clickedElement.closest("[docs-id], [has-docs]") as HTMLElement;
         if (docs_element) {
-            setSelectedDocElement(docs_element as HTMLElement);
+            docs.setSelectedDocElement(docs_element as HTMLElement);
             e.preventDefault();
             e.stopPropagation();
 

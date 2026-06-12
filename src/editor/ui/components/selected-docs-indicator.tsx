@@ -1,15 +1,16 @@
 import { createEffect, createSignal, JSX, Show, createMemo, onCleanup } from 'solid-js';
 import { Portal } from 'solid-js/web';
+import { useDocs } from '~/editor/controllers/docs-controller';
 import { ToolController } from "~/editor/controllers/tool-controller";
 import { EditorCamera } from '~/editor/internal/editor-space';
 import { DocsTool } from "~/editor/tools/docs-tool";
-import { hoveredDocElement, selectedDocElement } from "~/singletons/docs";
 
 export const DocsElementIndicator = (props: {tool_controller: ToolController, editor_camera: EditorCamera, world_space_ref?: HTMLDivElement}) => {
+    const docs = useDocs();
     const [style, setStyle] = createSignal<JSX.CSSProperties>({});
     const target = createMemo(() => {
-        const hovered_element = hoveredDocElement();
-        return hovered_element != null ? hovered_element : selectedDocElement();
+        const hovered_element = docs.hoveredDocElement();
+        return hovered_element != null ? hovered_element : docs.selectedDocElement();
     });
 
     const isInsideGraph = createMemo(() => {
