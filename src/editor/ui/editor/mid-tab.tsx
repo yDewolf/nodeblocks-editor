@@ -6,9 +6,21 @@ import { PageViewer, StaticViewDisplayer } from '../components/page-controller';
 import { Show } from "solid-js";
 import { DocsView } from "../screens/docs-view";
 import DocsIcon from "~/assets/icons/book.svg";
+import { DocsTool } from "~/editor/tools/docs-tool";
 
 export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor}) => {
     const DocsCallback = () => <DocsView />;
+    const page_obj = {
+        page_title: "Documentation",
+        view_displayer_css: "docs-view",
+        element: DocsCallback
+    };
+    // FIXME: shouldn't access tool controller for this
+    props.editor.tool_controller.tools.forEach((tool) => {
+        if (tool instanceof DocsTool) {
+            tool.onSelectDocumentation = () => props.page_viewer.current_page = page_obj;
+        }
+    });
 
     return (
         <div class="middle-tab-holder">
@@ -23,11 +35,7 @@ export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor
                         {/* Placeholder: */}
                         <div class="theme-button-holder">
                             <button class="icon-button" onclick={() => {
-                                props.page_viewer.current_page = {
-                                    page_title: "Docs",
-                                    view_displayer_css: "docs-view",
-                                    element: DocsCallback
-                                };
+                                props.page_viewer.current_page = page_obj;
                             }}>
                                 <DocsIcon class="medium-icon"/>
                             </button>

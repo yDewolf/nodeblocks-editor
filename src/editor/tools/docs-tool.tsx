@@ -8,6 +8,7 @@ import { NodeEditor } from "../node-editor";
 export class DocsTool extends BaseEditorTool {
     protected _selected_docs_path: string | undefined = undefined;
     private lastHoveredElement: HTMLElement | null = null;
+    public onSelectDocumentation?: () => void;
 
     constructor(node_editor: NodeEditor) {
         super(node_editor);
@@ -20,6 +21,10 @@ export class DocsTool extends BaseEditorTool {
         if (this._selected_docs_path != path) {
             this._selected_docs_path = path;
             docs.setCurrentDocsPath(this._selected_docs_path);
+        }
+
+        if (this._selected_docs_path) {
+            this.onSelectDocumentation?.();
         }
         console.log(path);
     }
