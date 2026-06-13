@@ -4,7 +4,7 @@ import { EditorToolbar } from "./subpanels/editor-toolbar";
 import { NodeEditor } from "~/editor/node-editor";
 import { PageViewer, StaticViewDisplayer } from '../components/page-controller';
 import { Show } from "solid-js";
-import { DocsView } from "../screens/docs-view";
+import { DocsView } from "../screens/docs/docs-view";
 import DocsIcon from "~/assets/icons/book.svg";
 import { DocsTool } from "~/editor/tools/docs-tool";
 import MinimizeIcon from "~/assets/icons/minimize.svg";

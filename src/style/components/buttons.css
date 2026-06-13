@@ -97,3 +97,14 @@ select {
     background-color: var(--overlay-highlight);
     color: var(--font-color);
 }
+
+.dev-mode-button {
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.dev-mode-button.active {
+    color: var(--selection-color);
+}
