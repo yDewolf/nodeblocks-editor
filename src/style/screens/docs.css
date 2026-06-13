@@ -16,6 +16,8 @@
 }
 
 .docs-content {
+    gap: 8px;
+    word-break: break-all;
     h2 {
         font-size: 1.3rem;
     }
@@ -24,9 +26,14 @@
     }
 }
 
-.docs-tag {
+.tag-holder, .path-holder, .docs-tag {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    word-break: normal;
+}
+
+.docs-tag {
     font-size: 0.9rem;
 }
 

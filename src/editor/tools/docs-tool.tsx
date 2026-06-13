@@ -26,7 +26,6 @@ export class DocsTool extends BaseEditorTool {
         if (this._selected_docs_path) {
             this.onSelectDocumentation?.();
         }
-        console.log(path);
     }
     
     globalOnPointerMove = (e: PointerEvent): void => {

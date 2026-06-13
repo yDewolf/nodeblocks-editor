@@ -31,7 +31,6 @@ export class DocsResolver {
 
     constructor() {
         this._metadata_controller = metadata;
-        console.log(metadata.store);
     }
 
     public async resolve(docs_path: string): Promise<DocPayload> {

@@ -18,7 +18,7 @@ function get_categories_recursive(category: NodeCategory | string) {
     if (category.super_category) {
         categories = [...get_categories_recursive(category.super_category), ...categories]
     }
-    
+
     categories.push(category);
     return categories;
 }
@@ -79,7 +79,7 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
     })
 
     return (
-        <div class="keep fill row-container">
+        <div class="path-holder keep fill row-container">
             <For each={path_parts()}>
                 {(part, idx) => {
                     return (
@@ -105,9 +105,9 @@ export const DocsTags = (props: {docs_data?: DocPayload}) => {
 
     return (
         <Show when={data_tags().length > 0}>
-            <div class="keep fill container">
+            <div class="text-section">
                 <h3>Tags</h3>
-                <div class="keep fill row-container">
+                <div class="tag-holder row-container keep fill">
                     <For each={data_tags()}>
                         {(tag, idx) => {
                             const tag_name = typeof tag === "string" ? tag : tag.tag_id;

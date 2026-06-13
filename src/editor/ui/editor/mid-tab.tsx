@@ -10,7 +10,7 @@ import { DocsTool } from "~/editor/tools/docs-tool";
 import MinimizeIcon from "~/assets/icons/minimize.svg";
 
 export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor}) => {
-    const DocsCallback = () => <DocsView />;
+    const DocsCallback = () => <DocsView scene_controller={props.editor.scene_controller}/>;
     const page_obj = {
         page_title: "Documentation",
         view_displayer_css: "docs-view",

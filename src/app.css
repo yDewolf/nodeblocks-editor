@@ -23,3 +23,7 @@ body {
 .remove-input {
   pointer-events: none;
 }
+
+.remove-input.all * {
+  pointer-events: none !important;
+}
