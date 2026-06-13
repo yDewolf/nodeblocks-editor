@@ -1,11 +1,42 @@
-import { createMemo, For } from "solid-js";
+import { createMemo, For, Show } from "solid-js";
 import { useDocs } from "~/editor/controllers/docs-controller";
 import { EditorTool } from "~/editor/tools/base-tool";
 import { NodeCategory, NodeTag } from "~/wrapper/metadata/node_filters";
+import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
+import TagIcon from "~/assets/icons/tag.svg";
+
+// TODO: Refactor this file later
 
 type PathPart = {
     label: string,
+}
 
+function get_categories_recursive(category: NodeCategory | string) {
+    if (typeof category === "string") {
+        // TODO: grab categories from metadata I guess
+        return [];
+    }
+    
+    let categories: NodeCategory[] = [];
+    if (category.super_category) {
+        categories = [...get_categories_recursive(category.super_category), ...categories]
+    }
+
+    categories.push(category);
+    return categories;
+}
+
+function get_node_tags(node: NodeTypeMeta) {
+    let tags: Array<NodeTag | string> = [];
+    if (node.category) {
+        const categories = get_categories_recursive(node.category);
+        categories.forEach((category) => {
+            tags = [...category.default_tags, ...tags];
+        })
+    }
+
+    tags = [...tags, ...node.tags];
+    return tags
 }
 
 function recursive_category_part(category: NodeCategory | string, path_parts: PathPart[]) {
@@ -14,14 +45,14 @@ function recursive_category_part(category: NodeCategory | string, path_parts: Pa
         path_parts.push({label: category})
         return;
     }
-    
-    if (category.super_category) {
-        recursive_category_part(category.super_category, path_parts);
-    }
 
-    if (category.category_id) {
-        path_parts.push({label: category.category_id});
-    }
+    const categories = get_categories_recursive(category)
+    categories.forEach((category) => {
+        if (!category.category_id) return;
+        path_parts.push({
+            label: category.category_id
+        });
+    })
 }
 
 export const DocsView = (props: {current_tool?: EditorTool}) => {
@@ -63,24 +94,59 @@ export const DocsView = (props: {current_tool?: EditorTool}) => {
         return path_parts;
     })
 
+    const data_tags = createMemo(() => {
+        const data = docs_data();
+        if (!data) return [];
+        
+        if (data.type === "node") {
+            return get_node_tags(data.data);
+        }
+
+        return []
+    });
+
     return (
         <div class="docs-view-body">
             <div class="docs-left-panel">
                 TODO
             </div>
             <div class="docs-content">
-                <div class="keep fill row-container">
-                    <For each={path_parts()}>
-                        {(part, idx) => {
-                            return (
-                                <span>{part.label + (idx() < (path_parts()?.length ?? 1) - 1 ? " > " : "")}</span>
-                            )
-                        }}                        
-                    </For>
-                </div>
-                <p>
-                    {docs_data() ? JSON.stringify(docs_data()) : "No Documentation"}
-                </p>
+                <Show when={docs_data()} fallback={
+                    <h2>Couldn't find documentation</h2>
+                }>
+                    <div class="keep fill row-container">
+                        <For each={path_parts()}>
+                            {(part, idx) => {
+                                return (
+                                    <span>{part.label + (idx() < (path_parts()?.length ?? 1) - 1 ? " > " : "")}</span>
+                                )
+                            }}                        
+                        </For>
+                    </div>
+                    
+                    <Show when={data_tags().length > 0}>
+                        <div class="keep fill container">
+                            <h3>Tags</h3>
+                            <div class="keep fill row-container">
+                                <For each={data_tags()}>
+                                    {(tag, idx) => {
+                                        const tag_name = typeof tag === "string" ? tag : tag.tag_id;
+                                        return (
+                                            <div class="docs-tag">
+                                                <TagIcon class="tag-icon"/>
+                                                <span>{tag_name}</span>
+                                            </div>
+                                        )
+                                    }}
+                                </For>
+                            </div>
+                        </div>
+                    </Show>
+                    <h2>{docs_data()?.data.capitalized_name}</h2>
+                    <p>
+                        {docs_data() ? JSON.stringify(docs_data()) : "No Documentation"}
+                    </p>
+                </Show>
             </div>
         </div>
     )
