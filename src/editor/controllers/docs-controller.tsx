@@ -32,8 +32,13 @@ export class DocsController {
             if (!path || isServer) {
                 return undefined;
             }
-            const data = await docsResolver.resolve(path);
-            return data;
+            try {
+                const data = await docsResolver.resolve(path);
+                return data;
+            } catch (e) {
+                console.warn(e);
+                return undefined;
+            }
         });
         
         this.docsData = docsDataResource[0];

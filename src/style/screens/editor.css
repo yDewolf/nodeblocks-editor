@@ -3,6 +3,7 @@
 @import url("~/style/components/notifications.css");
 @import url("~/style/misc/animations/import.css");
 @import url("~/style/screens/settings.css");
+@import url("~/style/screens/docs.css");
 
 .viewport {
   user-select: none;

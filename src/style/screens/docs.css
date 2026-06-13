@@ -1,0 +1,28 @@
+.docs-view-body {
+    display: grid;
+    height: stretch;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 20px;
+}
+
+.docs-content, .docs-left-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.docs-left-panel {
+    background-color: var(--dark-overlay-background);
+    width: auto;
+}
+
+.docs-content {
+    
+}
+
+
+@media (max-width: 1024px) {
+    .docs-view-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: 100px minmax(0, 1fr) ;
+    }
+}

@@ -7,12 +7,14 @@ import { Show } from "solid-js";
 import { DocsView } from "../screens/docs-view";
 import DocsIcon from "~/assets/icons/book.svg";
 import { DocsTool } from "~/editor/tools/docs-tool";
+import MinimizeIcon from "~/assets/icons/minimize.svg";
 
 export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor}) => {
     const DocsCallback = () => <DocsView />;
     const page_obj = {
         page_title: "Documentation",
         view_displayer_css: "docs-view",
+        icon_element: () => <MinimizeIcon class="small-icon"/>,
         element: DocsCallback
     };
     // FIXME: shouldn't access tool controller for this

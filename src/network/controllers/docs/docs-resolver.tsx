@@ -38,7 +38,6 @@ export class DocsResolver {
         if (docs_path.startsWith(DocsPath.NODE)) {
             const type_id = docs_path.replace(DocsPath.NODE + "/", "");
             const meta = this._metadata_controller.get_node_meta(type_id);
-            console.log(meta);
 
             if (!meta) throw new Error(`Couldn't find metadata for node ${type_id}`);
             return { type: "node", data: meta };

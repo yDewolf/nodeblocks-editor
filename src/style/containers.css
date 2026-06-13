@@ -5,6 +5,7 @@ div {
 }
 
 .view-displayer {
+    padding: 4px;
     pointer-events: auto;
     background-color: var(--overlay-background);
     border: 1px solid var(--stroke-color);
