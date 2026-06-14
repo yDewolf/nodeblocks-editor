@@ -57,162 +57,191 @@ export const NodeDocsContent = (props: {
 }
 
 interface DropdownBadge {
-    icon?: JSXElement,
-    label: string
+    icon?: JSXElement;
+    label: string;
 }
 
-const NodeSlotSection = (props: {
-    data: NodeTypeMeta,
-    constructor?: BaseNodeConstructor,
-    scene_controller: SceneController,
-    devMode: boolean
-}) => {
-    const slots = createMemo(() => {
-        const meta = props.data.slot_meta;
-        const node_constructor = props.constructor;
-        let slot_bundle: Array<[SlotData, SlotMeta, string]> = []
-        node_constructor?._slots.forEach((slot_data, slot_id) => {
-            const slot_meta = meta[slot_id];
-            if (slot_meta) {
-                slot_bundle.push([slot_data, slot_meta, slot_id]);
-            }
-        })
+function resolve_slot_type_label(slotData: SlotData): string {
+    if (slotData.data_type && slotData.data_type != "unknown") {
+        return slotData.data_type;
+    }
 
-        return slot_bundle;
+    return slotData.type?.split(":").at(-1) ?? "unknown";
+}
+
+const BadgeTag = (props: { badge: DropdownBadge }) => (
+    <div class="tag-holder">
+        {props.badge.icon}
+        {props.badge.label}
+    </div>
+);
+
+const SlotDropdownItem = (props: {
+    slot_id: string;
+    slot_data: SlotData;
+    slot_meta: SlotMeta;
+    devMode: boolean;
+}) => {
+    const badges = createMemo<DropdownBadge[]>(() => {
+        const badge_list: DropdownBadge[] = [
+            {
+                label: resolve_slot_type_label(props.slot_data),
+                icon: props.slot_data.is_input ? <InputIcon class="tag-icon" /> : <OutputIcon class="tag-icon" />
+            }
+        ];
+
+        if (props.slot_data.max_connections) {
+            badge_list.push({ label: `max: ${props.slot_data.max_connections}` });
+        }
+        return badge_list;
+    });
+
+    return (
+        <DropdownSection
+            header_content={() => (
+                <div class="fill keep row-container space-between">
+                    <div class="docs-slot-header">
+                        <SlotHeader slot_id={props.slot_id} slot_meta={props.slot_meta} slot_data={props.slot_data} />
+                        <For each={badges()}>{(badge) => <BadgeTag badge={badge}/>}</For>
+                    </div>
+                    <Show when={props.devMode}>
+                        <span style={{"min-width": "fit-content"}}>{props.slot_id}</span>
+                    </Show>
+                </div>
+            )}
+            content={
+                <div>
+                    <div class="text-section">
+                        <h4>Description</h4>
+                        <p>{props.slot_meta.description}</p>
+                    </div>
+                    <Show when={props.slot_data.max_connections}>
+                        <div class="text-section">
+                            <h4>Max Connections: {props.slot_data.max_connections}</h4>
+                        </div>
+                    </Show>
+                </div>
+            }
+        />
+    );
+};
+
+export const NodeSlotSection = (props: {
+    data: NodeTypeMeta;
+    constructor?: BaseNodeConstructor;
+    scene_controller: SceneController;
+    devMode: boolean;
+}) => {
+    const slot_bundle = createMemo(() => {
+        const meta = props.data.slot_meta;
+        const bundles: Array<[SlotData, SlotMeta, string]> = [];
+        
+        props.constructor?._slots.forEach((slotData, slotId) => {
+            const slotMeta = meta[slotId];
+            if (slotMeta) bundles.push([slotData, slotMeta, slotId]);
+        });
+        return bundles;
     });
 
     return (
         <div class="text-section">
             <h3>Slots</h3>
             <div class="fill keep container">
-                <For each={slots()}>
-                    {([slot_data, slot_meta, slot_id]) => {
-                        let slot_badges: Array<DropdownBadge> = [];
-                        // FIXME: This DataType label shouldn't be always unknown for custom DataTypes...
-                        slot_badges.push({
-                            label: slot_data.data_type != "unknown" ? (slot_data.data_type ?? "null") : (slot_data.type.split(":").at(-1) ?? "undefined"),
-                            icon: slot_data.is_input ? <InputIcon class="tag-icon"/> : <OutputIcon class="tag-icon"/>
-                        })
-                        if (slot_data.max_connections) {
-                            slot_badges.push({
-                                label: `max: ${slot_data.max_connections}`
-                            });
-                        }
-
-                        return (
-                            <DropdownSection 
-                                header_content={() => {
-                                    return (
-                                        <div class="fill keep row-container space-between">
-                                            <div class="docs-slot-header">
-                                                <SlotHeader slot_id={slot_id} slot_meta={slot_meta} slot_data={slot_data} />
-                                                <For each={slot_badges}>
-                                                    {(badge) => (
-                                                        <div class="tag-holder">
-                                                            {badge.icon}
-                                                            {badge.label}
-                                                        </div>
-                                                    )}
-                                                </For>
-                                            </div>
-                                            <Show when={props.devMode}>
-                                                <span style={{"min-width": "fit-content"}}>{slot_id}</span>
-                                            </Show>
-                                        </div>
-                                    )
-                                }}
-                                content={
-                                    <div>
-                                        <div class="text-section">
-                                            <h4>Description</h4>
-                                            <p>{slot_meta.description}</p>
-                                        </div>
-                                        <Show when={slot_data.max_connections}>
-                                            <div class="text-section">
-                                                <h4>Max Connections: {slot_data.max_connections}</h4>
-                                            </div>
-                                        </Show>
-                                    </div>
-                                }
-                            />
-                        )
-                    }}
+                <For each={slot_bundle()}>
+                    {([slotData, slotMeta, slotId]) => (
+                        <SlotDropdownItem 
+                            slot_id={slotId} 
+                            slot_data={slotData} 
+                            slot_meta={slotMeta} 
+                            devMode={props.devMode} 
+                        />
+                    )}
                 </For>
             </div>
         </div>
-    )
-}
+    );
+};
 
-const NodeParameterSection = (props: {
-    data: NodeTypeMeta,
-    constructor?: BaseNodeConstructor,
-    devMode: boolean
+const ParameterDropdownItem = (props: {
+    param_id: string;
+    param_data: NodeDataModel;
+    param_meta: ParameterMeta;
+    devMode: boolean;
 }) => {
-    const parameters = createMemo(() => {
-        const meta = props.data.parameter_meta;
-        let param_bundle: Array<[NodeDataModel, ParameterMeta, string]> = []
-        props.constructor?._data_model.raw_parameters.forEach((param_data, param_id) => {
-            const param_meta = meta[param_id];
-            if (param_meta) {
-                param_bundle.push([param_data, param_meta, param_id]);
-            }
-        })
+    const parameter = createMemo(() => new NodeParameter(props.param_data, props.param_id));
+    const badges: DropdownBadge[] = [
+        {
+            label: props.param_data.type,
+            icon: <ToolIcon class="tag-icon" />
+        }
+    ];
 
-        return param_bundle;
-    })
+    return (
+        <DropdownSection
+            header_content={() => (
+                <div class="fill keep row-container space-between">
+                    <div class="docs-slot-header">
+                        <span>
+                            {props.param_meta.capitalized_name !== "" 
+                                ? props.param_meta.capitalized_name 
+                                : props.param_id}
+                        </span>
+                        <For each={badges}>{(badge) => <BadgeTag badge={badge} />}</For>
+                    </div>
+                    <Show when={props.devMode}>
+                        <span style={{ "min-width": "fit-content" }}>{props.param_id}</span>
+                    </Show>
+                </div>
+            )}
+            content={
+                <div>
+                    <div class="text-section">
+                        <h4>Widget</h4>
+                        <div class="remove-input all">
+                            <NodeFieldSelector parameter={parameter()} hide_label={true} />
+                        </div>
+                    </div>
+                    <div class="text-section">
+                        <h4>Description</h4>
+                        <p>{props.param_meta.description}</p>
+                    </div>
+                </div>
+            }
+        />
+    );
+};
+
+export const NodeParameterSection = (props: {
+    data: NodeTypeMeta;
+    constructor?: BaseNodeConstructor;
+    devMode: boolean;
+}) => {
+    const param_bundle = createMemo(() => {
+        const meta = props.data.parameter_meta;
+        const bundles: Array<[NodeDataModel, ParameterMeta, string]> = [];
+
+        props.constructor?._data_model.raw_parameters.forEach((paramData, paramId) => {
+            const paramMeta = meta[paramId];
+            if (paramMeta) bundles.push([paramData, paramMeta, paramId]);
+        });
+        return bundles;
+    });
+
     return (
         <div class="text-section">
             <h3>Parameters</h3>
             <div class="fill keep container">
-                <For each={parameters()}>
-                    {([param_data, param_meta, param_id]) => {
-                        let param_badges: Array<DropdownBadge> = [];
-                        param_badges.push({
-                            label: param_data.type,
-                            icon: <ToolIcon class="tag-icon"/>
-                        });
-                        const parameter = new NodeParameter(param_data, param_id);
-                        return (
-                            <DropdownSection 
-                                header_content={() => {
-                                    return (
-                                        <div class="fill keep row-container space-between">
-                                            <div class="docs-slot-header">
-                                                <span>{param_meta.capitalized_name != "" ? param_meta.capitalized_name : param_id}</span>
-                                                <For each={param_badges}>
-                                                    {(badge) => (
-                                                        <div class="tag-holder">
-                                                            {badge.icon}
-                                                            {badge.label}
-                                                        </div>
-                                                    )}
-                                                </For>
-                                            </div>
-                                            <Show when={props.devMode}>
-                                                <span style={{"min-width": "fit-content"}}>{param_id}</span>
-                                            </Show>
-                                        </div>
-                                    )
-                                }}
-                                content={
-                                    <div>
-                                        <div class="text-section">
-                                            <h4>Widget</h4>
-                                            <div class="remove-input all">
-                                                <NodeFieldSelector parameter={parameter} hide_label={true}/>
-                                            </div>
-                                        </div>
-                                        <div class="text-section">
-                                            <h4>Description</h4>
-                                            <p>{param_meta.description}</p>
-                                        </div>
-                                    </div>
-                                }
-                            />
-                        )
-                    }}
+                <For each={param_bundle()}>
+                    {([paramData, paramMeta, paramId]) => (
+                        <ParameterDropdownItem 
+                            param_id={paramId} 
+                            param_data={paramData} 
+                            param_meta={paramMeta} 
+                            devMode={props.devMode} 
+                        />
+                    )}
                 </For>
             </div>
         </div>
-    )
-}
+    );
+};
