@@ -18,10 +18,11 @@ const TYPE_CONFIGS: Record<string, { type: string; step?: number; min?: number }
 };
 
 export const NodeFieldSelector = (props: {
-    node: GraphNode | null;
+    node?: GraphNode;
     parameter: NodeParameter;
-    workspace: UserWorkspace | undefined;
-    parameter_sync: ((node: GraphNode, parameter: NodeParameter) => void) | undefined;
+    workspace?: UserWorkspace;
+    parameter_sync?: ((node: GraphNode, parameter: NodeParameter) => void);
+    hide_label?: boolean
 }) => {
     let inputRef!: HTMLInputElement;
     const field_id = `${props.node?.id}${props.parameter._field_id}`;
@@ -59,7 +60,9 @@ export const NodeFieldSelector = (props: {
 
     return (
         <div class="field-grid">
-            <label class="field-label" for={field_id}>{props.parameter._field_id}</label>
+            <Show when={!props.hide_label}>
+                <label class="field-label" for={field_id}>{props.parameter._field_id}</label>
+            </Show>
             <Switch fallback={
                 <NumberField
                     step={step}

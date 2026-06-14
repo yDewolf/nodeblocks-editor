@@ -110,7 +110,10 @@
 .middle-tab-holder {
     display: grid;
     padding: 20px 5px;
+    grid-template-rows: minmax(0, 1fr);
+    max-height: calc(100vh - 40px);
 }
+
 
 .middle-tab {
   pointer-events: none;

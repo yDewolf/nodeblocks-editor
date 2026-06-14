@@ -17,13 +17,22 @@
 }
 
 .docs-content {
-    gap: 8px;
+    overflow-y: scroll;
+    
     word-break: break-all;
+    gap: 8px;
     h2 {
         font-size: 1.3rem;
     }
     h3 {
         font-size: 1.1rem;
+    }
+}
+
+.docs-sections {
+    .section-header {
+        flex-direction: row-reverse;
+        padding: 4px 2px;
     }
 }
 

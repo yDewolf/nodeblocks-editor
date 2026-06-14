@@ -8,7 +8,9 @@ import { NodePreview } from "../../editor/components/node/node-component";
 import { SlotHeader } from "../../editor/components/node/slot-components";
 import InputIcon from "~/assets/icons/input.svg";
 import OutputIcon from "~/assets/icons/output.svg";
+import ToolIcon from "~/assets/icons/tool.svg";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
+import { NodeFieldSelector } from '../../editor/components/node/node-field';
 
 export const NodeDocsContent = (props: {
     path: () => string | undefined,
@@ -41,7 +43,7 @@ export const NodeDocsContent = (props: {
     
 
     return (
-        <div class="keep fill container">
+        <div class="keep fill container docs-sections">
             <div class="text-section">
                 <h3>Preview</h3>
                 <div class="remove-input all">
@@ -149,7 +151,7 @@ const NodeParameterSection = (props: {
     const parameters = createMemo(() => {
         const meta = props.data.parameter_meta;
         let param_bundle: Array<[NodeDataModel, ParameterMeta, string]> = []
-        props.constructor?._slots.forEach((param_data, param_id) => {
+        props.constructor?._data_model.raw_parameters.forEach((param_data, param_id) => {
             const param_meta = meta[param_id];
             if (param_meta) {
                 param_bundle.push([param_data, param_meta, param_id]);
@@ -162,7 +164,54 @@ const NodeParameterSection = (props: {
         <div class="text-section">
             <h3>Parameters</h3>
             <div class="fill keep container">
-                
+                <For each={parameters()}>
+                    {([param_data, param_meta, param_id]) => {
+                        let param_badges: Array<DropdownBadge> = [];
+                        param_badges.push({
+                            label: param_data.type,
+                            icon: <ToolIcon class="tag-icon"/>
+                        });
+                        const parameter = new NodeParameter(param_data, param_id);
+                        return (
+                            <DropdownSection 
+                                header_content={() => {
+                                    return (
+                                        <div class="fill keep row-container space-between">
+                                            <div class="docs-slot-header">
+                                                <span>{param_meta.capitalized_name != "" ? param_meta.capitalized_name : param_id}</span>
+                                                <For each={param_badges}>
+                                                    {(badge) => (
+                                                        <div class="tag-holder">
+                                                            {badge.icon}
+                                                            {badge.label}
+                                                        </div>
+                                                    )}
+                                                </For>
+                                            </div>
+                                            <Show when={props.devMode}>
+                                                <span style={{"min-width": "fit-content"}}>{param_id}</span>
+                                            </Show>
+                                        </div>
+                                    )
+                                }}
+                                content={
+                                    <div>
+                                        <div class="text-section">
+                                            <h4>Widget</h4>
+                                            <div class="remove-input all">
+                                                <NodeFieldSelector parameter={parameter} hide_label={true}/>
+                                            </div>
+                                        </div>
+                                        <div class="text-section">
+                                            <h4>Description</h4>
+                                            <p>{param_meta.description}</p>
+                                        </div>
+                                    </div>
+                                }
+                            />
+                        )
+                    }}
+                </For>
             </div>
         </div>
     )
