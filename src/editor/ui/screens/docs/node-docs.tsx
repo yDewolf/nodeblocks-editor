@@ -6,11 +6,13 @@ import { NodeTypeMeta, ParameterMeta, SlotMeta } from "~/wrapper/metadata/type_m
 import { DropdownSection } from "../../components/panels/dropdown";
 import { NodePreview } from "../../editor/components/node/node-component";
 import { SlotHeader } from "../../editor/components/node/slot-components";
+import { NodeParameter } from "~/wrapper/nodes/data/node-data";
+import { NodeFieldSelector } from '../../editor/components/node/node-field';
 import InputIcon from "~/assets/icons/input.svg";
 import OutputIcon from "~/assets/icons/output.svg";
 import ToolIcon from "~/assets/icons/tool.svg";
-import { NodeParameter } from "~/wrapper/nodes/data/node-data";
-import { NodeFieldSelector } from '../../editor/components/node/node-field';
+import FilterIcon from "~/assets/icons/filter.svg";
+
 
 export const NodeDocsContent = (props: {
     path: () => string | undefined,
@@ -169,12 +171,34 @@ const ParameterDropdownItem = (props: {
     devMode: boolean;
 }) => {
     const parameter = createMemo(() => new NodeParameter(props.param_data, props.param_id));
-    const badges: DropdownBadge[] = [
-        {
-            label: props.param_data.type,
-            icon: <ToolIcon class="tag-icon" />
+    const badges = createMemo<DropdownBadge[]>(() => {
+        const data = props.param_data;
+        const list: DropdownBadge[] = [
+            {
+                label: data.type,
+                icon: <ToolIcon class="tag-icon" />
+            }
+        ];
+
+        if (data.default != undefined) {
+            list.push({ label: `default: ${data.default}` });
         }
-    ];
+        if (data.step != undefined) {
+            list.push({ label: `step: ${data.step}` });
+        }
+        if (data.range != undefined) {
+            list.push({ label: `range` });
+        }
+        if (data.extension_filter != undefined) {
+            if (data.extension_filter.length > 0) list.push({ icon: <FilterIcon class="tag-icon"/>, label: "" });
+        }
+
+        return list;
+    });
+
+    const formatValue = (val: any) => {
+        return String(val);
+    };
 
     return (
         <DropdownSection
@@ -186,7 +210,7 @@ const ParameterDropdownItem = (props: {
                                 ? props.param_meta.capitalized_name 
                                 : props.param_id}
                         </span>
-                        <For each={badges}>{(badge) => <BadgeTag badge={badge} />}</For>
+                        <For each={badges()}>{(badge) => <BadgeTag badge={badge} />}</For>
                     </div>
                     <Show when={props.devMode}>
                         <span style={{ "min-width": "fit-content" }}>{props.param_id}</span>
@@ -201,10 +225,61 @@ const ParameterDropdownItem = (props: {
                             <NodeFieldSelector parameter={parameter()} hide_label={true} />
                         </div>
                     </div>
+
                     <div class="text-section">
                         <h4>Description</h4>
-                        <p>{props.param_meta.description}</p>
+                        <p>{props.param_meta.description != "" ? props.param_meta.description : "No Description"}</p>
                     </div>
+
+                    <Show when={props.param_data.default != undefined}>
+                        <div class="text-section row">
+                            <h4>Default Value:</h4>
+                            <span>{formatValue(props.param_data.default)}</span>
+                        </div>
+                    </Show>
+
+                    <Show when={props.param_data.step != undefined}>
+                        <div class="text-section row">
+                            <h4>Step Increment:</h4>
+                            <span>{formatValue(props.param_data.step)}</span>
+                        </div>
+                    </Show>
+
+                    <Show when={props.param_data.range != undefined}>
+                        <div class="text-section row">
+                            <h4>Allowed Range</h4>
+                            <p>
+                                Min: {props.param_data.range.min ?? "None"} |
+                                Max: {props.param_data.range.max ?? "None"}
+                            </p>
+                        </div>
+                    </Show>
+
+                    <Show when={props.param_data.extension_filter != undefined && props.param_data.extension_filter?.length > 0}>
+                        <div class="text-section">
+                            <h4>Allowed Extensions</h4>
+                            <div class="row-container">
+                                <For each={props.param_data.extension_filter}>
+                                    {(extension) => (
+                                        <span class="tag-holder">{extension}</span>
+                                    )}
+                                </For>
+                            </div>
+                        </div>
+                    </Show>
+
+                    <Show when={props.param_data.options != undefined && props.param_data.options?.length > 0}>
+                        <div class="text-section">
+                            <h4>Available Options</h4>
+                            <div class="row-container" style={{ "flex-wrap": "wrap" }}>
+                                <For each={props.param_data.options}>
+                                    {(option) => (
+                                        <span class="tag-holder">{formatValue(option)}</span>
+                                    )}
+                                </For>
+                            </div>
+                        </div>
+                    </Show>
                 </div>
             }
         />

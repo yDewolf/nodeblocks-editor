@@ -21,6 +21,10 @@
     gap: 2px;
 }
 
+.text-section.row {
+    flex-direction: row;
+}
+
 .section-body > div {
     padding: 8px 12px;
 }
