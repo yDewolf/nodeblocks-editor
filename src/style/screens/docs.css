@@ -3,6 +3,7 @@
     height: stretch;
     grid-template-columns: 200px minmax(0, 1fr);
     gap: 20px;
+    overflow-y: scroll;
 }
 
 .docs-content, .docs-left-panel {
@@ -40,6 +41,27 @@
 .tag-icon {
     width: 1.2rem;
     height: 1.2rem;
+}
+
+
+.docs-slot-header {
+    display: flex;
+    width: stretch;
+    gap: 10px;
+
+    .node-slot {
+        width: fit-content;
+        text-align: left;
+        flex-direction: row;
+        min-width: auto;
+    }
+}
+
+.docs-slot-header > .tag-holder {
+    background-color: var(--dark-overlay-highlight);
+    border-radius: 4px;
+    padding: 2px;
+    gap: 2px;
 }
 
 @media (max-width: 1024px) {

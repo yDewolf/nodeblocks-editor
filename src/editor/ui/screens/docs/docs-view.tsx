@@ -1,12 +1,11 @@
-import { createMemo, createSignal, Match, Show, Switch } from "solid-js";
+import { createMemo, createSignal, For, JSXElement, Match, Show, Switch } from "solid-js";
 import { useDocs } from "~/editor/controllers/docs-controller";
 import { EditorTool } from "~/editor/tools/base-tool";
 import { DocsPath, DocsTags } from "./docs-components";
-import CodeIcon from "~/assets/icons/code.svg";
 import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
-import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
-import { NodePreview } from "../../editor/components/node/node-component";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
+import CodeIcon from "~/assets/icons/code.svg";
+import { NodeDocsContent } from "./node-docs";
 
 export const DocsView = (props: {current_tool?: EditorTool, scene_controller: SceneController}) => {
     const docs = useDocs();
@@ -44,7 +43,7 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
                         <h2>{docs_data()?.data.capitalized_name}</h2>
                         <p>{docs_data()?.data.description}</p>
                     </div>
-                    <DocsContentSelector path={docs.currentDocsPath} docs_data={docs_data()} scene_controller={props.scene_controller}/>
+                    <DocsContentSelector path={docs.currentDocsPath} docs_data={docs_data()} scene_controller={props.scene_controller} devMode={devMode()}/>
                     <Show when={devMode()}>
                         <p>
                             {docs_data() ? JSON.stringify(docs_data()) : "No Documentation"}
@@ -60,7 +59,8 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
 const DocsContentSelector = (props: {
     path: () => string | undefined,
     docs_data?: DocPayload,
-    scene_controller: SceneController
+    scene_controller: SceneController,
+    devMode: boolean
 }) => {
     if (!props.docs_data) return undefined;
     if (!props.path()) return undefined;
@@ -70,40 +70,8 @@ const DocsContentSelector = (props: {
             <span>No implementation for documentation type {props.docs_data.type}</span>
         }>
             <Match when={props.docs_data.type === "node"}>
-                <NodeDocsContent path={props.path} scene_controller={props.scene_controller} data={props.docs_data.type === "node" ? props.docs_data.data : undefined}/>            
+                <NodeDocsContent path={props.path} scene_controller={props.scene_controller} data={props.docs_data.type === "node" ? props.docs_data.data : undefined} devMode={props.devMode}/>            
             </Match>
         </Switch>
-    )
-}
-
-const NodeDocsContent = (props: {
-    path: () => string | undefined,
-    data?: NodeTypeMeta,
-    scene_controller: SceneController
-}) => {
-    if (!props.data) {
-        return <span>Couldn't load documentation</span>
-    }
-
-    const preview = createMemo(() => {
-        const path = props.path() ?? "";
-        const type_id = path.split("/").at(-1);
-        if (type_id) {
-            const node_constructor = props.scene_controller.node_controller.node_constructors.get(type_id)
-            if (node_constructor) {
-                return <NodePreview constructor={node_constructor}/>
-            }
-        }
-        return <span>Couldn't parse Node Preview</span>
-    })
-    return (
-        <div class="keep fill container">
-            <div class="container">
-                <h3>Preview</h3>
-                <div class="remove-input all">
-                    {preview()}            
-                </div>
-            </div>
-        </div>
     )
 }

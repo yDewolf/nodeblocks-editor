@@ -1,5 +1,6 @@
 import { Show } from "solid-js";
 import { metadata } from "~/singletons/metadata";
+import { SlotData } from "~/wrapper/helpers/node-type-file";
 import { NodeTypeMeta, SlotMeta } from "~/wrapper/metadata/type_metadata";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 
@@ -69,6 +70,26 @@ export const _SlotComponent = (props: {
             <Show when={props.show_label}>
                 <span class="slot-label">{slot_label}</span>
             </Show>
+        </div>
+    )
+}
+
+export const SlotHeader = (props: {
+    slot_data: SlotData,
+    slot_meta: SlotMeta,
+    slot_id: string
+}) => { 
+    const slot_label = props.slot_meta ? props.slot_meta.capitalized_name : props.slot_id;
+    return (
+        <div 
+            class="node-slot"
+            classList={{
+                "input-slot": props.slot_data.is_input,
+                "output-slot": !props.slot_data.is_input,
+            }}
+        >
+            <div class="slot-dot"></div>
+            <span class="slot-label">{slot_label}</span>
         </div>
     )
 }
