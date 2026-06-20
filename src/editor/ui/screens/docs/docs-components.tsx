@@ -83,11 +83,13 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
 
         path_split.forEach((part, idx) => {
             if (idx == 0) return;
-            const this_path = path_split.filter((part, part_idx) => part_idx <= idx);
+            const this_path = path_parts.filter((part, part_idx) => part_idx <= idx);
+            
             let local_parts: string[] = [];
             this_path.forEach((path_part) => {
-                local_parts.push(path_part);
+                local_parts.push(path_part.label);
             });
+            local_parts.push(part);
             path_parts.push({
                 path: local_parts,
                 label: part
@@ -101,7 +103,7 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
             <For each={path_parts()}>
                 {(part, idx) => {
                     return (
-                        <a href={`#?docs=${part.path.join("/")}`}>
+                        <a href={`#?docs=${part.path.join(".")}`}>
                             <span>{part.label + (idx() < (path_parts()?.length ?? 1) - 1 ? " > " : "")}</span>
                         </a>
                     )
