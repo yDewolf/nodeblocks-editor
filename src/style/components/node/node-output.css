@@ -12,6 +12,8 @@
 }
 
 .output-text {
+    width: fit-content;
+    margin: auto ;
     font-size: 1.4rem;
 
     border: solid 2px;
