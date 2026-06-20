@@ -31,18 +31,21 @@ export class MetadataController {
         this.store = store;
         this.setStore = setStore;
         // console.log("Metadata content:", store.header, store.data_types, store.node_types);
-        if (this.store.header) {
-            this.metadata_version = {
-                meta_version: this.store.header.meta_version,
-                types_version: this.store.header.types_version
+        this._client.add_handler(ServerMessages.HANDSHAKE_SYNC, (message) => {
+            if (!this.store.header || !this.check_is_updated()) {
+                console.warn("Couldn't load metadata from cache. Fetching metadata from server")
+                this.request_metadata();
+            } else {
+                console.log("Metadata loaded from cache...");
+                this.metadata_version = {
+                    meta_version: this.store.header.meta_version,
+                    types_version: this.store.header.types_version
+                }
             }
-        } else {
-            console.warn("Couldn't load metadata from cache. Fetching metadata from server")
-            this.update_metadata({meta_version: 0, types_version: 0})
-        }
+        })
 
         this._client.add_handler(ServerMessages.METADATA_UPDATED, (message) => {
-            this.update_metadata(message.metadata_version);
+            this.request_metadata();
         });
     }
 
@@ -53,8 +56,20 @@ export class MetadataController {
         ) {
             return;
         }
+        this.request_metadata();
+    }
 
-        this.metadata_version = new_version;
+    protected check_is_updated = async () => {
+        const header_url = new URL(`${this._client.base_http_url}/api/metadata`);
+        const headerRes = await fetch(header_url).then(r => r.json());
+        const header_meta: MetadataHeader = parse_header(headerRes);
+        if (this.metadata_version?.meta_version != header_meta.meta_version) return false;
+        if (this.metadata_version.types_version != header_meta.types_version) return false;
+        return true;
+    }
+
+    protected request_metadata = async () => {
+        console.log("Starting metadata request");
         try {
             const header_url = new URL(`${this._client.base_http_url}/api/metadata`);
             const node_url = new URL("metadata/nodes", header_url);
@@ -63,6 +78,8 @@ export class MetadataController {
                 header_url.searchParams.append("token", this._client.session_token);
                 node_url.searchParams.append("token", this._client.session_token);
                 datatypes_url.searchParams.append("token", this._client.session_token);
+            } else {
+                throw Error("Missing Session Token");
             }
             const [headerRes, nodesRes, datatypesRes] = await Promise.all([
                 fetch(header_url).then(r => r.json()),
@@ -73,16 +90,19 @@ export class MetadataController {
             const header_meta: MetadataHeader = parse_header(headerRes);
             const node_types: Record<string, NodeTypeMeta> = parse_node_types(nodesRes, header_meta.tags, header_meta.categories);
             const data_types: Record<string, DataTypeMeta> = parse_data_types(datatypesRes);
+            this.metadata_version = {
+                meta_version: header_meta.meta_version,
+                types_version: header_meta.types_version
+            }
             this.setStore("header", reconcile(header_meta));
             this.setStore("node_types", reconcile(node_types));
             this.setStore("data_types", reconcile(data_types));
-
+            console.log("Fetched meta: ", header_meta);
         } catch (error) {
             console.error("Failed to fetch metadata from server", error);
         }
     }
 
-    
     public get_header() {
         return this.store.header;
     }

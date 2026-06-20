@@ -43,7 +43,7 @@ export const NodeFieldSelector = (props: {
             const isFloat = props.parameter.type.base === DefaultDataTypes.FLOAT;
             const parsed = isFloat ? parseFloat(raw_value) : parseInt(raw_value);
             if (isNaN(parsed)) return;
-            console.log(parsed);
+            // console.log(parsed);
             new_value = parsed;
         }
         if (input_type === "number" && is_range) {

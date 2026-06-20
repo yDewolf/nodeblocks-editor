@@ -11,7 +11,6 @@ const ArrayCanvas = (props: { data: any[], shape: number[], target_channel: numb
         const ctx = canvasRef.getContext('2d');
         if (!ctx) return;
         if (!(props.data instanceof Array)) {
-            console.log(props.shape);
             return;
         }
 
