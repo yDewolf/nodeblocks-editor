@@ -148,18 +148,22 @@ export const NodeSlotSection = (props: {
     return (
         <div class="text-section">
             <h3>Slots</h3>
-            <div class="fill keep container">
-                <For each={slot_bundle()}>
-                    {([slotData, slotMeta, slotId]) => (
-                        <SlotDropdownItem 
-                            slot_id={slotId} 
-                            slot_data={slotData} 
-                            slot_meta={slotMeta} 
-                            devMode={props.devMode} 
-                        />
-                    )}
-                </For>
-            </div>
+            <Show when={slot_bundle().length > 0} fallback={
+                <span>This node has no Slots</span>
+            }>
+                <div class="fill keep container">
+                    <For each={slot_bundle()}>
+                        {([slotData, slotMeta, slotId]) => (
+                            <SlotDropdownItem 
+                                slot_id={slotId} 
+                                slot_data={slotData} 
+                                slot_meta={slotMeta} 
+                                devMode={props.devMode} 
+                                />
+                            )}
+                    </For>
+                </div>
+            </Show>
         </div>
     );
 };
@@ -305,18 +309,22 @@ export const NodeParameterSection = (props: {
     return (
         <div class="text-section">
             <h3>Parameters</h3>
-            <div class="fill keep container">
-                <For each={param_bundle()}>
-                    {([paramData, paramMeta, paramId]) => (
-                        <ParameterDropdownItem 
-                            param_id={paramId} 
-                            param_data={paramData} 
-                            param_meta={paramMeta} 
-                            devMode={props.devMode} 
-                        />
-                    )}
-                </For>
-            </div>
+            <Show when={param_bundle().length > 0} fallback={
+                <span>This node has no parameters</span>
+            }>
+                <div class="fill keep container">
+                    <For each={param_bundle()}>
+                        {([paramData, paramMeta, paramId]) => (
+                            <ParameterDropdownItem 
+                                param_id={paramId} 
+                                param_data={paramData} 
+                                param_meta={paramMeta} 
+                                devMode={props.devMode} 
+                            />
+                        )}
+                    </For>
+                </div>
+            </Show>
         </div>
     );
 };

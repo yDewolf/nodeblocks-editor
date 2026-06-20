@@ -5,6 +5,7 @@ import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 import TagIcon from "~/assets/icons/tag.svg";
 
 type PathPart = {
+    path: string[],
     label: string,
 }
 
@@ -36,17 +37,23 @@ function get_node_tags(node: NodeTypeMeta) {
     return tags
 }
 
-function recursive_category_part(category: NodeCategory | string, path_parts: PathPart[]) {
+function recursive_category_part(category: NodeCategory | string, current_path: string[], path_parts: PathPart[]) {
     if (!category) {return;}
     if (typeof category === "string") {
-        path_parts.push({label: category})
+        current_path = [...current_path, category];
+        path_parts.push({
+            path: current_path,
+            label: category
+        })
         return;
     }
 
     const categories = get_categories_recursive(category)
     categories.forEach((category) => {
         if (!category.category_id) return;
+        current_path = [...current_path, category.category_id];
         path_parts.push({
+            path: current_path,
             label: category.category_id
         });
     })
@@ -62,18 +69,29 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
         const path_split = props.current_path.split("/");
         if (path_split.length == 0) return [];
         
+        const root_path = [path_split[0]] 
         let path_parts: PathPart[] = [{
+            path: root_path,
             label: path_split[0]
         }];
         
         if (props.docs_data?.type === "node") {
+            let current_path = root_path;
             const node_category = props.docs_data.data.category;
-            recursive_category_part(node_category, path_parts);            
+            recursive_category_part(node_category, current_path, path_parts);            
         }
 
         path_split.forEach((part, idx) => {
             if (idx == 0) return;
-            path_parts.push({label: part})
+            const this_path = path_split.filter((part, part_idx) => part_idx <= idx);
+            let local_parts: string[] = [];
+            this_path.forEach((path_part) => {
+                local_parts.push(path_part);
+            });
+            path_parts.push({
+                path: local_parts,
+                label: part
+            })
         });
         return path_parts;
     })
@@ -83,7 +101,9 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
             <For each={path_parts()}>
                 {(part, idx) => {
                     return (
-                        <span>{part.label + (idx() < (path_parts()?.length ?? 1) - 1 ? " > " : "")}</span>
+                        <a href={`#?docs=${part.path.join("/")}`}>
+                            <span>{part.label + (idx() < (path_parts()?.length ?? 1) - 1 ? " > " : "")}</span>
+                        </a>
                     )
                 }}                        
             </For>
