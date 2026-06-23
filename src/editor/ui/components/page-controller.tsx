@@ -1,7 +1,7 @@
 import { createSignal, JSXElement, Show } from "solid-js";
 import CloseIcon from "~/assets/icons/close.svg";
 
-interface PageView {
+export interface PageView {
     page_title: string,
     view_displayer_css?: string,
     icon_element?: () => JSXElement,

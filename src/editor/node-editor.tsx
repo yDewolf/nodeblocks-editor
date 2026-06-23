@@ -3,7 +3,7 @@ import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { GraphNode } from "../wrapper/nodes/graph-node";
 import { NodeSlot } from '../wrapper/nodes/slot/node-slot';
 import { Vector2 } from '../wrapper/data_types/geometry';
-import { KeyEventManager as GeneralEventManager } from "./internal/input_manager/input-manager";
+import { KeyEventManager } from "./internal/input_manager/input-manager";
 import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./internal/input_manager/keybind-events";
 import { EventHandler, InputEvents } from "./internal/input_manager/event-handling";
 import { SceneController } from "../wrapper/controllers/scene-controller";
@@ -26,14 +26,13 @@ import { SessionController } from "~/network/session/session-controller";
 import { EditorRightPanel } from "./ui/editor/right-tab";
 import {} from "./ui/ui-themes";
 import "~/style/screens/editor.css";
-import { EditorToolbar } from './ui/editor/subpanels/editor-toolbar';
-import { SceneMinimap } from "./ui/components/scene-minimap";
-import { ThemeButton } from './ui/components/buttons/theme-button';
 import { EditorMidTab } from './ui/editor/mid-tab';
 import { NodeTypeSelector, SelectedNodeType } from "./ui/editor/subpanels/node-type-selector";
 import { PageViewer } from "./ui/components/page-controller";
-import { DocsElementIndicator } from "./ui/components/selected-docs-indicator";
 import { DocsController, useDocs } from "./controllers/docs-controller";
+import { DocsElementIndicator } from "./ui/components/selected-docs-indicator";
+import { DocsView } from "./ui/screens/docs/docs-view";
+import MinimizeIcon from '~/assets/icons/minimize.svg';
 
 
 export class NodeEditor {
@@ -51,7 +50,7 @@ export class NodeEditor {
     tool_controller: ToolController
 
     selection_controller: SelectionController
-    input_manager: GeneralEventManager
+    input_manager: KeyEventManager
 
     editor_space: EditorSpace
     editor_grid: Grid
@@ -81,7 +80,7 @@ export class NodeEditor {
         this._cursor_world_pos = cursorWorldPos;
         this._set_cursor_world_pos = setCursorWorldPos;
 
-        this.input_manager = new GeneralEventManager();
+        this.input_manager = new KeyEventManager();
 
         this.editor_space = new EditorSpace()
         this.editor_grid = new Grid({x: 32, y: 32});
@@ -332,6 +331,18 @@ export class NodeEditor {
         });
 
         const selector = new NodeTypeSelector();
+
+        // FIXME: Implement a better way of indexing pages on a pageviewer and accessing them
+        const DocsCallback = () => <DocsView scene_controller={this.scene_controller}/>;
+        const docsPage = {
+            page_title: "Documentation",
+            view_displayer_css: "docs-view",
+            icon_element: () => <MinimizeIcon class="small-icon"/>,
+            element: DocsCallback
+        };
+        const openDocsPage = () => {
+            this.main_page_viewer.current_page = docsPage;
+        }
         return (
             <div 
                 class="editor-view"
@@ -441,10 +452,10 @@ export class NodeEditor {
                     onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
                 >
                     <EditorLeftTabHolder node_type_selector={selector} main_page_viewer={this.main_page_viewer} editor={this}/>
-                    <EditorMidTab page_viewer={this.main_page_viewer} editor={this}/>
+                    <EditorMidTab docs_page={docsPage} page_viewer={this.main_page_viewer} editor={this}/>
                     <EditorRightPanel editor={this} state_controller={this._state_controller}/>
                 </div>
-                <DocsElementIndicator tool_controller={this.tool_controller} editor_camera={this.editor_space.camera} world_space_ref={world_space_ref}/>
+                <DocsElementIndicator open_docs_page={openDocsPage} input_manager={this.input_manager} tool_controller={this.tool_controller} editor_camera={this.editor_space.camera} world_space_ref={world_space_ref}/>
             </div>
         );
     }

@@ -2,27 +2,20 @@ import { ThemeButton } from "../components/buttons/theme-button";
 import { SceneMinimap } from "../components/scene-minimap";
 import { EditorToolbar } from "./subpanels/editor-toolbar";
 import { NodeEditor } from "~/editor/node-editor";
-import { PageViewer, StaticViewDisplayer } from '../components/page-controller';
+import { PageView, PageViewer, StaticViewDisplayer } from '../components/page-controller';
 import { Show } from "solid-js";
 import { DocsView } from "../screens/docs/docs-view";
 import DocsIcon from "~/assets/icons/book.svg";
-import { DocsTool } from "~/editor/tools/docs-tool";
 import MinimizeIcon from "~/assets/icons/minimize.svg";
 
-export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor}) => {
-    const DocsCallback = () => <DocsView scene_controller={props.editor.scene_controller}/>;
-    const page_obj = {
-        page_title: "Documentation",
-        view_displayer_css: "docs-view",
-        icon_element: () => <MinimizeIcon class="small-icon"/>,
-        element: DocsCallback
-    };
+export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor, docs_page: PageView}) => {
+    
     // FIXME: shouldn't access tool controller for this
-    props.editor.tool_controller.tools.forEach((tool) => {
-        if (tool instanceof DocsTool) {
-            tool.onSelectDocumentation = () => props.page_viewer.current_page = page_obj;
-        }
-    });
+    // props.editor.tool_controller.tools.forEach((tool) => {
+    //     if (tool instanceof DocsTool) {
+    //         tool.onSelectDocumentation = () => props.page_viewer.current_page = page_obj;
+    //     }
+    // });
 
     return (
         <div class="middle-tab-holder">
@@ -37,7 +30,7 @@ export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor
                         {/* Placeholder: */}
                         <div class="theme-button-holder">
                             <button class="icon-button" onclick={() => {
-                                props.page_viewer.current_page = page_obj;
+                                props.page_viewer.current_page = props.docs_page;
                             }}>
                                 <DocsIcon class="medium-icon"/>
                             </button>

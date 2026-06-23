@@ -84,3 +84,17 @@
 .selected-docs-indicator.in-graph {
     /* transition: width 0.15s ease, height 0.15s ease, opacity 0.1s ease; */
 }
+
+.selected-docs-popup {
+  min-width: 100px;
+  max-width: 200px;
+  min-height: 40px;
+  border-radius: 8px;
+  border-bottom-left-radius: 0;
+  padding: 8px;
+  margin: 4px;
+
+  pointer-events: auto;
+  background-color: var(--overlay-background);
+  border: solid 1px var(--stroke-color);
+}
