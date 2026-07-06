@@ -1,8 +1,9 @@
-import { createMemo, For, Show } from "solid-js";
 import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
+import { createMemo, For, Match, Show, Switch } from 'solid-js';
 import { NodeCategory, NodeTag } from "~/wrapper/metadata/node_filters";
 import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 import TagIcon from "~/assets/icons/tag.svg";
+import { DocsPathSplitter } from "~/singletons/metadata";
 
 type PathPart = {
     path: string[],
@@ -66,7 +67,7 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
             return [];
         }
         
-        const path_split = props.current_path.split("/");
+        const path_split = props.current_path.split(DocsPathSplitter);
         if (path_split.length == 0) return [];
         
         const root_path = [path_split[0]] 
@@ -103,9 +104,18 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
             <For each={path_parts()}>
                 {(part, idx) => {
                     return (
-                        <a href={`#?docs=${part.path.join(".")}`}>
-                            <span>{part.label + (idx() < (path_parts()?.length ?? 1) - 1 ? " > " : "")}</span>
-                        </a>
+                        <>
+                            <a href={`#docs=${part.path.join(DocsPathSplitter)}`}>
+                                <span>{part.label}</span>
+                            </a>
+                            <Switch>
+                                <Match when={idx() < (path_parts()?.length ?? 1) - 1}>
+                                    <span>
+                                        {">"}
+                                    </span>
+                                </Match>
+                            </Switch>
+                        </>
                     )
                 }}                        
             </For>

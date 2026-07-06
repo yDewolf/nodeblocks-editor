@@ -1,7 +1,8 @@
-import { createSignal, createResource, Resource, JSX, createContext, useContext } from "solid-js";
+import { createSignal, createResource, Resource, JSX, createContext, useContext, onCleanup, createEffect } from "solid-js";
 import { docsResolver } from "~/singletons/docs";
 import { isServer } from "solid-js/web";
 import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
+import { getHashParams, setHashParam } from "../utils/url-utils";
 
 export class DocsController {
     public hoveredDocElement: () => HTMLElement | null;
@@ -63,3 +64,34 @@ export function useDocs() {
     }
     return context;
 }
+
+export const DocsUrlSync = () => {
+    if (isServer) return;
+
+    const docs = useDocs();
+    const handleHashChange = () => {
+        const params = getHashParams();
+        const pathFromUrl = params["docs"];
+
+        if (pathFromUrl !== docs.currentDocsPath()) {
+            docs.setCurrentDocsPath(pathFromUrl || undefined);
+        }
+    };
+
+    handleHashChange();
+
+    window.addEventListener("hashchange", handleHashChange);
+    onCleanup(() => window.removeEventListener("hashchange", handleHashChange));
+
+    createEffect(() => {
+        const currentPath = docs.currentDocsPath();
+        const params = getHashParams();
+        const urlPath = params["docs"];
+
+        if (currentPath !== urlPath) {
+            setHashParam("docs", currentPath);
+        }
+    });
+
+    return null;
+};

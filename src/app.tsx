@@ -4,7 +4,7 @@ import { session_controller } from "./singletons/user_session";
 import { createContext, createEffect, onMount } from "solid-js";
 import { NodeEditor } from "./editor/node-editor";
 import { UpdateRootDataTheme } from "./editor/ui/ui-themes";
-import { DocsController, DocsProvider } from "./editor/controllers/docs-controller";
+import { DocsController, DocsProvider, DocsUrlSync } from './editor/controllers/docs-controller';
 
 const node_editor = new NodeEditor(session_controller);
 
@@ -40,6 +40,7 @@ export default function App() {
   return (
     <main>
       <DocsProvider>
+        <DocsUrlSync/>
         {node_editor.View()}
       </DocsProvider>
     </main>

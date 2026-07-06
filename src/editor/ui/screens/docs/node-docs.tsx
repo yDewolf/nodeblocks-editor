@@ -12,6 +12,7 @@ import InputIcon from "~/assets/icons/input.svg";
 import OutputIcon from "~/assets/icons/output.svg";
 import ToolIcon from "~/assets/icons/tool.svg";
 import FilterIcon from "~/assets/icons/filter.svg";
+import { DocsPathSplitter } from "~/singletons/metadata";
 
 
 export const NodeDocsContent = (props: {
@@ -26,7 +27,7 @@ export const NodeDocsContent = (props: {
 
     const constructor = createMemo(() => {
         const path = props.path() ?? "";
-        const type_id = path.split("/").at(-1);
+        const type_id = path.split(DocsPathSplitter).at(-1);
         if (type_id) {
             const node_constructor = props.scene_controller.node_controller.node_constructors.get(type_id)
             return node_constructor;

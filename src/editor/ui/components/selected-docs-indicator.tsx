@@ -10,6 +10,9 @@ import ExpandIcon from '~/assets/icons/expand.svg';
 
 // Não sei se fica melhor continuar mostrando o selecionado ou mostrar apenas o hovered
 const KeepSelectedHighlighted = false;
+
+// TODO: Arrumar quando você seleciona um elemento dentro de um scroll
+// o indicador não acompanha o elemento
 export const DocsElementIndicator = (props: {
     input_manager: KeyEventManager,
     tool_controller: ToolController, 
