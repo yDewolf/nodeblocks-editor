@@ -90,11 +90,24 @@
   max-width: 200px;
   min-height: 40px;
   border-radius: 8px;
-  border-bottom-left-radius: 0;
   padding: 8px;
   margin: 4px;
 
   pointer-events: auto;
   background-color: var(--overlay-background);
   border: solid 1px var(--stroke-color);
+}
+.selected-docs-popup:not(.right):not(.top) {
+  border-bottom-left-radius: 0;
+}
+
+.selected-docs-popup:not(.right).top {
+  border-top-left-radius: 0;
+}
+
+.selected-docs-popup.right:not(.top) {
+  border-bottom-right-radius: 0;
+}
+.selected-docs-popup.right.top {
+  border-top-right-radius: 0;
 }
