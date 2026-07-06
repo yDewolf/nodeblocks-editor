@@ -66,7 +66,13 @@
     }
 }
 
-.docs-slot-header > .tag-holder {
+.docs-header-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.docs-header-badges > .tag-holder {
     background-color: var(--dark-overlay-highlight);
     border-radius: 4px;
     padding: 2px;

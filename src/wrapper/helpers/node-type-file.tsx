@@ -6,7 +6,7 @@ import { BaseDataType, DefaultDataTypes, DefaultRenderers, UNKNOWN_TYPE } from "
 import { BaseSlotType } from "../nodes/data/slot-types";
 import { CustomDataType } from "../nodes/data/custom-data-types";
 
-interface TypeFile {
+export interface TypeFile {
     format: number,
     version: number,
     id: string,

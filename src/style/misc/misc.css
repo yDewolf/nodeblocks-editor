@@ -97,6 +97,12 @@
   background-color: var(--overlay-background);
   border: solid 1px var(--stroke-color);
 }
+
+.docs-popup-header > p {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
 .selected-docs-popup:not(.right):not(.top) {
   border-bottom-left-radius: 0;
 }
