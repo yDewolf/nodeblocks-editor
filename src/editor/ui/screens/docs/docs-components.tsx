@@ -105,6 +105,7 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
                 {(part, idx) => {
                     return (
                         <>
+                            {/* FIXME: this path generator. It includes categories that aren't parsed by DocsResolver */}
                             <a href={`#docs=${part.path.join(DocsPathSplitter)}`}>
                                 <span>{part.label}</span>
                             </a>

@@ -13,6 +13,8 @@ import OutputIcon from "~/assets/icons/output.svg";
 import ToolIcon from "~/assets/icons/tool.svg";
 import FilterIcon from "~/assets/icons/filter.svg";
 import { DocsPathSplitter } from "~/singletons/metadata";
+import { DocsPath } from "~/network/controllers/docs/docs-interfaces";
+import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 
 
 export const NodeDocsContent = (props: {
@@ -61,6 +63,7 @@ export const NodeDocsContent = (props: {
 
 interface DropdownBadge {
     icon?: JSXElement;
+    href?: string;
     label: string;
 }
 
@@ -75,20 +78,24 @@ function resolve_slot_type_label(slotData: SlotData): string {
 const BadgeTag = (props: { badge: DropdownBadge }) => (
     <div class="tag-holder">
         {props.badge.icon}
-        {props.badge.label}
+        <a href={props.badge.href}>
+            {props.badge.label}
+        </a>
     </div>
 );
 
 const SlotDropdownItem = (props: {
-    slot_id: string;
-    slot_data: SlotData;
-    slot_meta: SlotMeta;
-    devMode: boolean;
+    slot_id: string,
+    datatype?: BaseDataType,
+    slot_data: SlotData,
+    slot_meta: SlotMeta,
+    devMode: boolean,
 }) => {
     const badges = createMemo<DropdownBadge[]>(() => {
         const badge_list: DropdownBadge[] = [
             {
                 label: resolve_slot_type_label(props.slot_data),
+                href: `#docs=${DocsPath.DATATYPE}${DocsPathSplitter}${props.datatype?.type_id}`,
                 icon: props.slot_data.is_input ? <InputIcon class="tag-icon" /> : <OutputIcon class="tag-icon" />
             }
         ];
@@ -156,14 +163,22 @@ export const NodeSlotSection = (props: {
             }>
                 <div class="fill keep container">
                     <For each={slot_bundle()}>
-                        {([slotData, slotMeta, slotId]) => (
-                            <SlotDropdownItem 
-                                slot_id={slotId} 
-                                slot_data={slotData} 
-                                slot_meta={slotMeta} 
-                                devMode={props.devMode} 
+                        {([slotData, slotMeta, slotId]) => {
+                            const slot_type = props.constructor?._slot_types.get(slotData.type);
+                            let data_type = props.scene_controller.node_type_reader.data_types.get(slotData.data_type ?? "");
+                            if (slot_type) {
+                                data_type = slot_type.data_type;
+                            }
+                            return (
+                                <SlotDropdownItem 
+                                    datatype={data_type}
+                                    slot_id={slotId} 
+                                    slot_data={slotData} 
+                                    slot_meta={slotMeta} 
+                                    devMode={props.devMode} 
                                 />
-                            )}
+                            )
+                        }}
                     </For>
                 </div>
             </Show>
@@ -217,7 +232,9 @@ const ParameterDropdownItem = (props: {
                                 ? props.param_meta.capitalized_name 
                                 : props.param_id}
                         </span>
-                        <For each={badges()}>{(badge) => <BadgeTag badge={badge} />}</For>
+                        <div class="docs-header-badges">
+                            <For each={badges()}>{(badge) => <BadgeTag badge={badge} />}</For>
+                        </div>
                     </div>
                     <Show when={props.devMode}>
                         <span style={{ "min-width": "fit-content" }}>{props.param_id}</span>

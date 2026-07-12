@@ -6,6 +6,7 @@ import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 
 const interfaceModules = import.meta.glob("/src/docs/interface/**/*.json");
+const datatypeModules = import.meta.glob("/src/docs/datatypes/**/*.json");
 export function make_node_docs_path(node?: GraphNode, type_id?: string): string | undefined {
     return DocsPath.NODE + DocsPathSplitter + (node ? node.type_id : type_id)
 }
@@ -46,14 +47,22 @@ export class DocsResolver {
             const datatype_id = docs_path.replace(DocsPath.DATATYPE + DocsPathSplitter, "");
             const meta = this._metadata_controller.get_datatype_meta(datatype_id);
             
-            if (!meta) throw new Error(`Couldn't find metadata for ${datatype_id}`);
+            if (!meta) {
+                const local_path = docs_path.replace(DocsPathSplitter, "/");
+                const full_path = `/src/docs/${local_path}.json`;
+                const loader = datatypeModules[full_path];
+                if (!loader) throw new Error(`Couldn't find metadata for ${datatype_id}`);
+                
+                const raw_module = await loader() as any;
+                const json_data = raw_module.default ?? raw_module;
+                return { type: "datatype", data: json_data };
+            };
             return { type: "datatype", data: meta };
         }
 
         if (docs_path.startsWith(DocsPath.UI)) {
             const ui_path = docs_path.replace(DocsPathSplitter, "/");
             const full_path = `/src/docs/${ui_path}.json`;
-            console.log(full_path);
             const loader = interfaceModules[full_path];
 
             if (!loader) throw new Error(`Couldn't find metadata for UI element. Path: ${docs_path}`);

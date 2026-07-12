@@ -8,7 +8,7 @@ import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 // export const SlotComponentReferences = new ReactiveMap<NodeSlot, Array<SlotComponent>>();
 export class SlotComponent {
     slot: NodeSlot;
-    node_meta: NodeTypeMeta;
+    node_meta?: NodeTypeMeta;
     slot_meta?: SlotMeta
 
     constructor(slot: NodeSlot, node_meta?: NodeTypeMeta) {

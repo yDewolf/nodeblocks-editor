@@ -1,4 +1,3 @@
-import { nanoid } from "nanoid"
 import { JSXElement, Show } from "solid-js"
 
 export const SimpleField = (props: {
