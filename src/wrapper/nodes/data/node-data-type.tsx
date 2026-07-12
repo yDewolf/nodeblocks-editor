@@ -24,6 +24,8 @@ export function _match_renderer(base_type: DefaultDataTypes): DefaultRenderers {
         case DefaultDataTypes.FLOAT: return DefaultRenderers.SCALAR;
         case DefaultDataTypes.INT: return DefaultRenderers.SCALAR;
         case DefaultDataTypes.UINT: return DefaultRenderers.SCALAR;
+        case DefaultDataTypes.TEXT: return DefaultRenderers.TEXT;
+        case DefaultDataTypes.BOOLEAN: return DefaultRenderers.SCALAR;        
         default:
             return DefaultRenderers.NOT_IMPLEMENTED
     }
