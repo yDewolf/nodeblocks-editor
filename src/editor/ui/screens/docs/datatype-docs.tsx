@@ -1,13 +1,14 @@
-import { createMemo, createResource, createSignal } from "solid-js";
+import { createMemo, createResource, createSignal, Match, Switch } from "solid-js";
 import { DocsPathSplitter } from "~/singletons/metadata";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { DataTypeMeta } from "~/wrapper/metadata/type_metadata";
 import { OutputSelector } from '../../editor/components/node/output/node-output';
 import { FieldValueDisplayer, SimpleField } from "../../components/input-fields";
 import { DocsPath } from "~/network/controllers/docs/docs-interfaces";
-import { BaseDataType, DataTypeUtils } from "~/wrapper/nodes/data/node-data-type";
-import { generate_datatype_random_value } from '../../../../wrapper/nodes/data/data-type-value-utils';
+import { BaseDataType, DataTypeUtils, DefaultRenderers } from "~/wrapper/nodes/data/node-data-type";
+import { DataTypeGenParams, generate_datatype_random_value } from '../../../../wrapper/nodes/data/data-type-value-utils';
 import RefreshIcon from '~/assets/icons/refresh.svg';
+import { createStore } from "solid-js/store";
 
 export const DataTypeDocsContent = (props: {
     path: () => string | undefined,
@@ -44,6 +45,7 @@ const DataTypeAttributes = (props: {
     meta: DataTypeMeta,
     datatype?: BaseDataType
 }) => {
+    // TODO: Mexer nisso aqui depois para não ficar repetitivo com os outros subcomponentes
     if (!props.datatype) {
         return <div class="text-section">
             <h3>Attributes</h3>
@@ -77,12 +79,13 @@ const DataTypePreview = (props: {
     }
     
     const [fetch_signal, refetch] = createSignal(false);
+    const [genParams, setGenParams] = createStore<DataTypeGenParams>({});
     const preview_value = createMemo(() => {
         fetch_signal()
         refetch(false);
-        if (!props.datatype) return undefined;
 
-        const value = generate_datatype_random_value(props.datatype, {})
+        if (!props.datatype) return undefined;
+        const value = generate_datatype_random_value(props.datatype, genParams)
         return value;
     });
 
@@ -94,9 +97,119 @@ const DataTypePreview = (props: {
                     <RefreshIcon class="dropdown-icon"/>
                 </button>
             </div>
+
             <div>
+                <GenParamsEditor 
+                    renderer={props.datatype?.renderer} 
+                    params={genParams} 
+                    setParams={setGenParams} 
+                />
                 <OutputSelector output_renderer={props.datatype?.renderer} output_value={preview_value()}/>
             </div>
         </div>
     )
 }
+
+export const GenParamsEditor = (props: {
+    renderer: DefaultRenderers | undefined;
+    params: DataTypeGenParams;
+    setParams: (updater: (prev: DataTypeGenParams) => DataTypeGenParams) => void;
+}) => {
+    const id = ""
+    return (
+        <div class="fill container">
+            <Switch fallback={
+                <span>Sem parâmetros disponíveis para este Renderer.</span>
+            }>
+                <Match when={props.renderer === DefaultRenderers.SCALAR}>
+                    <div class="container">
+                        <div class="field-holder">
+                            <SimpleField field_name="Min" field_displayer={
+                                () => <FieldValueDisplayer value_element={() => <input 
+                                    type="number" 
+                                    value={props.params.scalar?.value_range?.min ?? ""} 
+                                    oninput={(e) => props.setParams(p => ({
+                                        ...p,
+                                        scalar: { value_range: { ...p.scalar?.value_range, min: e.target.value === "" ? undefined : Number(e.target.value) } }
+                                    }))}
+                                    id={id + "-min"}/>}/>
+                            } field_id={id + "-min"}/>
+                        </div>
+                        <div class="field-holder">
+                            <SimpleField field_name="Max" field_displayer={
+                                () => <FieldValueDisplayer value_element={() => <input 
+                                    type="number" 
+                                    value={props.params.scalar?.value_range?.max ?? ""} 
+                                    oninput={(e) => props.setParams(p => ({
+                                        ...p,
+                                        scalar: { value_range: { ...p.scalar?.value_range, max: e.target.value === "" ? undefined : Number(e.target.value) } }
+                                    }))}
+                                    id={id + "-max"}/>}/>
+                            } field_id={id + "-max"}/>
+                        </div>
+                    </div>
+                </Match>
+                <Match when={props.renderer === DefaultRenderers.ARRAY}>
+                    <div class="row-container fill">
+                        <div class="container">
+                            <div class="field-holder">
+                                <SimpleField field_name="Shape" field_displayer={
+                                    () => <FieldValueDisplayer value_element={() => <input 
+                                        type="text"
+                                        placeholder="example: 10,10,3"
+                                        oninput={(e) => {
+                                            const val = e.target.value;
+                                            const parsedShape = val ? val.split(",").map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0) : [];
+                                            props.setParams(p => ({
+                                                ...p,
+                                                array: { ...p.array, shape: parsedShape }
+                                            }));
+                                        }}
+                                        id={id + "shape"}/>}/>
+                                } field_id={id + "shape"}/>
+                            </div>
+                        </div>
+                        <div class="keep row-container">
+                            <div class="field-holder">
+                                <SimpleField field_name="Min" field_displayer={
+                                    () => <FieldValueDisplayer value_element={() => <input 
+                                        type="number"
+                                        oninput={(e) => props.setParams(p => ({
+                                            ...p,
+                                            array: { ...p.array, value_range: { ...p.array?.value_range, min: e.target.value === "" ? undefined : Number(e.target.value) } }
+                                        }))}
+                                        id={id + "min"}/>}/>
+                                } field_id={id + "min"}/>
+                            </div>
+                            <div class="field-holder">
+                                <SimpleField field_name="Max" field_displayer={
+                                    () => <FieldValueDisplayer value_element={() => <input 
+                                        type="number"
+                                        oninput={(e) => props.setParams(p => ({
+                                            ...p,
+                                            array: { ...p.array, value_range: { ...p.array?.value_range, min: e.target.value === "" ? undefined : Number(e.target.value) } }
+                                        }))}
+                                        id={id + "max"}/>}/>
+                                } field_id={id + "max"}/>
+                            </div>
+                        </div>
+                    </div>
+                </Match>
+
+                <Match when={props.renderer === DefaultRenderers.TEXT}>
+                    <div class="field-holder">
+                        <SimpleField field_name="SampleText" field_displayer={
+                            () => <FieldValueDisplayer value_element={() => <input 
+                                type="text"
+                                onInput={(e) => props.setParams(p => ({
+                                    ...p,
+                                    text: { text: e.target.value || undefined }
+                                }))}
+                                id={id + "text"}/>}/>
+                        } field_id={id + "text"}/>
+                    </div>
+                </Match>
+            </Switch>
+        </div>
+    );
+};
