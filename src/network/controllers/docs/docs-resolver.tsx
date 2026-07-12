@@ -51,7 +51,9 @@ export class DocsResolver {
         }
 
         if (docs_path.startsWith(DocsPath.UI)) {
-            const full_path = `/src/docs/${docs_path}.json`;
+            const ui_path = docs_path.replace(DocsPathSplitter, "/");
+            const full_path = `/src/docs/${ui_path}.json`;
+            console.log(full_path);
             const loader = interfaceModules[full_path];
 
             if (!loader) throw new Error(`Couldn't find metadata for UI element. Path: ${docs_path}`);
