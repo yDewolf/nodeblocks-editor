@@ -125,6 +125,10 @@ export class MetadataController {
         }
     };
 
+    public get_all() {
+        return this.store;
+    }
+
     public get_header() {
         const id = this.current_types_id;
         return id ? this.store[id]?.header : null;

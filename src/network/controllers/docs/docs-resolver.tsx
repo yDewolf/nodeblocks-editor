@@ -34,6 +34,10 @@ export class DocsResolver {
         this._metadata_controller = metadata;
     }
 
+    public allData() {
+        return this._metadata_controller.get_all();
+    }
+
     public async resolve(docs_path: string): Promise<DocPayload> {
         if (docs_path.startsWith(DocsPath.NODE)) {
             const type_id = docs_path.replace(DocsPath.NODE + DocsPathSplitter, "");

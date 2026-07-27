@@ -3,6 +3,7 @@ import { docsResolver } from "~/singletons/docs";
 import { isServer } from "solid-js/web";
 import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
 import { getHashParams, setHashParam } from "../utils/url-utils";
+import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
 
 export class DocsController {
     public hoveredDocElement: () => HTMLElement | null;
@@ -15,6 +16,7 @@ export class DocsController {
     public setCurrentDocsPath: (path: string | undefined) => void;
 
     public docsData: Resource<DocPayload | undefined>;
+    public allDocs: Record<string, MetadataStoreData>;
 
     constructor() {
         const [hoveredDocElement, setHoveredDocElement] = createSignal<HTMLElement | null>(null);
@@ -41,7 +43,7 @@ export class DocsController {
                 return undefined;
             }
         });
-        
+        this.allDocs = docsResolver.allData();
         this.docsData = docsDataResource[0];
     }
 }
