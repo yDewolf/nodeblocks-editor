@@ -343,6 +343,8 @@ export class NodeEditor {
         const openDocsPage = () => {
             this.main_page_viewer.current_page = docsPage;
         }
+        const docsPageVisible = () => this.main_page_viewer.current_page === docsPage;
+
         return (
             <div 
                 class="editor-view"
@@ -455,7 +457,7 @@ export class NodeEditor {
                     <EditorMidTab docs_page={docsPage} page_viewer={this.main_page_viewer} editor={this}/>
                     <EditorRightPanel editor={this} state_controller={this._state_controller}/>
                 </div>
-                <DocsElementIndicator open_docs_page={openDocsPage} input_manager={this.input_manager} tool_controller={this.tool_controller} editor_camera={this.editor_space.camera} world_space_ref={world_space_ref}/>
+                <DocsElementIndicator open_docs_page={openDocsPage} docsPageVisible={docsPageVisible} input_manager={this.input_manager} tool_controller={this.tool_controller} editor_camera={this.editor_space.camera} world_space_ref={world_space_ref}/>
             </div>
         );
     }

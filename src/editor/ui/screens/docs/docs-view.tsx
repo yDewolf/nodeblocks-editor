@@ -84,6 +84,19 @@ const DocsContentSelector = (props: {
 }
 
 
+const make_docs_index = (docs_record: Record<string, MetadataStoreData>) => {
+    const type_doc_ids = new Map(Object.entries(docs_record)).keys().toArray();
+    let flattened_index: string[] = [];
+    let index: Map<string, string> = new Map();
+    type_doc_ids.forEach((id) => {
+        // TODO: finish this thing, my pc is dying now bye
+        const datatype_keys = new Map(Object.entries(docs_record[id].data_types)).keys().toArray()
+        const nodetype_keys = new Map(Object.entries(docs_record[id].node_types)).keys().toArray()
+        flattened_index = [...flattened_index, ...datatype_keys, ...nodetype_keys];
+    });
+
+    return [flattened_index, index];
+}
 export const DocsSidebar = (props: {
     docs_data?: DocPayload
 }) => {

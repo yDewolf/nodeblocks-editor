@@ -18,12 +18,14 @@ export const DocsElementIndicator = (props: {
     tool_controller: ToolController, 
     editor_camera: EditorCamera, 
     world_space_ref?: HTMLDivElement,
-    open_docs_page: () => void
+    open_docs_page: () => void,
+    docsPageVisible: () => boolean
 }) => {
     const docs = useDocs();
     let PopupRef: HTMLDivElement | undefined;
     const [style, setStyle] = createSignal<JSX.CSSProperties>({});
     const [popupStyle, setPopupStyle] = createSignal<JSX.CSSProperties>({});
+    const [popupVisible, setPopupVisible] = createSignal(false);
     const [isToRight, setIsToRight] = createSignal(false);
     const [isToTop, setIsToTop] = createSignal(false);
 
@@ -155,7 +157,7 @@ export const DocsElementIndicator = (props: {
                     />
                 </Portal>
             </Show>
-            <Show when={docs.selectedDocElement() && isToolActive()}>
+            <Show when={docs.selectedDocElement() && isToolActive() && !props.docsPageVisible()}>
                 <Portal mount={isSelectedInsideGraph() ? props.world_space_ref : document.body}>
                     <div
                         ref={PopupRef}
