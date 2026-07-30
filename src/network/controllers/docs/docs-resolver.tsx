@@ -1,9 +1,13 @@
 import { DocsPathSplitter, metadata } from "~/singletons/metadata";
-import { MetadataController } from "../metadata/metadata_controller";
+import { MetadataController, MetadataStoreData } from "../metadata/metadata_controller";
 import { DocPayload, DocsPath } from "./docs-interfaces";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
+import { DataTypeMeta, NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
+import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
+
+const LOCAL_DATA_ID = "builtin";
 
 const interfaceModules = import.meta.glob("/src/docs/interface/**/*.json");
 const datatypeModules = import.meta.glob("/src/docs/datatypes/**/*.json");
@@ -32,6 +36,39 @@ export class DocsResolver {
 
     constructor() {
         this._metadata_controller = metadata;
+        this.injectLocalData();
+    }
+
+    private async injectLocalData() {
+        let node_types: Record<string, NodeTypeMeta> = {};
+        // FIX: Insert Node Type modules here if needed
+        let data_types: Record<string, DataTypeMeta> = {};
+        for (const path in datatypeModules) {
+            const filename = path.split("/").at(-1)?.replace(".json", "");
+            if (!filename) {
+                console.error("Couldn't get filename from path: ", path);
+                continue;
+            }
+            data_types[filename] = await this.load_local_metadata(path, datatypeModules);
+        }
+        let interface_meta: Record<string, BaseMetadata> = {};
+        for (const path in interfaceModules) {
+            const filename = path.split("/").at(-1)?.replace(".json", "");
+            if (!filename) {
+                console.error("Couldn't get filename from path: ", path);
+                continue;
+            }
+            interface_meta[filename] = await this.load_local_metadata(path, interfaceModules);
+        }
+
+        const local_data: MetadataStoreData = {
+            header: null,
+            node_types: node_types,
+            data_types: data_types,
+            interface: interface_meta
+        };
+        this._metadata_controller.insertMetadata(LOCAL_DATA_ID, local_data);
+        return local_data;
     }
 
     public allData() {
@@ -54,12 +91,7 @@ export class DocsResolver {
             if (!meta) {
                 const local_path = docs_path.replace(DocsPathSplitter, "/");
                 const full_path = `/src/docs/${local_path}.json`;
-                const loader = datatypeModules[full_path];
-                if (!loader) throw new Error(`Couldn't find metadata for ${datatype_id}`);
-                
-                const raw_module = await loader() as any;
-                const json_data = raw_module.default ?? raw_module;
-                return { type: "datatype", data: json_data };
+                return {type: "datatype", data: await this.load_local_metadata(full_path, datatypeModules)};
             };
             return { type: "datatype", data: meta };
         }
@@ -67,16 +99,19 @@ export class DocsResolver {
         if (docs_path.startsWith(DocsPath.UI)) {
             const ui_path = docs_path.replace(DocsPathSplitter, "/");
             const full_path = `/src/docs/${ui_path}.json`;
-            const loader = interfaceModules[full_path];
-
-            if (!loader) throw new Error(`Couldn't find metadata for UI element. Path: ${docs_path}`);
-
-            const raw_module = await loader() as any;
-            const json_data = raw_module.default ?? raw_module;
-
-            return { type: "interface", data: json_data };
+            return {type: "interface", data: await this.load_local_metadata(full_path, interfaceModules)};
         }
 
         throw new Error(`Invalid docs path format ${docs_path}`);
+    }
+
+    protected async load_local_metadata(full_path: string, modules: Record<string, () => Promise<any>>) {
+        const loader = modules[full_path];
+        if (!loader) throw new Error(`Couldn't find metadata for path: ${full_path}`);
+
+        const raw_module = await loader() as any;
+        const json_data = raw_module.default ?? raw_module;
+
+        return json_data;
     }
 }

@@ -141,5 +141,9 @@ export const TypeDocsContent = (props: {
             header="NodeType"
             content={<div>TODO</div>}
         />
+        <DropdownSection 
+            header="Interface"
+            content={<div>TODO</div>}
+        />
     </div>
 }

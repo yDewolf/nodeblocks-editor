@@ -31,6 +31,7 @@ export class DocsController {
         this.currentDocsPath = currentDocsPath;
         this.setCurrentDocsPath = setCurrentDocsPath;
     
+        this.allDocs = docsResolver.allData();
         const docsDataResource = createResource(currentDocsPath, async (path) => {
             if (!path || isServer) {
                 return undefined;
@@ -43,7 +44,6 @@ export class DocsController {
                 return undefined;
             }
         });
-        this.allDocs = docsResolver.allData();
         this.docsData = docsDataResource[0];
     }
 }

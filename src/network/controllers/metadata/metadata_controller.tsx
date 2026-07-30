@@ -5,12 +5,14 @@ import { Metadata, MetadataHeader, MetadataVersion, parse_header } from "../../.
 import { NodeTypeMeta, DataTypeMeta, ParameterMeta, SlotMeta, parse_node_types, parse_data_types, parse_node_type } from "../../../wrapper/metadata/type_metadata";
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 import { createSignal } from "solid-js";
+import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
 
 const METADATA_CACHE_KEY = "type_metadata_cache"
 export interface MetadataStoreData {
     header: MetadataHeader | null; 
     node_types: Record<string, NodeTypeMeta>;
     data_types: Record<string, DataTypeMeta>;
+    interface?: Record<string, BaseMetadata>;
 }
 
 export class MetadataController {
@@ -47,6 +49,10 @@ export class MetadataController {
         this._client.add_handler(ServerMessages.METADATA_UPDATED, (message) => {
             this.request_metadata();
         });
+    }
+
+    public insertMetadata(id: string, metadata: MetadataStoreData) {
+        this.setStore(id, reconcile(metadata));
     }
 
     private get current_types_id(): string | undefined {
@@ -116,7 +122,7 @@ export class MetadataController {
                 data_types: data_types
             };
             
-            this.setStore(header_meta.types_id, reconcile(data));
+            this.insertMetadata(header_meta.types_id, data);
             this.current_types_id = header_meta.types_id;
             console.log("Fetched meta: ", header_meta);
 
