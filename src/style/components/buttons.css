@@ -1,8 +1,3 @@
-select {
-    background-color: var(--overlay-highlight);
-    border-color: var(--stroke-color);
-}
-
 @keyframes animate_open {
     0% { height: 0; }
     100% {  }

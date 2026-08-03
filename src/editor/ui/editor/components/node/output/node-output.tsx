@@ -16,7 +16,6 @@ export const OutputSelector = (props: {output_renderer: DefaultRenderers | undef
             <Match when={props.output_renderer === DefaultRenderers.ARRAY}>
                 <ArrayView output_value={props.output_value?.[1]}/>
             </Match>
-
             <Match when={props.output_renderer === DefaultRenderers.TEXT}>
                 <div class="custom-view">JSON: {JSON.stringify(props.output_value?.[1])}</div>
             </Match>

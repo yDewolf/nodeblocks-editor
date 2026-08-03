@@ -57,7 +57,7 @@ const DataTypeAttributes = (props: {
         <div class="text-section">
             <h3>Attributes</h3>
             <SimpleField field_name="Base" field_displayer={
-                () => <a href={`#docs=${DocsPath.DATATYPE}${DocsPathSplitter}${props.datatype?.base}`}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></a>
+                () => <a class="field-link" href={`#docs=${DocsPath.DATATYPE}${DocsPathSplitter}${props.datatype?.base}`}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></a>
             } field_id={props.datatype?.type_id + "-base"}/>
             <SimpleField field_name="Renderer" field_displayer={
                 () => <FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.renderer} id={props.datatype?.type_id + "-renderer"}/>}/>
@@ -98,7 +98,7 @@ const DataTypePreview = (props: {
                 </button>
             </div>
 
-            <div>
+            <div class="container fill">
                 <GenParamsEditor 
                     renderer={props.datatype?.renderer} 
                     params={genParams} 
@@ -119,13 +119,14 @@ export const GenParamsEditor = (props: {
     return (
         <div class="fill container">
             <Switch fallback={
-                <span>Sem parâmetros disponíveis para este Renderer.</span>
+                <span>No parameters available for this renderer</span>
             }>
                 <Match when={props.renderer === DefaultRenderers.SCALAR}>
-                    <div class="container">
+                    <div class="fill container">
                         <div class="field-holder">
                             <SimpleField field_name="Min" field_displayer={
                                 () => <FieldValueDisplayer value_element={() => <input 
+                                    class="fill"
                                     type="number" 
                                     value={props.params.scalar?.value_range?.min ?? ""} 
                                     oninput={(e) => props.setParams(p => ({
@@ -138,6 +139,7 @@ export const GenParamsEditor = (props: {
                         <div class="field-holder">
                             <SimpleField field_name="Max" field_displayer={
                                 () => <FieldValueDisplayer value_element={() => <input 
+                                    class="fill"
                                     type="number" 
                                     value={props.params.scalar?.value_range?.max ?? ""} 
                                     oninput={(e) => props.setParams(p => ({
@@ -151,7 +153,7 @@ export const GenParamsEditor = (props: {
                 </Match>
                 <Match when={props.renderer === DefaultRenderers.ARRAY}>
                     <div class="row-container fill">
-                        <div class="container">
+                        <div class="fill container">
                             <div class="field-holder">
                                 <SimpleField field_name="Shape" field_displayer={
                                     () => <FieldValueDisplayer value_element={() => <input 
@@ -200,6 +202,7 @@ export const GenParamsEditor = (props: {
                     <div class="field-holder">
                         <SimpleField field_name="SampleText" field_displayer={
                             () => <FieldValueDisplayer value_element={() => <input 
+                                class="fill"
                                 type="text"
                                 onInput={(e) => props.setParams(p => ({
                                     ...p,

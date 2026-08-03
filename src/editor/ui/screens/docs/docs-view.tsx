@@ -6,10 +6,12 @@ import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import CodeIcon from "~/assets/icons/code.svg";
 import { NodeDocsContent } from "./node-docs";
-import { InterfaceDocsContent } from "./interface-docs";
+import { InterfaceDocsContent } from './interface-docs';
 import { DataTypeDocsContent } from "./datatype-docs";
 import { DropdownSection } from "../../components/panels/dropdown";
 import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
+import { DocsPath as DocPathPrefix } from '../../../../network/controllers/docs/docs-interfaces';
+import { DocsPathSplitter } from "~/singletons/metadata";
 
 export const DocsView = (props: {current_tool?: EditorTool, scene_controller: SceneController}) => {
     const docs = useDocs();
@@ -85,16 +87,16 @@ const DocsContentSelector = (props: {
 
 
 const make_docs_index = (docs_record: Record<string, MetadataStoreData>) => {
-    const type_doc_ids = new Map(Object.entries(docs_record)).keys().toArray();
+    const type_doc_ids: string[] = Object.keys(docs_record);
     let flattened_index: string[] = [];
     let index: Map<string, string> = new Map();
     type_doc_ids.forEach((id) => {
-        // TODO: finish this thing, my pc is dying now bye
-        const datatype_keys = new Map(Object.entries(docs_record[id].data_types)).keys().toArray()
-        const nodetype_keys = new Map(Object.entries(docs_record[id].node_types)).keys().toArray()
-        flattened_index = [...flattened_index, ...datatype_keys, ...nodetype_keys];
+        const datatype_keys = Object.keys(docs_record[id].data_types ?? []);
+        const nodetype_keys = Object.keys(docs_record[id].node_types ?? []);
+        const interface_keys = Object.keys(docs_record[id].interface ?? []);
+        flattened_index = [...flattened_index, ...datatype_keys, ...nodetype_keys, ...interface_keys];
     });
-
+    
     return [flattened_index, index];
 }
 export const DocsSidebar = (props: {
@@ -102,11 +104,10 @@ export const DocsSidebar = (props: {
 }) => {
     const docs = useDocs();
     const loaded_docs = createMemo(() => {
-        console.log(docs.allDocs);
         return new Map(Object.entries(docs.allDocs)).keys().toArray();
     });
     return (
-        <div class="fill keep container">
+        <div class="scrollable fill keep container">
             <For each={loaded_docs()}>
                 {(type_id, idx) => {
                     const data = docs.allDocs[type_id];
@@ -132,18 +133,41 @@ export const TypeDocsContent = (props: {
 }) => {
     return <div class="fill container">
         {/* TODO: path toward DataType or NodeType */}
-        <DropdownSection 
-            header="DataType"
-            header_class="fill"
-            content={<div>TODO</div>}
-        />
-        <DropdownSection 
-            header="NodeType"
-            content={<div>TODO</div>}
-        />
-        <DropdownSection 
-            header="Interface"
-            content={<div>TODO</div>}
-        />
+        <Show when={props.data.data_types != undefined ? Object.keys(props.data.data_types).length != 0 : false}>
+            <DropdownSection 
+                header="DataType"
+                content={<div class="fill container">
+                    <For each={Object.keys(props.data.data_types ?? [])}>
+                        {(id) => {
+                            return <a href={"#docs=" + DocPathPrefix.DATATYPE + DocsPathSplitter + id}>{id}</a>
+                        }}
+                    </For>
+                </div>}
+            />
+        </Show>
+        <Show when={props.data.node_types != undefined ? Object.keys(props.data.node_types).length != 0 : false}>
+            <DropdownSection 
+                header="NodeType"
+                content={<div class="fill container">
+                    <For each={Object.keys(props.data.node_types ?? [])}>
+                        {(id) => {
+                            return <a href={"#docs=" + DocPathPrefix.NODE + DocsPathSplitter + id}>{id}</a>
+                        }}
+                    </For>
+                </div>}
+            />
+        </Show>
+        <Show when={props.data.interface != undefined ? Object.keys(props.data.interface).length != 0 : false}>
+            <DropdownSection 
+                header="Interface"
+                content={<div class="fill container">
+                    <For each={Object.keys(props.data.interface ?? [])}>
+                        {(id) => {
+                            return <a href={"#docs=" + DocPathPrefix.UI + DocsPathSplitter + id}>{id}</a>
+                        }}
+                    </For>
+                </div>}
+            />
+        </Show>
     </div>
 }
