@@ -13,7 +13,7 @@ import OutputIcon from "~/assets/icons/output.svg";
 import ToolIcon from "~/assets/icons/tool.svg";
 import FilterIcon from "~/assets/icons/filter.svg";
 import { DocsPathSplitter } from "~/singletons/metadata";
-import { DocsPath } from "~/network/controllers/docs/docs-interfaces";
+import { DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
 import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 
 
@@ -95,7 +95,7 @@ const SlotDropdownItem = (props: {
         const badge_list: DropdownBadge[] = [
             {
                 label: resolve_slot_type_label(props.slot_data),
-                href: `#docs=${DocsPath.DATATYPE}${DocsPathSplitter}${props.datatype?.type_id}`,
+                href: `#docs=${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${props.datatype?.type_id}`,
                 icon: props.slot_data.is_input ? <InputIcon class="tag-icon" /> : <OutputIcon class="tag-icon" />
             }
         ];

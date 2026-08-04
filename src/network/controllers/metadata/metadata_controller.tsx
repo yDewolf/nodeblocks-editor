@@ -6,6 +6,7 @@ import { NodeTypeMeta, DataTypeMeta, ParameterMeta, SlotMeta, parse_node_types, 
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 import { createSignal } from "solid-js";
 import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
+import { DocsPathPrefix } from "../docs/docs-interfaces";
 
 const METADATA_CACHE_KEY = "type_metadata_cache"
 export interface MetadataStoreData {
@@ -13,6 +14,14 @@ export interface MetadataStoreData {
     node_types: Record<string, NodeTypeMeta>;
     data_types: Record<string, DataTypeMeta>;
     interface?: Record<string, BaseMetadata>;
+}
+
+// Must have the same keys as MetadataStoreData interface
+export const PathPrefixMap: Record<string, DocsPathPrefix> = {
+    "header": DocsPathPrefix.HEADER,
+    "node_types": DocsPathPrefix.NODE,
+    "data_types": DocsPathPrefix.DATATYPE,
+    "interface": DocsPathPrefix.UI,
 }
 
 export class MetadataController {

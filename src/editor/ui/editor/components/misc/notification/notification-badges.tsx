@@ -1,5 +1,5 @@
 import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
-import { timeSignal } from "~/editor/utils/time-ticker";
+import { timeSignal } from "~/editor/utils/time-utils";
 import { NotificationController } from "~/network/controllers/notification_controller";
 import { NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta, ServerNotification } from "~/network/websocket/requests/notifications";
 import { Vector2 } from "~/wrapper/data_types/geometry";

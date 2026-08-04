@@ -124,7 +124,7 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
     )
 }
 
-export const DocsTags = (props: {docs_data?: DocPayload}) => {
+export const DocsTags = (props: {docs_data?: DocPayload, section_title?: string}) => {
     const data_tags = createMemo(() => {
         const data = props.docs_data;
         if (!data) return [];
@@ -133,13 +133,17 @@ export const DocsTags = (props: {docs_data?: DocPayload}) => {
             return get_node_tags(data.data);
         }
 
+        if (data.type === "header") {
+            return Object.values(data.data.tags);
+        }
+
         return []
     });
 
     return (
         <Show when={data_tags().length > 0}>
             <div class="text-section">
-                <h3>Tags</h3>
+                <h3>{props.section_title ?? "Tags"}</h3>
                 <div class="tag-holder row-container keep fill">
                     <For each={data_tags()}>
                         {(tag, idx) => {

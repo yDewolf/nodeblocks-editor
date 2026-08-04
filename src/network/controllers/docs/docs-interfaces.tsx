@@ -11,11 +11,11 @@ export type DocPayload =
     | { type: "node"; data: NodeTypeMeta }
     | { type: "datatype"; data: DataTypeMeta }
     | { type: "interface"; data: InterfaceElementMeta }
-    // TODO: Implement header metadata stuff
-    // | { type: "header"; data: MetadataHeader }
+    | { type: "header"; data: MetadataHeader }
 ;
 
-export enum DocsPath {
+export enum DocsPathPrefix {
+    HEADER = "",
     NODE = "nodetypes",
     DATATYPE = "datatypes",
     UI = "interface"

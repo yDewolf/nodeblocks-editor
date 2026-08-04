@@ -4,7 +4,7 @@ import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { DataTypeMeta } from "~/wrapper/metadata/type_metadata";
 import { OutputSelector } from '../../editor/components/node/output/node-output';
 import { FieldValueDisplayer, SimpleField } from "../../components/input-fields";
-import { DocsPath } from "~/network/controllers/docs/docs-interfaces";
+import { DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
 import { BaseDataType, DataTypeUtils, DefaultRenderers } from "~/wrapper/nodes/data/node-data-type";
 import { DataTypeGenParams, generate_datatype_random_value } from '../../../../wrapper/nodes/data/data-type-value-utils';
 import RefreshIcon from '~/assets/icons/refresh.svg';
@@ -57,7 +57,7 @@ const DataTypeAttributes = (props: {
         <div class="text-section">
             <h3>Attributes</h3>
             <SimpleField field_name="Base" field_displayer={
-                () => <a class="field-link" href={`#docs=${props.datatype?.root_id}${DocsPathSplitter}${DocsPath.DATATYPE}${DocsPathSplitter}${props.datatype?.base}`}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></a>
+                () => <a class="field-link" href={`#docs=${props.datatype?.root_id}${DocsPathSplitter}${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${props.datatype?.base}`}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></a>
             } field_id={props.datatype?.type_id + "-base"}/>
             <SimpleField field_name="Renderer" field_displayer={
                 () => <FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.renderer} id={props.datatype?.type_id + "-renderer"}/>}/>

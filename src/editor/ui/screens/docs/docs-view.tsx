@@ -9,10 +9,11 @@ import { NodeDocsContent } from "./node-docs";
 import { InterfaceDocsContent } from './interface-docs';
 import { DataTypeDocsContent } from "./datatype-docs";
 import { DropdownSection } from "../../components/panels/dropdown";
-import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
-import { DocsPath as DocPathPrefix } from '../../../../network/controllers/docs/docs-interfaces';
+import { MetadataStoreData, PathPrefixMap } from "~/network/controllers/metadata/metadata_controller";
+import { DocsPathPrefix } from '../../../../network/controllers/docs/docs-interfaces';
 import { DocsPathSplitter } from "~/singletons/metadata";
 import { BaseMetadata } from '../../../../wrapper/metadata/base_metadata';
+import { HeaderDocsContent } from "./header-docs";
 
 export const DocsView = (props: {current_tool?: EditorTool, scene_controller: SceneController}) => {
     const docs = useDocs();
@@ -28,9 +29,6 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
     })
 
     const [devMode, setDevMode] = createSignal(false);
-    const capitalized_name = (docs_data()?.data.capitalized_name);
-    const description = docs_data()?.data.description;
-
     return (
         <div class="docs-view-body">
             <div class="docs-left-panel">
@@ -46,10 +44,12 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
                 <Show when={docs_data()} fallback={
                     <h2>Couldn't find documentation</h2>
                 }>
-                    <DocsTags docs_data={docs_data()}/>
+                    <Show when={docs_data()?.type != "header"}>
+                        <DocsTags docs_data={docs_data()}/>
+                    </Show>
                     <div class="text-section">
-                        <h2>{(capitalized_name)}</h2>
-                        <p>{(description) == "" || undefined ? "No Description" : (description)}</p>
+                        <h2>{(docs_data()?.data.capitalized_name)}</h2>
+                        <p>{(docs_data()?.data.description) == "" || undefined ? "No Description" : (docs_data()?.data.description)}</p>
                     </div>
                     <DocsContentSelector path={docs.currentDocsPath} docs_data={docs_data()} scene_controller={props.scene_controller} devMode={devMode()}/>
                 </Show>
@@ -76,6 +76,9 @@ const DocsContentSelector = (props: {
         <Switch fallback={
             <span>No implementation for documentation type {props.docs_data.type}</span>
         }>
+            <Match when={props.docs_data.type === "header"}>
+                <HeaderDocsContent path={props.path} scene_controller={props.scene_controller} data={props.docs_data.type === "header" ? props.docs_data.data : undefined} devMode={props.devMode}/>            
+            </Match>
             <Match when={props.docs_data.type === "node"}>
                 <NodeDocsContent path={props.path} scene_controller={props.scene_controller} data={props.docs_data.type === "node" ? props.docs_data.data : undefined} devMode={props.devMode}/>            
             </Match>
@@ -137,18 +140,27 @@ export const TypeDocsContent = (props: {
     data: MetadataStoreData
 }) => {
     return <div class="fill container">
+        {/* Procedural way of generating these dropdowns */}
+        {/* <For each={Object.keys(props.data)}>
+            {(key: string) => {
+                return (
+                    <TypeSubgroup data={(props.data as Record<string, any>)[key]} header={key} docs_prefix={PathPrefixMap[key]} root_id={props.root_id}/>
+                )
+            }}
+        </For> */}
+
         {/* TODO: implement header metadata linking stuff */}
-        {/* <a href={"#docs=" + props.root_id}>header</a> */}
-        <TypeSubgroup data={props.data.data_types} header="DataTypes" docs_prefix={DocPathPrefix.DATATYPE} root_id={props.root_id}/>
-        <TypeSubgroup data={props.data.node_types} header="NodeTypes" docs_prefix={DocPathPrefix.NODE} root_id={props.root_id}/>
-        <TypeSubgroup data={props.data.interface} header="Interface" docs_prefix={DocPathPrefix.UI} root_id={props.root_id}/>
+        <a href={"#docs=" + props.root_id}>header</a>
+        <MetadataStoreSubContent data={props.data.data_types} header="datatypes" docs_prefix={DocsPathPrefix.DATATYPE} root_id={props.root_id}/>
+        <MetadataStoreSubContent data={props.data.node_types} header="nodetypes" docs_prefix={DocsPathPrefix.NODE} root_id={props.root_id}/>
+        <MetadataStoreSubContent data={props.data.interface} header="interface" docs_prefix={DocsPathPrefix.UI} root_id={props.root_id}/>
     </div>
 }
 
-const TypeSubgroup = (props: {
+export const MetadataStoreSubContent = (props: {
     data?: Record<string, any>,
     header: string,
-    docs_prefix: DocPathPrefix,
+    docs_prefix: DocsPathPrefix,
     root_id: string
 }) => {
     if (!props.data) {
@@ -158,7 +170,7 @@ const TypeSubgroup = (props: {
     return (
         <Show when={props.data != undefined ? Object.keys(props.data).length != 0 : false}>
             <DropdownSection 
-                header={props.header}
+                header_content={() => <div class="fill keep row-container">{props.header}</div>}
                 content={<div class="fill container">
                     <For each={Object.keys(props.data ?? [])}>
                         {(id) => {
