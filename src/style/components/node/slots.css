@@ -16,13 +16,6 @@
   overflow: hidden;
 }
 
-.slot-label:hover {
-  z-index: 1;
-  text-overflow: clip;
-  overflow: visible;
-  background-color: var(--selection-color-alpha);
-}
-
 .slot-dot {
   pointer-events: auto;
   width: 12px;

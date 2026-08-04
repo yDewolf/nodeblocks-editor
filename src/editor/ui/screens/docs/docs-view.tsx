@@ -12,6 +12,7 @@ import { DropdownSection } from "../../components/panels/dropdown";
 import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
 import { DocsPath as DocPathPrefix } from '../../../../network/controllers/docs/docs-interfaces';
 import { DocsPathSplitter } from "~/singletons/metadata";
+import { BaseMetadata } from '../../../../wrapper/metadata/base_metadata';
 
 export const DocsView = (props: {current_tool?: EditorTool, scene_controller: SceneController}) => {
     const docs = useDocs();
@@ -157,17 +158,36 @@ export const TypeDocsContent = (props: {
                 </div>}
             />
         </Show>
-        <Show when={props.data.interface != undefined ? Object.keys(props.data.interface).length != 0 : false}>
+        <TypeSubgroup data={props.data.interface} header="Interface" docs_prefix={DocPathPrefix.UI}/>
+    </div>
+}
+
+const TypeSubgroup = (props: {
+    data?: Record<string, any>,
+    header: string,
+    docs_prefix: DocPathPrefix
+}) => {
+    if (!props.data) {
+        return undefined;
+    }
+
+    return (
+        <Show when={props.data != undefined ? Object.keys(props.data).length != 0 : false}>
             <DropdownSection 
-                header="Interface"
+                header={props.header}
                 content={<div class="fill container">
-                    <For each={Object.keys(props.data.interface ?? [])}>
+                    <For each={Object.keys(props.data ?? [])}>
                         {(id) => {
-                            return <a href={"#docs=" + DocPathPrefix.UI + DocsPathSplitter + id}>{id}</a>
+                            if (!props.data) {
+                                return undefined;
+                            }
+                            const type_data = props.data[id] as BaseMetadata;
+                            const name = type_data.capitalized_name != "" ? type_data.capitalized_name : id;
+                            return <a href={"#docs=" + props.docs_prefix + DocsPathSplitter + id}>{name}</a>
                         }}
                     </For>
                 </div>}
             />
         </Show>
-    </div>
+    )
 }

@@ -61,7 +61,7 @@ export const NodeFieldSelector = (props: {
     return (
         <div class="field-grid">
             <Show when={!props.hide_label}>
-                <label class="field-label" for={field_id}>{props.parameter._field_id}</label>
+                <label class="field-label highlightable" title={props.parameter._field_id} for={field_id}>{props.parameter._field_id}</label>
             </Show>
             <Switch fallback={
                 <NumberField

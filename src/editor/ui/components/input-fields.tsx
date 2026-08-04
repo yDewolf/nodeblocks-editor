@@ -7,7 +7,7 @@ export const SimpleField = (props: {
 }) => {
     return (
         <div class="field-grid fill">
-            <label class="field-label" for={props.field_id}>{props.field_name}</label>
+            <label class="field-label" title={props.field_name} for={props.field_id}>{props.field_name}</label>
             {props.field_displayer()}
         </div>
     )

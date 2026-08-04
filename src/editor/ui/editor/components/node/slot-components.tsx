@@ -29,13 +29,14 @@ export class SlotComponent {
         onClick: (slot: NodeSlot) => void,
         onHover: (slot: NodeSlot) => void
     ) => {
-        return <_SlotComponent onHover={onHover} onClick={onClick} show_label={show_label} slot={this.slot}/>
+        return <_SlotComponent highlightable={true} onHover={onHover} onClick={onClick} show_label={show_label} slot={this.slot}/>
     }
 
 }
 export const _SlotComponent = (props: {
     slot: NodeSlot,
     show_label: boolean,
+    highlightable?: boolean,
     node_meta?: NodeTypeMeta,
     onClick: (slot: NodeSlot) => void,
     onHover: (slot: NodeSlot) => void,
@@ -68,7 +69,7 @@ export const _SlotComponent = (props: {
                 }}
             ></div>
             <Show when={props.show_label}>
-                <span class="slot-label">{slot_label}</span>
+                <span class="slot-label" classList={{"highlightable": props.highlightable}}>{slot_label}</span>
             </Show>
         </div>
     )
@@ -77,7 +78,8 @@ export const _SlotComponent = (props: {
 export const SlotHeader = (props: {
     slot_data: SlotData,
     slot_meta: SlotMeta,
-    slot_id: string
+    slot_id: string,
+    highlightable?: boolean,
 }) => { 
     const slot_label = props.slot_meta ? props.slot_meta.capitalized_name : props.slot_id;
     return (
@@ -89,7 +91,7 @@ export const SlotHeader = (props: {
             }}
         >
             <div class="slot-dot"></div>
-            <span class="slot-label">{slot_label}</span>
+            <span class="slot-label" classList={{"highlightable": props.highlightable}}>{slot_label}</span>
         </div>
     )
 }

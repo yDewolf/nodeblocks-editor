@@ -22,6 +22,13 @@ select:focus-visible, input:focus-visible {
   }
 }
 
+.field-label {
+    align-self: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 .field-section {
     display: flex;
     flex-direction: column;
