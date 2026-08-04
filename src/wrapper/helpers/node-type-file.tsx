@@ -165,6 +165,7 @@ export class NodeTypeFile {
 
         json_data.data_types.forEach((type_data, type_id) => {
             const custom_data_type = new CustomDataType(
+                json_data.id,
                 type_id,
                 type_data.base,
                 type_data.default_renderer,
@@ -185,6 +186,7 @@ export class NodeTypeFile {
             json_data.node_types.forEach((type_data, type_id) => {
                 const node_data: NodeData = new NodeData(type_data.parameters);
                 const custom_type_constructor = new CustomNodeConstructor(
+                    json_data.id,
                     type_id,
                     node_data,
                     type_data.slots,

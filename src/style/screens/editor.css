@@ -21,8 +21,11 @@
   background-image: repeating-linear-gradient(var(--grid-color) 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, var(--grid-color) 0 1px, transparent 1px 100%);
 }
 
-.editor-ui {
+.editor-view {
   color: var(--font-color);
+}
+
+.editor-ui {
   stroke: var(--font-color);
   
   z-index: 2;

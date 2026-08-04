@@ -18,6 +18,7 @@ export const DocsElementIndicator = (props: {
     tool_controller: ToolController, 
     editor_camera: EditorCamera, 
     world_space_ref?: HTMLDivElement,
+    editor_view_ref?: HTMLDivElement,
     open_docs_page: () => void,
     docsPageVisible: () => boolean
 }) => {
@@ -149,7 +150,7 @@ export const DocsElementIndicator = (props: {
     return (
         <>
             <Show when={target() != null && isToolActive()}>
-                <Portal mount={isInsideGraph() ? props.world_space_ref : document.body}>
+                <Portal mount={isInsideGraph() ? props.world_space_ref : props.editor_view_ref}>
                     <div 
                         class="selected-docs-indicator" 
                         classList={{"in-graph": isInsideGraph()}}
@@ -158,7 +159,7 @@ export const DocsElementIndicator = (props: {
                 </Portal>
             </Show>
             <Show when={docs.selectedDocElement() && isToolActive() && !props.docsPageVisible()}>
-                <Portal mount={isSelectedInsideGraph() ? props.world_space_ref : document.body}>
+                <Portal mount={isSelectedInsideGraph() ? props.world_space_ref : props.editor_view_ref}>
                     <div
                         ref={PopupRef}
                         class="container selected-docs-popup"

@@ -8,6 +8,7 @@ import { BaseSlotType } from "../nodes/data/slot-types";
 
 
 export class BaseNodeConstructor {
+    root_id: string;
     type_id: string;
 
     _data_model: NodeData
@@ -15,7 +16,8 @@ export class BaseNodeConstructor {
     _slots: Map<string, SlotData>;
     _slot_types: Map<string, BaseSlotType>;
 
-    constructor(type_id: string) {
+    constructor(root_type: string, type_id: string) {
+        this.root_id = root_type;
         this.type_id = type_id
         
         this._data_model = new NodeData(new Map());
@@ -25,7 +27,7 @@ export class BaseNodeConstructor {
 
     public make_node(node_name: string, position: Vector2, id: string = "", node_data: Map<string, any> | undefined = undefined): GraphNode {
         const node = new GraphNode(
-            node_name, new NodeData(this._data_model.raw_parameters), position, id, this.type_id
+            this.type_id, this.root_id, node_name, new NodeData(this._data_model.raw_parameters), position, id
         );
         if (node_data) {
             node_data.entries().forEach(([key, value]) => {
@@ -82,8 +84,8 @@ export class BaseNodeConstructor {
 }
 
 export class CustomNodeConstructor extends BaseNodeConstructor {
-    constructor(type_id: string, data: NodeData, slots: Map<string, SlotData>, slot_types: Map<string, BaseSlotType>) {
-        super(type_id);
+    constructor(root_type: string, type_id: string, data: NodeData, slots: Map<string, SlotData>, slot_types: Map<string, BaseSlotType>) {
+        super(root_type, type_id);
         
         this._data_model = data;
         this._slots = slots;

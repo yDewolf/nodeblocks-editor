@@ -82,27 +82,28 @@ export class DocsTool extends BaseEditorTool {
             e.stopPropagation();
 
             const docs_id = docs_element.getAttribute("docs-id");
-            if (docs_id) {
+            const root_id = docs_element.getAttribute("docs-root");
+            if (docs_id && root_id) {
                 this._set_last_pos({x: e.clientX, y: e.clientY});
-                this.selected_docs_path = make_ui_docs_path(docs_id);
+                this.selected_docs_path = make_ui_docs_path(root_id, docs_id);
             }
         }
     }
 
     onClickOnNodeSlot(slot: NodeSlot): void {
         // Select DataType type id as path
-        this.selected_docs_path = make_datatype_docs_path(undefined, slot)
+        this.selected_docs_path = make_datatype_docs_path(slot.data_type.root_id, undefined, slot)
         this._set_last_pos(undefined);
     }
 
     onClickOnNodePreview(node_preview: NodeTypePreview): void {
-        this.selected_docs_path = make_node_docs_path(undefined, node_preview.node_constructor.type_id)    
+        this.selected_docs_path = make_node_docs_path(node_preview.node_constructor.root_id, undefined, node_preview.node_constructor.type_id)    
         this._set_last_pos(undefined);
     }
 
     onClickOnNode(node: GraphNode): void {
         // Select Node type id as path
-        this.selected_docs_path = make_node_docs_path(node);
+        this.selected_docs_path = make_node_docs_path(node.root_id, node);
         this._set_last_pos(undefined);
     }
 }

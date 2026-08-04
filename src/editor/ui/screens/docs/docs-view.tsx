@@ -28,6 +28,9 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
     })
 
     const [devMode, setDevMode] = createSignal(false);
+    const capitalized_name = (docs_data()?.data.capitalized_name);
+    const description = docs_data()?.data.description;
+
     return (
         <div class="docs-view-body">
             <div class="docs-left-panel">
@@ -45,8 +48,8 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
                 }>
                     <DocsTags docs_data={docs_data()}/>
                     <div class="text-section">
-                        <h2>{docs_data()?.data.capitalized_name}</h2>
-                        <p>{(docs_data()?.data.description) == "" || undefined ? "No Description" : (docs_data()?.data.description)}</p>
+                        <h2>{(capitalized_name)}</h2>
+                        <p>{(description) == "" || undefined ? "No Description" : (description)}</p>
                     </div>
                     <DocsContentSelector path={docs.currentDocsPath} docs_data={docs_data()} scene_controller={props.scene_controller} devMode={devMode()}/>
                 </Show>
@@ -105,7 +108,7 @@ export const DocsSidebar = (props: {
 }) => {
     const docs = useDocs();
     const loaded_docs = createMemo(() => {
-        return new Map(Object.entries(docs.allDocs)).keys().toArray();
+        return Object.keys(docs.allDocs);
     });
     return (
         <div class="scrollable fill keep container">
@@ -117,7 +120,7 @@ export const DocsSidebar = (props: {
                             header={type_id}
                             header_class=""
                             content={
-                                <TypeDocsContent type_id={type_id} data={data}/>
+                                <TypeDocsContent type_id={type_id} data={data} root_id={type_id}/>
                             }
                         />
                     )
@@ -130,42 +133,23 @@ export const DocsSidebar = (props: {
 // TODO: Move these elements to another file
 export const TypeDocsContent = (props: {
     type_id: string,
+    root_id: string,
     data: MetadataStoreData
 }) => {
     return <div class="fill container">
-        {/* TODO: path toward DataType or NodeType */}
-        <Show when={props.data.data_types != undefined ? Object.keys(props.data.data_types).length != 0 : false}>
-            <DropdownSection 
-                header="DataType"
-                content={<div class="fill container">
-                    <For each={Object.keys(props.data.data_types ?? [])}>
-                        {(id) => {
-                            return <a href={"#docs=" + DocPathPrefix.DATATYPE + DocsPathSplitter + id}>{id}</a>
-                        }}
-                    </For>
-                </div>}
-            />
-        </Show>
-        <Show when={props.data.node_types != undefined ? Object.keys(props.data.node_types).length != 0 : false}>
-            <DropdownSection 
-                header="NodeType"
-                content={<div class="fill container">
-                    <For each={Object.keys(props.data.node_types ?? [])}>
-                        {(id) => {
-                            return <a href={"#docs=" + DocPathPrefix.NODE + DocsPathSplitter + id}>{id}</a>
-                        }}
-                    </For>
-                </div>}
-            />
-        </Show>
-        <TypeSubgroup data={props.data.interface} header="Interface" docs_prefix={DocPathPrefix.UI}/>
+        {/* TODO: implement header metadata linking stuff */}
+        {/* <a href={"#docs=" + props.root_id}>header</a> */}
+        <TypeSubgroup data={props.data.data_types} header="DataTypes" docs_prefix={DocPathPrefix.DATATYPE} root_id={props.root_id}/>
+        <TypeSubgroup data={props.data.node_types} header="NodeTypes" docs_prefix={DocPathPrefix.NODE} root_id={props.root_id}/>
+        <TypeSubgroup data={props.data.interface} header="Interface" docs_prefix={DocPathPrefix.UI} root_id={props.root_id}/>
     </div>
 }
 
 const TypeSubgroup = (props: {
     data?: Record<string, any>,
     header: string,
-    docs_prefix: DocPathPrefix
+    docs_prefix: DocPathPrefix,
+    root_id: string
 }) => {
     if (!props.data) {
         return undefined;
@@ -183,7 +167,7 @@ const TypeSubgroup = (props: {
                             }
                             const type_data = props.data[id] as BaseMetadata;
                             const name = type_data.capitalized_name != "" ? type_data.capitalized_name : id;
-                            return <a href={"#docs=" + props.docs_prefix + DocsPathSplitter + id}>{name}</a>
+                            return <a href={"#docs=" + props.root_id + DocsPathSplitter + props.docs_prefix + DocsPathSplitter + id}>{name}</a>
                         }}
                     </For>
                 </div>}

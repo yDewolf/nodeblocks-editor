@@ -135,33 +135,33 @@ export class MetadataController {
         return this.store;
     }
 
-    public get_header() {
-        const id = this.current_types_id;
+    public get_header(root_id?: string) {
+        const id = root_id ?? this.current_types_id;
         return id ? this.store[id]?.header : null;
     }
 
-    public get_categories() {
-        const id = this.current_types_id;
+    public get_categories(root_id?: string) {
+        const id = root_id ?? this.current_types_id;
         return id ? this.store[id]?.header?.categories : undefined;
     }
 
-    public get_tags() {
-        const id = this.current_types_id;
+    public get_tags(root_id?: string) {
+        const id = root_id ?? this.current_types_id;
         return id ? this.store[id]?.header?.tags : undefined;
     }
     
-    public get_node_meta(type_id: string) {
-        const id = this.current_types_id;
+    public get_node_meta(type_id: string, root_id?: string) {
+        const id = root_id ?? this.current_types_id;
         return id ? this.store[id]?.node_types[type_id] : undefined;
     }
 
-    public get_datatype_meta(datatype_id: string) {
-        const id = this.current_types_id;
+    public get_datatype_meta(datatype_id: string, root_id?: string) {
+        const id = root_id ?? this.current_types_id;
         return id ? this.store[id]?.data_types[datatype_id] : undefined;
     }
 
-    public get_all_nodes() {
-        const id = this.current_types_id;
+    public get_all_nodes(root_id?: string) {
+        const id = root_id ?? this.current_types_id;
         return id ? this.store[id]?.node_types : {};
     }
 }

@@ -39,6 +39,7 @@ export class BaseDataType {
         public type_whitelist: DefaultDataTypes[] = [],
         public name_whitelist: string[] = [],
         renderer: DefaultRenderers | undefined  = undefined,
+        public root_id: string = "builtin",
     ) {
         if (renderer == undefined) {
             renderer = _match_renderer(this.base)

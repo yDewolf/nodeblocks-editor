@@ -21,7 +21,6 @@ export class NodeController {
 
     constructor() {
         this._node_constructors = new Map();
-        this._node_constructors.set("default", new BaseNodeConstructor("default"))
 
         const [nodes, setNodes] = createSignal<GraphNode[]>([])
         this._nodes = nodes;

@@ -314,6 +314,7 @@ export class NodeEditor {
         this._set_docs_controller(useDocs());
         let viewportRef: HTMLDivElement | undefined;
         let world_space_ref: HTMLDivElement | undefined;
+        let editor_view_ref: HTMLDivElement | undefined;
         onMount(() => {
             if (viewportRef) {
                 const rect = viewportRef.getBoundingClientRect();
@@ -348,6 +349,7 @@ export class NodeEditor {
         return (
             <div 
                 class="editor-view"
+                ref={editor_view_ref}
                 onPointerUp={(e) => {this.input_manager.onPointerUp(e); this.tool_controller.current_tool?.globalOnPointerUp(e)}}
                 onPointerDown={(e) => {this.tool_controller.current_tool?.globalOnPointerDown(e)}}
                 onPointerMove={(e) => this.tool_controller.current_tool?.globalOnPointerMove(e)}
@@ -448,7 +450,6 @@ export class NodeEditor {
                         </For>
                     </div>
                 </div>
-                
                 <div 
                     class="editor-ui" 
                     onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
@@ -457,7 +458,7 @@ export class NodeEditor {
                     <EditorMidTab docs_page={docsPage} page_viewer={this.main_page_viewer} editor={this}/>
                     <EditorRightPanel editor={this} state_controller={this._state_controller}/>
                 </div>
-                <DocsElementIndicator open_docs_page={openDocsPage} docsPageVisible={docsPageVisible} input_manager={this.input_manager} tool_controller={this.tool_controller} editor_camera={this.editor_space.camera} world_space_ref={world_space_ref}/>
+                <DocsElementIndicator open_docs_page={openDocsPage} docsPageVisible={docsPageVisible} input_manager={this.input_manager} tool_controller={this.tool_controller} editor_camera={this.editor_space.camera} world_space_ref={world_space_ref} editor_view_ref={editor_view_ref}/>
             </div>
         );
     }
