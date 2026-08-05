@@ -7,6 +7,17 @@
     overflow-y: scroll;
 }
 
+.docs-sidebar {
+    display: grid;
+    height: stretch;
+    gap: 4px;
+    grid-template-rows: 0.75fr 0.25fr;
+}
+.docs-sidebar > div {
+    border: 1px solid var(--stroke-color);
+    padding: 4px;
+}
+
 .docs-content, .docs-left-panel {
     display: flex;
     flex-direction: column;
@@ -109,6 +120,6 @@
 @media (max-width: 1024px) {
     .docs-view-body {
         grid-template-columns: 1fr;
-        grid-template-rows: 100px minmax(0, 1fr) ;
+        grid-template-rows: 150px minmax(0, 1fr) ;
     }
 }

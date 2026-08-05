@@ -31,7 +31,7 @@ export class DocsTool extends BaseEditorTool {
         
         if (this._selected_docs_path != path) {
             this._selected_docs_path = path;
-            docs.setCurrentDocsPath(this._selected_docs_path);
+            docs.docs_path = this._selected_docs_path;
         }
 
         if (this._selected_docs_path) {

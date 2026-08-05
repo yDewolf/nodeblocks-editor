@@ -18,7 +18,7 @@ import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 
 
 export const NodeDocsContent = (props: {
-    path: () => string | undefined,
+    path: string | undefined,
     data?: NodeTypeMeta,
     scene_controller: SceneController,
     devMode: boolean
@@ -28,7 +28,7 @@ export const NodeDocsContent = (props: {
     }
 
     const constructor = createMemo(() => {
-        const path = props.path() ?? "";
+        const path = props.path ?? "";
         const type_id = path.split(DocsPathSplitter).at(-1);
         if (type_id) {
             const node_constructor = props.scene_controller.node_controller.node_constructors.get(type_id)

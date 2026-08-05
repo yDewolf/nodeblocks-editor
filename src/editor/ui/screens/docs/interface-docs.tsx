@@ -2,7 +2,7 @@ import { InterfaceElementMeta } from "~/network/controllers/docs/docs-interfaces
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 
 export const InterfaceDocsContent = (props: {
-    path: () => string | undefined,
+    path: string | undefined,
     data?: InterfaceElementMeta,
     scene_controller: SceneController,
     devMode: boolean

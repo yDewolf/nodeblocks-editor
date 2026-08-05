@@ -11,7 +11,7 @@ import RefreshIcon from '~/assets/icons/refresh.svg';
 import { createStore } from "solid-js/store";
 
 export const DataTypeDocsContent = (props: {
-    path: () => string | undefined,
+    path: string | undefined,
     data?: DataTypeMeta,
     scene_controller: SceneController,
     devMode: boolean
@@ -21,7 +21,7 @@ export const DataTypeDocsContent = (props: {
     }
     
     const datatype = createMemo(() => {
-        const path = props.path() ?? "";
+        const path = props.path ?? "";
         const type_id = path.split(DocsPathSplitter).at(-1);
         if (type_id) {
             if (props.data?.is_builtin) {

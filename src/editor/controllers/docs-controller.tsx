@@ -5,6 +5,8 @@ import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
 import { getHashParams, setHashParam } from "../utils/url-utils";
 import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
 
+const MAX_DOCS_TABS = 16;
+
 export class DocsController {
     public hoveredDocElement: () => HTMLElement | null;
     public setHoveredDocElement: (element: HTMLElement | null) => void;
@@ -12,8 +14,25 @@ export class DocsController {
     public selectedDocElement: () => HTMLElement | null;
     public setSelectedDocElement: (element: HTMLElement | null) => void;
 
-    public currentDocsPath: () => string | undefined;
-    public setCurrentDocsPath: (path: string | undefined) => void;
+    private _current_docs_path: () => string | undefined;
+    private _set_current_docs_path: (path: string | undefined) => void;
+
+    // TODO: keep this history on localStorage
+    private _docs_history: () => string[];
+    private _set_docs_history: (value: string[]) => void;
+
+    get docs_history() { return this._docs_history(); }
+    private set docs_history(value: string[]) { this._set_docs_history(value); }
+
+    get docs_path() { return this._current_docs_path(); }
+    set docs_path(path: string | undefined) { 
+        this._set_current_docs_path(path);
+
+        if (!path) return;
+        if (!this.docs_history.find((value) => value === path)) {
+            this.docs_history = [...this.docs_history, path];
+        }
+    }
 
     public docsData: Resource<DocPayload | undefined>;
     public allDocs: Record<string, MetadataStoreData>;
@@ -27,12 +46,17 @@ export class DocsController {
         this.selectedDocElement = selectedDocElement;
         this.setSelectedDocElement = setSelectedDocElement;
 
-        const [currentDocsPath, setCurrentDocsPath] = createSignal<string | undefined>(undefined);
-        this.currentDocsPath = currentDocsPath;
-        this.setCurrentDocsPath = setCurrentDocsPath;
+        const [_current_docs_path, _set_current_docs_path] = createSignal<string | undefined>(undefined);
+        this._current_docs_path = _current_docs_path;
+        this._set_current_docs_path = _set_current_docs_path;
     
+        const [docsHistory, setDocsHistory] = createSignal<string[]>([]);
+        this._docs_history = docsHistory;
+        this._set_docs_history = setDocsHistory;
+
+
         this.allDocs = docsResolver.allData();
-        const docsDataResource = createResource(currentDocsPath, async (path) => {
+        const docsDataResource = createResource(_current_docs_path, async (path) => {
             if (!path || isServer) {
                 return undefined;
             }
@@ -75,8 +99,8 @@ export const DocsUrlSync = () => {
         const params = getHashParams();
         const pathFromUrl = params["docs"];
 
-        if (pathFromUrl !== docs.currentDocsPath()) {
-            docs.setCurrentDocsPath(pathFromUrl || undefined);
+        if (pathFromUrl !== docs.docs_path) {
+            docs.docs_path = pathFromUrl || undefined;
         }
     };
 
@@ -86,7 +110,7 @@ export const DocsUrlSync = () => {
     onCleanup(() => window.removeEventListener("hashchange", handleHashChange));
 
     createEffect(() => {
-        const currentPath = docs.currentDocsPath();
+        const currentPath = docs.docs_path;
         const params = getHashParams();
         const urlPath = params["docs"];
 

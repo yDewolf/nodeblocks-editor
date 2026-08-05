@@ -179,6 +179,7 @@ export const MetadataStoreSubContent = (props: {
     return (
         <Show when={props.data != undefined ? Object.keys(props.data).length != 0 : false}>
             <DropdownSection 
+                dropdown_class="list"
                 header_content={() => <div class="fill keep row-container">{props.header}</div>}
                 content={<div class="fill container">
                     <For each={Object.keys(props.data ?? [])}>

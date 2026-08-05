@@ -8,6 +8,10 @@
     height: 100%;
 }
 
+.dropdown-section.list {
+    height: fit-content;
+}
+
 .tab-displayer {
     display: contents;
 }

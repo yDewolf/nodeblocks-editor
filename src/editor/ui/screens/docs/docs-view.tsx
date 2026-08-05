@@ -37,7 +37,7 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
             </div>
             <div class="docs-content">
                 <div class="fill keep row-container space-between">
-                    <DocsPath current_path={docs.currentDocsPath()} docs_data={docs_data()}/>                    
+                    <DocsPath current_path={docs.docs_path} docs_data={docs_data()}/>                    
                     <button class="icon-button dev-mode-button" classList={{"active": devMode()}} onclick={() => setDevMode(!devMode())}>
                         <CodeIcon/>
                     </button>
@@ -52,7 +52,7 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
                         <h2>{(docs_data()?.data.capitalized_name)}</h2>
                         <p>{(docs_data()?.data.description) == "" || undefined ? "No Description" : (docs_data()?.data.description)}</p>
                     </div>
-                    <DocsContentSelector path={docs.currentDocsPath} docs_data={docs_data()} scene_controller={props.scene_controller} devMode={devMode()}/>
+                    <DocsContentSelector path={docs.docs_path} docs_data={docs_data()} scene_controller={props.scene_controller} devMode={devMode()}/>
                 </Show>
                 <Show when={devMode()}>
                     <p>
@@ -65,13 +65,13 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
 }
 
 const DocsContentSelector = (props: {
-    path: () => string | undefined,
+    path: string | undefined,
     docs_data?: DocPayload,
     scene_controller: SceneController,
     devMode: boolean
 }) => {
     if (!props.docs_data) return undefined;
-    if (!props.path()) return undefined;
+    if (!props.path) return undefined;
     
     return (
         <Switch fallback={

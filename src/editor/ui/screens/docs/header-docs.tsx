@@ -9,7 +9,7 @@ import { DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces"
 import { MetadataContentIndex } from "./docs-sidebar"
 
 export const HeaderDocsContent = (props: {
-    path: () => string | undefined,
+    path: string | undefined,
     data?: MetadataHeader,
     scene_controller: SceneController,
     devMode: boolean

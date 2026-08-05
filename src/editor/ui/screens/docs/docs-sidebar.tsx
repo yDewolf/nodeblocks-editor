@@ -13,13 +13,14 @@ export const DocsSidebar = (props: {
         return Object.keys(docs.allDocs);
     });
     return (
-        <div class="fill keep container">
+        <div class="docs-sidebar">
             <div class="scrollable fill keep container">
                 <For each={loaded_docs()}>
                     {(type_id, idx) => {
                         const data = docs.allDocs[type_id];
                         return (
                             <DropdownSection 
+                                dropdown_class="list"
                                 header={type_id}
                                 header_class=""
                                 content={
@@ -30,8 +31,15 @@ export const DocsSidebar = (props: {
                     }}
                 </For>
             </div>
-            <div>
-
+            <div class="scrollable keep fill container">
+                <For each={docs.docs_history.reverse()}>
+                    {(path: string) => {
+                        return (
+                            // TODO: Format this properly so root and other stuff appears only if needed 
+                            <a class="docs-href" href={"#docs=" + path}>{path}</a>
+                        )
+                    }}
+                </For>
             </div>
         </div>
     )
