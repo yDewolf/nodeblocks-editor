@@ -78,7 +78,7 @@ function resolve_slot_type_label(slotData: SlotData): string {
 const BadgeTag = (props: { badge: DropdownBadge }) => (
     <div class="tag-holder">
         {props.badge.icon}
-        <a class="field-link" href={props.badge.href}>
+        <a class="field-link docs-href" href={props.badge.href}>
             {props.badge.label}
         </a>
     </div>

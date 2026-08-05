@@ -1,9 +1,11 @@
-import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
+import { DocPayload, DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
 import { createMemo, For, Match, Show, Switch } from 'solid-js';
 import { NodeCategory, NodeTag } from "~/wrapper/metadata/node_filters";
 import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 import TagIcon from "~/assets/icons/tag.svg";
 import { DocsPathSplitter } from "~/singletons/metadata";
+import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
+import { DropdownSection } from "../../components/panels/dropdown";
 
 type PathPart = {
     path: string[],
@@ -106,7 +108,7 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
                     return (
                         <>
                             {/* FIXME: this path generator. It includes categories that aren't parsed by DocsResolver */}
-                            <a href={`#docs=${part.path.join(DocsPathSplitter)}`}>
+                            <a class="docs-href" href={`#docs=${part.path.join(DocsPathSplitter)}`}>
                                 <span>{part.label}</span>
                             </a>
                             <Switch>
@@ -158,6 +160,39 @@ export const DocsTags = (props: {docs_data?: DocPayload, section_title?: string}
                     </For>
                 </div>
             </div>
+        </Show>
+    )
+}
+
+
+
+export const MetadataStoreSubContent = (props: {
+    data?: Record<string, any>,
+    header: string,
+    docs_prefix: DocsPathPrefix,
+    root_id: string
+}) => {
+    if (!props.data) {
+        return undefined;
+    }
+
+    return (
+        <Show when={props.data != undefined ? Object.keys(props.data).length != 0 : false}>
+            <DropdownSection 
+                header_content={() => <div class="fill keep row-container">{props.header}</div>}
+                content={<div class="fill container">
+                    <For each={Object.keys(props.data ?? [])}>
+                        {(id) => {
+                            if (!props.data) {
+                                return undefined;
+                            }
+                            const type_data = props.data[id] as BaseMetadata;
+                            const name = type_data.capitalized_name != "" ? type_data.capitalized_name : id;
+                            return <a class="docs-href" href={"#docs=" + props.root_id + DocsPathSplitter + props.docs_prefix + DocsPathSplitter + id}>{name}</a>
+                        }}
+                    </For>
+                </div>}
+            />
         </Show>
     )
 }

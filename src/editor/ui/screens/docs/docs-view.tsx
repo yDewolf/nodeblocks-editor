@@ -14,6 +14,7 @@ import { DocsPathPrefix } from '../../../../network/controllers/docs/docs-interf
 import { DocsPathSplitter } from "~/singletons/metadata";
 import { BaseMetadata } from '../../../../wrapper/metadata/base_metadata';
 import { HeaderDocsContent } from "./header-docs";
+import { DocsSidebar } from "./docs-sidebar";
 
 export const DocsView = (props: {current_tool?: EditorTool, scene_controller: SceneController}) => {
     const docs = useDocs();
@@ -105,85 +106,4 @@ const make_docs_index = (docs_record: Record<string, MetadataStoreData>) => {
     });
     
     return [flattened_index, index];
-}
-export const DocsSidebar = (props: {
-    docs_data?: DocPayload
-}) => {
-    const docs = useDocs();
-    const loaded_docs = createMemo(() => {
-        return Object.keys(docs.allDocs);
-    });
-    return (
-        <div class="scrollable fill keep container">
-            <For each={loaded_docs()}>
-                {(type_id, idx) => {
-                    const data = docs.allDocs[type_id];
-                    return (
-                        <DropdownSection 
-                            header={type_id}
-                            header_class=""
-                            content={
-                                <TypeDocsContent type_id={type_id} data={data} root_id={type_id}/>
-                            }
-                        />
-                    )
-                }}
-            </For>
-        </div>
-    )
-}
-
-// TODO: Move these elements to another file
-export const TypeDocsContent = (props: {
-    type_id: string,
-    root_id: string,
-    data: MetadataStoreData
-}) => {
-    return <div class="fill container">
-        {/* Procedural way of generating these dropdowns */}
-        {/* <For each={Object.keys(props.data)}>
-            {(key: string) => {
-                return (
-                    <TypeSubgroup data={(props.data as Record<string, any>)[key]} header={key} docs_prefix={PathPrefixMap[key]} root_id={props.root_id}/>
-                )
-            }}
-        </For> */}
-
-        {/* TODO: implement header metadata linking stuff */}
-        <a href={"#docs=" + props.root_id}>header</a>
-        <MetadataStoreSubContent data={props.data.data_types} header="datatypes" docs_prefix={DocsPathPrefix.DATATYPE} root_id={props.root_id}/>
-        <MetadataStoreSubContent data={props.data.node_types} header="nodetypes" docs_prefix={DocsPathPrefix.NODE} root_id={props.root_id}/>
-        <MetadataStoreSubContent data={props.data.interface} header="interface" docs_prefix={DocsPathPrefix.UI} root_id={props.root_id}/>
-    </div>
-}
-
-export const MetadataStoreSubContent = (props: {
-    data?: Record<string, any>,
-    header: string,
-    docs_prefix: DocsPathPrefix,
-    root_id: string
-}) => {
-    if (!props.data) {
-        return undefined;
-    }
-
-    return (
-        <Show when={props.data != undefined ? Object.keys(props.data).length != 0 : false}>
-            <DropdownSection 
-                header_content={() => <div class="fill keep row-container">{props.header}</div>}
-                content={<div class="fill container">
-                    <For each={Object.keys(props.data ?? [])}>
-                        {(id) => {
-                            if (!props.data) {
-                                return undefined;
-                            }
-                            const type_data = props.data[id] as BaseMetadata;
-                            const name = type_data.capitalized_name != "" ? type_data.capitalized_name : id;
-                            return <a href={"#docs=" + props.root_id + DocsPathSplitter + props.docs_prefix + DocsPathSplitter + id}>{name}</a>
-                        }}
-                    </For>
-                </div>}
-            />
-        </Show>
-    )
 }

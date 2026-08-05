@@ -1,13 +1,12 @@
 import { SceneController } from "~/wrapper/controllers/scene-controller"
 import { MetadataHeader } from "~/wrapper/metadata/header_metadata"
-import { DocsTags } from "./docs-components"
+import { DocsTags, MetadataStoreSubContent } from "./docs-components"
 import { SimpleField, FieldValueDisplayer } from "../../components/input-fields"
 import { unixToDate } from "~/editor/utils/time-utils"
-import { createMemo, For } from "solid-js"
-import { DropdownSection } from '../../components/panels/dropdown';
+import { createMemo } from "solid-js"
 import { useDocs } from "~/editor/controllers/docs-controller"
-import { MetadataStoreSubContent } from './docs-view';
 import { DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces"
+import { MetadataContentIndex } from "./docs-sidebar"
 
 export const HeaderDocsContent = (props: {
     path: () => string | undefined,
@@ -20,7 +19,9 @@ export const HeaderDocsContent = (props: {
     }
     const docs = useDocs();
     const metadata = createMemo(() => {
-        if (!props.data) {return undefined;}
+        if (!props.data) {
+            throw new Error("Trying to access metadata that doesn't exist");
+        }
         return docs.allDocs[props.data?.types_id];
     });
 
@@ -41,9 +42,7 @@ export const HeaderDocsContent = (props: {
             <DocsTags section_title="All tags" docs_data={{type: "header", data: props.data}}/>
             <div class="text-section">
                 <h3>Index</h3>
-                <MetadataStoreSubContent data={metadata()?.data_types} header="datatypes" docs_prefix={DocsPathPrefix.DATATYPE} root_id={props.data.types_id}/>
-                <MetadataStoreSubContent data={metadata()?.node_types} header="nodetypes" docs_prefix={DocsPathPrefix.NODE} root_id={props.data.types_id}/>
-                <MetadataStoreSubContent data={metadata()?.interface} header="interface" docs_prefix={DocsPathPrefix.UI} root_id={props.data.types_id}/>
+                <MetadataContentIndex data={metadata()} root_id={props.data.types_id}/>
             </div>
         </div>
     )

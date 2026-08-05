@@ -76,8 +76,34 @@
 .docs-header-badges > .tag-holder {
     background-color: var(--dark-overlay-highlight);
     border-radius: 4px;
-    padding: 2px;
+    padding: 3px;
     gap: 2px;
+}
+
+.docs-href {
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 30ms linear;
+}
+
+.docs-href:hover {
+    background-color: var(--dark-overlay-highlight);
+}
+
+.tag-holder > .docs-href {
+    background-color: var(--dark-overlay-highlight);
+}
+
+.tag-holder > .docs-href:hover {
+    background-color: var(--overlay-highlight);
+}
+
+.field-grid > .docs-href {
+    text-decoration: underline;
+}
+
+.field-grid > .docs-href:hover {
+    .field-holder {background-color: var(--overlay-highlight);}
 }
 
 @media (max-width: 1024px) {

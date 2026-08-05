@@ -57,7 +57,8 @@ const DataTypeAttributes = (props: {
         <div class="text-section">
             <h3>Attributes</h3>
             <SimpleField field_name="Base" field_displayer={
-                () => <a class="field-link" href={`#docs=${props.datatype?.root_id}${DocsPathSplitter}${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${props.datatype?.base}`}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></a>
+                // TODO: maybe add a better visual for field links
+                () => <a class="field-link docs-href" href={`#docs=${props.datatype?.root_id}${DocsPathSplitter}${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${props.datatype?.base}`}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></a>
             } field_id={props.datatype?.type_id + "-base"}/>
             <SimpleField field_name="Renderer" field_displayer={
                 () => <FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.renderer} id={props.datatype?.type_id + "-renderer"}/>}/>
