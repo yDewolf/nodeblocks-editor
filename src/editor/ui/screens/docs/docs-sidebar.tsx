@@ -1,9 +1,11 @@
-import { createMemo, For } from "solid-js";
+import { createEffect, createMemo, For, Match, Switch } from 'solid-js';
 import { useDocs } from "~/editor/controllers/docs-controller";
 import { DocPayload, DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
 import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
 import { DropdownSection } from "../../components/panels/dropdown";
 import { MetadataStoreSubContent } from "./docs-components";
+import { DocsPathSplitter } from '~/singletons/metadata';
+import CloseIcon from '~/assets/icons/close.svg';
 
 export const DocsSidebar = (props: {
     docs_data?: DocPayload
@@ -11,6 +13,17 @@ export const DocsSidebar = (props: {
     const docs = useDocs();
     const loaded_docs = createMemo(() => {
         return Object.keys(docs.allDocs);
+    });
+    
+    const make_id_from_path = (path: string) => {
+        return "index-" + path
+    }
+    createEffect(() => {
+        if (docs.docs_path) {
+            const docs_link = document.getElementById(make_id_from_path(docs.docs_path));
+            if (!docs_link) return;
+            docs_link.scrollIntoView({ behavior: "smooth"})
+        }
     });
     return (
         <div class="docs-sidebar">
@@ -32,14 +45,39 @@ export const DocsSidebar = (props: {
                 </For>
             </div>
             <div class="scrollable keep fill container">
-                <For each={docs.docs_history.reverse()}>
-                    {(path: string) => {
-                        return (
-                            // TODO: Format this properly so root and other stuff appears only if needed 
-                            <a class="docs-href" href={"#docs=" + path}>{path}</a>
-                        )
-                    }}
-                </For>
+                <Switch fallback={
+                    <p>Previous tabs will show up here</p>
+                }>
+                    <Match when={docs.docs_history.length > 0}>
+                        <For each={docs.docs_history.reverse()}>
+                            {(path: string) => {
+                                const final_target = path.split(DocsPathSplitter).at(-1);
+                                let reduced_path = path;
+                                if (final_target) {
+                                    if (!docs.docs_history.find((other_path: string) => other_path.endsWith(final_target) && other_path != path)) {
+                                        console.log("reducing path: ", path);
+                                        reduced_path = final_target;
+                                    }
+                                }
+                                return (
+                                    // TODO: Format this properly so root and other stuff appears only if needed 
+                                    <div class="fill row-container space-between docs-href-container">
+                                        <a class="fill docs-href" href={"#docs=" + path} id={make_id_from_path(path)}
+                                            classList={{
+                                                "selected": docs.docs_path == path
+                                            }}
+                                        >{reduced_path}</a>
+                                        <button class="icon-button" onclick={() => {
+                                            docs.removeFromHistory(path);
+                                        }}>
+                                            <CloseIcon class="smaller-icon"/>
+                                        </button>
+                                    </div>
+                                )
+                            }}
+                        </For>
+                    </Match>
+                </Switch>
             </div>
         </div>
     )

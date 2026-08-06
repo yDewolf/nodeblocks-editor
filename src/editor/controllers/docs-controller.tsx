@@ -5,8 +5,6 @@ import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
 import { getHashParams, setHashParam } from "../utils/url-utils";
 import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
 
-const MAX_DOCS_TABS = 16;
-
 export class DocsController {
     public hoveredDocElement: () => HTMLElement | null;
     public setHoveredDocElement: (element: HTMLElement | null) => void;
@@ -23,6 +21,10 @@ export class DocsController {
 
     get docs_history() { return this._docs_history(); }
     private set docs_history(value: string[]) { this._set_docs_history(value); }
+    public removeFromHistory(path: string) {
+        const filtered = this.docs_history.filter((value: string) => value != path);
+        this.docs_history = filtered;
+    }
 
     get docs_path() { return this._current_docs_path(); }
     set docs_path(path: string | undefined) { 

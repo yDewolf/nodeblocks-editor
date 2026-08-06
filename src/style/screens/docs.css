@@ -11,8 +11,22 @@
     display: grid;
     height: stretch;
     gap: 4px;
+    grid-template-columns: 100%;
     grid-template-rows: 0.75fr 0.25fr;
 }
+
+.tab-history {
+    gap: 5px;
+}
+
+.tab-history > a {
+    min-height: fit-content;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: break-all;
+}
+
 .docs-sidebar > div {
     border: 1px solid var(--stroke-color);
     padding: 4px;
@@ -30,8 +44,8 @@
 
 .docs-content {
     overflow-y: scroll;
-    
     word-break: break-all;
+    
     gap: 8px;
     h2 {
         font-size: 1.3rem;
@@ -97,7 +111,24 @@
     transition: background-color 30ms linear;
 }
 
-.docs-href:hover {
+.docs-href-container {
+    align-items: center;
+    svg {
+        width: 14px;
+        height: 14px;
+    }
+    button {
+        display: none;
+    }
+}
+
+.docs-href-container:hover {
+    button {
+        display: inherit;
+    }
+}
+
+.docs-href:hover, .docs-href.selected {
     background-color: var(--dark-overlay-highlight);
 }
 

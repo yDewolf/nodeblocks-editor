@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, JSXElement, Match, Show, Switch } from "solid-js";
+import { createMemo, createSignal, Match, Show, Switch } from "solid-js";
 import { useDocs } from "~/editor/controllers/docs-controller";
 import { EditorTool } from "~/editor/tools/base-tool";
 import { DocsPath, DocsTags } from "./docs-components";
@@ -8,13 +8,10 @@ import CodeIcon from "~/assets/icons/code.svg";
 import { NodeDocsContent } from "./node-docs";
 import { InterfaceDocsContent } from './interface-docs';
 import { DataTypeDocsContent } from "./datatype-docs";
-import { DropdownSection } from "../../components/panels/dropdown";
-import { MetadataStoreData, PathPrefixMap } from "~/network/controllers/metadata/metadata_controller";
-import { DocsPathPrefix } from '../../../../network/controllers/docs/docs-interfaces';
-import { DocsPathSplitter } from "~/singletons/metadata";
-import { BaseMetadata } from '../../../../wrapper/metadata/base_metadata';
+import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
 import { HeaderDocsContent } from "./header-docs";
 import { DocsSidebar } from "./docs-sidebar";
+import AskDocsIcon from "~/assets/icons/ask-about.svg";
 
 export const DocsView = (props: {current_tool?: EditorTool, scene_controller: SceneController}) => {
     const docs = useDocs();
@@ -43,7 +40,25 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
                     </button>
                 </div>
                 <Show when={docs_data()} fallback={
-                    <h2>Couldn't find documentation</h2>
+                    <Show when={docs.docs_path} fallback={
+                        <div class="text-section">
+                            <h2>No documentation selected</h2>
+                            <p>You can view documentation about datatypes, nodetypes and interface elements by:</p>
+                            <ul>
+                                <li class="row-container center-items">
+                                    selecting an element with the docs tool (<AskDocsIcon class="small-icon"/>)
+                                </li>
+                                <li class="row-container center-items">
+                                    using the documentation index (left tab in this view)
+                                </li>
+                                <li class="row-container center-items">
+                                    inserting #docs={"<path.to.documentation>"} in your browser's url
+                                </li>
+                            </ul>
+                        </div>
+                    }>
+                        <h2>Couldn't find documentation</h2>
+                    </Show>
                 }>
                     <Show when={docs_data()?.type != "header"}>
                         <DocsTags docs_data={docs_data()}/>

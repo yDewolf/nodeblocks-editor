@@ -1,5 +1,9 @@
 @import url("misc/scrollbars.css");
 
+.center-items {
+    align-items: center;
+}
+
 div {
     border-radius: var(--default-border-radius);
 }
@@ -68,6 +72,17 @@ svg {
 
 svg.small-icon {
     width: 28px;
+}
+
+svg.smaller-icon {
+    width: 20px;
+}
+
+.smaller-icon {
+    svg {
+        width: 20px;
+        height: 20px;
+    }
 }
 
 .small-icon {
