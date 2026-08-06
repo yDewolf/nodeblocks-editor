@@ -35,6 +35,9 @@ export const HeaderDocsContent = (props: {
                 <SimpleField field_name="version" field_displayer={
                     () => <FieldValueDisplayer value_element={() => <input readonly value={props.data?.types_version} id={props.data?.types_id + "-version"}/>}/>
                 } field_id={props.data?.types_id + "-version"}/>
+                <SimpleField field_name="meta_version" field_displayer={
+                    () => <FieldValueDisplayer value_element={() => <input readonly value={props.data?.meta_version} id={props.data?.types_id + "-meta_version"}/>}/>
+                } field_id={props.data?.types_id + "-meta_version"}/>
                 <SimpleField field_name="last_modified" field_displayer={
                     () => <FieldValueDisplayer value_element={() => <input readonly value={unixToDate(props.data?.last_modified ?? 0)} id={props.data?.types_id + "-last_modified"}/>}/>
                 } field_id={props.data?.types_id + "-last_modified"}/>
