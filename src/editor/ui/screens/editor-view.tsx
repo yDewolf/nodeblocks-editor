@@ -17,13 +17,15 @@ import { NodeTypeSelector, SelectedNodeType } from "../editor/subpanels/node-typ
 import { DocsView } from "./docs/docs-view";
 import MinimizeIcon from '~/assets/icons/minimize.svg';
 import { PageViewer } from "../components/page-controller";
+import { session_controller } from "~/singletons/user_session";
 
 export const EditorView = (props: {
     editor: NodeEditor
 }) => {
     const editor = props.editor;
-    const main_page_viewer = new PageViewer();
     const docs = useDocs();
+    editor._set_docs_controller(docs);
+    const main_page_viewer = new PageViewer();
     
     let viewportRef: HTMLDivElement | undefined;
     let world_space_ref: HTMLDivElement | undefined;
@@ -145,8 +147,8 @@ export const EditorView = (props: {
                     <For each={editor.scene_controller.node_controller.nodes}>
                         {(node) => <NodeComponent 
                                 node={node}
-                                notification_controller={editor._session_controller.notification_controller}
-                                workspace={editor._session_controller.user_workspace}
+                                notification_controller={session_controller.notification_controller}
+                                workspace={session_controller.user_workspace}
                                 camera={editor.editor_space.camera}
                                 onClick={(node: GraphNode) => {
                                     editor.input_manager.generalizedEventHandler({node: node}, InputEvents.CLICK_ON_NODE)

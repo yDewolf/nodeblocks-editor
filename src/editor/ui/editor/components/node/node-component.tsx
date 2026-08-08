@@ -271,7 +271,7 @@ const SlotGrid = (props: {
 
 const AnchoredSlotGrid = (props: {
     node: GraphNode,
-    node_meta: NodeTypeMeta,
+    node_meta?: NodeTypeMeta,
     onClickSlot: (slot: NodeSlot) => void, 
     onHoverSlot: (slot: NodeSlot) => void}
 ) => {

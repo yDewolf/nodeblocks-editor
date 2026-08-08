@@ -19,12 +19,15 @@ import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 import { SessionController } from "~/network/session/session-controller";
 import {} from "./ui/ui-themes";
 import "~/style/screens/editor.css";
-import { PageViewer } from "./ui/components/page-controller";
+import { DocsController } from "./controllers/docs-controller";
+import { session_controller } from "~/singletons/user_session";
 
 
 export class NodeEditor {
+    _docs_controller: () => DocsController | undefined;
+    _set_docs_controller: (docs: DocsController | undefined) => void;
+    
     scene_controller: SceneController;
-    _session_controller: SessionController;
     
     _state_controller: StateController
     _status_controller: WebsocketStatusController
@@ -43,9 +46,12 @@ export class NodeEditor {
     private _cursor_world_pos: () => Vector2;
     private _set_cursor_world_pos: (v: Vector2) => void;
 
-    constructor (session_controller: SessionController) {
-        this._session_controller = session_controller;
-        this._session_controller.notification_controller._editor = this;
+    constructor () {
+        const [docsController, setDocsController] = createSignal(undefined);
+        this._docs_controller = docsController;
+        this._set_docs_controller = setDocsController;
+
+        session_controller.notification_controller._editor = this;
 
         this._state_controller = new StateController(this._editor_client);
         this._status_controller = new WebsocketStatusController(this._editor_client);
@@ -72,7 +78,8 @@ export class NodeEditor {
         this.setup_message_handlers();
     }
 
-    get _editor_client() { return this._session_controller.client; }
+    get _editor_client() { return session_controller.client; }
+    get docs_controller() { return this._docs_controller(); }
 
     get cursor_world_pos() { return this._cursor_world_pos(); }
     set cursor_world_pos(v: Vector2) { this._set_cursor_world_pos(v); }

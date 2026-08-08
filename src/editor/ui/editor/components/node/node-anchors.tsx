@@ -7,7 +7,7 @@ import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 export const NodeAnchor = (props: {
     anchor_pos: Vector2, 
     all_slots: NodeSlot[],
-    node_meta: NodeTypeMeta,
+    node_meta?: NodeTypeMeta,
     onClickSlot: (slot: NodeSlot) => void, 
     onHoverSlot: (slot: NodeSlot) => void
 }) => {
