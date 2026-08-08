@@ -1,7 +1,6 @@
 import { EditorSpace } from "./internal/editor-space";
-import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import { createSignal } from "solid-js";
 import { GraphNode } from "../wrapper/nodes/graph-node";
-import { NodeSlot } from '../wrapper/nodes/slot/node-slot';
 import { Vector2 } from '../wrapper/data_types/geometry';
 import { KeyEventManager } from "./internal/input_manager/input-manager";
 import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./internal/input_manager/keybind-events";
@@ -9,9 +8,7 @@ import { EventHandler, InputEvents } from "./internal/input_manager/event-handli
 import { SceneController } from "../wrapper/controllers/scene-controller";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./controllers/selection-controller";
-import { ConnectionLines, ConnectionPreview } from "./ui/editor/components/misc/connection-lines";
 import { Grid } from "./ui/editor/components/misc/grid";
-import { NodeComponent } from './ui/editor/components/node/node-component';
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 import { StateController } from "~/network/controllers/state_controller";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
@@ -19,25 +16,13 @@ import { ServerSyncController } from "~/network/controllers/sync_controller";
 import { ActionController } from "~/network/controllers/actions/action-controller";
 import { NodeSceneRequestData } from "~/network/websocket/request-types";
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
-import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
-import { NodeParameter } from "~/wrapper/nodes/data/node-data";
-import { EditorLeftTabHolder } from './ui/editor/left-tab';
 import { SessionController } from "~/network/session/session-controller";
-import { EditorRightPanel } from "./ui/editor/right-tab";
 import {} from "./ui/ui-themes";
 import "~/style/screens/editor.css";
-import { EditorMidTab } from './ui/editor/mid-tab';
-import { NodeTypeSelector, SelectedNodeType } from "./ui/editor/subpanels/node-type-selector";
 import { PageViewer } from "./ui/components/page-controller";
-import { DocsController, useDocs } from "./controllers/docs-controller";
-import { DocsElementIndicator } from "./ui/components/selected-docs-indicator";
-import { DocsView } from "./ui/screens/docs/docs-view";
-import MinimizeIcon from '~/assets/icons/minimize.svg';
 
 
 export class NodeEditor {
-    _docs_controller: () => DocsController | undefined;
-    _set_docs_controller: (docs: DocsController | undefined) => void;
     scene_controller: SceneController;
     _session_controller: SessionController;
     
@@ -55,17 +40,10 @@ export class NodeEditor {
     editor_space: EditorSpace
     editor_grid: Grid
 
-    protected main_page_viewer: PageViewer
-
     private _cursor_world_pos: () => Vector2;
     private _set_cursor_world_pos: (v: Vector2) => void;
 
     constructor (session_controller: SessionController) {
-        const [docsController, setDocsController] = createSignal(undefined);
-        this._docs_controller = docsController;
-        this._set_docs_controller = setDocsController;
-        
-        this.main_page_viewer = new PageViewer();
         this._session_controller = session_controller;
         this._session_controller.notification_controller._editor = this;
 
@@ -95,7 +73,6 @@ export class NodeEditor {
     }
 
     get _editor_client() { return this._session_controller.client; }
-    get docs_controller() { return this._docs_controller(); }
 
     get cursor_world_pos() { return this._cursor_world_pos(); }
     set cursor_world_pos(v: Vector2) { this._set_cursor_world_pos(v); }
@@ -308,158 +285,5 @@ export class NodeEditor {
             node.is_current_step = true;
             node.last_output = node_output;
         });
-    }
-
-    public View() {
-        this._set_docs_controller(useDocs());
-        let viewportRef: HTMLDivElement | undefined;
-        let world_space_ref: HTMLDivElement | undefined;
-        let editor_view_ref: HTMLDivElement | undefined;
-        onMount(() => {
-            if (viewportRef) {
-                const rect = viewportRef.getBoundingClientRect();
-                this.editor_space.camera.size = { x: rect.width, y: rect.height };
-                const resizeObserver = new ResizeObserver((entries) => {
-                    for (let entry of entries) {
-                        const { width, height } = entry.contentRect;
-                        this.editor_space.camera.size = { x: width, y: height };
-                    }
-                });
-
-                resizeObserver.observe(viewportRef);
-                onCleanup(() => resizeObserver.disconnect());
-            }
-        });
-
-        const selector = new NodeTypeSelector();
-
-        // FIXME: Implement a better way of indexing pages on a pageviewer and accessing them
-        const DocsCallback = () => <DocsView scene_controller={this.scene_controller}/>;
-        const docsPage = {
-            page_title: "Documentation",
-            view_displayer_css: "docs-view",
-            icon_element: () => <MinimizeIcon class="small-icon"/>,
-            element: DocsCallback
-        };
-        const openDocsPage = () => {
-            this.main_page_viewer.current_page = docsPage;
-        }
-        const docsPageVisible = () => this.main_page_viewer.current_page === docsPage;
-
-        return (
-            <div 
-                class="editor-view"
-                ref={editor_view_ref}
-                onPointerUp={(e) => {this.input_manager.onPointerUp(e); this.tool_controller.current_tool?.globalOnPointerUp(e)}}
-                onPointerDown={(e) => {this.tool_controller.current_tool?.globalOnPointerDown(e)}}
-                onPointerMove={(e) => this.tool_controller.current_tool?.globalOnPointerMove(e)}
-            >
-                <div 
-                    ref={viewportRef} 
-                    class="viewport"
-                    style={{
-                        position: "absolute", 
-                        height: "100vh", 
-                        width: "100vw"
-                    }}
-                    classList={{
-                        'move-mode': this.input_manager.get_keybind_state("PanCamera"),
-                        'moving-mode': this.selection_controller.moving
-                    }}
-
-                    oncontextmenu={(e) => {e.preventDefault()}}
-                    tabindex="0"
-                    onKeyDown={(e) => this.input_manager.onKeyDown(e)}
-                    onKeyUp={(e) => this.input_manager.onKeyUp(e)}
-                    onWheel={(e) => this.input_manager.onWheel(e)}
-
-                    onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
-                    onPointerDown={(e) => this.input_manager.onPointerDown(e)} 
-
-                    onPointerLeave={(e) => this.input_manager.onPointerUp(e)}
-                    onMouseOver={() => {
-                        this.input_manager.generalizedEventHandler({}, InputEvents.HOVER_BACKGROUND)
-                    }}
-                >
-                    <div 
-                        style={{
-                        position: "absolute",
-                        inset: 0,
-                        "pointer-events": "none"
-                    }}>
-                        {this.editor_grid.View(this.editor_space.camera)}
-                    </div>
-                    
-                    <div 
-                        ref={world_space_ref}
-                        class="world-space"
-                        style={{
-                            "transform-origin": "0 0",
-                            transform: `translate(${-this.editor_space.camera.offset.x * this.editor_space.camera.zoom}px, ${-this.editor_space.camera.offset.y * this.editor_space.camera.zoom}px) scale(${this.editor_space.camera.zoom})`,
-                            position: "absolute",
-                        }}
-                    >
-                        <Show when={this.selection_controller.selection_rect.active}>
-                            {this.selection_controller.selection_rect.View()}
-                        </Show>
-                        <svg style={{
-                            position: "absolute",
-                            inset: 0,
-                            overflow: "visible",
-                            "pointer-events": "none",
-                        }}>
-                            <For each={this.scene_controller.connection_controller.connections}>
-                                {(conn) => <ConnectionLines 
-                                    connection={conn} 
-                                    onDisconnect={() => {
-                                        ConnActionUtils.request_disconnect([conn], this._action_controller);
-                                    }} 
-                                />}
-                            </For>
-                            
-                            <Show when={this.selection_controller.selected_slot}>
-                                <ConnectionPreview start_slot={this.selection_controller.selected_slot} hovered_slot={this.selection_controller.hovered_slot} cursor_pos={this.cursor_world_pos}/>
-                            </Show>
-                        </svg>
-                        
-                        <SelectedNodeType world_mouse_pos={this.cursor_world_pos} scene_controller={this.scene_controller} selection_controller={this.selection_controller}/>
-                        <For each={this.scene_controller.node_controller.nodes}>
-                            {(node) => <NodeComponent 
-                                    node={node}
-                                    notification_controller={this._session_controller.notification_controller}
-                                    workspace={this._session_controller.user_workspace}
-                                    camera={this.editor_space.camera}
-                                    onClick={(node: GraphNode) => {
-                                        this.input_manager.generalizedEventHandler({node: node}, InputEvents.CLICK_ON_NODE)
-                                    }}
-                                    onClickSlot={(slot: NodeSlot) => {
-                                        this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.CLICK_ON_NODE_SLOT)
-                                    }}
-                                    onHoverSlot={(slot: NodeSlot) => {
-                                        this.input_manager.generalizedEventHandler({slot: slot}, InputEvents.HOVER_SLOT)
-                                    }}
-                                    onHoverNode={(node: GraphNode) => {
-                                        this.input_manager.generalizedEventHandler({node: node}, InputEvents.HOVER_NODE)
-                                    }}
-                                    syncParameter={(node: GraphNode, parameter: NodeParameter) => {
-                                        // TODO: Update only this parameter
-                                        NodeActionUtils.request_update_nodes([node], this._action_controller);
-                                    }}
-                                />
-                            }
-                        </For>
-                    </div>
-                </div>
-                <div 
-                    class="editor-ui" 
-                    onPointerMove={(e) => this.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
-                >
-                    <EditorLeftTabHolder node_type_selector={selector} main_page_viewer={this.main_page_viewer} editor={this}/>
-                    <EditorMidTab docs_page={docsPage} page_viewer={this.main_page_viewer} editor={this}/>
-                    <EditorRightPanel editor={this} state_controller={this._state_controller}/>
-                </div>
-                <DocsElementIndicator open_docs_page={openDocsPage} docsPageVisible={docsPageVisible} input_manager={this.input_manager} tool_controller={this.tool_controller} editor_camera={this.editor_space.camera} world_space_ref={world_space_ref} editor_view_ref={editor_view_ref}/>
-            </div>
-        );
     }
 }

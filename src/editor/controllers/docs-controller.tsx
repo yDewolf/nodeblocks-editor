@@ -1,11 +1,23 @@
-import { createSignal, createResource, Resource, JSX, createContext, useContext, onCleanup, createEffect } from "solid-js";
+import { createSignal, createResource, Resource, JSX, createContext, useContext, onCleanup, createEffect, createMemo, Accessor } from "solid-js";
 import { docsResolver } from "~/singletons/docs";
 import { isServer } from "solid-js/web";
 import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
 import { getHashParams, setHashParam } from "../utils/url-utils";
 import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
+import { DocSearchHelper, DocTopic } from "~/network/controllers/docs/docs-helper";
+import { makePersisted } from "@solid-primitives/storage";
+import { createStore, SetStoreFunction } from "solid-js/store";
+
+const DOCS_STATE_KEY = "app_docs_state";
+interface DocsState {
+    opened_tabs: string[]
+}
+
 
 export class DocsController {
+    public readonly store: DocsState;
+    private setStore: SetStoreFunction<DocsState>;
+
     public hoveredDocElement: () => HTMLElement | null;
     public setHoveredDocElement: (element: HTMLElement | null) => void;
 
@@ -15,15 +27,14 @@ export class DocsController {
     private _current_docs_path: () => string | undefined;
     private _set_current_docs_path: (path: string | undefined) => void;
 
-    // TODO: keep this history on localStorage
-    private _docs_history: () => string[];
-    private _set_docs_history: (value: string[]) => void;
+    protected _doc_topics: Accessor<DocTopic[]>;
+    get doc_topics() { return this._doc_topics(); }
 
-    get docs_history() { return this._docs_history(); }
-    private set docs_history(value: string[]) { this._set_docs_history(value); }
+    get opened_tabs() { return this.store.opened_tabs }
+    private set opened_tabs(value: string[]) { this.setStore("opened_tabs", value) }
     public removeFromHistory(path: string) {
-        const filtered = this.docs_history.filter((value: string) => value != path);
-        this.docs_history = filtered;
+        const filtered = this.opened_tabs.filter((value: string) => value != path);
+        this.opened_tabs = filtered;
     }
 
     get docs_path() { return this._current_docs_path(); }
@@ -31,15 +42,29 @@ export class DocsController {
         this._set_current_docs_path(path);
 
         if (!path) return;
-        if (!this.docs_history.find((value) => value === path)) {
-            this.docs_history = [...this.docs_history, path];
+        if (!this.opened_tabs.find((value) => value === path)) {
+            this.opened_tabs = [...this.opened_tabs, path];
         }
     }
 
     public docsData: Resource<DocPayload | undefined>;
     public allDocs: Record<string, MetadataStoreData>;
-
+    
     constructor() {
+        this.allDocs = docsResolver.allData();
+        const [docsStore, setDocsStore] = makePersisted(
+            createStore<DocsState>({
+                opened_tabs: [],
+            }),
+            { name: DOCS_STATE_KEY }
+        );
+        this.store = docsStore;
+        this.setStore = setDocsStore;
+        this._doc_topics = createMemo(() => {
+            return DocSearchHelper.get_doc_topics(this.allDocs);
+        });
+
+        // Signals
         const [hoveredDocElement, setHoveredDocElement] = createSignal<HTMLElement | null>(null);
         this.hoveredDocElement = hoveredDocElement;
         this.setHoveredDocElement = setHoveredDocElement;
@@ -52,12 +77,7 @@ export class DocsController {
         this._current_docs_path = _current_docs_path;
         this._set_current_docs_path = _set_current_docs_path;
     
-        const [docsHistory, setDocsHistory] = createSignal<string[]>([]);
-        this._docs_history = docsHistory;
-        this._set_docs_history = setDocsHistory;
-
-
-        this.allDocs = docsResolver.allData();
+        // Resources and Memos
         const docsDataResource = createResource(_current_docs_path, async (path) => {
             if (!path || isServer) {
                 return undefined;
@@ -71,6 +91,7 @@ export class DocsController {
             }
         });
         this.docsData = docsDataResource[0];
+        
     }
 }
 

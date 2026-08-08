@@ -6,6 +6,7 @@ import { DropdownSection } from "../../components/panels/dropdown";
 import { MetadataStoreSubContent } from "./docs-components";
 import { DocsPathSplitter } from '~/singletons/metadata';
 import CloseIcon from '~/assets/icons/close.svg';
+import { DocSearchBar } from '../../components/docs/docs-searchbar';
 
 export const DocsSidebar = (props: {
     docs_data?: DocPayload
@@ -27,34 +28,37 @@ export const DocsSidebar = (props: {
     });
     return (
         <div class="docs-sidebar">
-            <div class="scrollable fill keep container">
-                <For each={loaded_docs()}>
-                    {(type_id, idx) => {
-                        const data = docs.allDocs[type_id];
-                        return (
-                            <DropdownSection 
-                                dropdown_class="list"
-                                header={type_id}
-                                header_class=""
-                                content={
-                                    <MetadataContentIndex data={data} root_id={type_id}/>
-                                }
-                            />
-                        )
-                    }}
-                </For>
+            <div class="docs-index fill keep container">
+                <DocSearchBar />
+                <div class="scrollable fill keep container">
+                    <For each={loaded_docs()}>
+                        {(type_id, idx) => {
+                            const data = docs.allDocs[type_id];
+                            return (
+                                <DropdownSection 
+                                    dropdown_class="list"
+                                    header={type_id}
+                                    header_class=""
+                                    content={
+                                        <MetadataContentIndex data={data} root_id={type_id}/>
+                                    }
+                                />
+                            )
+                        }}
+                    </For>
+                </div>
             </div>
             <div class="scrollable keep fill container">
                 <Switch fallback={
                     <p>Previous tabs will show up here</p>
                 }>
-                    <Match when={docs.docs_history.length > 0}>
-                        <For each={docs.docs_history.reverse()}>
+                    <Match when={docs.opened_tabs.length > 0}>
+                        <For each={docs.opened_tabs.reverse()}>
                             {(path: string) => {
                                 const final_target = path.split(DocsPathSplitter).at(-1);
                                 let reduced_path = path;
                                 if (final_target) {
-                                    if (!docs.docs_history.find((other_path: string) => other_path.endsWith(final_target) && other_path != path)) {
+                                    if (!docs.opened_tabs.find((other_path: string) => other_path.endsWith(final_target) && other_path != path)) {
                                         console.log("reducing path: ", path);
                                         reduced_path = final_target;
                                     }

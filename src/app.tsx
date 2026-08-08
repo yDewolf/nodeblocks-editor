@@ -5,6 +5,7 @@ import { createContext, createEffect, onMount } from "solid-js";
 import { NodeEditor } from "./editor/node-editor";
 import { UpdateRootDataTheme } from "./editor/ui/ui-themes";
 import { DocsController, DocsProvider, DocsUrlSync } from './editor/controllers/docs-controller';
+import { EditorView } from "./editor/ui/screens/editor-view";
 
 const node_editor = new NodeEditor(session_controller);
 
@@ -37,11 +38,12 @@ export default function App() {
       UpdateRootDataTheme();
   });
 
+
   return (
     <main>
       <DocsProvider>
         <DocsUrlSync/>
-        {node_editor.View()}
+        <EditorView editor={node_editor}/>
       </DocsProvider>
     </main>
   );

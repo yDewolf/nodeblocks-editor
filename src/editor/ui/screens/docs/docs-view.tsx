@@ -8,7 +8,6 @@ import CodeIcon from "~/assets/icons/code.svg";
 import { NodeDocsContent } from "./node-docs";
 import { InterfaceDocsContent } from './interface-docs';
 import { DataTypeDocsContent } from "./datatype-docs";
-import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
 import { HeaderDocsContent } from "./header-docs";
 import { DocsSidebar } from "./docs-sidebar";
 import AskDocsIcon from "~/assets/icons/ask-about.svg";
@@ -106,19 +105,4 @@ const DocsContentSelector = (props: {
             </Match>
         </Switch>
     )
-}
-
-
-const make_docs_index = (docs_record: Record<string, MetadataStoreData>) => {
-    const type_doc_ids: string[] = Object.keys(docs_record);
-    let flattened_index: string[] = [];
-    let index: Map<string, string> = new Map();
-    type_doc_ids.forEach((id) => {
-        const datatype_keys = Object.keys(docs_record[id].data_types ?? []);
-        const nodetype_keys = Object.keys(docs_record[id].node_types ?? []);
-        const interface_keys = Object.keys(docs_record[id].interface ?? []);
-        flattened_index = [...flattened_index, ...datatype_keys, ...nodetype_keys, ...interface_keys];
-    });
-    
-    return [flattened_index, index];
 }

@@ -4,9 +4,7 @@ import { EditorToolbar } from "./subpanels/editor-toolbar";
 import { NodeEditor } from "~/editor/node-editor";
 import { PageView, PageViewer, StaticViewDisplayer } from '../components/page-controller';
 import { Show } from "solid-js";
-import { DocsView } from "../screens/docs/docs-view";
 import DocsIcon from "~/assets/icons/book.svg";
-import MinimizeIcon from "~/assets/icons/minimize.svg";
 
 export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor, docs_page: PageView}) => {
     

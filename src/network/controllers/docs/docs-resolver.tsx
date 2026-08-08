@@ -12,11 +12,11 @@ const LOCAL_DATA_ID = "builtin";
 
 const interfaceModules = import.meta.glob("/src/docs/builtin/interface/**/*.json");
 const datatypeModules = import.meta.glob("/src/docs/builtin/datatypes/**/*.json");
-export function make_node_docs_path(root_id: string, node?: GraphNode, type_id?: string): string | undefined {
+export function make_node_docs_path(root_id: string, node?: GraphNode, type_id?: string): string {
     return root_id + DocsPathSplitter + DocsPathPrefix.NODE + DocsPathSplitter + (node ? node.type_id : type_id)
 }
 
-export function make_datatype_docs_path(root_id: string, datatype?: BaseDataType, slot?: NodeSlot): string | undefined{
+export function make_datatype_docs_path(root_id: string, datatype?: BaseDataType, slot?: NodeSlot, type_id?: string): string {
     if (datatype) {
         return root_id + DocsPathSplitter + DocsPathPrefix.DATATYPE + DocsPathSplitter + datatype.type_id;
     }
@@ -25,7 +25,11 @@ export function make_datatype_docs_path(root_id: string, datatype?: BaseDataType
         return root_id + DocsPathSplitter + DocsPathPrefix.DATATYPE + DocsPathSplitter + slot.data_type.type_id;
     }
 
-    return undefined;
+    if (type_id) {
+        return root_id + DocsPathSplitter + DocsPathPrefix.DATATYPE + DocsPathSplitter + type_id;
+    }
+
+    return root_id;
 }
 
 export function make_ui_docs_path(root_id: string, docs_element_id: string) {

@@ -1,11 +1,10 @@
 import { SceneController } from "~/wrapper/controllers/scene-controller"
 import { MetadataHeader } from "~/wrapper/metadata/header_metadata"
-import { DocsTags, MetadataStoreSubContent } from "./docs-components"
+import { DocsTags } from "./docs-components"
 import { SimpleField, FieldValueDisplayer } from "../../components/input-fields"
 import { unixToDate } from "~/editor/utils/time-utils"
 import { createMemo } from "solid-js"
 import { useDocs } from "~/editor/controllers/docs-controller"
-import { DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces"
 import { MetadataContentIndex } from "./docs-sidebar"
 
 export const HeaderDocsContent = (props: {
