@@ -3,7 +3,6 @@ import { NodeServerClient } from "../websocket/websocket-handler";
 import { UserSession } from "./user-session";
 import { UserWorkspace } from "./user-workspace";
 import { NotificationController } from "../controllers/notification_controller";
-import { MetadataController } from "../controllers/metadata/metadata_controller";
 
 export class SessionController {
     client: NodeServerClient;

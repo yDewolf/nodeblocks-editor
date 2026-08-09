@@ -1,6 +1,7 @@
 import { createSignal, createMemo, For, Show } from "solid-js";
 import { useDocs } from "~/editor/controllers/docs-controller";
 import { DocSearchHelper } from "~/network/controllers/docs/docs-helper";
+import { DocsHref } from "./docs-reference";
 
 export const DocSearchBar = (props: {
 
@@ -39,7 +40,7 @@ export const DocSearchBar = (props: {
                         <div>No topic found</div>
                     }>
                         {(topic) => (
-                            <a class="docs-href" href={`#docs=${topic.path}`} onClick={() => setQuery("")}>
+                            <DocsHref path={topic.path} onclick={() => setQuery("")}>
                                 <div class="row-container space-between center-items">
                                     <span class="search-result-title">{topic.capitalized_name}</span>
                                     <span class="search-result-root">
@@ -49,7 +50,7 @@ export const DocSearchBar = (props: {
                                 <Show when={topic.description}>
                                     <p class="search-result-description">{topic.description}</p>
                                 </Show>
-                            </a>
+                            </DocsHref>
                         )}
                     </For>
                 </div>

@@ -15,6 +15,7 @@ import FilterIcon from "~/assets/icons/filter.svg";
 import { DocsPathSplitter } from "~/singletons/metadata";
 import { DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
 import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
+import { DocsHref } from "../../components/docs/docs-reference";
 
 
 export const NodeDocsContent = (props: {
@@ -78,9 +79,9 @@ function resolve_slot_type_label(slotData: SlotData): string {
 const BadgeTag = (props: { badge: DropdownBadge }) => (
     <div class="tag-holder">
         {props.badge.icon}
-        <a class="field-link docs-href" href={props.badge.href}>
+        <DocsHref class="field-link" path={props.badge.href ?? ""}>
             {props.badge.label}
-        </a>
+        </DocsHref>
     </div>
 );
 

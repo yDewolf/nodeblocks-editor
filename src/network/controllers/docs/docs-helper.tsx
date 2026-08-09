@@ -1,4 +1,4 @@
-import { MetadataController, MetadataStoreData } from "../metadata/metadata_controller";
+import { MetadataStoreData } from "../metadata/metadata_controller";
 import { make_datatype_docs_path, make_node_docs_path, make_ui_docs_path } from "./docs-resolver";
 
 export type DocTopicType = 'node' | 'datatype' | 'interface' | "header";

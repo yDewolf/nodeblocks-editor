@@ -9,6 +9,7 @@ import { BaseDataType, DataTypeUtils, DefaultRenderers } from "~/wrapper/nodes/d
 import { DataTypeGenParams, generate_datatype_random_value } from '../../../../wrapper/nodes/data/data-type-value-utils';
 import RefreshIcon from '~/assets/icons/refresh.svg';
 import { createStore } from "solid-js/store";
+import { DocsHref } from "../../components/docs/docs-reference";
 
 export const DataTypeDocsContent = (props: {
     path: string | undefined,
@@ -58,7 +59,7 @@ const DataTypeAttributes = (props: {
             <h3>Attributes</h3>
             <SimpleField field_name="Base" field_displayer={
                 // TODO: maybe add a better visual for field links
-                () => <a class="field-link docs-href" href={`#docs=${props.datatype?.root_id}${DocsPathSplitter}${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${props.datatype?.base}`}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></a>
+                () => <DocsHref class="field-link" path={`${props.datatype?.root_id}${DocsPathSplitter}${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${props.datatype?.base}`}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></DocsHref>
             } field_id={props.datatype?.type_id + "-base"}/>
             <SimpleField field_name="Renderer" field_displayer={
                 () => <FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.renderer} id={props.datatype?.type_id + "-renderer"}/>}/>

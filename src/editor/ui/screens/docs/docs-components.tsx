@@ -6,6 +6,7 @@ import TagIcon from "~/assets/icons/tag.svg";
 import { DocsPathSplitter } from "~/singletons/metadata";
 import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
 import { DropdownSection } from "../../components/panels/dropdown";
+import { DocsHref } from "../../components/docs/docs-reference";
 
 type PathPart = {
     path: string[],
@@ -108,9 +109,9 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
                     return (
                         <>
                             {/* FIXME: this path generator. It includes categories that aren't parsed by DocsResolver */}
-                            <a class="docs-href" href={`#docs=${part.path.join(DocsPathSplitter)}`}>
+                            <DocsHref path={part.path.join(DocsPathSplitter)}>
                                 <span>{part.label}</span>
-                            </a>
+                            </DocsHref>
                             <Switch>
                                 <Match when={idx() < (path_parts()?.length ?? 1) - 1}>
                                     <span>
@@ -189,7 +190,7 @@ export const MetadataStoreSubContent = (props: {
                             }
                             const type_data = props.data[id] as BaseMetadata;
                             const name = type_data.capitalized_name != "" ? type_data.capitalized_name : id;
-                            return <a class="docs-href" href={"#docs=" + props.root_id + DocsPathSplitter + props.docs_prefix + DocsPathSplitter + id}>{name}</a>
+                            return <DocsHref path={props.root_id + DocsPathSplitter + props.docs_prefix + DocsPathSplitter + id}>{name}</DocsHref>
                         }}
                     </For>
                 </div>}
