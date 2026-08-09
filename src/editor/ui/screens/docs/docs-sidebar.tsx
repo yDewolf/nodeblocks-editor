@@ -49,7 +49,7 @@ export const DocsSidebar = (props: {
                     </For>
                 </div>
             </div>
-            <div class="scrollable keep fill container">
+            <div class="tab-history scrollable keep fill container">
                 <Switch fallback={
                     <p>Previous tabs will show up here</p>
                 }>

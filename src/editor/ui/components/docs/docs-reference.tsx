@@ -10,6 +10,7 @@ export const DocsHref = (props: {
 }) => {
     return (
         <a
+            title={props.path}
             classList={props.classList}
             id={props.id} 
             class={"docs-href " + (props.class ?? "")} 

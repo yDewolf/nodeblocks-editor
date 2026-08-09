@@ -167,10 +167,12 @@ export const DocsElementIndicator = (props: {
                         style={popupStyle()} 
                     >  
                         <div class="fill keep row-container space-between docs-popup-header" style={{"align-items": 'center'}}>
-                            <DocsIcon class="small-icon"/>
-                            <p>
-                            {docs.docsData.latest?.data.capitalized_name ?? "Not found"}
-                            </p>
+                            <div class="keep row-container center-items">
+                                <DocsIcon class="small-icon"/>
+                                <p>
+                                {docs.docsData.latest?.data.capitalized_name ?? "Not found"}
+                                </p>
+                            </div>
                             <button class="icon-button" onclick={() => props.open_docs_page()}>
                                 <ExpandIcon class="small-icon"/>
                             </button>
