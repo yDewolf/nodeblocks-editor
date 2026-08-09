@@ -1,0 +1,224 @@
+.docs-view-body {
+    display: grid;
+    height: stretch;
+    grid-template-columns: 200px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    column-gap: 20px;
+    overflow-y: scroll;
+}
+
+.docs-sidebar {
+    display: grid;
+    height: stretch;
+    gap: 4px;
+    grid-template-columns: 100%;
+    grid-template-rows: minmax(0, 0.75fr) minmax(0, 0.25fr);
+}
+
+.tab-history {
+    gap: 5px;
+}
+
+.tab-history .docs-href {
+    min-height: fit-content;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: break-all;
+}
+
+.docs-sidebar > div {
+    border: 1px solid var(--stroke-color);
+    padding: 4px;
+}
+
+.docs-content, .docs-left-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.docs-left-panel {
+    height: 80vh;
+    background-color: var(--dark-overlay-background);
+    width: auto;
+}
+
+.docs-content {
+    overflow-y: scroll;
+    word-break: break-all;
+    
+    gap: 8px;
+    h2 {
+        font-size: 1.3rem;
+    }
+    h3 {
+        font-size: 1.1rem;
+    }
+}
+
+.docs-sections {
+    .section-header {
+        flex-direction: row-reverse;
+        padding: 4px 2px;
+    }
+}
+
+.tag-holder, .path-holder, .docs-tag {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    word-break: normal;
+}
+
+.docs-tag {
+    font-size: 0.9rem;
+}
+
+.tag-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+
+.docs-slot-header {
+    display: flex;
+    width: stretch;
+    gap: 10px;
+
+    .node-slot {
+        width: fit-content;
+        text-align: left;
+        flex-direction: row;
+        min-width: auto;
+    }
+}
+
+.docs-header-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.docs-header-badges > .tag-holder {
+    background-color: var(--dark-overlay-highlight);
+    border-radius: 4px;
+    padding: 3px;
+    gap: 2px;
+}
+
+.docs-href {
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 30ms linear;
+}
+
+.docs-href-container {
+    align-items: center;
+    svg {
+        width: 14px;
+        height: 14px;
+    }
+    button {
+        display: none;
+    }
+}
+
+.docs-href-container:hover {
+    button {
+        display: inherit;
+    }
+}
+
+.docs-href:hover, .docs-href.selected {
+    background-color: var(--dark-overlay-highlight);
+}
+
+.tag-holder > .docs-href {
+    background-color: var(--dark-overlay-highlight);
+}
+
+.tag-holder > .docs-href:hover {
+    background-color: var(--overlay-highlight);
+}
+
+.field-grid > .docs-href {
+    text-decoration: underline;
+}
+
+.field-grid > .docs-href:hover {
+    .field-holder {background-color: var(--overlay-highlight);}
+}
+
+.doc-search-container {
+    height: 26px;
+    position: relative;
+}
+
+.doc-search-bar {
+    box-sizing: border-box;
+    padding: 4px 12px;
+}
+
+.doc-search-bar.dropdown-visible {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.search-results-dropdown {
+    z-index: 1;
+    font-size: 0.9rem;
+    min-width: stretch;
+    max-width: 200%;
+    max-height: 25vh !important;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--dark-overlay-background);
+    border: solid 1px var(--stroke-color);
+
+    padding: 8px;
+}
+
+.search-results-dropdown.unfocused {
+    display: none;
+}
+
+.search-result-root {
+    display: flex;
+    text-align: right;
+    opacity: 0.75;
+    font-size: 0.55rem;
+}
+
+.search-result-title, .search-result-description {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.search-result-description {
+    font-size: 0.7rem;
+    color: var(--secondary-font-color);
+}
+
+@media (max-width: 1024px) {
+    .search-results-dropdown {
+        max-width: stretch;
+    }
+
+    .docs-left-panel {
+        height: auto;
+    }
+
+    .docs-sidebar {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) minmax(0, 48px);
+    }
+
+    .docs-view-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 150px) minmax(0, 1fr);
+    }
+}

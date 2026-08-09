@@ -1,5 +1,6 @@
 import { Show } from "solid-js";
 import { metadata } from "~/singletons/metadata";
+import { SlotData } from "~/wrapper/helpers/node-type-file";
 import { NodeTypeMeta, SlotMeta } from "~/wrapper/metadata/type_metadata";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 
@@ -7,7 +8,7 @@ import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 // export const SlotComponentReferences = new ReactiveMap<NodeSlot, Array<SlotComponent>>();
 export class SlotComponent {
     slot: NodeSlot;
-    node_meta: NodeTypeMeta;
+    node_meta?: NodeTypeMeta;
     slot_meta?: SlotMeta
 
     constructor(slot: NodeSlot, node_meta?: NodeTypeMeta) {
@@ -28,13 +29,14 @@ export class SlotComponent {
         onClick: (slot: NodeSlot) => void,
         onHover: (slot: NodeSlot) => void
     ) => {
-        return <_SlotComponent onHover={onHover} onClick={onClick} show_label={show_label} slot={this.slot}/>
+        return <_SlotComponent highlightable={true} onHover={onHover} onClick={onClick} show_label={show_label} slot={this.slot}/>
     }
 
 }
 export const _SlotComponent = (props: {
     slot: NodeSlot,
     show_label: boolean,
+    highlightable?: boolean,
     node_meta?: NodeTypeMeta,
     onClick: (slot: NodeSlot) => void,
     onHover: (slot: NodeSlot) => void,
@@ -44,18 +46,19 @@ export const _SlotComponent = (props: {
     const slot_label = slot_meta ? slot_meta.capitalized_name : props.slot.slot_id;
     return (
         <div
-        onMouseOver={(e) => {
-            e.stopPropagation();
-            props.onHover(props.slot);
-        }}
-        title={slot_label}
-        class="node-slot"
-        classList={{
-            "connected-slot": props.slot.connections.size > 0,
-            "selected-slot": props.slot.selected,
-            "input-slot": props.slot.is_input,
-            "output-slot": !props.slot.is_input,
-        }}
+            has-docs={true}
+            onMouseOver={(e) => {
+                e.stopPropagation();
+                props.onHover(props.slot);
+            }}
+            title={slot_label}
+            class="node-slot"
+            classList={{
+                "connected-slot": props.slot.connections.size > 0,
+                "selected-slot": props.slot.selected,
+                "input-slot": props.slot.is_input,
+                "output-slot": !props.slot.is_input,
+            }}
         >
             <div 
                 ref={props.slot._element}
@@ -66,8 +69,29 @@ export const _SlotComponent = (props: {
                 }}
             ></div>
             <Show when={props.show_label}>
-                <span class="slot-label">{slot_label}</span>
+                <span class="slot-label" classList={{"highlightable": props.highlightable}}>{slot_label}</span>
             </Show>
+        </div>
+    )
+}
+
+export const SlotHeader = (props: {
+    slot_data: SlotData,
+    slot_meta: SlotMeta,
+    slot_id: string,
+    highlightable?: boolean,
+}) => { 
+    const slot_label = props.slot_meta ? props.slot_meta.capitalized_name : props.slot_id;
+    return (
+        <div 
+            class="node-slot"
+            classList={{
+                "input-slot": props.slot_data.is_input,
+                "output-slot": !props.slot_data.is_input,
+            }}
+        >
+            <div class="slot-dot"></div>
+            <span class="slot-label" classList={{"highlightable": props.highlightable}}>{slot_label}</span>
         </div>
     )
 }

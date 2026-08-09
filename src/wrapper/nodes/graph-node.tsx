@@ -8,6 +8,8 @@ import { BaseNode } from './scene-element';
 export class GraphNode extends BaseNode {
     id: string;
     node_name: string;
+
+    root_id: string;
     type_id: string;
 
     // Used to set node parameters etc.
@@ -35,9 +37,10 @@ export class GraphNode extends BaseNode {
     private _size: () => Vector2;
     private _setSize: (v: Vector2) => void;
 
-    constructor(node_name: string, node_data: NodeData, position: Vector2, id: string = "", type_id: string = "BaseNode") {
+    constructor(type_id: string, root_type: string, node_name: string, node_data: NodeData, position: Vector2, id: string = "") {
         super();
         
+        this.root_id = root_type;
         this.type_id = type_id;
         this.id = id;
         this.node_name = node_name;

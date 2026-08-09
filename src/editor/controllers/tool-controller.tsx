@@ -8,9 +8,9 @@ import { DocsTool } from "../tools/docs-tool";
 import { CommentTool } from "../tools/comment-tool";
 
 export class ToolController {
-    selection_controller: SelectionController
+    selection_controller: SelectionController;
     connection_controller: ConnectionController;
-    node_editor: NodeEditor
+    node_editor: NodeEditor;
 
     private _current_tool: () => EditorTool | undefined
     private _set_current_tool: (tool: EditorTool | undefined) => void;

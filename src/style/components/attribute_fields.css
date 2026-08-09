@@ -1,9 +1,16 @@
-select {
-    padding: 2px 4px;
-    border-radius: 4px;
-    border: 1px solid var(--stroke-color);
+.field-link > * {
+    pointer-events: none;
 }
-select:focus-visible {
+
+select, input {
+    background-color: var(--overlay-highlight);
+    border-color: var(--stroke-color);
+    border: 1px solid var(--stroke-color);
+    border-radius: 4px;
+    padding: 2px 4px;
+}
+
+select:focus-visible, input:focus-visible {
     border-color: var(--overlay-highlight);
     outline: none;
 }
@@ -13,6 +20,13 @@ select:focus-visible {
   label {
     margin-right: 10px;
   }
+}
+
+.field-label {
+    align-self: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .field-section {

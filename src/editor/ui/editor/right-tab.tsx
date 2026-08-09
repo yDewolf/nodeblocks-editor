@@ -52,7 +52,7 @@ export const EditorRightPanel = (props: {editor: NodeEditor, state_controller: S
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
     const [selectedTab1, setSelectedTab1] = createSignal<string>(Object.keys(bottom_tabs).at(0) ?? "");
     return (
-        <div class="right-tab-holder">
+        <div class="right-tab-holder" docs-id="editor-right-tab" docs-root="builtin">
             <DropdownSection
                 expanded_states={[expanded, setExpanded]}
                 dropdown_class="right-tab-dropdown"                

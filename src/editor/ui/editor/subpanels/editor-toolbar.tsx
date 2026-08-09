@@ -21,7 +21,9 @@ const ToolSelector = (props: {tool: EditorTool, current_tool?: EditorTool, set_s
     const tool_name = props.tool.constructor.name;
     const tool_style = TOOL_ICON_MAP.get(tool_name);
     return (
-        <button onclick={() => {props.set_selected_tool(props.tool);}}
+        <button onclick={() => {
+            props.set_selected_tool(props.tool);
+        }}
             class="tool-selector-container" 
             classList={{
                 "selected": props.current_tool === props.tool

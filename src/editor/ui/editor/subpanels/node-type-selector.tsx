@@ -98,6 +98,7 @@ export class NodeTypePreview {
     public View(onPointerDown: (node_preview: NodeTypePreview) => void) {
         return (
             <div 
+                has-docs={true}
                 onPointerDown={() => onPointerDown(this)}
                 class="node-type-preview"
                 classList={{

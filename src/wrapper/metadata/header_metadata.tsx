@@ -1,3 +1,4 @@
+import { BaseMetadata } from "./base_metadata"
 import { NodeCategory, NodeTag, parse_category, parse_tag } from "./node_filters"
 import { DataTypeMeta, NodeTypeMeta } from "./type_metadata"
 
@@ -6,7 +7,7 @@ export interface MetadataVersion {
     types_version: number
 }
 
-export interface MetadataHeader extends MetadataVersion {
+export interface MetadataHeader extends MetadataVersion, BaseMetadata {
     types_id: string,
     last_modified: number,
 
@@ -32,6 +33,8 @@ export const parse_header = (json_data: any): MetadataHeader => {
     }
 
     const header_meta: MetadataHeader = {
+        capitalized_name: json_data.capitalized_name ?? json_data.types_id ?? "",
+        description: json_data.description ?? "",
         types_version: json_data.types_version,
         meta_version: json_data.meta_version,
         types_id: json_data.types_id ?? "",

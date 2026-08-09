@@ -1,10 +1,13 @@
 import "./app.css";
+import "./singletons/docs";
+import { session_controller } from "./singletons/user_session";
 import { createEffect, onMount } from "solid-js";
 import { NodeEditor } from "./editor/node-editor";
-import { session_controller } from "./singletons/user_session";
 import { UpdateRootDataTheme } from "./editor/ui/ui-themes";
+import { DocsProvider, DocsUrlSync } from './editor/controllers/docs-controller';
+import { EditorView } from "./editor/ui/screens/editor-view";
 
-const node_editor = new NodeEditor(session_controller);
+const node_editor = new NodeEditor();
 
 async function testHandleConnection() {
   try {
@@ -35,9 +38,13 @@ export default function App() {
       UpdateRootDataTheme();
   });
 
+
   return (
     <main>
-      {node_editor.View()}
+      <DocsProvider>
+        <DocsUrlSync/>
+        <EditorView editor={node_editor}/>
+      </DocsProvider>
     </main>
   );
 }

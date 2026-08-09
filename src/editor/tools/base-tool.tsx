@@ -2,7 +2,7 @@ import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { NodeEditor } from "../node-editor";
-import { NodeTypePreview } from "../ui/panels/type_selector/node-type-selector";
+import { NodeTypePreview } from "../ui/editor/subpanels/node-type-selector";
 
 export interface ComponentEventHandler {
     onKeyDown(e: KeyboardEvent): void;
@@ -16,6 +16,10 @@ export interface ComponentEventHandler {
     onPointerDown(e: PointerEvent): void;
 
     onPointerUp(e: PointerEvent): void;
+
+    globalOnPointerDown(e: PointerEvent): void;
+    globalOnPointerUp(e: PointerEvent): void
+    globalOnPointerMove(e: PointerEvent): void
 
     onClickOnNode(node: GraphNode): void;
 
@@ -32,6 +36,7 @@ export interface ComponentEventHandler {
 }
 
 export abstract class BaseEventHandler implements ComponentEventHandler {
+    
     onClickOnNodePreview(node_preview: NodeTypePreview): void {
     }
     onKeyDown(e: KeyboardEvent): void {
@@ -47,7 +52,11 @@ export abstract class BaseEventHandler implements ComponentEventHandler {
     }
     onPointerUp(e: PointerEvent): void {
     }
-    
+
+    globalOnPointerDown(e: PointerEvent): void {}
+    globalOnPointerUp(e: PointerEvent): void {}
+    globalOnPointerMove(e: PointerEvent): void {}
+
     onClickOnNode(node: GraphNode): void {
     }
     onClickOnNodeSlot(slot: NodeSlot): void {

@@ -24,6 +24,8 @@ export function _match_renderer(base_type: DefaultDataTypes): DefaultRenderers {
         case DefaultDataTypes.FLOAT: return DefaultRenderers.SCALAR;
         case DefaultDataTypes.INT: return DefaultRenderers.SCALAR;
         case DefaultDataTypes.UINT: return DefaultRenderers.SCALAR;
+        case DefaultDataTypes.TEXT: return DefaultRenderers.TEXT;
+        case DefaultDataTypes.BOOLEAN: return DefaultRenderers.SCALAR;        
         default:
             return DefaultRenderers.NOT_IMPLEMENTED
     }
@@ -37,6 +39,7 @@ export class BaseDataType {
         public type_whitelist: DefaultDataTypes[] = [],
         public name_whitelist: string[] = [],
         renderer: DefaultRenderers | undefined  = undefined,
+        public root_id: string = "builtin",
     ) {
         if (renderer == undefined) {
             renderer = _match_renderer(this.base)

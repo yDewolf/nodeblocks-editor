@@ -12,7 +12,7 @@ export interface NodeTypeMeta extends BaseMetadata {
 }
 
 export interface DataTypeMeta extends BaseMetadata {
-    
+    is_builtin?: boolean
 }
 
 export const parse_node_types = (
