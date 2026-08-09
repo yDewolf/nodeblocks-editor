@@ -65,7 +65,6 @@ export const DocsSidebar = (props: {
                                     }
                                 }
                                 return (
-                                    // TODO: Format this properly so root and other stuff appears only if needed 
                                     <div class="fill row-container space-between docs-href-container">
                                         <DocsHref class="fill" path={path} id={make_id_from_path(path)}
                                             classList={{
@@ -102,7 +101,6 @@ export const MetadataContentIndex = (props: {
             }}
         </For> */}
 
-        {/* TODO: implement header metadata linking stuff */}
         <DocsHref  path={props.root_id}>header</DocsHref>
         <MetadataStoreSubContent data={props.data.data_types} header="datatypes" docs_prefix={DocsPathPrefix.DATATYPE} root_id={props.root_id}/>
         <MetadataStoreSubContent data={props.data.node_types} header="nodetypes" docs_prefix={DocsPathPrefix.NODE} root_id={props.root_id}/>

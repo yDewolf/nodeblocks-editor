@@ -8,7 +8,6 @@ import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 // import { NodeSceneRequestData } from "../websocket/request-types";
 // import { Action } from "./actions/action-controller";
 
-// TODO: Observe Actions
 export class ServerSyncController {
     _client: NodeServerClient
     _scene_controller: SceneController

@@ -22,10 +22,6 @@ export const EditorMidTab = (props: {page_viewer: PageViewer, editor: NodeEditor
             }>
                 <div class="middle-tab-overlay container">
                     <div class="keep fill row-container space-between">
-                        {/* <div>
-                            TODO: Docs Button here
-                        </div> */}
-                        {/* Placeholder: */}
                         <div class="theme-button-holder">
                             <button class="icon-button" onclick={() => {
                                 props.page_viewer.current_page = props.docs_page;

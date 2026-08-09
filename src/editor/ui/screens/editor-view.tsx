@@ -163,7 +163,7 @@ export const EditorView = (props: {
                                     editor.input_manager.generalizedEventHandler({node: node}, InputEvents.HOVER_NODE)
                                 }}
                                 syncParameter={(node: GraphNode, parameter: NodeParameter) => {
-                                    // TODO: Update only this parameter
+                                    // TODO: Update only this parameter instead of the whole node
                                     NodeActionUtils.request_update_nodes([node], editor._action_controller);
                                 }}
                             />

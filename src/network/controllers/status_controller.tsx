@@ -45,8 +45,10 @@ export class WebsocketStatusController {
         }
     }
 
-    // TODO:
+    // TODO: Request Connect
     public request_connect() {
-
+        if (this._client) {
+            this._client.connect();
+        }
     }
 }

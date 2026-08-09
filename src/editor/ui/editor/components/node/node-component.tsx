@@ -295,7 +295,6 @@ export const NodeBodySections = (props: {
     node_meta?: NodeTypeMeta
 }) => {
     return (
-        // TODO
         <div class="node-body-sections container fill">
             <Show when={props.node.node_data.parameters.size > 0}>
                 <DropdownSection header="Parameters" content={

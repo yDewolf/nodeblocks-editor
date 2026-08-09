@@ -14,7 +14,7 @@ export type ClientVersionSync = {
 // Response for ClientVersionSync
 export type ServerVersionSync = {
     types?: TypeFile,
-    metadata?: Metadata // TODO: implement metadata stuff
+    metadata?: Metadata
 }
 
 
