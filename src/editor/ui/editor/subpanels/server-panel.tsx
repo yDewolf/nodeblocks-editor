@@ -46,7 +46,7 @@ export const ServerPanel = (props: {editor: NodeEditor, state_controller: StateC
                 </Switch>
             </div>
             <div class="control-panel keep row-container">
-                <select name="" id="" onInput={(e) => {
+                <select value={props.state_controller.loop_state} name="" id="" onInput={(e) => {
                     props.editor._editor_client.sendCommand({
                         type: ClientMessages.SET_INSTANCE_LOOP_STATE,
                         payload: {state: e.currentTarget.value as LoopStates}
