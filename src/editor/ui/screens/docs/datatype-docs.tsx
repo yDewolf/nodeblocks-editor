@@ -2,7 +2,7 @@ import { createMemo, createResource, createSignal, Match, Switch } from "solid-j
 import { DocsPathSplitter } from "~/singletons/metadata";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { DataTypeMeta } from "~/wrapper/metadata/type_metadata";
-import { OutputSelector } from '../../editor/components/node/output/node-output';
+import { _SlotOutputPack, OutputSelector } from '../../editor/components/node/output/node-output';
 import { FieldValueDisplayer, SimpleField } from "../../components/input-fields";
 import { DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
 import { BaseDataType, DataTypeUtils, DefaultRenderers } from "~/wrapper/nodes/data/node-data-type";
@@ -10,6 +10,7 @@ import { DataTypeGenParams, generate_datatype_random_value } from '../../../../w
 import RefreshIcon from '~/assets/icons/refresh.svg';
 import { createStore } from "solid-js/store";
 import { DocsHref } from "../../components/docs/docs-reference";
+import { SlotOutputWrapper } from "~/wrapper/nodes/slot/node-slot";
 
 export const DataTypeDocsContent = (props: {
     path: string | undefined,
@@ -87,8 +88,14 @@ const DataTypePreview = (props: {
         refetch(false);
 
         if (!props.datatype) return undefined;
-        const value = generate_datatype_random_value(props.datatype, genParams)
-        return value;
+        const value = generate_datatype_random_value(props.datatype, genParams);
+        const output: SlotOutputWrapper = {
+            value: value[1]
+        }
+        const pack: _SlotOutputPack = {
+            output: output
+        }
+        return pack;
     });
 
     return (

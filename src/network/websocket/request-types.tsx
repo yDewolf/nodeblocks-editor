@@ -3,6 +3,7 @@ import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, EditorAct
 import { ServerNotification, NotificationWithMeta } from './requests/notifications';
 import { TypeFile } from "~/wrapper/helpers/node-type-file";
 import { Metadata, MetadataVersion } from "~/wrapper/metadata/header_metadata";
+import { NodeOutput } from "~/wrapper/nodes/graph-node";
 
 // First message client sends after connecting
 export type ClientVersionSync = {
@@ -16,7 +17,6 @@ export type ServerVersionSync = {
     types?: TypeFile,
     metadata?: Metadata
 }
-
 
 export type NodeSceneRequestData = {[uid: string]: MinimalNodeSceneData};
 export type ConnSceneRequestData = {[uid: string]: ConnectionSceneData};
@@ -35,7 +35,7 @@ export type ConnectionActionPayload =
 export type ServerMessage = 
     | (ServerVersionSync & { type: ServerMessages.SYNC_VERSIONS })
     | { type: ServerMessages.METADATA_UPDATED; metadata_version: MetadataVersion}
-    | { type: ServerMessages.NODE_OUTPUT; node_id: string; value: any }
+    | { type: ServerMessages.NODE_OUTPUT; node_id: string; value: NodeOutput }
     // FIXME: handshake_sync is not fully type safe
     | { type: ServerMessages.HANDSHAKE_SYNC; status: number; session: string}
     // | { type: ServerMessages.HANDSHAKE_SYNC; status: number; message: string }

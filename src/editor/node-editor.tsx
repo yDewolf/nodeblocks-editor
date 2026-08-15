@@ -21,6 +21,7 @@ import {} from "./ui/ui-themes";
 import "~/style/screens/editor.css";
 import { DocsController } from "./controllers/docs-controller";
 import { session_controller } from "~/singletons/user_session";
+import { SlotOutputWrapper } from "~/wrapper/nodes/slot/node-slot";
 
 
 export class NodeEditor {
@@ -277,8 +278,8 @@ export class NodeEditor {
                 console.error("ERROR: Couldn't find node with id ", message.node_id);
                 return;
             }
-            const node_output: Map<string, Map<string, any>> = new Map(
-                Object.entries(message.value).map(([slot_id, slot_output]: [string, any]) => {
+            const node_output: Map<string, SlotOutputWrapper> = new Map(
+                Object.entries(message.value).map(([slot_id, slot_output]: [string, SlotOutputWrapper]) => {
                     return [slot_id, slot_output];
                 })
             );

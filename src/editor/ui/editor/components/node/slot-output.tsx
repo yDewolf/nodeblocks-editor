@@ -1,14 +1,18 @@
 import { createMemo, Show } from "solid-js"
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot"
-import { OutputSelector } from "./output/node-output";
+import { _SlotOutputPack, OutputSelector } from "./output/node-output";
 
 export const SlotOutput = (props: {slot: NodeSlot}) => {
     const slot_output = createMemo(() => {
         if (props.slot.last_output) {
-            if (props.slot.last_output.size == 0) {
+            if (props.slot.last_output.value.size == 0) {
                 return undefined;
             }
-            return [props.slot.slot_id, props.slot.last_output];
+            const pack: _SlotOutputPack = {
+                slot_id: props.slot.slot_id,
+                output: props.slot.last_output
+            };
+            return pack;
         }
         return undefined;
     });

@@ -7,6 +7,11 @@ import { ReactiveMap } from "@solid-primitives/map";
 import { BaseDataType } from "../data/node-data-type";
 import { BaseSlotType } from "../data/slot-types";
 
+export interface SlotOutputWrapper {
+    value: any,
+    value_meta?: any
+}
+
 export class NodeSlot {
     parent_node: GraphNode;
     _element: HTMLDivElement | undefined; // FIXME: SlotComponent
@@ -24,8 +29,8 @@ export class NodeSlot {
 
     _connections: ReactiveMap<NodeSlot, NodeConnection>;
 
-    private _last_output: () => Map<string, any>;
-    private _set_last_output: (out: Map<string, any>) => void;
+    private _last_output: () => SlotOutputWrapper;
+    private _set_last_output: (out: SlotOutputWrapper) => void;
 
     _last_world_pos: Vector2 = {x: 0, y: 0};
 
@@ -37,7 +42,7 @@ export class NodeSlot {
         this.data_type = data_type == null ? slot_type.data_type : data_type;
         this.slot_id = slot_id;
 
-        const [lastOutput, setLastOutput] = createSignal(new Map());
+        const [lastOutput, setLastOutput] = createSignal({value: undefined, value_meta: undefined});
         this._last_output = lastOutput;
         this._set_last_output = setLastOutput;
 
@@ -53,7 +58,7 @@ export class NodeSlot {
     }
 
     get last_output() { return this._last_output() }
-    set last_output(output: Map<string, any>) { this._set_last_output(output); }
+    set last_output(output: SlotOutputWrapper) { this._set_last_output(output); }
 
     get selected() { return this._selected() }
     set selected(value: boolean) { this._set_selected(value); }

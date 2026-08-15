@@ -1,11 +1,12 @@
 import { createEffect, createMemo, createSignal, For, Index, Match, Show, Switch } from "solid-js";
 import { ScalarView } from './scalar-output';
+import { SlotOutputWrapper } from "~/wrapper/nodes/slot/node-slot";
 
 // TODO: add a interpreter option on the UI so the user can select
 // how the array should be interpreted
 const ArrayCanvas = (props: { data: any[], shape: number[], target_channel: number }) => {
     let canvasRef: HTMLCanvasElement | undefined;
-
+    
     createEffect(() => {
         if (!canvasRef) return;
         const ctx = canvasRef.getContext('2d');
@@ -88,11 +89,16 @@ const get_array_shape = (array: any): number[] => {
     return shape;
 };
 
-export const ArrayView = (props: { output_value: any | undefined }) => {
+export const ArrayView = (props: { output_value: SlotOutputWrapper | undefined }) => {
     if (!props.output_value) return <div>Empty</div>;
     const [target_channel, setTargetChannel] = createSignal(0);
 
-    const shape = createMemo(() => get_array_shape(props.output_value));
+    const shape = createMemo(() => {
+        // if ("shape" in props.output_value?.value_meta) {
+        //     return props.output_value?.value_meta.shape;
+        // }
+        return get_array_shape(props.output_value?.value)
+    });
     const dims = () => shape().length;
 
     return (
@@ -124,9 +130,9 @@ export const ArrayView = (props: { output_value: any | undefined }) => {
                 </Show>
             </div>
             <Switch fallback={
-                <Switch fallback={<div class="text-preview">{JSON.stringify(props.output_value).slice(0, 100)}...</div>}>
+                <Switch fallback={<div class="text-preview">{JSON.stringify(props.output_value.value).slice(0, 100)}...</div>}>
                     <Match when={dims() <= 3 || (dims() === 4 && shape().at(0) === 1)}>
-                        <ArrayCanvas data={props.output_value} shape={shape()} target_channel={target_channel()}/>
+                        <ArrayCanvas data={props.output_value.value} shape={shape()} target_channel={target_channel()}/>
                     </Match>
                     <Match when={dims() > 3}>
                         <div class="simplified-view">

@@ -1,9 +1,11 @@
 import { createSignal } from 'solid-js';
 import { Rect, Vector2 } from '../data_types/geometry';
 import { NodeConnection } from './node-connection';
-import { NodeSlot } from './slot/node-slot';
+import { NodeSlot, SlotOutputWrapper } from './slot/node-slot';
 import { NodeData } from './data/node-data';
 import { BaseNode } from './scene-element';
+
+export type NodeOutput = Record<string, SlotOutputWrapper>;
 
 export class GraphNode extends BaseNode {
     id: string;
@@ -16,11 +18,11 @@ export class GraphNode extends BaseNode {
     private _node_data: () => NodeData;
     private _set_node_data:  (data: NodeData) => void;
 
-    private _last_output: () => Map<string, Map<string, any>>;
-    private _set_last_output: (out: Map<string, Map<string, any>>) => void;
+    private _last_output: () => Map<string, SlotOutputWrapper>;
+    private _set_last_output: (out: Map<string, SlotOutputWrapper>) => void;
 
     private _target_slot_output: () => string | undefined;
-    private _set_target_slot_output: (slot_id: string) => void;
+    private _set_target_slot_output: (slot_id: string | undefined) => void;
 
     private _is_current_step: () => boolean;
     private _set_current_step: (v: boolean) => void;
@@ -82,10 +84,10 @@ export class GraphNode extends BaseNode {
     set is_current_step(v: boolean) { this._set_current_step(v) }
 
     get target_slot_output() { return this._target_slot_output() }
-    set target_slot_output(out: any) { this._set_target_slot_output(out); }
+    set target_slot_output(slot_id: string | undefined) { this._set_target_slot_output(slot_id); }
 
     get last_output() { return this._last_output() }
-    set last_output(output: Map<string, Map<string, any>>) { 
+    set last_output(output: Map<string, SlotOutputWrapper>) { 
         this._set_last_output(output) 
         if (this.target_slot_output == undefined) {
             const output_slots = this.output_slots;

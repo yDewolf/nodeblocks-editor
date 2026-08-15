@@ -54,7 +54,7 @@ export const DocsSidebar = (props: {
                     <p>Previous tabs will show up here</p>
                 }>
                     <Match when={docs.opened_tabs.length > 0}>
-                        <For each={docs.opened_tabs.reverse()}>
+                        <For each={docs.opened_tabs.toReversed()}>
                             {(path: string) => {
                                 const final_target = path.split(DocsPathSplitter).at(-1);
                                 let reduced_path = path;
