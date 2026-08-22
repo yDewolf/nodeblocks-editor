@@ -81,7 +81,7 @@ export const NodeComponent = (props: {
                     />
                     <NotificationPopupHolder 
                         notification_controller={props.notification_controller}
-                        notifications={props.notification_controller.forNode(props.node.id)}
+                        notifications={props.notification_controller.relatedToNode(props.node)}
                         pos={{x: 0, y: props.node.rect.size.y}}
                     />
                 </div>

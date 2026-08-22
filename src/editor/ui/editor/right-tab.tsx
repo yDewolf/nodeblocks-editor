@@ -9,13 +9,13 @@ import { TabSelector } from "../components/panels/tab-display"
 import { ServerPanel } from "./subpanels/server-panel"
 import { NodeAttributes } from "./subpanels/node-attributes"
 
-const NotificationLog = (props: {node_uid?: string}) => {
+const NotificationLog = (props: {node?: GraphNode}) => {
     const notification_controller = session_controller.notification_controller;
     
     const all_notifications = createMemo(() => [...notification_controller.forAll(),]);
     const notifications = createMemo(() => {
-        if (props.node_uid) {
-            return notification_controller.forNode(props.node_uid);
+        if (props.node) {
+            return notification_controller.relatedToNode(props.node);
         }
 
         return all_notifications();
@@ -46,7 +46,7 @@ export const EditorRightPanel = (props: {editor: NodeEditor, state_controller: S
     }
 
     const bottom_tabs: Record<string, () => JSXElement> = {
-        "Notifications": () => <NotificationLog node_uid={selectedNode()?.id}/>,
+        "Notifications": () => <NotificationLog node={selectedNode()}/>,
         "History": () => <NotificationLog/>
     }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");

@@ -4,6 +4,8 @@ import { isConnNotify, isNodeNotify, isParamNotify, isSlotNotify, NotificationLe
 import { createStore, produce, SetStoreFunction } from "solid-js/store";
 import { NodeEditor } from "~/editor/node-editor";
 import { Vector2 } from "~/wrapper/data_types/geometry";
+import { BaseNode } from "~/wrapper/nodes/scene-element";
+import { GraphNode } from "~/wrapper/nodes/graph-node";
 
 
 type NotificationStore = {
@@ -218,6 +220,12 @@ export class NotificationController {
                 this._editor.editor_space.teleport_to_pos(medium);
             }
         }
+    }
+
+    public relatedToNode(node: GraphNode, ordered: boolean = true) {
+        // TODO: improve this I guess
+        let notifications = this.forAll(ordered)
+        return notifications.filter((notif) => notif.node_uid == node.id)
     }
 
     public forNode(node_uid: string, ordered: boolean = true) {
