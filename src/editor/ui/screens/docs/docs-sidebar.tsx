@@ -24,7 +24,15 @@ export const DocsSidebar = (props: {
         if (docs.docs_path) {
             const docs_link = document.getElementById(make_id_from_path(docs.docs_path));
             if (!docs_link) return;
-            docs_link.scrollIntoView({ behavior: "smooth"})
+
+            const container = docs_link.closest(".scrollable");
+            if (!container) return;
+
+            const relativeTop = container.getBoundingClientRect().top - docs_link.getBoundingClientRect().top + container.scrollTop;
+            container.scrollTo({
+                top: relativeTop,
+                behavior: "smooth"
+            });
         }
     });
     return (
