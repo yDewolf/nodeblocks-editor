@@ -59,3 +59,7 @@
   --selection-color: var(--main-color);
   --selection-color-alpha: #7bb4ff4d;
 }
+
+* {
+  transition: color 50ms linear, background-color 50ms linear;
+}

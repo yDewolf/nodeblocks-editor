@@ -19,12 +19,17 @@
     gap: 5px;
 }
 
-.tab-history .docs-href {
+.tab-history .docs-href, .docs-index .docs-href {
     min-height: fit-content;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     word-break: break-all;
+}
+
+.docs-index .docs-href:hover {
+    overflow: visible;
+    min-width: fit-content;
 }
 
 .docs-sidebar > div {
