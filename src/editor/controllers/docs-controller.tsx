@@ -10,7 +10,8 @@ import { createStore, SetStoreFunction } from "solid-js/store";
 
 const DOCS_STATE_KEY = "app_docs_state";
 interface DocsState {
-    opened_tabs: string[]
+    opened_tabs: string[],
+    is_docs_page_opened: boolean
 }
 
 
@@ -32,6 +33,10 @@ export class DocsController {
 
     get opened_tabs() { return this.store.opened_tabs }
     private set opened_tabs(value: string[]) { this.setStore("opened_tabs", value) }
+    
+    get is_docs_page_opened() { return this.store.is_docs_page_opened; }
+    set is_docs_page_opened(value: boolean) { this.setStore("is_docs_page_opened", value) }
+
     public removeFromHistory(path: string) {
         const filtered = this.opened_tabs.filter((value: string) => value != path);
         this.opened_tabs = filtered;
@@ -55,6 +60,7 @@ export class DocsController {
         const [docsStore, setDocsStore] = makePersisted(
             createStore<DocsState>({
                 opened_tabs: [],
+                is_docs_page_opened: false,
             }),
             { name: DOCS_STATE_KEY }
         );

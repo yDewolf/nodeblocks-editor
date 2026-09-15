@@ -1,4 +1,4 @@
-import { onMount, onCleanup, Show, For } from "solid-js";
+import { onMount, onCleanup, Show, For, createEffect } from "solid-js";
 import { useDocs } from "~/editor/controllers/docs-controller";
 import { InputEvents } from "~/editor/internal/input_manager/event-handling";
 import { NodeEditor } from "~/editor/node-editor";
@@ -31,7 +31,7 @@ export const EditorView = (props: {
     let world_space_ref: HTMLDivElement | undefined;
     let editor_view_ref: HTMLDivElement | undefined;
     const selector = new NodeTypeSelector();
-
+    
     // FIXME: Implement a better way of indexing pages on a pageviewer and accessing them
     const DocsCallback = () => <DocsView scene_controller={editor.scene_controller}/>;
     const docsPage = {
@@ -40,13 +40,12 @@ export const EditorView = (props: {
         icon_element: () => <MinimizeIcon class="small-icon"/>,
         element: DocsCallback
     };
-
+    
     const openDocsPage = () => {
         main_page_viewer.current_page = docsPage;
     }
-
-    const isDocsPageVisible = () => main_page_viewer.current_page === docsPage;
     
+    const isDocsPageVisible = () => main_page_viewer.current_page === docsPage;    
     onMount(() => {
         if (viewportRef) {
             const rect = viewportRef.getBoundingClientRect();
@@ -62,9 +61,14 @@ export const EditorView = (props: {
             onCleanup(() => resizeObserver.disconnect());
         }
 
-        if (docs.docs_path) {
+        // TODO: abstract this to auto open any page that was visible before
+        if (docs.is_docs_page_opened) {
             openDocsPage();
         }
+    });
+
+    createEffect(() => {
+        docs.is_docs_page_opened = isDocsPageVisible();
     });
 
     return (
