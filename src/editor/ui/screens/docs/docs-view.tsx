@@ -11,6 +11,7 @@ import { DataTypeDocsContent } from "./datatype-docs";
 import { HeaderDocsContent } from "./header-docs";
 import { DocsSidebar } from "./docs-sidebar";
 import AskDocsIcon from "~/assets/icons/ask-about.svg";
+import { DocAnnotationHelper } from "~/network/controllers/docs/anottation-helper";
 
 export const DocsView = (props: {current_tool?: EditorTool, scene_controller: SceneController}) => {
     const docs = useDocs();
@@ -64,7 +65,7 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
                     </Show>
                     <div class="text-section">
                         <h2>{(docs_data()?.data.capitalized_name)}</h2>
-                        <p>{(docs_data()?.data.description) == "" || undefined ? "No Description" : (docs_data()?.data.description)}</p>
+                        <p>{(docs_data()?.data.description) == "" || undefined ? "No Description" : (DocAnnotationHelper.parseGeneric(docs_data()?.data.description, docs_data()?.data))}</p>
                     </div>
                     <DocsContentSelector path={docs.docs_path} docs_data={docs_data()} scene_controller={props.scene_controller} devMode={devMode()}/>
                 </Show>

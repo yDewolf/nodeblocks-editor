@@ -16,6 +16,7 @@ import { DocsPathSplitter } from "~/singletons/metadata";
 import { DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
 import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 import { DocsHref } from "../../components/docs/docs-reference";
+import { DocAnnotationHelper } from "~/network/controllers/docs/anottation-helper";
 
 
 export const NodeDocsContent = (props: {
@@ -96,7 +97,8 @@ const SlotDropdownItem = (props: {
         const badge_list: DropdownBadge[] = [
             {
                 label: resolve_slot_type_label(props.slot_data),
-                href: `#docs=${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${props.datatype?.type_id}`,
+                // FIXME: adicionar contexto sobre o escopo (MetadataHeader id)
+                href: `${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${props.datatype?.type_id}`,
                 icon: props.slot_data.is_input ? <InputIcon class="tag-icon" /> : <OutputIcon class="tag-icon" />
             }
         ];
@@ -126,7 +128,7 @@ const SlotDropdownItem = (props: {
                 <div>
                     <div class="text-section">
                         <h4>Description</h4>
-                        <p>{props.slot_meta.description}</p>
+                        <p>{DocAnnotationHelper.parseGeneric(props.slot_meta.description, props.slot_meta)}</p>
                     </div>
                     <Show when={props.slot_data.max_connections}>
                         <div class="text-section">
@@ -253,7 +255,8 @@ const ParameterDropdownItem = (props: {
 
                     <div class="text-section">
                         <h4>Description</h4>
-                        <p>{props.param_meta.description != "" ? props.param_meta.description : "No Description"}</p>
+                        {/* FIXME: pass NodeMeta as context */}
+                        <p>{props.param_meta.description != "" ? DocAnnotationHelper.parseGeneric(props.param_meta.description, props.param_meta) : "No Description"}</p>
                     </div>
 
                     <Show when={props.param_data.default != undefined}>

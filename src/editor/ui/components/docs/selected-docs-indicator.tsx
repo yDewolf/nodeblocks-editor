@@ -7,6 +7,7 @@ import { KeyEventManager } from '~/editor/internal/input_manager/input-manager';
 import { DocsTool } from "~/editor/tools/docs-tool";
 import DocsIcon from '~/assets/icons/book.svg';
 import ExpandIcon from '~/assets/icons/expand.svg';
+import { DocAnnotationHelper } from '~/network/controllers/docs/anottation-helper';
 
 // Não sei se fica melhor continuar mostrando o selecionado ou mostrar apenas o hovered
 const KeepSelectedHighlighted = false;
@@ -178,7 +179,7 @@ export const DocsElementIndicator = (props: {
                             </button>
                         </div>
                         <p>
-                            {docs.docsData.latest?.data.description !== "" ? docs.docsData.latest?.data.description : ""}
+                            {docs.docsData.latest?.data.description !== "" ? DocAnnotationHelper.parseGeneric(docs.docsData.latest?.data.description, docs.docsData.latest?.data) : ""}
                         </p>
                     </div>
                 </Portal>

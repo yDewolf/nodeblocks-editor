@@ -117,6 +117,10 @@
     transition: background-color 30ms linear;
 }
 
+.docs-href.text-reference {
+    text-decoration: underline;
+}
+
 .docs-href-container {
     align-items: center;
     svg {
