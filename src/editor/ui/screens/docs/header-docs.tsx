@@ -4,7 +4,7 @@ import { DocsTags } from "./docs-components"
 import { SimpleField, FieldValueDisplayer } from "../../components/input-fields"
 import { unixToDate } from "~/editor/utils/time-utils"
 import { createMemo } from "solid-js"
-import { useDocs } from "~/editor/controllers/docs-controller"
+import { useDocs } from "~/context/metadata/docs-context"
 import { MetadataContentIndex } from "./docs-sidebar"
 
 export const HeaderDocsContent = (props: {

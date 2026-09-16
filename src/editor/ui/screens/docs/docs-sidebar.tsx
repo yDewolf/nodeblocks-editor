@@ -1,5 +1,5 @@
 import { createEffect, createMemo, For, Match, Switch } from 'solid-js';
-import { useDocs } from "~/editor/controllers/docs-controller";
+import { useDocs } from "~/context/metadata/docs-context";
 import { DocPayload, DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
 import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
 import { DropdownSection } from "../../components/panels/dropdown";

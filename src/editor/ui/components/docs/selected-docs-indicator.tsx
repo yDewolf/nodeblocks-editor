@@ -1,13 +1,15 @@
 import { createEffect, createSignal, JSX, Show, createMemo, onCleanup } from 'solid-js';
 import { Portal } from 'solid-js/web';
-import { useDocs } from '~/editor/controllers/docs-controller';
+import { useDocs } from "~/context/metadata/docs-context";
 import { ToolController } from "~/editor/controllers/tool-controller";
 import { EditorCamera } from '~/editor/internal/editor-space';
 import { KeyEventManager } from '~/editor/internal/input_manager/input-manager';
 import { DocsTool } from "~/editor/tools/docs-tool";
 import DocsIcon from '~/assets/icons/book.svg';
 import ExpandIcon from '~/assets/icons/expand.svg';
-import { DocAnnotationHelper } from '~/network/controllers/docs/anottation-helper';
+import { DocAnnotationHelper } from '~/helpers/anottation-helper';
+import { MetaProvider } from '~/context/metadata/metadata-context';
+import { ParsedMetaText } from './metadata-text';
 
 // Não sei se fica melhor continuar mostrando o selecionado ou mostrar apenas o hovered
 const KeepSelectedHighlighted = false;
@@ -149,7 +151,7 @@ export const DocsElementIndicator = (props: {
     });
 
     return (
-        <>
+        <MetaProvider value={{metadata: docs.currentRoot}}>
             <Show when={target() != null && isToolActive()}>
                 <Portal mount={isInsideGraph() ? props.world_space_ref : props.editor_view_ref}>
                     <div 
@@ -178,12 +180,10 @@ export const DocsElementIndicator = (props: {
                                 <ExpandIcon class="small-icon"/>
                             </button>
                         </div>
-                        <p>
-                            {docs.docsData.latest?.data.description !== "" ? DocAnnotationHelper.parseGeneric(docs.docsData.latest?.data.description, docs.docsData.latest?.data) : ""}
-                        </p>
+                        <ParsedMetaText text={docs.docsData.latest?.data.description} default=""/>
                     </div>
                 </Portal>
             </Show>
-        </>
+        </MetaProvider>
     );
 };

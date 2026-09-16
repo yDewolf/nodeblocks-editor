@@ -4,7 +4,7 @@ import { session_controller } from "./singletons/user_session";
 import { createEffect, onMount } from "solid-js";
 import { NodeEditor } from "./editor/node-editor";
 import { UpdateRootDataTheme } from "./editor/ui/ui-themes";
-import { DocsProvider, DocsUrlSync } from './editor/controllers/docs-controller';
+import { DocsProvider, DocsUrlSync } from "./context/metadata/docs-context";
 import { EditorView } from "./editor/ui/screens/editor-view";
 
 const node_editor = new NodeEditor();

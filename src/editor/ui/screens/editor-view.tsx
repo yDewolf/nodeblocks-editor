@@ -1,5 +1,5 @@
 import { onMount, onCleanup, Show, For, createEffect } from "solid-js";
-import { useDocs } from "~/editor/controllers/docs-controller";
+import { useDocs } from "~/context/metadata/docs-context";
 import { InputEvents } from "~/editor/internal/input_manager/event-handling";
 import { NodeEditor } from "~/editor/node-editor";
 import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";

@@ -1,5 +1,5 @@
 import { createSignal, createMemo, For, Show } from "solid-js";
-import { useDocs } from "~/editor/controllers/docs-controller";
+import { useDocs } from "~/context/metadata/docs-context";
 import { DocSearchHelper } from "~/network/controllers/docs/docs-helper";
 import { DocsHref } from "./docs-reference";
 

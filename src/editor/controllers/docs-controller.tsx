@@ -1,12 +1,12 @@
-import { createSignal, createResource, Resource, JSX, createContext, useContext, onCleanup, createEffect, createMemo, Accessor } from "solid-js";
+import { createSignal, createResource, Resource, createMemo, Accessor } from "solid-js";
 import { docsResolver } from "~/singletons/docs";
 import { isServer } from "solid-js/web";
 import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
-import { getHashParams, setHashParam } from "../utils/url-utils";
 import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
 import { DocSearchHelper, DocTopic } from "~/network/controllers/docs/docs-helper";
 import { makePersisted } from "@solid-primitives/storage";
 import { createStore, SetStoreFunction } from "solid-js/store";
+import { DocsPathSplitter } from "~/singletons/metadata";
 
 const DOCS_STATE_KEY = "app_docs_state";
 interface DocsState {
@@ -54,6 +54,22 @@ export class DocsController {
 
     public docsData: Resource<DocPayload | undefined>;
     public allDocs: Record<string, MetadataStoreData>;
+
+
+    get currentRootId(): string | undefined {
+        const splitted = this.docs_path?.split(DocsPathSplitter);
+        if (splitted) {
+            return splitted.at(0);
+        }
+        return undefined;
+    }
+    get currentRoot(): MetadataStoreData | undefined {
+        if (this.currentRootId && this.currentRootId in this.allDocs) {
+            const store_data = this.allDocs[this.currentRootId];
+            return store_data;
+        }
+        return undefined;
+    }
     
     constructor() {
         this.allDocs = docsResolver.allData();
@@ -97,56 +113,5 @@ export class DocsController {
             }
         });
         this.docsData = docsDataResource[0];
-        
     }
 }
-
-const DocsContext = createContext<DocsController>();
-export function DocsProvider(props: { children: JSX.Element }) {
-    const controller = new DocsController();
-
-    return (
-        <DocsContext.Provider value={controller}>
-            {props.children}
-        </DocsContext.Provider>
-    );
-}
-
-export function useDocs() {
-    const context = useContext(DocsContext);
-    if (!context) {
-        throw new Error("Not inside a '<DocsProvider/>'");
-    }
-    return context;
-}
-
-export const DocsUrlSync = () => {
-    if (isServer) return;
-
-    const docs = useDocs();
-    const handleHashChange = () => {
-        const params = getHashParams();
-        const pathFromUrl = params["docs"];
-
-        if (pathFromUrl !== docs.docs_path) {
-            docs.docs_path = pathFromUrl || undefined;
-        }
-    };
-
-    handleHashChange();
-
-    window.addEventListener("hashchange", handleHashChange);
-    onCleanup(() => window.removeEventListener("hashchange", handleHashChange));
-
-    createEffect(() => {
-        const currentPath = docs.docs_path;
-        const params = getHashParams();
-        const urlPath = params["docs"];
-
-        if (currentPath !== urlPath) {
-            setHashParam("docs", currentPath);
-        }
-    });
-
-    return null;
-};

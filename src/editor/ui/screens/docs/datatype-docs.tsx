@@ -11,6 +11,7 @@ import RefreshIcon from '~/assets/icons/refresh.svg';
 import { createStore } from "solid-js/store";
 import { DocsHref } from "../../components/docs/docs-reference";
 import { SlotOutputWrapper } from "~/wrapper/nodes/slot/node-slot";
+import { DataTypeMetaProvider } from "~/context/metadata/metadata-context";
 
 export const DataTypeDocsContent = (props: {
     path: string | undefined,
@@ -36,10 +37,12 @@ export const DataTypeDocsContent = (props: {
     });
     
     return (
-        <div class="keep fill container docs-sections">
-            <DataTypeAttributes meta={props.data} datatype={datatype()}/>
-            <DataTypePreview meta={props.data} datatype={datatype()}/>
-        </div>
+        <DataTypeMetaProvider value={{datatype_meta: props.data}}>
+            <div class="keep fill container docs-sections">
+                <DataTypeAttributes meta={props.data} datatype={datatype()}/>
+                <DataTypePreview meta={props.data} datatype={datatype()}/>
+            </div>
+        </DataTypeMetaProvider>
     )
 }
 

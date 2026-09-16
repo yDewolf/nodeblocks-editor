@@ -16,7 +16,8 @@ import { DocsPathSplitter } from "~/singletons/metadata";
 import { DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
 import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 import { DocsHref } from "../../components/docs/docs-reference";
-import { DocAnnotationHelper } from "~/network/controllers/docs/anottation-helper";
+import { NodeMetaProvider, useMetaContext } from "~/context/metadata/metadata-context";
+import { ParsedMetaText } from '../../components/docs/metadata-text';
 
 
 export const NodeDocsContent = (props: {
@@ -46,8 +47,6 @@ export const NodeDocsContent = (props: {
         }
         return <span>Couldn't parse Node Preview</span>
     });
-
-    
 
     return (
         <div class="keep fill container docs-sections">
@@ -93,12 +92,13 @@ const SlotDropdownItem = (props: {
     slot_meta: SlotMeta,
     devMode: boolean,
 }) => {
+    const metaContext = useMetaContext();
     const badges = createMemo<DropdownBadge[]>(() => {
         const badge_list: DropdownBadge[] = [
             {
                 label: resolve_slot_type_label(props.slot_data),
-                // FIXME: adicionar contexto sobre o escopo (MetadataHeader id)
-                href: `${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${props.datatype?.type_id}`,
+                // FIXME: adicionar alguma utilidade para gerar paths:
+                href: `${metaContext.metadata?.header?.types_id}${DocsPathSplitter}${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${props.datatype?.type_id}`,
                 icon: props.slot_data.is_input ? <InputIcon class="tag-icon" /> : <OutputIcon class="tag-icon" />
             }
         ];
@@ -128,7 +128,7 @@ const SlotDropdownItem = (props: {
                 <div>
                     <div class="text-section">
                         <h4>Description</h4>
-                        <p>{DocAnnotationHelper.parseGeneric(props.slot_meta.description, props.slot_meta)}</p>
+                        <ParsedMetaText text={props.slot_meta.description} default="No Description"/>
                     </div>
                     <Show when={props.slot_data.max_connections}>
                         <div class="text-section">
@@ -255,8 +255,7 @@ const ParameterDropdownItem = (props: {
 
                     <div class="text-section">
                         <h4>Description</h4>
-                        {/* FIXME: pass NodeMeta as context */}
-                        <p>{props.param_meta.description != "" ? DocAnnotationHelper.parseGeneric(props.param_meta.description, props.param_meta) : "No Description"}</p>
+                        <ParsedMetaText text={props.param_meta.description} default="No Description"/>
                     </div>
 
                     <Show when={props.param_data.default != undefined}>
