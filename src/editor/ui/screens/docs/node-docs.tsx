@@ -77,7 +77,7 @@ function resolve_slot_type_label(slotData: SlotData): string {
 const BadgeTag = (props: { badge: DropdownBadge }) => (
     <div class="tag-holder">
         {props.badge.icon}
-        <DocsHref class="field-link" path={props.badge.href ?? ""}>
+        <DocsHref class="field-link" route={props.badge.href ? {path: props.badge.href} : undefined}>
             {props.badge.label}
         </DocsHref>
     </div>

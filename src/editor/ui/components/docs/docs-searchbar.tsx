@@ -40,7 +40,7 @@ export const DocSearchBar = (props: {
                         <div>No topic found</div>
                     }>
                         {(topic) => (
-                            <DocsHref path={topic.path} onclick={() => setQuery("")}>
+                            <DocsHref route={{path: topic.path}} onclick={() => setQuery("")}>
                                 <div class="row-container space-between center-items">
                                     <span class="search-result-title">{topic.capitalized_name}</span>
                                     <span class="search-result-root">

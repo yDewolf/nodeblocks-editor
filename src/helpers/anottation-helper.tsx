@@ -1,10 +1,10 @@
 import { JSX } from "solid-js";
 import { MetadataHeader } from "~/wrapper/metadata/header_metadata";
 import { NodeTypeMeta, DataTypeMeta } from "~/wrapper/metadata/type_metadata";
-import { DocsPathPrefix, InterfaceElementMeta } from "../network/controllers/docs/docs-interfaces";
+import {  InterfaceElementMeta } from "../network/controllers/docs/docs-interfaces";
 import { useResolvedMeta } from "~/context/metadata/metadata-context";
 import { DocsHref } from "~/editor/ui/components/docs/docs-reference";
-import { DocsPathUtils } from "./docs-path-utils";
+import { CURRENT_PATH, DocsPathUtils, DocsRoute } from "./docs-path-utils";
 
 export type ResolvedMeta = ReturnType<typeof useResolvedMeta>;
 
@@ -17,7 +17,8 @@ export type ParseContext =
 export class DocAnnotationHelper {
     static parse(
         text: string | undefined | null,
-        resolvedMeta: ResolvedMeta
+        resolvedMeta: ResolvedMeta,
+        super_path?: string
     ): JSX.Element {
         if (!text) return null;
 
@@ -34,7 +35,7 @@ export class DocAnnotationHelper {
             const label = match[1];
             const annotation = match[2];
 
-            elements.push(this.resolveAnnotation(annotation, label, resolvedMeta));
+            elements.push(this.resolveAnnotation(annotation, label, resolvedMeta, super_path));
             lastIndex = regex.lastIndex;
         }
 
@@ -48,28 +49,36 @@ export class DocAnnotationHelper {
     private static resolveAnnotation(
         annotation_str: string,
         label: string,
-        resolvedMeta: ResolvedMeta
+        resolvedMeta: ResolvedMeta,
+        super_path?: string
     ): JSX.Element {
-        const [annotation_type, target_id] = annotation_str.slice(1).split(":");
-        console.log(annotation_str, annotation_type, target_id);
+        const split = annotation_str.slice(1).split(":");
+        const annotation_type = split[0];
+        const annotation_target = split.slice(1).join(":");
+
+        super_path = super_path || CURRENT_PATH
         
         const rootMeta = resolvedMeta.rootMeta?.metadata;
         const nodeMeta = resolvedMeta.nodeMeta?.node_meta;
         const dataTypeMeta = resolvedMeta.dataTypeMeta?.datatype_meta;
 
         const currentTypesId = rootMeta?.header?.types_id || "";
-        let targetPath = "";
-        let displayLabel = label;
+        const defaultRoot = currentTypesId;
 
+        let displayLabel = label;
+        let finalRoute: DocsRoute | undefined = undefined;
         switch (annotation_type) {
             // --- Referências de Slot do Nó Atual ---
             case "slot": {
                 if (nodeMeta) {
-                    const slot = nodeMeta.slot_meta?.[target_id];
+                    const slot = nodeMeta.slot_meta?.[annotation_target];
                     if (slot && label === "auto") {
                         displayLabel = slot.capitalized_name;
                     }
-                    targetPath = `slot-${target_id}`; // Scroll relativo no nó atual
+                    finalRoute = {
+                        path: super_path,
+                        section: `slot-${annotation_target}`
+                    }
                 }
                 break;
             }
@@ -77,11 +86,14 @@ export class DocAnnotationHelper {
             // --- Referências de Parâmetro do Nó Atual ---
             case "params": {
                 if (nodeMeta) {
-                    const param = nodeMeta.parameter_meta?.[target_id];
+                    const param = nodeMeta.parameter_meta?.[annotation_target];
                     if (param && label === "auto") {
                         displayLabel = param.capitalized_name;
                     }
-                    targetPath = `param-${target_id}`; // Scroll relativo no nó atual
+                    finalRoute = {
+                        path: super_path,
+                        section: `param-${annotation_target}`
+                    }
                 }
                 break;
             }
@@ -89,7 +101,7 @@ export class DocAnnotationHelper {
             // --- Referências Globais a Outros Nós ---
             case "node": {
                 // Suporta "@node:target_id" (mesmo root) ou "@node:other_root.target_id"
-                const {rootId, docType, targetId} = DocsPathUtils.parsePath(target_id)
+                const {rootId, docType, targetId} = DocsPathUtils.parsePath(annotation_target, defaultRoot)
                 if (!targetId) { break; }
                 if (rootMeta && rootId === currentTypesId) {
                     const targetNode = rootMeta.node_types?.[targetId];
@@ -97,14 +109,13 @@ export class DocAnnotationHelper {
                         displayLabel = targetNode.capitalized_name;
                     }
                 }
-
-                targetPath = DocsPathUtils.makeNodePath(rootId, undefined, targetId);
+                finalRoute = { path: DocsPathUtils.makeNodePath(rootId, undefined, targetId) }
                 break;
             }
 
             // --- Referências Globais a Data Types ---
             case "datatype": {
-                const {rootId, docType, targetId} = DocsPathUtils.parsePath(target_id)
+                const {rootId, docType, targetId} = DocsPathUtils.parsePath(annotation_target, defaultRoot)
                 if (!targetId) { break; }
                 if (rootMeta && rootId === currentTypesId) {
                     const targetType = rootMeta.data_types?.[targetId];
@@ -113,18 +124,20 @@ export class DocAnnotationHelper {
                     }
                 }
 
-                targetPath = DocsPathUtils.makeDataTypePath(rootId, undefined, undefined, targetId);
+                finalRoute = { path: DocsPathUtils.makeDataTypePath(rootId, undefined, undefined, targetId) }
                 break;
             }
 
             default: {
-                targetPath = `${target_id}`;
+                finalRoute = { path: annotation_target }
                 break;
             }
         }
 
+        console.log(`${annotation_str} -> ${finalRoute}`);
+        console.debug(super_path, annotation_type, annotation_target);
         return (
-            <DocsHref class="text-reference" path={targetPath} children={displayLabel}/>
+            <DocsHref class="text-reference" route={finalRoute} children={displayLabel}/>
         );
     }
 }

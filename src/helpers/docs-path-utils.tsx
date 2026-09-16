@@ -4,7 +4,38 @@ import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 
+export const CURRENT_PATH = "{current}";
+export interface DocsRoute {
+    path: string;
+    section?: string;
+}
 export class DocsPathUtils {
+    static buildHash(route: DocsRoute): string {
+        const params = new URLSearchParams();
+        params.set("docs", route.path);
+        if (route.section) {
+            params.set("section", route.section);
+        }
+        return params.toString();
+    }
+
+    /**
+     * Interprets a given hash as a DocsRoute
+     */
+    static parseHash(hashString: string): DocsRoute | undefined {
+        const cleanHash = hashString.startsWith("#") ? hashString.slice(1) : hashString;
+        if (!cleanHash) return undefined;
+
+        const params = new URLSearchParams(cleanHash);
+        const path = params.get("docs");
+
+        if (!path) return undefined;
+
+        return {
+            path: path,
+            section: params.get("section") || undefined
+        };
+    }
     /**
      * Creates a path to a Node's documentation page.
      */
@@ -56,13 +87,25 @@ export class DocsPathUtils {
     /**
      * Parses a path string and returns its components.
      */
-    public static parsePath(path: string): { rootId: string; docType?: DocsPathPrefix; targetId?: string } {
+    public static parsePath(path: string, default_root: string): { rootId: string; docType?: DocsPathPrefix; targetId?: string } {
         if (!path) {
             return { rootId: "" };
         }
 
         const parts = path.split(DocsPathSplitter);
-
+        if (parts.length == 1) {
+            return {
+                rootId: default_root,
+                targetId: path
+            }
+        }
+        if (parts.length == 2) {
+            return {
+                rootId: default_root,
+                docType: parts[0] as DocsPathPrefix | undefined,
+                targetId: parts[1] || undefined
+            }
+        }
         return {
             rootId: parts[0] || "",
             docType: parts[1] as DocsPathPrefix | undefined,
@@ -91,7 +134,7 @@ export class DocsPathUtils {
      * Checks if a path is of a specific type.
      */
     public static isType(path: string, prefix: DocsPathPrefix): boolean {
-        const parsed = this.parsePath(path);
+        const parsed = this.parsePath(path, "");
         return parsed.docType === prefix;
     }
 }

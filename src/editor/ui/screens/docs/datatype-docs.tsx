@@ -62,7 +62,7 @@ const DataTypeAttributes = (props: {
             <h3>Attributes</h3>
             <SimpleField field_name="Base" field_displayer={
                 // TODO: maybe add a better visual for field links
-                () => <DocsHref class="field-link" path={DocsPathUtils.makeDataTypePath(props.datatype?.root_id ?? "unknown", props.datatype)}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></DocsHref>
+                () => <DocsHref class="field-link" route={{path: DocsPathUtils.makeDataTypePath(props.datatype?.root_id ?? "unknown", props.datatype)}}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></DocsHref>
             } field_id={props.datatype?.type_id + "-base"}/>
             <SimpleField field_name="Renderer" field_displayer={
                 () => <FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.renderer} id={props.datatype?.type_id + "-renderer"}/>}/>

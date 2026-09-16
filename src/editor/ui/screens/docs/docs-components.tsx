@@ -192,7 +192,7 @@ export const MetadataStoreSubContent = (props: {
                             }
                             const type_data = props.data[id] as BaseMetadata;
                             const name = type_data.capitalized_name != "" ? type_data.capitalized_name : id;
-                            return <DocsHref path={DocsPathUtils.makeAutoPath(props.root_id, props.docs_prefix, id)}>{name}</DocsHref>
+                            return <DocsHref route={{path: DocsPathUtils.makeAutoPath(props.root_id, props.docs_prefix, id)}}>{name}</DocsHref>
                         }}
                     </For>
                 </div>}
