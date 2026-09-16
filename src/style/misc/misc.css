@@ -1,3 +1,5 @@
+@import url("general_misc.css");
+
 .highlightable:hover {
     z-index: 1;
     text-overflow: clip;

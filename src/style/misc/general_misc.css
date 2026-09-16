@@ -1,0 +1,6 @@
+.code-text {
+    padding: 2px;
+    border-radius: 4px;
+    background-color: var(--dark-overlay-highlight);
+    color: var(--overlay-color);
+}
