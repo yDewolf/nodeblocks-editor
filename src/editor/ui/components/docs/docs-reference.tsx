@@ -22,7 +22,12 @@ export const DocsHref = (props: {
             id={props.id} 
             class={"docs-href " + (props.class ?? "")} 
             href={props.route ? `#${DocsPathUtils.buildHash(props.route)}` : `#docs=${props.path}`}
-            onclick={props.onclick}
+            onclick={(e) => {
+                docs.navigateToSection(props.route);
+                if (props.onclick) {
+                    props.onclick(e);
+                }
+            }}
         >
             {props.children}
         </a>

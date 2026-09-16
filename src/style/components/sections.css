@@ -28,3 +28,8 @@
 .section-body > div {
     padding: 8px 12px;
 }
+
+.highlight-section {
+    /* border: 1px var(--dark-overlay-background) solid; */
+    background-color: var(--dark-overlay-background);
+}

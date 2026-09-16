@@ -119,6 +119,20 @@ export class DocsController {
         return undefined;
     }
 
+    public navigateToSection(route: DocsRoute | undefined) {
+        if (!route) { return; }
+        if (route.section) {
+            requestAnimationFrame(() => {
+                const element = document.getElementById(route.section!);
+                if (element) {
+                    element.scrollIntoView({ behavior: "smooth", block: "start" });
+                    element.classList.add("highlight-section");
+                    setTimeout(() => element.classList.remove("highlight-section"), 500);
+                }
+            });
+        }
+    }
+
     public removeFromHistory(path: string) {
         const filtered = this.opened_tabs.filter((value: string) => value != path);
         this.opened_tabs = filtered;

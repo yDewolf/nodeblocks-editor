@@ -1,4 +1,4 @@
-import { createSignal, For, JSXElement, Show } from "solid-js"
+import { createSignal, For, JSXElement, onMount, Show } from "solid-js"
 import { Transition } from "solid-transition-group";
 import ArrowDownIcon from "~/assets/icons/arrow-down.svg";
 
@@ -19,6 +19,7 @@ export const DropdownIcon = (props: {expanded: boolean, icon?: () => JSXElement,
 }
 
 export const DropdownSection = (props: {
+    id?: string,
     header?: string, 
     header_class?: string,
     dropdown_class?: string, 
@@ -40,9 +41,22 @@ export const DropdownSection = (props: {
             {props.content}
         </Show>
     )
-    
+
+    let containerRef: HTMLDivElement | undefined;
+    onMount(() => {
+        if (!containerRef) return;
+
+        const originalScrollIntoView = containerRef.scrollIntoView.bind(containerRef);
+        containerRef.scrollIntoView = (arg?: boolean | ScrollIntoViewOptions) => {
+            setExpanded(true);
+
+            requestAnimationFrame(() => {
+                originalScrollIntoView(arg ?? { behavior: "smooth", block: "start" });
+            });
+        };
+    });
     return (
-        <div class={`dropdown-section ${props.dropdown_class ?? ""}`} classList={{"expanded": expanded()}}>
+        <div ref={containerRef} class={`dropdown-section ${props.dropdown_class ?? ""}`} classList={{"expanded": expanded()}} id={props.id}>
             <div class={`section-header ${props.header_class ?? ""}`} classList={{"expanded": expanded()}}>
                 <Show when={props.header_content} fallback={<span>{props.header}</span>}>
                     {props.header_content?.()}

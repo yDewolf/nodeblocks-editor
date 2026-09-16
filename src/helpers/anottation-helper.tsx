@@ -85,7 +85,7 @@ export class DocAnnotationHelper {
                     }
                     finalRoute = {
                         path: super_path,
-                        section: `slot-${annotation_target}`
+                        section: DocsPathUtils.makeSlotSectionId(annotation_target)
                     }
                 }
                 break;
@@ -100,7 +100,7 @@ export class DocAnnotationHelper {
                     }
                     finalRoute = {
                         path: super_path,
-                        section: `param-${annotation_target}`
+                        section: DocsPathUtils.makeParamSectionId(annotation_target)
                     }
                 }
                 break;

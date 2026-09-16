@@ -107,6 +107,7 @@ const SlotDropdownItem = (props: {
 
     return (
         <DropdownSection
+            id={DocsPathUtils.makeSlotSectionId(props.slot_id)}
             header_content={() => (
                 <div class="fill keep row-container space-between">
                     <div class="docs-slot-header">
@@ -223,6 +224,7 @@ const ParameterDropdownItem = (props: {
 
     return (
         <DropdownSection
+            id={DocsPathUtils.makeParamSectionId(props.param_id)}
             header_content={() => (
                 <div class="fill keep row-container space-between">
                     <div class="docs-slot-header">

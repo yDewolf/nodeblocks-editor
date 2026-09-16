@@ -7,7 +7,6 @@ import { KeyEventManager } from '~/editor/internal/input_manager/input-manager';
 import { DocsTool } from "~/editor/tools/docs-tool";
 import DocsIcon from '~/assets/icons/book.svg';
 import ExpandIcon from '~/assets/icons/expand.svg';
-import { DocAnnotationHelper } from '~/helpers/anottation-helper';
 import { MetaProvider } from '~/context/metadata/metadata-context';
 import { ParsedMetaText } from './metadata-text';
 
@@ -29,7 +28,6 @@ export const DocsElementIndicator = (props: {
     let PopupRef: HTMLDivElement | undefined;
     const [style, setStyle] = createSignal<JSX.CSSProperties>({});
     const [popupStyle, setPopupStyle] = createSignal<JSX.CSSProperties>({});
-    const [popupVisible, setPopupVisible] = createSignal(false);
     const [isToRight, setIsToRight] = createSignal(false);
     const [isToTop, setIsToTop] = createSignal(false);
 

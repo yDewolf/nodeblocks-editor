@@ -75,6 +75,20 @@ export class DocsPathUtils {
         return `${root_id}${DocsPathSplitter}${DocsPathPrefix.UI}${DocsPathSplitter}${docs_element_id}`;
     }
 
+    /**
+     * Creates a slot section id based on the slot id
+     */
+    public static makeSlotSectionId(slot_id: string) {
+        return `slot-${slot_id}`
+    }
+
+    /**
+     * Creates a param section id based on the param id
+     */
+    public static makeParamSectionId(param_id: string) {
+        return `param-${param_id}`
+    }
+
     public static makeAutoPath(root_id: string, docs_prefix: DocsPathPrefix, id: string) {
         switch (docs_prefix) {
             case DocsPathPrefix.NODE: return this.makeNodePath(root_id, undefined, id);

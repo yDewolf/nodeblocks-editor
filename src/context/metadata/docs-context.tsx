@@ -2,7 +2,6 @@ import { createContext, useContext, onCleanup, createEffect } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { isServer } from "solid-js/web";
 import { DocsController } from "~/editor/controllers/docs-controller";
-import { getHashParams, setHashParam } from "~/editor/utils/url-utils";
 import { DocsPathUtils } from "~/helpers/docs-path-utils";
 
 
@@ -50,26 +49,7 @@ export const DocsUrlSync = () => {
         const currentHash = window.location.hash.slice(1);
 
         if (newHash !== currentHash) {
-            // Usamos replaceState para não sujar o histórico se for só mudança de seção (opcional)
             window.history.pushState(null, "", `#${newHash}`);
-        }
-    });
-
-    // Efeito para fazer o Scroll Automático
-    createEffect(() => {
-        const sectionId = docs.route?.section;
-        // Esperamos o docsData carregar para garantir que os elementos já renderizaram
-        if (sectionId && docs.docsData()) {
-            // Pequeno delay para garantir a montagem do DOM no Solid
-            setTimeout(() => {
-                const element = document.getElementById(sectionId);
-                if (element) {
-                    element.scrollIntoView({ behavior: "smooth", block: "start" });
-                    // Opcional: Adicionar uma classe de "highlight" temporária
-                    element.classList.add("highlight-section");
-                    setTimeout(() => element.classList.remove("highlight-section"), 2000);
-                }
-            }, 50);
         }
     });
 
