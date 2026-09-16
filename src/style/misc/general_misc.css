@@ -4,3 +4,18 @@
     background-color: var(--dark-overlay-highlight);
     color: var(--overlay-color);
 }
+
+.embed-wrapper.youtube-embed {
+    margin: 0.8rem 0;
+    overflow: hidden;
+    
+    padding: 0;
+    width: fit-content;
+    height: fit-content;
+}
+
+.embed-wrapper .embed-frame {
+    border-radius: 8px;
+    border: 0;
+    background-color: var(--dark-overlay-highlight);
+}

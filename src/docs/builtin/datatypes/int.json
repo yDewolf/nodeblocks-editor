@@ -1,0 +1,5 @@
+{
+    "capitalized_name": "Integer",
+    "description": "A simple integer datatype.",
+    "is_builtin": true
+}

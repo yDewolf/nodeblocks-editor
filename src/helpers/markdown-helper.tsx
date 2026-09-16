@@ -1,5 +1,12 @@
 import { JSX } from "solid-js/jsx-runtime";
-import { CodeTextElement } from "~/editor/ui/components/docs/metadata-text";
+import { CodeTextElement, YouTubeEmbed } from "~/editor/ui/components/docs/metadata-text";
+
+export function extractYouTubeId(url: string): string | null {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+}
+
 
 // Obrigado Google Gemini por me ajudar a fazer isso aqui !!
 export class MarkdownHelper {
@@ -14,10 +21,58 @@ export class MarkdownHelper {
         if (typeof item !== "string") {
             return [item];
         }
-        return this.parseCode(item);
+        // Inicia a cadeia pelos Embeds/Mídia
+        return this.parseEmbeds(item);
     }
 
-    // --- 1. Processa blocos de código `texto` ---
+    private static parseEmbeds(text: string): JSX.Element[] {
+        const regex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+
+        return this.splitAndParse(
+            text,
+            regex,
+            (match) => {
+                const label = match[1];
+                const url = match[2].trim();
+                const ytId = extractYouTubeId(url);
+
+                if (ytId) {
+                    return <YouTubeEmbed videoId={ytId} title={label} />;
+                }
+
+                return <img src={url} alt={label} class="docs-image" />;
+            },
+            this.parseLinks.bind(this)
+        );
+    }
+
+    private static parseLinks(text: string): JSX.Element[] {
+        const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+        return this.splitAndParse(
+            text,
+            regex,
+            (match) => {
+                const label = match[1];
+                const url = match[2].trim();
+
+                const parsedLabel = this.parseCode(label);
+                const isExternal = /^https?:\/\//i.test(url);
+
+                return (
+                    <a
+                        href={url}
+                        target={isExternal ? "_blank" : undefined}
+                        rel={isExternal ? "noopener noreferrer" : undefined}
+                        class="docs-link"
+                    >
+                        {parsedLabel}
+                    </a>
+                );
+            },
+            this.parseCode.bind(this)
+        );
+    }
+
     private static parseCode(text: string): JSX.Element[] {
         const regex = /`([^`]+)`/g;
         return this.splitAndParse(
@@ -28,20 +83,8 @@ export class MarkdownHelper {
         );
     }
 
-    // --- 2. Processa Negrito *texto* ---
     private static parseBold(text: string): JSX.Element[] {
-        // Explicação da Regex:
-        // \*         -> Asterisco de abertura
-        // (          -> Início da captura
-        //   [^\s*]   -> O PRIMEIRO caractere não pode ser espaço nem asterisco
-        //   (?:      -> Grupo opcional do "meio" do texto
-        //     [^*]*  -> Qualquer quantidade de caracteres que não sejam asteriscos
-        //     [^\s*] -> O ÚLTIMO caractere também não pode ser espaço nem asterisco
-        //   )?       -> Faz o grupo do meio ser opcional (para aceitar palavras de 1 letra ex: *a*)
-        // )          -> Fim da captura
-        // \*         -> Asterisco de fechamento
         const regex = /\*([^\s*](?:[^*]*[^\s*])?)\*/g;
-        
         return this.splitAndParse(
             text,
             regex,
@@ -50,13 +93,8 @@ export class MarkdownHelper {
         );
     }
 
-    // --- 3. Processa Itálico _texto_ ---
     private static parseItalics(text: string): JSX.Element[] {
-        // Mesma lógica de validação de espaço do negrito, mas com um "bônus":
-        // O \b (Word Boundary) garante que o "_" não está no meio de uma palavra (snake_case)
-        // Isso impede que "tensor_0 * weight_0" transforme "0 * weight" em itálico.
         const regex = /\b_([^\s_](?:[^_]*[^\s_])?)_\b/g;
-        
         return this.splitAndParse(
             text,
             regex,

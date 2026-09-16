@@ -24,3 +24,21 @@ export const ParsedMetaText = (props: { text: string | undefined, default?: stri
 
     return <p class="parsed-meta-text">{parsedContent()}</p>;
 };
+
+// TODO: melhorar o jeito que isso aqui fica no meio do texto. Talvez funcionar como um popup (?) ou um dropdown
+export const YouTubeEmbed = (props: { videoId: string; title?: string }) => {
+    return (
+        <div class="embed-wrapper youtube-embed container">
+            <h4 class="embed-title">
+                {props.title}
+            </h4>
+            <iframe 
+                class="embed-frame"
+                src={`https://www.youtube.com/embed/${props.videoId}`}
+                title={props.title || "YouTube video player"}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+            />
+        </div>
+    );
+};
