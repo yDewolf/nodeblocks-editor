@@ -168,7 +168,7 @@ export const DocsElementIndicator = (props: {
                         style={popupStyle()} 
                     >  
                         <div class="fill keep row-container space-between docs-popup-header" style={{"align-items": 'center'}}>
-                            <div class="keep row-container center-items">
+                            <div class="keep fill center-items docs-popup-name-holder">
                                 <DocsIcon class="small-icon"/>
                                 <p>
                                 {docs.docsData.latest?.data.capitalized_name ?? "Not found"}
@@ -178,7 +178,8 @@ export const DocsElementIndicator = (props: {
                                 <ExpandIcon class="small-icon"/>
                             </button>
                         </div>
-                        <ParsedMetaText text={docs.docsData.latest?.data.description} default=""/>
+                        {/* TODO: implement a brief description field in metadata */}
+                        <ParsedMetaText class="docs-popup-description" text={docs.docsData.latest?.data.description} default=""/>
                     </div>
                 </Portal>
             </Show>

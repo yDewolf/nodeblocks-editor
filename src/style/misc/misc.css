@@ -98,6 +98,7 @@
 .selected-docs-popup {
   min-width: 100px;
   max-width: 200px;
+
   min-height: 40px;
   border-radius: 8px;
   padding: 8px;
@@ -106,11 +107,25 @@
   pointer-events: auto;
   background-color: var(--overlay-background);
   border: solid 1px var(--stroke-color);
+
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.docs-popup-header > p {
+.docs-popup-header p, .docs-popup-description {
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+.docs-popup-name-holder {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.docs-popup-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .selected-docs-popup:not(.right):not(.top) {
