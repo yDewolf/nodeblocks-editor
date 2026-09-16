@@ -11,6 +11,7 @@ import { DocsHref } from "../../components/docs/docs-reference";
 import { SlotOutputWrapper } from "~/wrapper/nodes/slot/node-slot";
 import { DataTypeMetaProvider } from "~/context/metadata/metadata-context";
 import { DocsPathUtils } from "~/helpers/docs-path-utils";
+import { DefaultDataTypes } from '../../../../wrapper/nodes/data/node-data-type';
 
 export const DataTypeDocsContent = (props: {
     path: string | undefined,
@@ -57,12 +58,19 @@ const DataTypeAttributes = (props: {
         </div>
     }
 
+    const base_type = createMemo(() => {
+        if (!props.datatype) {
+            return undefined;
+        }
+        return DataTypeUtils._match_default_data_type(props.datatype.base
+    )});
+    
     return (
         <div class="text-section">
             <h3>Attributes</h3>
             <SimpleField field_name="Base" field_displayer={
                 // TODO: maybe add a better visual for field links
-                () => <DocsHref class="field-link" route={{path: DocsPathUtils.makeDataTypePath(props.datatype?.root_id ?? "unknown", props.datatype)}}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></DocsHref>
+                () => <DocsHref class="field-link" route={{path: DocsPathUtils.makeDataTypePath(base_type()?.root_id ?? "unknown", base_type())}}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></DocsHref>
             } field_id={props.datatype?.type_id + "-base"}/>
             <SimpleField field_name="Renderer" field_displayer={
                 () => <FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.renderer} id={props.datatype?.type_id + "-renderer"}/>}/>

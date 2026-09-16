@@ -22,7 +22,9 @@ export class DocAnnotationHelper {
     ): JSX.Element {
         if (!text) return null;
 
-        const regex = /\[([^\]]+)\]\((@[^)]+)\)/g;
+        // regex feito pelo gemini
+        const regex = /\[([^\]]+)\]\((@[a-zA-Z_]\w*:[^\s)]+)\)|(@[a-zA-Z_]\w*:[a-zA-Z0-9_]+(?:[:\.-][a-zA-Z0-9_]+)*)/g;
+
         const elements: JSX.Element[] = [];
         let lastIndex = 0;
         let match: RegExpExecArray | null;
@@ -32,10 +34,10 @@ export class DocAnnotationHelper {
                 elements.push(text.substring(lastIndex, match.index));
             }
 
-            const label = match[1];
-            const annotation = match[2];
+            const label = match[1] ?? "auto";
+            const annotation = match[2] ?? match[3];
 
-            elements.push(this.resolveAnnotation(annotation, label, resolvedMeta, super_path));
+            elements.push(this.resolveAnnotation(annotation, label, resolvedMeta));
             lastIndex = regex.lastIndex;
         }
 
@@ -52,9 +54,15 @@ export class DocAnnotationHelper {
         resolvedMeta: ResolvedMeta,
         super_path?: string
     ): JSX.Element {
-        const split = annotation_str.slice(1).split(":");
-        const annotation_type = split[0];
-        const annotation_target = split.slice(1).join(":");
+        const cleanStr = annotation_str.startsWith("@") ? annotation_str.slice(1) : annotation_str;
+        const firstColonIndex = cleanStr.indexOf(":");
+
+        if (firstColonIndex === -1) {
+            return annotation_str;
+        }
+
+        const annotation_type = cleanStr.slice(0, firstColonIndex);
+        const annotation_target = cleanStr.slice(firstColonIndex + 1);
 
         super_path = super_path || CURRENT_PATH
         
@@ -134,8 +142,7 @@ export class DocAnnotationHelper {
             }
         }
 
-        console.log(`${annotation_str} -> ${finalRoute}`);
-        console.debug(super_path, annotation_type, annotation_target);
+        console.debug(`${annotation_str} -> ${finalRoute}`);
         return (
             <DocsHref class="text-reference" route={finalRoute} children={displayLabel}/>
         );
