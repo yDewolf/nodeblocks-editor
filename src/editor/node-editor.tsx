@@ -267,7 +267,7 @@ export class NodeEditor {
             // Sync after the types are loaded btw
             this._sync_controller.sync_with_server_scene()
         });
-            
+        
         this._editor_client.add_handler(ServerMessages.NODE_OUTPUT, (message) => {
             this.scene_controller.node_controller.nodes.forEach((node: GraphNode) => {
                 node.is_current_step = false;

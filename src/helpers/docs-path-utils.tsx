@@ -6,17 +6,17 @@ import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 
 export class DocsPathUtils {
     /**
-     * Cria o caminho de documentação para um nó.
+     * Creates a path to a Node's documentation page.
      */
-    static makeNodePath(root_id: string, node?: GraphNode, type_id?: string): string {
+    public static makeNodePath(root_id: string, node?: GraphNode, type_id?: string): string {
         const targetId = node ? node.type_id : type_id;
         return `${root_id}${DocsPathSplitter}${DocsPathPrefix.NODE}${DocsPathSplitter}${targetId}`;
     }
 
     /**
-     * Cria o caminho de documentação para um tipo de dado (datatype).
+     * Creates a path to a DataType's documentation page.
      */
-    static makeDataTypePath(
+    public static makeDataTypePath(
         root_id: string, 
         datatype?: BaseDataType, 
         slot?: NodeSlot, 
@@ -38,16 +38,25 @@ export class DocsPathUtils {
     }
 
     /**
-     * Cria o caminho de documentação para um elemento de interface de usuário.
+     * Creates a path to a UI Element's documentation page.
      */
-    static makeUIPath(root_id: string, docs_element_id: string): string {
+    public static makeUIPath(root_id: string, docs_element_id: string): string {
         return `${root_id}${DocsPathSplitter}${DocsPathPrefix.UI}${DocsPathSplitter}${docs_element_id}`;
     }
 
+    public static makeAutoPath(root_id: string, docs_prefix: DocsPathPrefix, id: string) {
+        switch (docs_prefix) {
+            case DocsPathPrefix.NODE: return this.makeNodePath(root_id, undefined, id);
+            case DocsPathPrefix.DATATYPE: return this.makeDataTypePath(root_id, undefined, undefined, id);
+            case DocsPathPrefix.UI: return this.makeUIPath(root_id, id);
+            case DocsPathPrefix.HEADER: return root_id;
+        }
+    }
+
     /**
-     * Faz o parse de uma string de caminho para extrair seus componentes.
+     * Parses a path string and returns its components.
      */
-    static parsePath(path: string): { rootId: string; docType?: DocsPathPrefix; targetId?: string } {
+    public static parsePath(path: string): { rootId: string; docType?: DocsPathPrefix; targetId?: string } {
         if (!path) {
             return { rootId: "" };
         }
@@ -62,24 +71,26 @@ export class DocsPathUtils {
     }
 
     /**
-     * Extrai apenas o rootId de um caminho completo.
+     * Extracts root id from a path.
      */
-    static extractRootId(path: string): string {
-        return path.split(DocsPathSplitter)[0] || "";
+    public static extractRootId(path: string): string {
+        // Maybe FIXME (limit = 3)
+        return path.split(DocsPathSplitter, 3)[0] || "";
     }
 
     /**
-     * Extrai o targetId (id do nó, datatype ou elemento de UI) de um caminho completo.
+     * Extracts the final id from a path.
      */
-    static extractTargetId(path: string): string | undefined {
-        const parts = path.split(DocsPathSplitter);
+    public static extractTargetId(path: string): string | undefined {
+        // Maybe FIXME (limit = 3)
+        const parts = path.split(DocsPathSplitter, 3);
         return parts.length >= 3 ? parts[2] : undefined;
     }
 
     /**
-     * Verifica se o caminho pertence a um tipo de prefixo específico.
+     * Checks if a path is of a specific type.
      */
-    static isType(path: string, prefix: DocsPathPrefix): boolean {
+    public static isType(path: string, prefix: DocsPathPrefix): boolean {
         const parsed = this.parsePath(path);
         return parsed.docType === prefix;
     }

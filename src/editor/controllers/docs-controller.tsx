@@ -6,7 +6,7 @@ import { MetadataStoreData } from "~/network/controllers/metadata/metadata_contr
 import { DocSearchHelper, DocTopic } from "~/network/controllers/docs/docs-helper";
 import { makePersisted } from "@solid-primitives/storage";
 import { createStore, SetStoreFunction } from "solid-js/store";
-import { DocsPathSplitter } from "~/singletons/metadata";
+import { DocsPathUtils } from "~/helpers/docs-path-utils";
 
 const DOCS_STATE_KEY = "app_docs_state";
 interface DocsState {
@@ -57,9 +57,8 @@ export class DocsController {
 
 
     get currentRootId(): string | undefined {
-        const splitted = this.docs_path?.split(DocsPathSplitter);
-        if (splitted) {
-            return splitted.at(0);
+        if (this.docs_path) {
+            return DocsPathUtils.extractRootId(this.docs_path);
         }
         return undefined;
     }

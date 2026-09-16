@@ -1,40 +1,15 @@
 import { DocsPathSplitter, metadata } from "~/singletons/metadata";
 import { MetadataController, MetadataStoreData } from "../metadata/metadata_controller";
 import { DocPayload, DocsPathPrefix } from "./docs-interfaces";
-import { GraphNode } from "~/wrapper/nodes/graph-node";
-import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 import { DataTypeMeta, NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
 import { MetadataHeader } from "~/wrapper/metadata/header_metadata";
+import { DocsPathUtils } from "~/helpers/docs-path-utils";
 
 const LOCAL_DATA_ID = "builtin";
 
 const interfaceModules = import.meta.glob("/src/docs/builtin/interface/**/*.json");
 const datatypeModules = import.meta.glob("/src/docs/builtin/datatypes/**/*.json");
-export function make_node_docs_path(root_id: string, node?: GraphNode, type_id?: string): string {
-    return root_id + DocsPathSplitter + DocsPathPrefix.NODE + DocsPathSplitter + (node ? node.type_id : type_id)
-}
-
-export function make_datatype_docs_path(root_id: string, datatype?: BaseDataType, slot?: NodeSlot, type_id?: string): string {
-    if (datatype) {
-        return root_id + DocsPathSplitter + DocsPathPrefix.DATATYPE + DocsPathSplitter + datatype.type_id;
-    }
-
-    if (slot) {
-        return root_id + DocsPathSplitter + DocsPathPrefix.DATATYPE + DocsPathSplitter + slot.data_type.type_id;
-    }
-
-    if (type_id) {
-        return root_id + DocsPathSplitter + DocsPathPrefix.DATATYPE + DocsPathSplitter + type_id;
-    }
-
-    return root_id;
-}
-
-export function make_ui_docs_path(root_id: string, docs_element_id: string) {
-    return root_id + DocsPathSplitter + DocsPathPrefix.UI + DocsPathSplitter + docs_element_id;
-}
 
 export class DocsResolver {
     private _metadata_controller: MetadataController;
@@ -91,9 +66,7 @@ export class DocsResolver {
     }
 
     public async resolve(docs_path: string): Promise<DocPayload> {
-        const path_parts = docs_path.split(DocsPathSplitter);
-        const path_root = path_parts.at(0) ?? "";
-        const rootless_path = docs_path.replace(path_root + DocsPathSplitter, "");
+        const path_root = DocsPathUtils.extractRootId(docs_path);
         if (docs_path == path_root) {
             const meta = this._metadata_controller.get_header(path_root);
 
@@ -101,18 +74,19 @@ export class DocsResolver {
             return { type: "header", data: meta }
         } 
 
-        if (rootless_path.startsWith(DocsPathPrefix.NODE)) {
-            const type_id = rootless_path.replace(DocsPathPrefix.NODE + DocsPathSplitter, "");
-            const meta = this._metadata_controller.get_node_meta(type_id, path_root);
+        const target_id = DocsPathUtils.extractTargetId(docs_path);
+        if (!target_id) {
+            throw new Error(`Missing target id for path: ${docs_path}`);
+        }
 
-            if (!meta) throw new Error(`Couldn't find metadata for node ${type_id}`);
+        if (DocsPathUtils.isType(docs_path, DocsPathPrefix.NODE)) {
+            const meta = this._metadata_controller.get_node_meta(target_id, path_root);
+            if (!meta) throw new Error(`Couldn't find metadata for node ${target_id}`);
             return { type: "node", data: meta };
         }
 
-        if (rootless_path.startsWith(DocsPathPrefix.DATATYPE)) {
-            const datatype_id = rootless_path.replace(DocsPathPrefix.DATATYPE + DocsPathSplitter, "");
-            const meta = this._metadata_controller.get_datatype_meta(datatype_id, path_root);
-            
+        if (DocsPathUtils.isType(docs_path, DocsPathPrefix.DATATYPE)) {
+            const meta = this._metadata_controller.get_datatype_meta(target_id, path_root);
             if (!meta) {
                 const local_path = docs_path.replaceAll(DocsPathSplitter, "/");
                 const full_path = `/src/docs/${local_path}.json`;
@@ -121,7 +95,7 @@ export class DocsResolver {
             return { type: "datatype", data: meta };
         }
 
-        if (rootless_path.startsWith(DocsPathPrefix.UI)) {
+        if (DocsPathUtils.isType(docs_path, DocsPathPrefix.UI)) {
             const ui_path = docs_path.replaceAll(DocsPathSplitter, "/");
             const full_path = `/src/docs/${ui_path}.json`;
             return {type: "interface", data: await this.load_local_metadata(full_path, interfaceModules)};

@@ -4,10 +4,10 @@ import { DocPayload, DocsPathPrefix } from "~/network/controllers/docs/docs-inte
 import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
 import { DropdownSection } from "../../components/panels/dropdown";
 import { MetadataStoreSubContent } from "./docs-components";
-import { DocsPathSplitter } from '~/singletons/metadata';
 import CloseIcon from '~/assets/icons/close.svg';
 import { DocSearchBar } from '../../components/docs/docs-searchbar';
 import { DocsHref } from '../../components/docs/docs-reference';
+import { DocsPathUtils } from '~/helpers/docs-path-utils';
 
 export const DocsSidebar = (props: {
     docs_data?: DocPayload
@@ -64,7 +64,7 @@ export const DocsSidebar = (props: {
                     <Match when={docs.opened_tabs.length > 0}>
                         <For each={docs.opened_tabs.toReversed()}>
                             {(path: string) => {
-                                const final_target = path.split(DocsPathSplitter).at(-1);
+                                const final_target = DocsPathUtils.extractTargetId(path);
                                 let reduced_path = path;
                                 if (final_target) {
                                     if (!docs.opened_tabs.find((other_path: string) => other_path.endsWith(final_target) && other_path != path)) {

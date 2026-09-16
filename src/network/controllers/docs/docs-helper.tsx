@@ -1,6 +1,5 @@
+import { DocsPathUtils } from "~/helpers/docs-path-utils";
 import { MetadataStoreData } from "../metadata/metadata_controller";
-import { make_datatype_docs_path, make_node_docs_path, make_ui_docs_path } from "./docs-resolver";
-
 export type DocTopicType = 'node' | 'datatype' | 'interface' | "header";
 export interface DocTopic {
     id: string;
@@ -37,7 +36,7 @@ export class DocSearchHelper {
                         type: 'node',
                         capitalized_name: node_meta.capitalized_name || id,
                         description: node_meta.description,
-                        path: make_node_docs_path(root_id, undefined, id)
+                        path: DocsPathUtils.makeNodePath(root_id, undefined, id)
                     });
                 });
             }
@@ -50,7 +49,7 @@ export class DocSearchHelper {
                         type: 'datatype',
                         capitalized_name: datatype_meta.capitalized_name || id,
                         description: datatype_meta.description,
-                        path: make_datatype_docs_path(root_id, undefined, undefined, id)
+                        path: DocsPathUtils.makeDataTypePath(root_id, undefined, undefined, id)
                     });
                 });
             }
@@ -63,7 +62,7 @@ export class DocSearchHelper {
                         type: 'interface',
                         capitalized_name: iface_meta.capitalized_name || id,
                         description: iface_meta.description,
-                        path: make_ui_docs_path(root_id, id)
+                        path: DocsPathUtils.makeUIPath(root_id, id)
                     });
                 });
             }

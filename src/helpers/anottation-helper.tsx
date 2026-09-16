@@ -4,7 +4,6 @@ import { NodeTypeMeta, DataTypeMeta } from "~/wrapper/metadata/type_metadata";
 import { DocsPathPrefix, InterfaceElementMeta } from "../network/controllers/docs/docs-interfaces";
 import { useResolvedMeta } from "~/context/metadata/metadata-context";
 import { DocsHref } from "~/editor/ui/components/docs/docs-reference";
-import { make_node_docs_path } from "~/network/controllers/docs/docs-resolver";
 import { DocsPathUtils } from "./docs-path-utils";
 
 export type ResolvedMeta = ReturnType<typeof useResolvedMeta>;

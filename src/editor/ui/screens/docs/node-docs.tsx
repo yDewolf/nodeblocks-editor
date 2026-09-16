@@ -12,12 +12,10 @@ import InputIcon from "~/assets/icons/input.svg";
 import OutputIcon from "~/assets/icons/output.svg";
 import ToolIcon from "~/assets/icons/tool.svg";
 import FilterIcon from "~/assets/icons/filter.svg";
-import { DocsPathSplitter } from "~/singletons/metadata";
-import { DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
 import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 import { DocsHref } from "../../components/docs/docs-reference";
-import { NodeMetaProvider, useMetaContext } from "~/context/metadata/metadata-context";
 import { ParsedMetaText } from '../../components/docs/metadata-text';
+import { DocsPathUtils } from '../../../../helpers/docs-path-utils';
 
 
 export const NodeDocsContent = (props: {
@@ -32,7 +30,7 @@ export const NodeDocsContent = (props: {
 
     const constructor = createMemo(() => {
         const path = props.path ?? "";
-        const type_id = path.split(DocsPathSplitter).at(-1);
+        const type_id = DocsPathUtils.extractTargetId(path);
         if (type_id) {
             const node_constructor = props.scene_controller.node_controller.node_constructors.get(type_id)
             return node_constructor;
@@ -92,13 +90,11 @@ const SlotDropdownItem = (props: {
     slot_meta: SlotMeta,
     devMode: boolean,
 }) => {
-    const metaContext = useMetaContext();
     const badges = createMemo<DropdownBadge[]>(() => {
         const badge_list: DropdownBadge[] = [
             {
                 label: resolve_slot_type_label(props.slot_data),
-                // FIXME: adicionar alguma utilidade para gerar paths:
-                href: `${metaContext.metadata?.header?.types_id}${DocsPathSplitter}${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${props.datatype?.type_id}`,
+                href: DocsPathUtils.makeDataTypePath(props.datatype?.root_id ?? "unknown", props.datatype),
                 icon: props.slot_data.is_input ? <InputIcon class="tag-icon" /> : <OutputIcon class="tag-icon" />
             }
         ];

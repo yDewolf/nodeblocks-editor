@@ -1,11 +1,11 @@
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { BaseEditorTool } from "./base-tool";
-import { make_datatype_docs_path, make_node_docs_path, make_ui_docs_path } from "~/network/controllers/docs/docs-resolver";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeTypePreview } from "../ui/editor/subpanels/node-type-selector";
 import { NodeEditor } from "../node-editor";
 import { Vector2 } from "~/wrapper/data_types/geometry";
 import { createSignal } from "solid-js";
+import { DocsPathUtils } from "~/helpers/docs-path-utils";
 
 export class DocsTool extends BaseEditorTool {
     protected _selected_docs_path: string | undefined = undefined;
@@ -85,25 +85,25 @@ export class DocsTool extends BaseEditorTool {
             const root_id = docs_element.getAttribute("docs-root");
             if (docs_id && root_id) {
                 this._set_last_pos({x: e.clientX, y: e.clientY});
-                this.selected_docs_path = make_ui_docs_path(root_id, docs_id);
+                this.selected_docs_path = DocsPathUtils.makeUIPath(root_id, docs_id);
             }
         }
     }
 
     onClickOnNodeSlot(slot: NodeSlot): void {
         // Select DataType type id as path
-        this.selected_docs_path = make_datatype_docs_path(slot.data_type.root_id, undefined, slot)
+        this.selected_docs_path = DocsPathUtils.makeDataTypePath(slot.data_type.root_id, undefined, slot)
         this._set_last_pos(undefined);
     }
 
     onClickOnNodePreview(node_preview: NodeTypePreview): void {
-        this.selected_docs_path = make_node_docs_path(node_preview.node_constructor.root_id, undefined, node_preview.node_constructor.type_id)    
+        this.selected_docs_path = DocsPathUtils.makeNodePath(node_preview.node_constructor.root_id, undefined, node_preview.node_constructor.type_id)    
         this._set_last_pos(undefined);
     }
 
     onClickOnNode(node: GraphNode): void {
         // Select Node type id as path
-        this.selected_docs_path = make_node_docs_path(node.root_id, node);
+        this.selected_docs_path = DocsPathUtils.makeNodePath(node.root_id, node);
         this._set_last_pos(undefined);
     }
 }

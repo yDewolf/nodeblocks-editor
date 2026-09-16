@@ -7,6 +7,7 @@ import { DocsPathSplitter } from "~/singletons/metadata";
 import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
 import { DropdownSection } from "../../components/panels/dropdown";
 import { DocsHref } from "../../components/docs/docs-reference";
+import { DocsPathUtils } from "~/helpers/docs-path-utils";
 
 type PathPart = {
     path: string[],
@@ -73,10 +74,11 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
         const path_split = props.current_path.split(DocsPathSplitter);
         if (path_split.length == 0) return [];
         
-        const root_path = [path_split[0]] 
+        const root_id = DocsPathUtils.extractRootId(props.current_path);
+        const root_path = [root_id] 
         let path_parts: PathPart[] = [{
             path: root_path,
-            label: path_split[0]
+            label: root_id
         }];
         
         if (props.docs_data?.type === "node") {
@@ -190,7 +192,7 @@ export const MetadataStoreSubContent = (props: {
                             }
                             const type_data = props.data[id] as BaseMetadata;
                             const name = type_data.capitalized_name != "" ? type_data.capitalized_name : id;
-                            return <DocsHref path={props.root_id + DocsPathSplitter + props.docs_prefix + DocsPathSplitter + id}>{name}</DocsHref>
+                            return <DocsHref path={DocsPathUtils.makeAutoPath(props.root_id, props.docs_prefix, id)}>{name}</DocsHref>
                         }}
                     </For>
                 </div>}
