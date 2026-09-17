@@ -194,7 +194,7 @@ export class NodeTypeFile {
                 );
                 this.set_constructor(type_id, custom_type_constructor);
             });
-            this.notify()
+            this.notify();
         })
     }
 

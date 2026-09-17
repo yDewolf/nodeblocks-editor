@@ -13,7 +13,7 @@ import { NodeComponent } from "../editor/components/node/node-component";
 import { EditorLeftTabHolder } from "../editor/left-tab";
 import { EditorMidTab } from "../editor/mid-tab";
 import { EditorRightPanel } from "../editor/right-tab";
-import { NodeTypeSelector, SelectedNodeType } from "../editor/subpanels/node-type-selector";
+import { SelectedNodeType } from "../editor/subpanels/node-type-selector";
 import { DocsView } from "./docs/docs-view";
 import MinimizeIcon from '~/assets/icons/minimize.svg';
 import { PageViewer } from "../components/page-controller";
@@ -30,7 +30,6 @@ export const EditorView = (props: {
     let viewportRef: HTMLDivElement | undefined;
     let world_space_ref: HTMLDivElement | undefined;
     let editor_view_ref: HTMLDivElement | undefined;
-    const selector = new NodeTypeSelector();
     
     // FIXME: Implement a better way of indexing pages on a pageviewer and accessing them
     const DocsCallback = () => <DocsView scene_controller={editor.scene_controller}/>;
@@ -179,7 +178,7 @@ export const EditorView = (props: {
                 class="editor-ui" 
                 onPointerMove={(e) => editor.input_manager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
             >
-                <EditorLeftTabHolder node_type_selector={selector} main_page_viewer={main_page_viewer} editor={editor}/>
+                <EditorLeftTabHolder main_page_viewer={main_page_viewer} editor={editor}/>
                 <EditorMidTab docs_page={docsPage} page_viewer={main_page_viewer} editor={editor}/>
                 <EditorRightPanel editor={editor} state_controller={editor._state_controller}/>
             </div>

@@ -14,6 +14,7 @@ async function testHandleConnection() {
     const promise = await session_controller.client.connect();
 
   } catch (error) {
+    // TODO: load previous cached scene with the corresponding node types
     console.error("Couldn't connect to server:", error);
     console.log("Loading default types")
     node_editor.scene_controller.load_scene("data/node_scene.json", "data/node_types.json");

@@ -29,6 +29,8 @@ export const NodeDocsContent = (props: {
     }
 
     const constructor = createMemo(() => {
+        props.scene_controller.node_scene_reader.keep_track();
+        props.scene_controller.node_type_reader.keep_track();
         const path = props.path ?? "";
         const type_id = DocsPathUtils.extractTargetId(path);
         if (type_id) {

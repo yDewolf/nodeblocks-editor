@@ -47,7 +47,7 @@ export class SceneController {
         
     }
 
-        public load_node_type_data(type_data: any) {
+    public load_node_type_data(type_data: any) {
         this.node_type_reader.load_type_data(type_data);
         this.node_controller.load_node_types(this.node_type_reader);
     }

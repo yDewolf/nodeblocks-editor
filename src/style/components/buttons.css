@@ -64,11 +64,12 @@
 
 .selectable-button {
     border: none;
-    background-color: var(--light-main-color);
+    background-color: var(--overlay-highlight);
 }
 
 .selectable-button.active {
-    background-color: var(--main-color);
+    background-color: var(--dark-overlay-highlight);
+    color: var(--dark-overlay-highlight-color);
 }
 
 .theme-button-holder {

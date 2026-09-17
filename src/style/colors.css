@@ -2,7 +2,7 @@
 :root {
   --editor-background-color: #fbffff;
   --grid-color: #a7a8ac75;
-  --font-color: #24262A;
+  --font-color: #33373f;
   --secondary-font-color: #3C3D3F;
 
   --node-color: #f4f6fada;
@@ -13,9 +13,10 @@
   --group-header-color: #D7E4EB;
   
   --overlay-background: #fff;
-  --overlay-font-color: var(var(--font-color));
+  --overlay-font-color: var(--font-color);
   --overlay-highlight: #BBCBD9;
   --dark-overlay-highlight: #DAE6F0;
+  --dark-overlay-highlight-color: #3c414b;
 
   --dark-overlay-background: #e7f1fa;
 }
@@ -34,11 +35,13 @@
   --group-color: #923eff;
   --group-header-color: #923eff;
   
+  --overlay-font-color: var(--font-color);
   --overlay-background: #141B21;
   --dark-overlay-background: #0C1014;
 
   --overlay-highlight: #243341;
-  --dark-overlay-highlight: #273542;
+  --dark-overlay-highlight: #394e63;
+  --dark-overlay-highlight-color: var(--font-color);
 }
 
 

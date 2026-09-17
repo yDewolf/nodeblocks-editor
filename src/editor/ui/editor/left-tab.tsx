@@ -1,15 +1,13 @@
 import { Accessor, createRoot, createSignal, JSXElement, onCleanup, Show } from "solid-js";
-import { ToolController } from "~/editor/controllers/tool-controller";
-import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { session_controller } from "~/singletons/user_session";
 import { FileExplorer } from "./subpanels/file-explorer";
 import LeftTabIcon from "~/assets/icons/left-tab.svg";
 import { DropsideItemData, Dropdown, DropsideManager, DropdownItemButton, DropdownSection } from "../components/panels/dropdown";
 import { TabSelector } from "../components/panels/tab-display";
-import { NodeTypeSelector, NodeTypePreview } from "./subpanels/node-type-selector";
 import { NodeEditor } from "~/editor/node-editor";
 import { PageViewer } from "../components/page-controller";
 import { SettingsView } from "../screens/settings-view";
+import { NodeTypePreview, NodeTypeSelector } from './subpanels/node-type-selector';
 
 const LeftTabDropdown = (props: {
     page_viewer: PageViewer
@@ -46,10 +44,9 @@ const LeftTabDropdown = (props: {
 export const EditorLeftTabHolder = (props: {
     main_page_viewer: PageViewer,
     editor: NodeEditor,
-    node_type_selector: NodeTypeSelector, 
 }) => {
     const tabs: Record<string, () => JSXElement> = {
-        "Nodes": () => props.node_type_selector.View(props.editor.scene_controller, (node_preview: NodeTypePreview) => props.editor.tool_controller.current_tool?.onClickOnNodePreview(node_preview)),
+        "Nodes": () => <NodeTypeSelector scene_controller={props.editor.scene_controller} onClickOnPreview={(node_preview: NodeTypePreview) => props.editor.tool_controller.current_tool?.onClickOnNodePreview(node_preview)}/>,
         "Workspace": () => <FileExplorer workspace={session_controller.user_workspace}/>
     }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
