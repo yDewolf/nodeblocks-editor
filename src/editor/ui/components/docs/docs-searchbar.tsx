@@ -6,21 +6,31 @@ import { DocsHref } from "./docs-reference";
 export const DocSearchBar = (props: {
 
 }) => {
+    let containerRef: HTMLDivElement | undefined;
     const [query, setQuery] = createSignal("");
     const [isFocused, setIsFocused] = createSignal(false);
     const docs = useDocs();
 
     const searchResults = createMemo(() => DocSearchHelper.search_topic(docs.doc_topics, query()));
+    const handleOnFocusOut = (e: FocusEvent) => {
+        const nextTarget = e.relatedTarget as Node
+        if (!nextTarget || !containerRef?.contains(nextTarget)) {
+            setIsFocused(false);
+        }
+    }
 
     return (
-        <div class="fill doc-search-container" onfocusout={() => {
-            setIsFocused(false);
-        }}>
+        <div 
+            ref={containerRef}
+            class="fill search-container" 
+            onFocusOut={handleOnFocusOut}
+        >
             <input
+                onFocusOut={handleOnFocusOut}
                 onfocusin={() => {
                     setIsFocused(true);
                 }}
-                class="fill doc-search-bar"
+                class="fill search-bar"
                 classList={{
                     "dropdown-visible": query().trim().length > 0
                 }}

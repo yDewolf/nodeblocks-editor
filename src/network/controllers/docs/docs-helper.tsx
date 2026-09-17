@@ -15,16 +15,6 @@ function escapeRegex(text: string): string {
 }
 
 export class DocSearchHelper {
-    // private metadata_controller: MetadataController;
-    // protected doc_topics: DocTopic[] | undefined = undefined;
-    
-    // public constructor(metadata_controller: MetadataController) {
-    //     this.metadata_controller = metadata_controller;
-
-    //     const topics = this.get_doc_topics(this.metadata_controller.store);
-    //     this.doc_topics = topics;
-    // }
-
     public static get_doc_topics(store: Record<string, MetadataStoreData>): DocTopic[] {
         const topics: DocTopic[] = [];
         Object.entries(store).forEach(([root_id, metaData]) => {
