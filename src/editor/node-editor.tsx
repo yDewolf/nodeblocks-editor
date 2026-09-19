@@ -92,12 +92,14 @@ export class NodeEditor {
         );
 
         this.input_manager.set_keybind_handler(
-            new Keybind("Zoom", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.SCROLL, true]]), modifiers: new Map([[KeyModifiers.SHIFT, false], [KeyModifiers.ALT, false]])})]),
+            new Keybind("Zoom", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.SCROLL, true]]), modifiers: new Map([[KeyModifiers.CTRL, true]])})]),
             {while_active:
                 (data) => {
+                    data.event.preventDefault();
                     const e = data.event;
                     if (e instanceof WheelEvent) {
-                        const delta = -e.deltaY * 0.001;
+                        // TODO: arrumar um jeito de determinar se a pessoa tá usando touchpad ou não
+                        const delta = Math.min(Math.abs(e.deltaY), 0.23) * (-e.deltaY < 0 ? -1 : 1);
                         const new_zoom = Math.max(0.1, Math.min(5.0, this.editor_space.camera.zoom + delta));
                         const [screen_pos, world_pos] = this.editor_space.get_cursor_pos(e)
                         
@@ -107,7 +109,12 @@ export class NodeEditor {
                             y: world_pos.y - (screen_pos.y / new_zoom)
                         });
                     }
-            }}
+            },
+            just_activated: 
+                (data) => {
+                    data.event.preventDefault();
+                }
+            }
         )
 
         this.input_manager.set_keybind_handler(
@@ -125,17 +132,21 @@ export class NodeEditor {
         )
 
         this.input_manager.set_keybind_handler(
-            new Keybind("Scroll", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.SCROLL, true]]), modifiers: new Map([[KeyModifiers.ALT, true]])})]),
+            new Keybind("Scroll", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.SCROLL, true]]), modifiers: new Map([[KeyModifiers.CTRL, false], [KeyModifiers.SHIFT, false]])})]),
             {while_active:
                 (data) => {
                     const e = data.event;
                     if (e instanceof WheelEvent) {
                         this.editor_space.camera.addOffset({
-                            x: 0,
+                            x: e.deltaX,
                             y: e.deltaY
                         });
                     }
-            }}
+            }, just_activated: 
+                (data) => {
+                    data.event.preventDefault();
+                }    
+            }
         )
 
         this.input_manager.set_keybind_handler(
