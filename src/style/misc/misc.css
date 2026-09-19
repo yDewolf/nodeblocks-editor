@@ -86,9 +86,9 @@
         width 0.2s cubic-bezier(0.25, 1, 0.5, 1),
         height 0.2s cubic-bezier(0.25, 1, 0.5, 1),
         opacity 0.15s ease;
-    
+
   background-color: var(--selection-color-alpha);
-  border: 2px solid var(--selection-color-alpha);
+  outline: 1px solid var(--dark-selection-color-alpha);
 }
 
 .selected-docs-indicator.in-graph {
@@ -106,7 +106,7 @@
 
   pointer-events: auto;
   background-color: var(--overlay-background);
-  border: solid 1px var(--stroke-color);
+  outline: solid 1px var(--stroke-color);
 
   grid-template-columns: minmax(0, 1fr);
 }

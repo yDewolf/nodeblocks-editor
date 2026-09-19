@@ -1,4 +1,4 @@
 {
     "capitalized_name": "Editor Left Tab",
-    "description": ""
+    "description": "A barra lateral esquerda do editor inclui duas abas, a de nodes e a do workspace. A de nodes permite que o usuário selecione tipos de node específicos, já o workspace permite que o usuário faça upload de arquivos no servidor. Além dessas abas, ao lado da logo há um dropdown para acessar as configurações do editor e as opções de cena."
 }

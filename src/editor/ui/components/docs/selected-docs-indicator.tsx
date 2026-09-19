@@ -78,6 +78,7 @@ export const DocsElementIndicator = (props: {
                     : (rect.width + rect.left - canvasRect.left); // To the right
 
                 setPopupStyle({
+                    width: "max-content",
                     position: "absolute",
                     top: `${(rect.top - canvasRect.top) / props.editor_camera.zoom}px`,
                     left: `${leftPos / props.editor_camera.zoom}px`,
@@ -85,13 +86,13 @@ export const DocsElementIndicator = (props: {
                     "z-index": 11
                 });
             }
-            
+        
             setStyle({
                 position: "absolute",
                 top: `${(rect.top - canvasRect.top) / props.editor_camera.zoom}px`,
                 left: `${(rect.left - canvasRect.left) / props.editor_camera.zoom}px`,
                 width: `${rect.width / props.editor_camera.zoom}px`,
-                height: `${rect.height / props.editor_camera.zoom}px`,
+                height: `${(rect.height / props.editor_camera.zoom)}px`,
                 opacity: 1,
                 "z-index": 10
             });
