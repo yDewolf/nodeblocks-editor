@@ -98,6 +98,7 @@
 .selected-docs-popup {
   min-width: 100px;
   max-width: 200px;
+  width: max-content;
 
   min-height: 40px;
   border-radius: 8px;

@@ -92,7 +92,7 @@ export class NodeEditor {
         );
 
         this.input_manager.set_keybind_handler(
-            new Keybind("Zoom", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.SCROLL, true]]), modifiers: new Map([[KeyModifiers.SHIFT, false]])})]),
+            new Keybind("Zoom", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.SCROLL, true]]), modifiers: new Map([[KeyModifiers.SHIFT, false], [KeyModifiers.ALT, false]])})]),
             {while_active:
                 (data) => {
                     const e = data.event;
@@ -119,6 +119,20 @@ export class NodeEditor {
                         this.editor_space.camera.addOffset({
                             x: e.deltaY,
                             y: 0
+                        });
+                    }
+            }}
+        )
+
+        this.input_manager.set_keybind_handler(
+            new Keybind("Scroll", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.SCROLL, true]]), modifiers: new Map([[KeyModifiers.ALT, true]])})]),
+            {while_active:
+                (data) => {
+                    const e = data.event;
+                    if (e instanceof WheelEvent) {
+                        this.editor_space.camera.addOffset({
+                            x: 0,
+                            y: e.deltaY
                         });
                     }
             }}

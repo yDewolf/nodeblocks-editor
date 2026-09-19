@@ -49,15 +49,18 @@ export class KeybindMap {
 
     public update_active(keys: Record<string, boolean>, mouse_buttons: Record<number, boolean>, modifiers: Record<number, boolean>): boolean {
         let is_now_active = true;
+        // TODO: revisar a lógica desses aqui:
         if (this._keys.size > 0 && this._keys.entries().toArray().every(key => {if (!key[1]) {return keys[key[0]]} else {return !keys[key[0]]}})) {
             is_now_active = false;
         }
 
-        if (is_now_active && this._mouse_buttons.size > 0 && this._mouse_buttons.entries().toArray().every(key => {if (!key[1]) {return mouse_buttons[key[0]]} else {return !mouse_buttons[key[0]]}})) {
+        // TODO: revisar a lógica desses aqui:
+        if (is_now_active && this._mouse_buttons.size > 0 && this._mouse_buttons.entries().toArray().some(key => {if (!key[1]) {return mouse_buttons[key[0]]} else {return !mouse_buttons[key[0]]}})) {
             is_now_active = false;
         }
 
-        if (is_now_active && this.modifiers.size > 0 && this.modifiers.entries().toArray().every(key => {if (!key[1]) {return modifiers[key[0]]} else {return !modifiers[key[0]]}})) {
+        // Todos os modificadores devem bater com as condições setadas na hora de criar a Keybind
+        if (is_now_active && this.modifiers.size > 0 && this.modifiers.entries().toArray().some(key => {return key[1] != modifiers[key[0]]})) {
             is_now_active = false;
         }
 

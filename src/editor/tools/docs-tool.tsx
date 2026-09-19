@@ -74,6 +74,10 @@ export class DocsTool extends BaseEditorTool {
         // Select UI element docs path
         const clickedElement = e.target as HTMLElement;
         if (!clickedElement) return;
+
+        if (clickedElement.parentElement instanceof HTMLButtonElement || clickedElement instanceof HTMLButtonElement) {
+            return;
+        }
         
         let docs_element = clickedElement.closest("[docs-id], [has-docs]") as HTMLElement;
         if (docs_element) {
