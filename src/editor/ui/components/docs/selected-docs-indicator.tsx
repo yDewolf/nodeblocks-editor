@@ -175,6 +175,7 @@ export const DocsElementIndicator = (props: {
                                 {docs.docsData.latest?.data.capitalized_name ?? "Not found"}
                                 </p>
                             </div>
+                            {/* FIXME: arrumar isso aqui para ele sempre abrir a página relacionada à esse popup */}
                             <button class="icon-button" onclick={() => props.open_docs_page()}>
                                 <ExpandIcon class="small-icon"/>
                             </button>
