@@ -1,4 +1,4 @@
-import { EditorSpace } from "./internal/editor-space";
+import { EditorSpace } from "./canvas/editor-space";
 import { createSignal } from "solid-js";
 import { GraphNode } from "../wrapper/nodes/graph-node";
 import { Vector2 } from '../protocols/nodeblocks/geometry';
@@ -7,7 +7,7 @@ import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./internal/inpu
 import { EventHandler, InputEvents } from "./internal/input_manager/event-handling";
 import { SceneController } from "../wrapper/controllers/scene-controller";
 import { ToolController } from "./controllers/tool-controller";
-import { SelectionController } from "./controllers/selection-controller";
+import { SelectionController } from "./canvas/selection-controller";
 import { Grid } from "./ui/editor/components/misc/grid";
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 import { StateController } from "~/network/controllers/state_controller";

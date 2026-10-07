@@ -2,7 +2,7 @@ import { EditorTool } from "~/editor/tools/base-tool";
 import { SelectionTool } from "~/editor/tools/selection-tool";
 import { ConnectionController } from "~/wrapper/controllers/connection-controller";
 import { NodeEditor } from "../node-editor";
-import { SelectionController } from "./selection-controller";
+import { SelectionController } from "../canvas/selection-controller";
 import { createSignal } from "solid-js";
 import { DocsTool } from "../tools/docs-tool";
 import { CommentTool } from "../tools/comment-tool";

@@ -4,7 +4,7 @@ import { DefaultDataTypes } from "../../../../../wrapper/nodes/data/node-data-ty
 import { createMemo, For, Match, Show, Switch } from "solid-js";
 import { debounce } from "~/editor/utils/debounce-utils";
 import { UserWorkspace } from "~/network/session/user-workspace";
-import { clamp } from '../../../../utils/parameter-utils';
+import { clamp } from '../../../../../../utils/parameter-utils';
 import { session_controller } from "~/singletons/user_session";
 
 const TYPE_CONFIGS: Record<string, { type: string; step?: number; min?: number }> = {

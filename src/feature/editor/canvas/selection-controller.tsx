@@ -11,7 +11,7 @@ import { NodeEditor } from "../node-editor";
 import { ConnSceneRequestData } from "~/network/websocket/request-types";
 import { NodeSceneFile } from '../../wrapper/helpers/node-scene-file';
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
-import { debounce, throttle } from "../utils/debounce-utils";
+import { debounce, throttle } from "../../../utils/debounce-utils";
 
 export class SelectionController {
     selection_rect: SelectionRect
