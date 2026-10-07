@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 import { EditorCamera } from "~/editor/internal/editor-space";
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 
 export class Grid {
     _grid_size: () => Vector2;

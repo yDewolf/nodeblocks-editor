@@ -1,7 +1,7 @@
 import { createMemo, createSignal, onMount, Show } from "solid-js";
 import { GraphNode } from "../graph-node";
 import { NodeConnection } from "../node-connection";
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeSlotStyle } from "./slot-style";
 import { ReactiveMap } from "@solid-primitives/map";
 import { BaseDataType } from "../data/node-data-type";

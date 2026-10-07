@@ -1,6 +1,6 @@
 import { createEffect, createRoot, createSignal } from "solid-js";
 import { EditorSpace } from "~/editor/internal/editor-space";
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { Grid } from "../ui/editor/components/misc/grid";
 import { SelectionRect } from "../ui/editor/components/misc/selection_rect";

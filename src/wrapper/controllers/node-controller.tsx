@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { Vector2 } from '~/wrapper/data_types/geometry';
+import { Vector2 } from '~/protocols/nodeblocks/geometry';
 import { GraphNode } from '../nodes/graph-node';
 import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
@@ -105,7 +105,7 @@ export class NodeController {
             }
             if (data instanceof Map) {
                 const new_node = this.create_node(
-                    "", node_data.position, node_data.type, uid, data
+                    "", node_data.position, node_data.type_id, uid, data
                 );
                 if (new_node) { 
                     this.add_node(new_node); 

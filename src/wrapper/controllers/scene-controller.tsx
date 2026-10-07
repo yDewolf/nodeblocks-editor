@@ -1,7 +1,10 @@
 import { NodeController } from "~/wrapper/controllers/node-controller";
 import { ConnectionController } from "./connection-controller";
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
-import { ConnectionSceneData, NodeSceneData, NodeSceneFile, SceneData } from "~/wrapper/helpers/node-scene-file";
+import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
+import { EditorNodeSceneData } from "~/protocols/nodeblocks/manifests/node/node_graph_data";
+import { ConnectionSceneData } from "~/protocols/nodeblocks/manifests/node/node_graph_data";
+import { SceneData } from "~/protocols/nodeblocks/manifests/node/node_graph_data";
 import { ActionController } from "~/network/controllers/actions/action-controller";
 import { ConnSceneRequestData, NodeSceneRequestData } from "~/network/websocket/request-types";
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
@@ -110,11 +113,11 @@ export class SceneController {
         }
 
         let nodes: NodeSceneRequestData = {};
-        this.node_scene_reader.scene_data.nodes.forEach((node_data: NodeSceneData, node_key: string) => {
-            const constructor = this.node_type_reader.get_constructor(node_data.type);
+        this.node_scene_reader.scene_data.nodes.forEach((node_data: EditorNodeSceneData, node_key: string) => {
+            const constructor = this.node_type_reader.get_constructor(node_data.type_id);
             if (constructor) {
                 nodes[node_key] = {
-                    type: constructor.type_id,
+                    type_id: constructor.type_id,
                     position: node_data.position,
                     data: node_data.data
                 }
@@ -136,10 +139,10 @@ export class SceneUtils {
         const node_types_id = scene_controller.node_type_reader.node_types_id;
         const node_types_version = scene_controller.node_type_reader.node_types_version;
 
-        let scene_nodes: Map<string, NodeSceneData> = new Map();
+        let scene_nodes: Map<string, EditorNodeSceneData> = new Map();
         scene_controller.node_controller.nodes.forEach((node, idx) => {
             scene_nodes.set(node.id, {
-                type: node.type_id,
+                type_id: node.type_id,
                 position: node.pos,
                 size: node.rect.size,
                 data: node.node_data.map_parameters()

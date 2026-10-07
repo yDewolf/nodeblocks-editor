@@ -1,34 +1,7 @@
 import { createSignal } from "solid-js";
-import { Vector2 } from "~/wrapper/data_types/geometry";
 import { downloadToFile } from "./file-utils";
 import { NodeSlot } from "../nodes/slot/node-slot";
-
-export interface MinimalNodeSceneData {
-    type: string,
-    data: Map<string, any>, //| {[key: string]: any},
-    position: Vector2,
-}
-
-export interface NodeSceneData extends MinimalNodeSceneData {
-    size: Vector2,
-}
-
-export interface ConnectionSceneData {
-    from_slot: string,
-    to_slot: string
-}
-
-export interface SceneData {
-    types_id: string,
-    types_version: number,
-    nodes: Map<string, NodeSceneData>,
-    connections: Map<string, ConnectionSceneData>
-}
-
-export interface NodePathData {
-    node_id: string,
-    slot_id?: string
-}
+import { NodePathData, SceneData } from "~/protocols/nodeblocks/manifests/node/node_graph_data";
 
 export class NodeSceneFile {
     _virtual_file: NodeSceneFile | undefined = undefined;
@@ -216,22 +189,5 @@ export class NodeSceneFile {
         return scene;
     }
 
-    static parse_node_path(path: string): NodePathData {
-        const regex = new RegExp("nodes:([a-z0-9-]+):slots:([^:\\s]+)", "i");
-        const match = regex.exec(path);
-        if (match) {
-            return {
-                node_id: match[1],
-                slot_id: match.length > 1 ? match[2] : undefined
-            }
-        }
-
-        return {
-            node_id: ""
-        }
-    }
-
-    static make_slot_path(slot: NodeSlot): string {
-        return `nodes:${slot.parent_node.id}:slots:${slot.slot_id}`
-    }
+    
 }

@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { Rect, Vector2 } from '../data_types/geometry';
+import { Rect, Vector2 } from '../../protocols/nodeblocks/geometry';
 import { NodeConnection } from './node-connection';
 import { NodeSlot, SlotOutputWrapper } from './slot/node-slot';
 import { NodeData } from './data/node-data';

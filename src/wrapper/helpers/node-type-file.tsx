@@ -1,7 +1,7 @@
 import { BaseNodeConstructor, CustomNodeConstructor } from "./node-constructor";
 import { NodeData } from "~/wrapper/nodes/data/node-data";
 import { batch, createSignal } from "solid-js";
-import { SceneData } from "./node-scene-file";
+import { SceneData } from "~/protocols/nodeblocks/manifests/node/node_graph_data";
 import { BaseDataType, DefaultDataTypes, UNKNOWN_TYPE } from "../nodes/data/node-data-type";
 import { BaseSlotType } from "../nodes/data/slot-types";
 import { CustomDataType } from "../nodes/data/custom-data-types";
@@ -57,8 +57,8 @@ export class NodeTypeFile {
         }
 
         const has_missing_constructor = scene_data.nodes.values().some((node_data) => {
-            if (!this.node_constructors.has(node_data.type)) {
-                console.warn("WARNING: Currently loaded types can't construct type", node_data.type)
+            if (!this.node_constructors.has(node_data.type_id)) {
+                console.warn("WARNING: Currently loaded types can't construct type", node_data.type_id)
                 return true;
             }
         })

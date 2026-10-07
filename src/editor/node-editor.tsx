@@ -1,7 +1,7 @@
 import { EditorSpace } from "./internal/editor-space";
 import { createSignal } from "solid-js";
 import { GraphNode } from "../wrapper/nodes/graph-node";
-import { Vector2 } from '../wrapper/data_types/geometry';
+import { Vector2 } from '../protocols/nodeblocks/geometry';
 import { KeyEventManager } from "./internal/input_manager/input-manager";
 import { Keybind, KeybindMap, KeyModifiers, MouseButtons } from "./internal/input_manager/keybind-events";
 import { EventHandler, InputEvents } from "./internal/input_manager/event-handling";
@@ -180,7 +180,7 @@ export class NodeEditor {
                     if (this.selection_controller.selected_node_type) {
                         let nodes: NodeSceneRequestData = {};
                         nodes[crypto.randomUUID()] = {
-                            type: this.selection_controller.selected_node_type, 
+                            type_id: this.selection_controller.selected_node_type, 
                             position: {x: world_pos.x, y: world_pos.y},
                             data: new Map()
                         };

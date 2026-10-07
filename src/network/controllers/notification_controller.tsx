@@ -3,7 +3,7 @@ import { ClientMessages, ServerMessages } from "../websocket/websocket-protocol"
 import { isConnNotify, isNodeNotify, isParamNotify, isSlotNotify, NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta, ServerNotification } from '../websocket/requests/notifications';
 import { createStore, produce, SetStoreFunction } from "solid-js/store";
 import { NodeEditor } from "~/editor/node-editor";
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { BaseNode } from "~/wrapper/nodes/scene-element";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 

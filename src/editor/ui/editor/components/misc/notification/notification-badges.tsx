@@ -2,7 +2,7 @@ import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
 import { timeSignal } from "~/editor/utils/time-utils";
 import { NotificationController } from "~/network/controllers/notification_controller";
 import { NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta, ServerNotification } from "~/network/websocket/requests/notifications";
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import InfoIcon from "~/assets/icons/notification/info.svg";
 import DebugIcon from "~/assets/icons/notification/debug.svg";
 import WarningIcon from "~/assets/icons/notification/warning.svg";

@@ -1,4 +1,4 @@
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { For, createMemo } from 'solid-js';
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { SlotComponent } from "./slot-components";

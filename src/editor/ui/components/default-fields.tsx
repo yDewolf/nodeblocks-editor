@@ -1,4 +1,4 @@
-import { Vector2 } from "~/wrapper/data_types/geometry"
+import { Vector2 } from "~/protocols/nodeblocks/geometry"
 import { FieldValueDisplayer } from "./input-fields"
 
 export const VectorField = (props: {

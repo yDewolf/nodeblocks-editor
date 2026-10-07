@@ -1,4 +1,4 @@
-import { Rect, Vector2 } from "~/wrapper/data_types/geometry";
+import { Rect, Vector2 } from "~/protocols/nodeblocks/geometry";
 import { GraphNode } from "../../wrapper/nodes/graph-node";
 import { createSignal } from 'solid-js';
 

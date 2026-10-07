@@ -1,6 +1,6 @@
 import { BaseEditorTool } from "./base-tool";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeEditor } from "../node-editor";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { ConnectionController } from "../../wrapper/controllers/connection-controller";

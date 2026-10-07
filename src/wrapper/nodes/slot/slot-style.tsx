@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { BaseSlotType } from "../data/slot-types";
 
 // FIXME: Move this to editor/ui/node

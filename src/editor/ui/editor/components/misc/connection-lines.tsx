@@ -1,5 +1,5 @@
 import { createMemo } from "solid-js";
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 

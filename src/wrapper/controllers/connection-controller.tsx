@@ -4,7 +4,8 @@ import { Action } from "~/network/controllers/actions/action-controller";
 import { ConnSceneRequestData } from "~/network/websocket/request-types";
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { ConnectionSceneData, NodeSceneFile } from "../helpers/node-scene-file";
+import { NodeSceneFile } from "../helpers/node-scene-file";
+import { ConnectionSceneData, NodePathUtils } from "~/protocols/nodeblocks/manifests/node/node_graph_data";
 import { NodeController } from "./node-controller";
 
 export class ConnectionController {
@@ -96,8 +97,8 @@ export class ConnectionController {
     }
 
     public static get_slots_from_path_data(conn_data: ConnectionSceneData, node_controller: NodeController) {
-        const node_a_path = NodeSceneFile.parse_node_path(conn_data.from_slot);
-        const node_b_path = NodeSceneFile.parse_node_path(conn_data.to_slot);
+        const node_a_path = NodePathUtils.parse_node_path(conn_data.from_slot);
+        const node_b_path = NodePathUtils.parse_node_path(conn_data.to_slot);
         if (node_a_path.slot_id == undefined || node_b_path.slot_id == undefined) {
             console.error("Couldn't find node slots. Paths:", node_a_path, node_b_path);
             return;

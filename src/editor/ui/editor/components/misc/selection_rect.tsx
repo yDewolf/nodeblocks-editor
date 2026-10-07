@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 import { EditorCamera } from "~/editor/internal/editor-space";
-import { Rect, Vector2 } from "~/wrapper/data_types/geometry";
+import { Rect, Vector2 } from "~/protocols/nodeblocks/geometry";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 
 export class SelectionRect {

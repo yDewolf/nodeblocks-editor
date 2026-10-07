@@ -1,6 +1,6 @@
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeEditor } from "../node-editor";
 import { NodeTypePreview } from "../ui/editor/subpanels/node-type-selector";
 

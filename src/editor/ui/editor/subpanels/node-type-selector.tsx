@@ -3,7 +3,7 @@ import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodePreview } from "../../editor/components/node/node-component";
 import CloseIcon from "~/assets/icons/close.svg";
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { SelectionController } from "~/editor/controllers/selection-controller";
 import { NodeCategory } from "~/wrapper/metadata/node_filters";
 import { metadata } from "~/singletons/metadata";

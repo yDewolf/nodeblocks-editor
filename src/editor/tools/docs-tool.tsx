@@ -3,7 +3,7 @@ import { BaseEditorTool } from "./base-tool";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeTypePreview } from "../ui/editor/subpanels/node-type-selector";
 import { NodeEditor } from "../node-editor";
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { createSignal } from "solid-js";
 import { DocsPathUtils } from "~/helpers/docs-path-utils";
 

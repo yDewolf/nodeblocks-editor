@@ -1,4 +1,4 @@
-import { Vector2 } from "~/wrapper/data_types/geometry";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node_spec";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
