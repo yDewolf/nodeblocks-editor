@@ -2,7 +2,7 @@ import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeEditor } from "../node-editor";
-import { NodeTypePreview } from "../ui/editor/subpanels/node-type-selector";
+import { NodeTypePreview } from "../components/node-type-selector";
 
 export interface ComponentEventHandler {
     onKeyDown(e: KeyboardEvent): void;

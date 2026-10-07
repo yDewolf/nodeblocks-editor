@@ -1,6 +1,7 @@
 import { createSignal, JSXElement, Show } from "solid-js";
 import CloseIcon from "~/assets/icons/close.svg";
 
+// TODO: pensar em um substituto pra isso aqui
 export interface PageView {
     page_title: string,
     view_displayer_css?: string,

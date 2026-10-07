@@ -5,8 +5,8 @@ import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 import TagIcon from "~/assets/icons/tag.svg";
 import { DocsPathSplitter } from "~/singletons/metadata";
 import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
-import { DropdownSection } from "../../components/panels/dropdown";
-import { DocsHref } from "../../components/docs/docs-reference";
+import { DropdownSection } from "../../../../components/panels/dropdown";
+import { DocsHref } from "../../../../components/docs/docs-reference";
 import { DocsPathUtils } from "~/helpers/docs-path-utils";
 
 type PathPart = {

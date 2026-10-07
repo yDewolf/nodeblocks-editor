@@ -2,11 +2,11 @@ import { createEffect, createMemo, For, Match, Switch } from 'solid-js';
 import { useDocs } from "~/context/metadata/docs-context";
 import { DocPayload, DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
 import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
-import { DropdownSection } from "../../components/panels/dropdown";
-import { MetadataStoreSubContent } from "./docs-components";
+import { DropdownSection } from "../../../../components/panels/dropdown";
+import { MetadataStoreSubContent } from "../../components/docs/docs-components";
 import CloseIcon from '~/assets/icons/close.svg';
-import { DocSearchBar } from '../../components/docs/docs-searchbar';
-import { DocsHref } from '../../components/docs/docs-reference';
+import { DocSearchBar } from '../../../../components/docs/docs-searchbar';
+import { DocsHref } from '../../../../components/docs/docs-reference';
 import { DocsPathUtils } from '~/helpers/docs-path-utils';
 
 export const DocsSidebar = (props: {

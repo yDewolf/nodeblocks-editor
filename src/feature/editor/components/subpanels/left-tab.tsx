@@ -1,13 +1,13 @@
 import { Accessor, createRoot, createSignal, JSXElement, onCleanup, Show } from "solid-js";
 import { session_controller } from "~/singletons/user_session";
-import { FileExplorer } from "./subpanels/file-explorer";
+import { FileExplorer } from "./component/file-explorer";
 import LeftTabIcon from "~/assets/icons/left-tab.svg";
-import { DropsideItemData, Dropdown, DropsideManager, DropdownItemButton, DropdownSection } from "../components/panels/dropdown";
-import { TabSelector } from "../components/panels/tab-display";
+import { DropsideItemData, Dropdown, DropsideManager, DropdownItemButton, DropdownSection } from "../../../../components/panels/dropdown";
+import { TabSelector } from "../../../../components/panels/tab-display";
 import { NodeEditor } from "~/editor/node-editor";
-import { PageViewer } from "../components/page-controller";
-import { SettingsView } from "../screens/settings-view";
-import { NodeTypePreview, NodeTypeSelector } from './subpanels/node-type-selector';
+import { PageViewer } from "../../../../components/page-controller";
+import { SettingsView } from "../../screens/settings-view";
+import { NodeTypePreview, NodeTypeSelector } from '../node-type-selector';
 
 const LeftTabDropdown = (props: {
     page_viewer: PageViewer

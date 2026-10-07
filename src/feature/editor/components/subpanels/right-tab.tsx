@@ -1,13 +1,13 @@
 import { StateController } from "~/network/controllers/state_controller"
 import { NodeEditor } from "~/editor/node-editor"
 import { createMemo, createSignal, For, JSXElement, Show } from "solid-js"
-import { BaseNotification, NotificationCard, SidebarNotifications } from "./components/misc/notification/notification-badges"
+import { BaseNotification, NotificationCard, SidebarNotifications } from "../notification-badges"
 import { session_controller } from "~/singletons/user_session"
 import { GraphNode } from "~/wrapper/nodes/graph-node"
-import { DropdownSection } from "../components/panels/dropdown"
-import { TabSelector } from "../components/panels/tab-display"
-import { ServerPanel } from "./subpanels/server-panel"
-import { NodeAttributes } from "./subpanels/node-attributes"
+import { DropdownSection } from "../../../../components/panels/dropdown"
+import { TabSelector } from "../../../../components/panels/tab-display"
+import { ServerPanel } from "./component/server-panel"
+import { NodeAttributes } from "./component/node-attributes"
 
 const NotificationLog = (props: {node?: GraphNode}) => {
     const notification_controller = session_controller.notification_controller;

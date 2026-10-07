@@ -1,7 +1,7 @@
 import { createMemo, createSignal, For, mapArray, Show } from "solid-js";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
-import { NodePreview } from "../../editor/components/node/node-component";
+import { NodePreview } from "../../node/node-component";
 import CloseIcon from "~/assets/icons/close.svg";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { SelectionController } from "~/editor/controllers/selection-controller";

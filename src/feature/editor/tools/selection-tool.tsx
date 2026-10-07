@@ -7,7 +7,7 @@ import { ConnectionController } from "../../wrapper/controllers/connection-contr
 import { NodeController } from "~/wrapper/controllers/node-controller";
 import { SelectionController } from "~/editor/controllers/selection-controller";
 import { createSignal } from "solid-js";
-import { NodeTypePreview } from "../ui/editor/subpanels/node-type-selector";
+import { NodeTypePreview } from "../components/node-type-selector";
 
 export class SelectionTool extends BaseEditorTool {
     selection_controller: SelectionController

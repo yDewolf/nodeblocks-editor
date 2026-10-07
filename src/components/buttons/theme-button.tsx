@@ -1,6 +1,6 @@
 import SunIcon from "~/assets/icons/sun.svg";
 import MoonIcon from "~/assets/icons/moon.svg";
-import { getCurrentTheme, toggleTheme } from "../../ui-themes";
+import { getCurrentTheme, toggleTheme } from "../../feature/ui-themes";
 import { Show, createMemo } from 'solid-js';
 
 export const ThemeButton = (props: {icon_class: string}) => {

@@ -1,8 +1,8 @@
-import { ThemeButton } from "../components/buttons/theme-button";
-import { SceneMinimap } from "../components/scene-minimap";
-import { EditorToolbar } from "./subpanels/editor-toolbar";
+import { ThemeButton } from "../../../../components/buttons/theme-button";
+import { SceneMinimap } from "../scene-minimap";
+import { EditorToolbar } from "./component/editor-toolbar";
 import { NodeEditor } from "~/editor/node-editor";
-import { PageView, PageViewer, StaticViewDisplayer } from '../components/page-controller';
+import { PageView, PageViewer, StaticViewDisplayer } from '../../../../components/page-controller';
 import { Show } from "solid-js";
 import DocsIcon from "~/assets/icons/book.svg";
 

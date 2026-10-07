@@ -8,7 +8,7 @@ import { EventHandler, InputEvents } from "./internal/input_manager/event-handli
 import { SceneController } from "../wrapper/controllers/scene-controller";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./canvas/selection-controller";
-import { Grid } from "./ui/editor/components/misc/grid";
+import { Grid } from "./components/canvas/grid";
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 import { StateController } from "~/network/controllers/state_controller";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
@@ -17,7 +17,7 @@ import { ActionController } from "~/network/controllers/actions/action-controlle
 import { NodeSceneRequestData } from "~/network/websocket/request-types";
 import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 import { SessionController } from "~/network/session/session-controller";
-import {} from "./ui/ui-themes";
+import {} from "../ui-themes";
 import "~/style/screens/editor.css";
 import { DocsController } from "./controllers/docs-controller";
 import { session_controller } from "~/singletons/user_session";

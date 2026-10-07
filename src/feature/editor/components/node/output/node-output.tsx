@@ -7,6 +7,7 @@ import { SlotOutputWrapper } from "~/wrapper/nodes/slot/node-slot";
 
 export interface _SlotOutputPack {slot_id?: string, output?: SlotOutputWrapper}
 
+// TODO: desassociar isso aqui dos nodes e ser simplesmente um baglh que renderiza algum valor de acordo com o datatype
 export const OutputSelector = (props: {output_renderer: DefaultRenderers | undefined, output_value: _SlotOutputPack | undefined}) => {
     return (
         <Switch fallback={<span class="none">No Output</span>}>

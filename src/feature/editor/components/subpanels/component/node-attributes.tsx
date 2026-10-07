@@ -5,9 +5,9 @@ import { metadata } from "~/singletons/metadata";
 import { session_controller } from "~/singletons/user_session";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
-import { VectorField } from "../../components/default-fields";
-import { SimpleField, FieldValueDisplayer, FieldSection } from "../../components/input-fields";
-import { NodeBodySections } from "../components/node/node-component";
+import { VectorField } from "../../../../../components/default-fields";
+import { SimpleField, FieldValueDisplayer, FieldSection } from "../../../../../components/input-fields";
+import { NodeBodySections } from "../../node/node-component";
 
 export const NodeAttributes = (props: {editor: NodeEditor, node?: GraphNode}) => {
     if (!props.node) {

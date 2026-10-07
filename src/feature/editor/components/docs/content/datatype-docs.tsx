@@ -1,17 +1,17 @@
 import { createMemo, createSignal, Match, Switch } from "solid-js";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { DataTypeMeta } from "~/wrapper/metadata/type_metadata";
-import { _SlotOutputPack, OutputSelector } from '../../editor/components/node/output/node-output';
-import { FieldValueDisplayer, SimpleField } from "../../components/input-fields";
+import { _SlotOutputPack, OutputSelector } from '../../node/output/node-output';
+import { FieldValueDisplayer, SimpleField } from "../../../../../components/input-fields";
 import { BaseDataType, DataTypeUtils, DefaultRenderers } from "~/wrapper/nodes/data/node-data-type";
-import { DataTypeGenParams, generate_datatype_random_value } from '../../../../wrapper/nodes/data/data-type-value-utils';
+import { DataTypeGenParams, generate_datatype_random_value } from '../../../../../wrapper/nodes/data/data-type-value-utils';
 import RefreshIcon from '~/assets/icons/refresh.svg';
 import { createStore } from "solid-js/store";
-import { DocsHref } from "../../components/docs/docs-reference";
+import { DocsHref } from "../../../../../components/docs/docs-reference";
 import { SlotOutputWrapper } from "~/wrapper/nodes/slot/node-slot";
 import { DataTypeMetaProvider } from "~/context/metadata/metadata-context";
 import { DocsPathUtils } from "~/helpers/docs-path-utils";
-import { DefaultDataTypes } from '../../../../wrapper/nodes/data/node-data-type';
+import { DefaultDataTypes } from '../../../../../wrapper/nodes/data/node-data-type';
 
 export const DataTypeDocsContent = (props: {
     path: string | undefined,

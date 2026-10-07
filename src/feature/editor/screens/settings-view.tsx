@@ -1,5 +1,5 @@
-import { PageViewer } from "../components/page-controller"
-import { getCurrentTheme, setTheme, Theme } from "../ui-themes"
+import { PageViewer } from "../../../components/page-controller"
+import { getCurrentTheme, setTheme, Theme } from "../../ui-themes"
 
 // TODO: improve this page
 export const SettingsView = (props: {page_viewer: PageViewer}) => {

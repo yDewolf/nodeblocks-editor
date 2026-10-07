@@ -1,7 +1,7 @@
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { BaseEditorTool } from "./base-tool";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { NodeTypePreview } from "../ui/editor/subpanels/node-type-selector";
+import { NodeTypePreview } from "../components/node-type-selector";
 import { NodeEditor } from "../node-editor";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { createSignal } from "solid-js";
