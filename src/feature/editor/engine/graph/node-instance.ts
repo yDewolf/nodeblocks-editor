@@ -1,7 +1,7 @@
-import { NodeSceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
+import { NodeSceneData, SlotPathData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 
-export class SlotInstance {
+export class SlotInstance implements SlotPathData {
     node_id: string
     slot_id: string
     spec: NodeSlotSpec

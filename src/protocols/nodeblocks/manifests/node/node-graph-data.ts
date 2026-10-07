@@ -11,7 +11,7 @@ export interface SlotPathData extends NodePathData {
 
 
 export interface NodeSceneData {
-    uid?: string;
+    uid: string;
     nodetype_fqn: string;
     position: Vector2;
     data: Record<string, any>;
@@ -22,11 +22,11 @@ export interface EditorNodeSceneData extends NodeSceneData {
 }
 
 export interface ConnectionSceneData {
-    uid?: string;
+    uid: string;
 
     // Serialized paths
-    from_slot: string;
-    to_slot: string;
+    from_slot: SlotPathData;
+    to_slot: SlotPathData;
 }
 
 
