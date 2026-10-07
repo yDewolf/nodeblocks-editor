@@ -12,6 +12,11 @@ export enum ServerMessages {
     CLOSE_SOCKET = "disconnect"
 }
 
+export enum ServerMessageTypes {
+    SCENE_EVENT = "scene_event",
+    COMMAND_RESPONSE = "cmd_response"
+}
+
 export enum WebsocketStatus {
     ERROR = -1,
     CONNECTED = 1,

@@ -1,0 +1,17 @@
+import { ServerMessageTypes } from "../../server-message-protocol";
+import { BaseServerMessage } from "./base-server-message";
+
+
+export type ServerEngineEvent = BaseServerMessage & {
+    type: ServerMessageTypes.SCENE_EVENT
+    event_type: string
+    data: any // TODO: adicionar os engine events
+}
+
+export type ServerCmdResponse = BaseServerMessage & {
+    type: ServerMessageTypes.COMMAND_RESPONSE
+    cmd_uid: string
+    response_payload: any // TODO
+}
+
+export type ServerSceneMessages = ServerEngineEvent | ServerCmdResponse;
