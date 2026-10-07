@@ -1,51 +1,31 @@
-import "./app.css";
-import "./singletons/docs";
-import { session_controller } from "./singletons/user_session";
-import { createEffect, onMount } from "solid-js";
-import { NodeEditor } from "./editor/node-editor";
-import { UpdateRootDataTheme } from "./editor/ui/ui-themes";
-import { DocsProvider, DocsUrlSync } from "./feature/docs/docs-context";
-import { EditorView } from "./editor/ui/screens/editor-view";
+import { PackageManager } from "./feature/editor/engine/packages/package-manager";
+import { TypeSpecRegistry } from "./feature/editor/engine/type-registry";
+import { SceneConnectionManager } from "./feature/editor/network/scene-connection-manager";
+import { AppSessionManager } from "./network/app-session-manager";
+import { CommandGroups, ExecutionShortcuts, SceneExecutionCmdTypes } from "./protocols/nodeblocks/network/client-command-protocol";
 
-const node_editor = new NodeEditor();
-
-async function testHandleConnection() {
-  try {
-    const promise = await session_controller.client.connect();
-
-  } catch (error) {
-    // TODO: load previous cached scene with the corresponding node types
-    console.error("Couldn't connect to server:", error);
-    console.log("Loading default types")
-    node_editor.scene_controller.load_scene("data/node_scene.json", "data/node_types.json");
-  }
-}
-
-if (import.meta.hot) {
-  import.meta.hot.dispose(() => {
-    session_controller.client.disconnect();
-  });
+async function connectToScene(scene_id: string) {
+  
 }
 
 export default function App() {
-  onMount(() => {
-    const handleUnload = () => session_controller.client.disconnect();
-    window.addEventListener("beforeunload", handleUnload);
-    testHandleConnection();
-    // UpdateRootDataTheme();
+  const appSession = new AppSessionManager("localhost", 8080);
+  let sceneConnection: SceneConnectionManager | null = null;
+  appSession.login("test_user").then(() => {
+    const registry = new TypeSpecRegistry();
+    const packageManager = new PackageManager(registry);
+  
+    sceneConnection = new SceneConnectionManager(appSession, packageManager);
+    sceneConnection.connect("test_scene");
   });
-
-  createEffect(() => {
-      UpdateRootDataTheme();
-  });
-
 
   return (
     <main>
-      <DocsProvider>
-        <DocsUrlSync/>
-        <EditorView editor={node_editor}/>
-      </DocsProvider>
+      <button onclick={() => {
+        sceneConnection?.sendCommand({cmd_group: CommandGroups.EXECUTION, cmd_uid: "test_command", type: SceneExecutionCmdTypes.EXECUTION_SHORTCUT, shortcut: ExecutionShortcuts.EXECUTION_STEP})
+      }}>
+        Step
+      </button>
     </main>
   );
 }

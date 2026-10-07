@@ -1,7 +1,6 @@
-
-import { ServerNotification } from "~/network/websocket/requests/notifications";
-import { Metadata, MetadataVersion } from "~/wrapper/metadata/header_metadata";
-import { NodeOutput } from "~/wrapper/nodes/graph-node";
+import { ServerNotification } from "~/old/network/websocket/requests/notifications";
+import { Metadata, MetadataVersion } from "~/old/wrapper/metadata/header_metadata";
+import { NodeOutput } from "~/old/wrapper/nodes/graph-node";
 import { PackageManifest } from "../../manifests/package-manifest";
 import { ServerMessages, EditorActionStatus } from "../server-message-protocol";
 import { ServerSceneMessages } from "./server/server-scene-messages";
