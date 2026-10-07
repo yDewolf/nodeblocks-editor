@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { ClientCommand, ClientMessage, ClientVersionSync, ServerMessage } from "./request-types";
-import { ClientMessages, ServerMessages, WebsocketStatus } from "./websocket-protocol";
+import { ClientMessages, ServerMessages, WebsocketStatus } from "../../protocols/nodeblocks/network/server-message-protocol";
 import { setStore, sessionStorage } from "../session/session-store";
 import { createSignal } from "solid-js";
 import { UserSession } from "../session/user-session";

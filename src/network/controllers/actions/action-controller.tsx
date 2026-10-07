@@ -1,5 +1,5 @@
 import { NodeServerClient } from "../../websocket/websocket-handler";
-import { ClientMessages, EditorActionStatus, SceneActionTypes, ServerMessages } from "../../websocket/websocket-protocol";
+import { ClientMessages, EditorActionStatus, SceneActionTypes, ServerMessages } from "../../../protocols/nodeblocks/network/server-message-protocol";
 import { ClientAction, ConnectionActionPayload, NodeActionPayload, NodeSceneRequestData } from '../../websocket/request-types';
 import { nanoid } from "nanoid";
 import { createSignal } from "solid-js";

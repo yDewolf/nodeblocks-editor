@@ -1,5 +1,5 @@
 import { NodeActionPayload, NodeSceneRequestData } from "~/network/websocket/request-types";
-import { SceneActionTypes, ClientMessages, EditorActionStatus } from "~/network/websocket/websocket-protocol";
+import { SceneActionTypes, ClientMessages, EditorActionStatus } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
 import { Action, ActionController } from "./action-controller";

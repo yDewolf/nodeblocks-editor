@@ -9,7 +9,7 @@ import { SceneController } from "../wrapper/controllers/scene-controller";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./canvas/selection-controller";
 import { Grid } from "./components/canvas/grid";
-import { ServerMessages } from "~/network/websocket/websocket-protocol";
+import { ServerMessages } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { StateController } from "~/network/controllers/state_controller";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
 import { ServerSyncController } from "~/network/controllers/sync_controller";

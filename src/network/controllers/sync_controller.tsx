@@ -1,6 +1,6 @@
 import { NodeServerClient } from "../websocket/websocket-handler";
 import { SceneController, SceneUtils } from "~/wrapper/controllers/scene-controller";
-import { ClientMessages, SceneActionTypes, ServerMessages } from "../websocket/websocket-protocol";
+import { ClientMessages, SceneActionTypes, ServerMessages } from "../../protocols/nodeblocks/network/server-message-protocol";
 import { NodeSceneFile } from "~/wrapper/helpers/node-scene-file";
 // import { createEffect, createRoot, on } from "solid-js";
 // import { GraphNode } from "~/wrapper/nodes/graph-node";

@@ -2,7 +2,7 @@ import { NodeEditor } from "~/editor/node-editor";
 import { StatePanel } from "./state-panel";
 import { StateController } from "~/network/controllers/state_controller";
 import { Match, Switch } from "solid-js";
-import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, WebsocketStatus } from "~/network/websocket/websocket-protocol";
+import { ClientMessages, InstanceCommands, InstanceStates, LoopStates, WebsocketStatus } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { WebsocketStatusController } from "~/network/controllers/status_controller";
 import SkipForwardIcon from "~/assets/icons/skip-forward.svg";
 

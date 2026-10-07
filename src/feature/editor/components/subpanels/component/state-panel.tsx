@@ -1,6 +1,6 @@
 import { Match, Switch } from "solid-js"
 import { StateController } from "~/network/controllers/state_controller"
-import { InstanceStates, LoopStates } from "~/network/websocket/websocket-protocol"
+import { InstanceStates, LoopStates } from "~/protocols/nodeblocks/network/server-message-protocol"
 import PauseIcon from "~/assets/icons/pause.svg";
 import RefreshIcon from "~/assets/icons/refresh.svg";
 import PlayIcon from "~/assets/icons/play.svg";

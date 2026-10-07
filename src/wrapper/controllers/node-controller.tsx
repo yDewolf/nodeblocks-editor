@@ -5,7 +5,7 @@ import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeTypeFile } from "~/wrapper/helpers/node-type-file";
 import { Action } from "~/network/controllers/actions/action-controller";
 import { NodeActionPayload, NodeSceneRequestData } from "~/network/websocket/request-types";
-import { SceneActionTypes } from "~/network/websocket/websocket-protocol";
+import { SceneActionTypes } from "~/protocols/nodeblocks/network/server-message-protocol";
 
 export class NodeController {
     private _nodes: () => GraphNode[];

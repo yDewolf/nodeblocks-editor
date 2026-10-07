@@ -1,5 +1,5 @@
 import { NodeServerClient } from "../websocket/websocket-handler";
-import { ClientMessages, ServerMessages } from "../websocket/websocket-protocol";
+import { ClientMessages, ServerMessages } from "../../protocols/nodeblocks/network/server-message-protocol";
 import { isConnNotify, isNodeNotify, isParamNotify, isSlotNotify, NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta, ServerNotification } from '../websocket/requests/notifications';
 import { createStore, produce, SetStoreFunction } from "solid-js/store";
 import { NodeEditor } from "~/editor/node-editor";

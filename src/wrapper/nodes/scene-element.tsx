@@ -1,7 +1,7 @@
 import { createMemo, createRoot, createSignal } from "solid-js";
 import { Action,PayloadTypes } from "~/network/controllers/actions/action-controller";
 import { NodeActionPayload, ConnectionActionPayload } from "~/network/websocket/request-types";
-import { EditorActionStatus, SceneActionTypes } from "~/network/websocket/websocket-protocol";
+import { EditorActionStatus, SceneActionTypes } from "~/protocols/nodeblocks/network/server-message-protocol";
 
 
 export interface SyncAbleElement<ActionPayloadType extends PayloadTypes> {

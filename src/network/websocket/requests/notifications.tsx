@@ -1,4 +1,4 @@
-import { ServerMessages } from "../websocket-protocol";
+import { ServerMessages } from "../../../protocols/nodeblocks/network/server-message-protocol";
 
 export enum NotificationLevel {
     ERROR = "error",

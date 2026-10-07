@@ -1,6 +1,6 @@
 import { createEffect, createRoot, createSignal } from "solid-js";
 import { NodeServerClient } from "../websocket/websocket-handler";
-import { InstanceStates, LoopStates, ClientMessages, InstanceCommands, WebsocketStatus, ServerMessages } from "../websocket/websocket-protocol";
+import { InstanceStates, LoopStates, ClientMessages, InstanceCommands, WebsocketStatus, ServerMessages } from "../../protocols/nodeblocks/network/server-message-protocol";
 
 export class WebsocketStatusController {
     private _client: NodeServerClient;

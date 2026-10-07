@@ -1,6 +1,6 @@
 import { createResource, createSignal, onMount } from "solid-js";
 import { NodeServerClient } from "../websocket/websocket-handler";
-import { ServerMessages } from "../websocket/websocket-protocol";
+import { ServerMessages } from "../../protocols/nodeblocks/network/server-message-protocol";
 
 export interface WorkspaceFile {
     name: string,
