@@ -2,10 +2,10 @@ import { nanoid } from "nanoid";
 import { TypeSpecRegistry } from "./type-registry";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { SceneGraph } from "./graph/scene-graph";
-import { NodeInstanceFactory } from "./helpers/node-instance-factory";
 import { NodeSceneData, SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { INodeProvider } from "./interfaces/node-provider-interface";
 import { PackageManifest } from "~/protocols/nodeblocks/manifests/package-manifest";
+import { NodeInstance } from "./graph/node-instance";
 
 export class NodeScene {
     scene_id: string
@@ -22,14 +22,16 @@ export class NodeScene {
         this.graph = new SceneGraph(this.registry);
     }
 
-    public createNode(node_fqn: string, position: Vector2) {
+    public createNode(node_fqn: string, position: Vector2): NodeInstance {
         const instance = this.node_provider.createNode(node_fqn, position);
         this.graph.addNode(instance);
+        return instance;
     }
 
-    public createNodeFromData(node_fqn: string, node_data: NodeSceneData) {
+    public createNodeFromData(node_fqn: string, node_data: NodeSceneData): NodeInstance {
         const instance = this.node_provider.createNodeFromData(node_fqn, node_data);
         this.graph.addNode(instance);
+        return instance;
     }
 
     public removeNode(node_id: string): boolean {
@@ -62,7 +64,7 @@ export class NodeScene {
         for (const manifest of extracted_dependencies) {
             dependency_map[manifest.package_id] = manifest.version;
         }
-        
+
         return {
             uid: this.scene_id,
             dependencies: dependency_map,
