@@ -6,8 +6,7 @@ export interface PackageManifest {
     version: string;
     package_id: string;
     
-    data_types: Map<string, DataTypeSpec>;
+    data_types: Record<string, DataTypeSpec>;
     // slot_types: Map<string, SlotTypeData>;
-    node_types: Map<string, NodeTypeSpec>;
+    node_types: Record<string, NodeTypeSpec>;
 }
- 
