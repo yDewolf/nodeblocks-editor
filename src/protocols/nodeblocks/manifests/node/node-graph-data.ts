@@ -12,9 +12,9 @@ export interface SlotPathData extends NodePathData {
 
 export interface NodeSceneData {
     uid?: string;
-    type_id: string; // TODO: Rename this to nodetype_fqn 
+    nodetype_fqn: string;
     position: Vector2;
-    data: Map<string, any>;
+    data: Record<string, any>;
 }
 
 export interface EditorNodeSceneData extends NodeSceneData {

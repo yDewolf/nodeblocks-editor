@@ -1,5 +1,4 @@
 import { DataTypeSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
-import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
 
 export class DatatypeHelper {
     public static areTypesCompatible(source_spec: DataTypeSpec, target_spec: DataTypeSpec): boolean {

@@ -114,7 +114,7 @@ export class SceneController {
 
         let nodes: NodeSceneRequestData = {};
         this.node_scene_reader.scene_data.nodes.forEach((node_data: EditorNodeSceneData, node_key: string) => {
-            const constructor = this.node_type_reader.get_constructor(node_data.type_id);
+            const constructor = this.node_type_reader.get_constructor(node_data.nodetype_fqn);
             if (constructor) {
                 nodes[node_key] = {
                     type_id: constructor.type_id,
@@ -142,7 +142,7 @@ export class SceneUtils {
         let scene_nodes: Map<string, EditorNodeSceneData> = new Map();
         scene_controller.node_controller.nodes.forEach((node, idx) => {
             scene_nodes.set(node.id, {
-                type_id: node.type_id,
+                nodetype_fqn: node.type_id,
                 position: node.pos,
                 size: node.rect.size,
                 data: node.node_data.map_parameters()

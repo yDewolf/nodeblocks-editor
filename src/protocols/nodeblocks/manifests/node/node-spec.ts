@@ -11,7 +11,7 @@ export interface NodeSlotSpec {
 }
 
 export interface NodeTypeSpec extends NamespaceModel {
-    parameters: Map<string, ParameterSpec>;
-    slots: Map<string, NodeSlotSpec>;
+    parameters: Record<string, ParameterSpec>;
+    slots: Record<string, NodeSlotSpec>;
 }
 
