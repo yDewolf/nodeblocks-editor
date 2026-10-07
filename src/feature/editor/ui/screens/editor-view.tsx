@@ -1,5 +1,5 @@
 import { onMount, onCleanup, Show, For, createEffect } from "solid-js";
-import { useDocs } from "~/feature/docs/docs-context";
+import { useDocs } from "~/context/metadata/docs-context";
 import { InputEvents } from "~/editor/internal/input_manager/event-handling";
 import { NodeEditor } from "~/editor/node-editor";
 import { ConnActionUtils } from "~/network/controllers/actions/conn-actions";
@@ -7,16 +7,16 @@ import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { DocsElementIndicator } from "./components/selected-docs-indicator";
-import { ConnectionLines, ConnectionPreview } from "./components/canvas/connection-lines";
-import { NodeComponent } from "./components/node/node-component";
-import { EditorLeftTabHolder } from "./components/subpanels/left-tab";
-import { EditorMidTab } from "./components/subpanels/mid-tab";
-import { EditorRightPanel } from "./components/subpanels/right-tab";
+import { DocsElementIndicator } from "../../components/selected-docs-indicator";
+import { ConnectionLines, ConnectionPreview } from "../../components/canvas/connection-lines";
+import { NodeComponent } from "../../components/node/node-component";
+import { EditorLeftTabHolder } from "../../components/subpanels/left-tab";
+import { EditorMidTab } from "../../components/subpanels/mid-tab";
+import { EditorRightPanel } from "../../components/subpanels/right-tab";
 import { SelectedNodeType } from "../../components/node-type-selector";
-import { DocsView } from "./screens/docs-view";
+import { DocsView } from "./docs/docs-view";
 import MinimizeIcon from '~/assets/icons/minimize.svg';
-import { PageViewer } from "../../components/page-controller";
+import { PageViewer } from "../../../../components/page-controller";
 import { session_controller } from "~/singletons/user_session";
 
 export const EditorView = (props: {

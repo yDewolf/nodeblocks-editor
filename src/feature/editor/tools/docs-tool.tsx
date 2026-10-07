@@ -5,7 +5,7 @@ import { NodeTypePreview } from "../components/node-type-selector";
 import { NodeEditor } from "../node-editor";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { createSignal } from "solid-js";
-import { DocsPathUtils } from "~/helpers/docs-path-utils";
+import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
 
 export class DocsTool extends BaseEditorTool {
     protected _selected_docs_path: string | undefined = undefined;

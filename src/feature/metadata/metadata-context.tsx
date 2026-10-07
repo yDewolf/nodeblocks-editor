@@ -1,7 +1,7 @@
 import { createContext, Match, Switch, useContext } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
-import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
-import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
+import { DocPayload } from "~/feature/docs/docs-interfaces";
+import { MetadataStoreData } from "~/feature/metadata/metadata_controller";
 import { DataTypeMeta, NodeTypeMeta } from '~/wrapper/metadata/type_metadata';
 
 // Root Meta

@@ -1,3 +1,3 @@
-import { DocsResolver } from "~/network/controllers/docs/docs-resolver";
+import { DocsResolver } from "~/feature/docs/docs-resolver";
 
 export const docsResolver = new DocsResolver();

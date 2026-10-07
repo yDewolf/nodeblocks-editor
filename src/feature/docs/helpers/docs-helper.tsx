@@ -1,5 +1,5 @@
-import { DocsPathUtils } from "~/helpers/docs-path-utils";
-import { MetadataStoreData } from "../metadata/metadata_controller";
+import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
+import { MetadataStoreData } from "../../metadata/metadata_controller";
 export type DocTopicType = 'node' | 'datatype' | 'interface' | "header";
 export interface DocTopic {
     id: string;

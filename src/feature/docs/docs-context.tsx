@@ -2,7 +2,7 @@ import { createContext, useContext, onCleanup, createEffect } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { isServer } from "solid-js/web";
 import { DocsController } from "~/editor/controllers/docs-controller";
-import { DocsPathUtils } from "~/helpers/docs-path-utils";
+import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
 
 
 const DocsContext = createContext<DocsController>();

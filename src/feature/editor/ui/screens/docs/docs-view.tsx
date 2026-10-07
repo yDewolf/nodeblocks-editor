@@ -1,20 +1,19 @@
 import { createMemo, createSignal, Match, Show, Switch } from "solid-js";
-import { useDocs } from "~/feature/docs/docs-context";
+import { useDocs } from "~/context/metadata/docs-context";
 import { EditorTool } from "~/editor/tools/base-tool";
-import { DocsPath, DocsTags } from "../../docs/components/docs-components";
-import { DocPayload } from "~/feature/docs/docs-interfaces";
+import { DocsPath, DocsTags } from "./docs-components";
+import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import CodeIcon from "~/assets/icons/code.svg";
-import { NodeDocsContent } from "../../docs/components/content/node-docs";
-import { InterfaceDocsContent } from '../../docs/components/content/interface-docs';
-import { DataTypeDocsContent } from "../../docs/components/content/datatype-docs";
-import { HeaderDocsContent } from "../../docs/components/content/header-docs";
+import { NodeDocsContent } from "./node-docs";
+import { InterfaceDocsContent } from './interface-docs';
+import { DataTypeDocsContent } from "./datatype-docs";
+import { HeaderDocsContent } from "./header-docs";
 import { DocsSidebar } from "./docs-sidebar";
 import AskDocsIcon from "~/assets/icons/ask-about.svg";
-import { DynamicMetaProvider, MetaProvider } from "~/feature/metadata/metadata-context";
-import { ParsedMetaText } from '../../metadata/components/metadata-text';
+import { DynamicMetaProvider, MetaProvider } from "~/context/metadata/metadata-context";
+import { ParsedMetaText } from '../../../../metadata/components/metadata-text';
 
-// TODO: rename this to EditorDocsView
 export const DocsView = (props: {current_tool?: EditorTool, scene_controller: SceneController}) => {
     const docs = useDocs();
     const docs_data = createMemo(() => {

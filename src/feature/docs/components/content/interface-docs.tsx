@@ -1,4 +1,4 @@
-import { InterfaceElementMeta } from "~/network/controllers/docs/docs-interfaces";
+import { InterfaceElementMeta } from "~/feature/docs/docs-interfaces";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 
 export const InterfaceDocsContent = (props: {

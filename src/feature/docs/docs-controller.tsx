@@ -1,12 +1,12 @@
 import { createSignal, createResource, Resource, createMemo, Accessor } from "solid-js";
 import { docsResolver } from "~/singletons/docs";
 import { isServer } from "solid-js/web";
-import { DocPayload } from "~/network/controllers/docs/docs-interfaces";
-import { MetadataStoreData } from "~/network/controllers/metadata/metadata_controller";
-import { DocSearchHelper, DocTopic } from "~/network/controllers/docs/docs-helper";
+import { DocPayload } from "~/feature/docs/docs-interfaces";
+import { MetadataStoreData } from "~/feature/metadata/metadata_controller";
+import { DocSearchHelper, DocTopic } from "~/feature/docs/helpers/docs-helper";
 import { makePersisted } from "@solid-primitives/storage";
 import { createStore, SetStoreFunction } from "solid-js/store";
-import { DocsPathUtils, DocsRoute } from "~/helpers/docs-path-utils";
+import { DocsPathUtils, DocsRoute } from "~/feature/docs/helpers/docs-path-utils";
 
 const DOCS_STATE_KEY = "app_docs_state";
 interface DocsState {

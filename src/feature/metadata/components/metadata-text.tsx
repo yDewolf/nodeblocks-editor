@@ -1,7 +1,7 @@
 import { createMemo, JSX } from "solid-js";
-import { useDocs } from "~/context/metadata/docs-context";
-import { useResolvedMeta } from "~/context/metadata/metadata-context";
-import { DocAnnotationHelper } from "~/helpers/anottation-helper";
+import { useDocs } from "~/feature/docs/docs-context";
+import { useResolvedMeta } from "~/feature/metadata/metadata-context";
+import { DocAnnotationHelper } from "~/feature/metadata/anottation-helper";
 import { MarkdownHelper } from "~/helpers/markdown-helper";
 
 export const CodeTextElement = (props: { children: JSX.Element }) => {

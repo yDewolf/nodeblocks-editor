@@ -1,8 +1,8 @@
 import { createStore, reconcile, SetStoreFunction } from "solid-js/store";
 import { NodeServerClient } from "~/network/websocket/websocket-handler";
 import { makePersisted } from "@solid-primitives/storage";
-import { Metadata, MetadataHeader, MetadataVersion, parse_header } from "../../../wrapper/metadata/header_metadata";
-import { NodeTypeMeta, DataTypeMeta, ParameterMeta, SlotMeta, parse_node_types, parse_data_types, parse_node_type } from "../../../wrapper/metadata/type_metadata";
+import { Metadata, MetadataHeader, MetadataVersion, parse_header } from "../../wrapper/metadata/header_metadata";
+import { NodeTypeMeta, DataTypeMeta, ParameterMeta, SlotMeta, parse_node_types, parse_data_types, parse_node_type } from "../../wrapper/metadata/type_metadata";
 import { ServerMessages } from "~/network/websocket/websocket-protocol";
 import { createSignal } from "solid-js";
 import { BaseMetadata } from "~/wrapper/metadata/base_metadata";

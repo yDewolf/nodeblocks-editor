@@ -2,6 +2,8 @@ import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
 import { MetadataHeader } from "~/wrapper/metadata/header_metadata";
 import { DataTypeMeta, NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 
+// TODO: rename this file to docs-protocols
+
 export interface InterfaceElementMeta extends BaseMetadata {
     shortcut?: string;
     related_features?: string[];

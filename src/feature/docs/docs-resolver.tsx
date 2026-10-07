@@ -4,7 +4,7 @@ import { DocPayload, DocsPathPrefix } from "./docs-interfaces";
 import { DataTypeMeta, NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
 import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
 import { MetadataHeader } from "~/wrapper/metadata/header_metadata";
-import { DocsPathUtils } from "~/helpers/docs-path-utils";
+import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
 
 const LOCAL_DATA_ID = "builtin";
 

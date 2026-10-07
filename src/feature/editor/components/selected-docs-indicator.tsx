@@ -1,14 +1,14 @@
 import { createEffect, createSignal, JSX, Show, createMemo, onCleanup } from 'solid-js';
 import { Portal } from 'solid-js/web';
-import { useDocs } from "~/context/metadata/docs-context";
+import { useDocs } from "~/feature/docs/docs-context";
 import { ToolController } from "~/editor/controllers/tool-controller";
 import { EditorCamera } from '~/editor/internal/editor-space';
 import { KeyEventManager } from '~/editor/internal/input_manager/input-manager';
 import { DocsTool } from "~/editor/tools/docs-tool";
 import DocsIcon from '~/assets/icons/book.svg';
 import ExpandIcon from '~/assets/icons/expand.svg';
-import { MetaProvider } from '~/context/metadata/metadata-context';
-import { ParsedMetaText } from './metadata-text';
+import { MetaProvider } from '~/feature/metadata/metadata-context';
+import { ParsedMetaText } from '../../metadata/components/metadata-text';
 
 // Não sei se fica melhor continuar mostrando o selecionado ou mostrar apenas o hovered
 const KeepSelectedHighlighted = false;

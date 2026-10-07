@@ -1,4 +1,4 @@
-import { DocsPathPrefix } from "~/network/controllers/docs/docs-interfaces";
+import { DocsPathPrefix } from "~/feature/docs/docs-interfaces";
 import { DocsPathSplitter } from "~/singletons/metadata";
 import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 import { GraphNode } from "~/wrapper/nodes/graph-node";

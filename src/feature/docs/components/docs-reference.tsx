@@ -1,6 +1,6 @@
 import { JSX } from 'solid-js';
-import { useDocs } from '~/context/metadata/docs-context';
-import { CURRENT_PATH, DocsPathUtils, DocsRoute } from '~/helpers/docs-path-utils';
+import { useDocs } from '~/feature/docs/docs-context';
+import { CURRENT_PATH, DocsPathUtils, DocsRoute } from '~/feature/docs/helpers/docs-path-utils';
 
 export const DocsHref = (props: {
     path?: string,

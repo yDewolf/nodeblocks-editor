@@ -1,6 +1,6 @@
 import { createSignal, createMemo, For, Show } from "solid-js";
-import { useDocs } from "~/context/metadata/docs-context";
-import { DocSearchHelper } from "~/network/controllers/docs/docs-helper";
+import { useDocs } from "~/feature/docs/docs-context";
+import { DocSearchHelper } from "~/feature/docs/helpers/docs-helper";
 import { DocsHref } from "./docs-reference";
 
 export const DocSearchBar = (props: {

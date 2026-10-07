@@ -4,19 +4,19 @@ import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeDataModel } from "~/wrapper/helpers/node-type-file";
 import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { NodeTypeMeta, ParameterMeta, SlotMeta } from "~/wrapper/metadata/type_metadata";
-import { DropdownSection } from "../../../../../components/panels/dropdown";
-import { NodePreview } from "../../node/node-component";
-import { SlotHeader } from "../../node/slot-components";
+import { DropdownSection } from "../../../../components/panels/dropdown";
+import { NodePreview } from "../../../editor/components/node/node-component";
+import { SlotHeader } from "../../../editor/components/node/slot-components";
 import { NodeParameter } from "~/wrapper/nodes/data/node-data";
-import { NodeFieldSelector } from '../../node/node-field';
+import { NodeFieldSelector } from '../../../editor/components/node/node-field';
 import InputIcon from "~/assets/icons/input.svg";
 import OutputIcon from "~/assets/icons/output.svg";
 import ToolIcon from "~/assets/icons/tool.svg";
 import FilterIcon from "~/assets/icons/filter.svg";
 import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
-import { DocsHref } from "../../../../../components/docs/docs-reference";
-import { ParsedMetaText } from '../../../../../components/docs/metadata-text';
-import { DocsPathUtils } from '../../../../../helpers/docs-path-utils';
+import { DocsHref } from "../docs-reference";
+import { ParsedMetaText } from '../../../metadata/components/metadata-text';
+import { DocsPathUtils } from '../../helpers/docs-path-utils';
 
 
 export const NodeDocsContent = (props: {

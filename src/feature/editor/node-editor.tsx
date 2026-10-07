@@ -19,7 +19,7 @@ import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
 import { SessionController } from "~/network/session/session-controller";
 import {} from "../ui-themes";
 import "~/style/screens/editor.css";
-import { DocsController } from "./controllers/docs-controller";
+import { DocsController } from "../docs/docs-controller";
 import { session_controller } from "~/singletons/user_session";
 import { SlotOutputWrapper } from "~/wrapper/nodes/slot/node-slot";
 
