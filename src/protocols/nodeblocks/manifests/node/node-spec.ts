@@ -1,5 +1,5 @@
-import { NamespaceModel } from "../../namespace_model";
-import { ParameterSpec } from "./datatype_spec";
+import { NamespaceModel } from "../../namespace-model";
+import { ParameterSpec } from "./datatype-spec";
 
 export interface NodeSlotSpec {
     data_type_id: string;

@@ -1,11 +1,11 @@
 import { BaseNodeConstructor, CustomNodeConstructor } from "./node-constructor";
 import { NodeData } from "~/wrapper/nodes/data/node-data";
 import { batch, createSignal } from "solid-js";
-import { SceneData } from "~/protocols/nodeblocks/manifests/node/node_graph_data";
+import { SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { BaseDataType, DefaultDataTypes, UNKNOWN_TYPE } from "../nodes/data/node-data-type";
 import { BaseSlotType } from "../nodes/data/slot-types";
 import { CustomDataType } from "../nodes/data/custom-data-types";
-import { PackageManifest } from "~/protocols/nodeblocks/manifests/package_manifest";
+import { PackageManifest } from "~/protocols/nodeblocks/manifests/package-manifest";
 
 export interface SlotTypeData {
     data_type_id: string

@@ -5,7 +5,7 @@ import { ConnSceneRequestData } from "~/network/websocket/request-types";
 import { NodeConnection } from "~/wrapper/nodes/node-connection";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeSceneFile } from "../helpers/node-scene-file";
-import { ConnectionSceneData, NodePathUtils } from "~/protocols/nodeblocks/manifests/node/node_graph_data";
+import { ConnectionSceneData, NodePathUtils } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { NodeController } from "./node-controller";
 
 export class ConnectionController {

@@ -2,7 +2,7 @@ import { createMemo, JSXElement, For, Show } from "solid-js";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
 import { NodeDataModel } from "~/wrapper/helpers/node-type-file";
-import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node_spec";
+import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { NodeTypeMeta, ParameterMeta, SlotMeta } from "~/wrapper/metadata/type_metadata";
 import { DropdownSection } from "../../components/panels/dropdown";
 import { NodePreview } from "../../editor/components/node/node-component";

@@ -1,8 +1,8 @@
-import { ConnectionSceneData } from "~/protocols/nodeblocks/manifests/node/node_graph_data";
-import { NodeSceneData } from "~/protocols/nodeblocks/manifests/node/node_graph_data";
+import { ConnectionSceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
+import { NodeSceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { CommandGroups, GraphActionTypes, ClientGraphCommandTypes, ClientSceneCommandTypes, SceneExecutionCmdTypes, ExecutionShortcuts, SceneWorkerExecutionState, SceneWorkerExecutionMode,ServerMessages, EditorActionStatus } from "./websocket-protocol";
 import { ServerNotification, NotificationWithMeta } from './requests/notifications';
-import { PackageManifest } from "~/protocols/nodeblocks/manifests/package_manifest";
+import { PackageManifest } from "~/protocols/nodeblocks/manifests/package-manifest";
 import { Metadata, MetadataVersion } from "~/wrapper/metadata/header_metadata";
 import { NodeOutput } from "~/wrapper/nodes/graph-node";
 

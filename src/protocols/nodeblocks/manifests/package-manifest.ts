@@ -1,5 +1,5 @@
-import { DataTypeSpec } from "./node/datatype_spec";
-import { NodeTypeSpec } from "./node/node_spec";
+import { DataTypeSpec } from "./node/datatype-spec";
+import { NodeTypeSpec } from "./node/node-spec";
 
 
 export interface PackageManifest {

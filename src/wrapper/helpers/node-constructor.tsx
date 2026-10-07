@@ -1,5 +1,5 @@
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
-import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node_spec";
+import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeData } from "~/wrapper/nodes/data/node-data";

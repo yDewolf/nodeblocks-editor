@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 import { downloadToFile } from "./file-utils";
 import { NodeSlot } from "../nodes/slot/node-slot";
-import { NodePathData, SceneData } from "~/protocols/nodeblocks/manifests/node/node_graph_data";
+import { NodePathData, SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 
 export class NodeSceneFile {
     _virtual_file: NodeSceneFile | undefined = undefined;

@@ -1,6 +1,6 @@
 import { Show } from "solid-js";
 import { metadata } from "~/singletons/metadata";
-import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node_spec";
+import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { NodeTypeMeta, SlotMeta } from "~/wrapper/metadata/type_metadata";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 

@@ -1,5 +1,5 @@
 import { DefaultDataTypes, DefaultRenderers } from "~/wrapper/nodes/data/node-data-type";
-import { NamespaceModel } from "../../namespace_model";
+import { NamespaceModel } from "../../namespace-model";
 
 
 export interface DataTypeSpec extends NamespaceModel {
