@@ -2,35 +2,13 @@ import { BaseNodeConstructor, CustomNodeConstructor } from "./node-constructor";
 import { NodeData } from "~/wrapper/nodes/data/node-data";
 import { batch, createSignal } from "solid-js";
 import { SceneData } from "./node-scene-file";
-import { BaseDataType, DefaultDataTypes, DefaultRenderers, UNKNOWN_TYPE } from "../nodes/data/node-data-type";
+import { BaseDataType, DefaultDataTypes, UNKNOWN_TYPE } from "../nodes/data/node-data-type";
 import { BaseSlotType } from "../nodes/data/slot-types";
 import { CustomDataType } from "../nodes/data/custom-data-types";
+import { PackageManifest } from "~/protocols/nodeblocks/manifests/package_manifest";
 
-export interface TypeFile {
-    format: number,
-    version: number,
-    id: string,
-    data_types: Map<string, DataTypeData>,
-    slot_types: Map<string, SlotTypeData>,
-    node_types: Map<string, NodeTypesData>
-}
-
-interface DataTypeData {
-    base?: DefaultDataTypes,
-    default_renderer: DefaultRenderers,
-    whitelist: Array<string>
-}
-
-interface SlotTypeData {
+export interface SlotTypeData {
     data_type_id: string
-}
-
-export interface SlotData {
-    type: string,
-    max_connections: number,
-    data_type: string | null,
-    is_input: boolean,
-    tooltip: string
 }
 
 // TODO: find a better way of adding parameter stuff
@@ -43,11 +21,6 @@ export interface NodeDataModel {
     extension_filter?: string[],
     options?: Array<any>,
     option_type?: DefaultDataTypes
-}
-
-interface NodeTypesData {
-    parameters: Map<string, NodeDataModel>
-    slots: Map<string, SlotData>
 }
 
 export class NodeTypeFile {
@@ -158,16 +131,16 @@ export class NodeTypeFile {
         }
     }
 
-    public async _parse_type_data(json_data: TypeFile) {
+    public async _parse_type_data(json_data: PackageManifest) {
         this.raw_data = json_data;
         this.node_types_version = json_data.version;
-        this.node_types_id = json_data.id;
+        this.node_types_id = json_data.package_id;
 
         json_data.data_types.forEach((type_data, type_id) => {
             const custom_data_type = new CustomDataType(
-                json_data.id,
+                json_data.package_id,
                 type_id,
-                type_data.base,
+                type_data.base_id,
                 type_data.default_renderer,
                 type_data.whitelist,
             )
@@ -186,7 +159,7 @@ export class NodeTypeFile {
             json_data.node_types.forEach((type_data, type_id) => {
                 const node_data: NodeData = new NodeData(type_data.parameters);
                 const custom_type_constructor = new CustomNodeConstructor(
-                    json_data.id,
+                    json_data.package_id,
                     type_id,
                     node_data,
                     type_data.slots,
@@ -198,11 +171,11 @@ export class NodeTypeFile {
         })
     }
 
-    static json_to_type_file(json_data: any): TypeFile {
+    static json_to_type_file(json_data: any): PackageManifest {
         return {
             format: json_data.format,
             version: json_data.version ?? -1,
-            id: json_data.id ?? "unknown",
+            package_id: json_data.id ?? "unknown",
             data_types: new Map(Object.entries(json_data.data_types || {}).map(([id, data]: [string, any]) => {
                 return [id, {
                     base: data.base,

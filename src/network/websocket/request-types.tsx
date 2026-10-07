@@ -1,7 +1,7 @@
 import { ConnectionSceneData, MinimalNodeSceneData } from "~/wrapper/helpers/node-scene-file";
 import { CommandGroups, GraphActionTypes, ClientGraphCommandTypes, ClientSceneCommandTypes, SceneExecutionCmdTypes, ExecutionShortcuts, SceneWorkerExecutionState, SceneWorkerExecutionMode,ServerMessages, EditorActionStatus } from "./websocket-protocol";
 import { ServerNotification, NotificationWithMeta } from './requests/notifications';
-import { TypeFile } from "~/wrapper/helpers/node-type-file";
+import { PackageManifest } from "~/protocols/nodeblocks/manifests/package_manifest";
 import { Metadata, MetadataVersion } from "~/wrapper/metadata/header_metadata";
 import { NodeOutput } from "~/wrapper/nodes/graph-node";
 
@@ -78,7 +78,7 @@ export type ClientMessageWrapper = {
 
 // Server Messages
 export type ServerVersionSync = {
-    types?: TypeFile;
+    types?: PackageManifest;
     metadata?: Metadata;
 };
 

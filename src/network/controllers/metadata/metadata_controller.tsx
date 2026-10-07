@@ -44,7 +44,7 @@ export class MetadataController {
         this._client.add_handler(ServerMessages.SYNC_VERSIONS, async (message) => {
             if (message.types && message.metadata) {
                 this.update_metadata(
-                    message.types.id, {
+                    message.types.package_id, {
                         meta_version: message.metadata.meta_version, 
                         types_version: message.metadata.types_version
                     }

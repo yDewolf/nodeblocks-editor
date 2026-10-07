@@ -1,7 +1,8 @@
 import { createMemo, JSXElement, For, Show } from "solid-js";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
-import { NodeDataModel, SlotData } from "~/wrapper/helpers/node-type-file";
+import { NodeDataModel } from "~/wrapper/helpers/node-type-file";
+import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node_spec";
 import { NodeTypeMeta, ParameterMeta, SlotMeta } from "~/wrapper/metadata/type_metadata";
 import { DropdownSection } from "../../components/panels/dropdown";
 import { NodePreview } from "../../editor/components/node/node-component";
@@ -68,9 +69,9 @@ interface DropdownBadge {
     label: string;
 }
 
-function resolve_slot_type_label(slotData: SlotData): string {
-    if (slotData.data_type && slotData.data_type != "unknown") {
-        return slotData.data_type;
+function resolve_slot_type_label(slotData: NodeSlotSpec): string {
+    if (slotData.data_type_id && slotData.data_type_id != "unknown") {
+        return slotData.data_type_id;
     }
 
     return slotData.type?.split(":").at(-1) ?? "unknown";
@@ -88,7 +89,7 @@ const BadgeTag = (props: { badge: DropdownBadge }) => (
 const SlotDropdownItem = (props: {
     slot_id: string,
     datatype?: BaseDataType,
-    slot_data: SlotData,
+    slot_data: NodeSlotSpec,
     slot_meta: SlotMeta,
     devMode: boolean,
 }) => {
@@ -148,7 +149,7 @@ export const NodeSlotSection = (props: {
 }) => {
     const slot_bundle = createMemo(() => {
         const meta = props.data.slot_meta;
-        const bundles: Array<[SlotData, SlotMeta, string]> = [];
+        const bundles: Array<[NodeSlotSpec, SlotMeta, string]> = [];
         
         props.constructor?._slots.forEach((slotData, slotId) => {
             const slotMeta = meta[slotId];
@@ -167,7 +168,7 @@ export const NodeSlotSection = (props: {
                     <For each={slot_bundle()}>
                         {([slotData, slotMeta, slotId]) => {
                             const slot_type = props.constructor?._slot_types.get(slotData.type);
-                            let data_type = props.scene_controller.node_type_reader.data_types.get(slotData.data_type ?? "");
+                            let data_type = props.scene_controller.node_type_reader.data_types.get(slotData.data_type_id ?? "");
                             if (slot_type) {
                                 data_type = slot_type.data_type;
                             }

@@ -1,5 +1,5 @@
 import { Vector2 } from "~/wrapper/data_types/geometry";
-import { SlotData } from "./node-type-file";
+import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node_spec";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { NodeData } from "~/wrapper/nodes/data/node-data";
@@ -13,7 +13,7 @@ export class BaseNodeConstructor {
 
     _data_model: NodeData
     
-    _slots: Map<string, SlotData>;
+    _slots: Map<string, NodeSlotSpec>;
     _slot_types: Map<string, BaseSlotType>;
 
     constructor(root_type: string, type_id: string) {
@@ -51,13 +51,13 @@ export class BaseNodeConstructor {
         return node;
     }
 
-    public _make_slot(parent_node: GraphNode, slot_id: string, slot_data: SlotData) {
+    public _make_slot(parent_node: GraphNode, slot_id: string, slot_data: NodeSlotSpec) {
         const slot_type = this._slot_types.get(slot_data.type);
         if (!slot_type) {
             return null;
         }
         
-        const slot_data_type = DataTypeUtils._match_default_data_type(slot_data.data_type == null ? "" : slot_data.data_type) 
+        const slot_data_type = DataTypeUtils._match_default_data_type(slot_data.data_type_id == null ? "" : slot_data.data_type_id) 
         return new NodeSlot(
             parent_node, 
             slot_type, 
@@ -84,7 +84,7 @@ export class BaseNodeConstructor {
 }
 
 export class CustomNodeConstructor extends BaseNodeConstructor {
-    constructor(root_type: string, type_id: string, data: NodeData, slots: Map<string, SlotData>, slot_types: Map<string, BaseSlotType>) {
+    constructor(root_type: string, type_id: string, data: NodeData, slots: Map<string, NodeSlotSpec>, slot_types: Map<string, BaseSlotType>) {
         super(root_type, type_id);
         
         this._data_model = data;

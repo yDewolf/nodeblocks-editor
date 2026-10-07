@@ -1,6 +1,6 @@
 import { Show } from "solid-js";
 import { metadata } from "~/singletons/metadata";
-import { SlotData } from "~/wrapper/helpers/node-type-file";
+import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node_spec";
 import { NodeTypeMeta, SlotMeta } from "~/wrapper/metadata/type_metadata";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 
@@ -76,7 +76,7 @@ export const _SlotComponent = (props: {
 }
 
 export const SlotHeader = (props: {
-    slot_data: SlotData,
+    slot_data: NodeSlotSpec,
     slot_meta: SlotMeta,
     slot_id: string,
     highlightable?: boolean,
