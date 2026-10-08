@@ -1,7 +1,6 @@
 import { CommandGroups, ClientGraphCommandTypes, GraphActionTypes } from "~/protocols/nodeblocks/network/client-command-protocol";
 import { NodeGraphCommand, NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
 import { NodeInstance, SlotInstance } from "../../engine/graph/node-instance";
-import { SceneGraph } from "../../engine/graph/scene-graph";
 import { TypeSpecRegistry } from "../../engine/type-registry";
 import { Action } from "../action";
 import { NodeScene } from "../../engine/node_scene";
@@ -35,6 +34,9 @@ export class AddNodesAction extends Action<NodeGraphCommand> {
         this._createdInstances = [];
 
         for (const [uid, sceneData] of Object.entries(this.nodesData)) {
+            if (sceneData.uid in scene.graph.allNodes) {
+                continue;
+            }
             const instance = scene.createNodeFromData(sceneData.nodetype_fqn, sceneData);
             this._createdInstances.push(instance);
         }
