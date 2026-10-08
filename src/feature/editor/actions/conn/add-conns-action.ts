@@ -9,6 +9,7 @@ export class AddConnectionsAction extends Action<ConnGraphCommand> {
         isClientside: boolean = false
     ) {
         super(isClientside);
+        this._targetIds = new Set(Object.keys(connsData));
     }
 
     public toServerMessage(): ConnGraphCommand {

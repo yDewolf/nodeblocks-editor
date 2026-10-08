@@ -14,6 +14,7 @@ export class RemoveNodesAction extends Action<NodeGraphCommand> {
         isClientside: boolean = false
     ) {
         super(isClientside);
+        this._targetIds = new Set(nodeUids);
     }
 
     public toServerMessage(): NodeGraphCommand {

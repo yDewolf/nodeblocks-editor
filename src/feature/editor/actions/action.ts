@@ -11,6 +11,9 @@ export abstract class Action<TCommand extends ClientCommand = ClientCommand> {
 
     private _status: EditorActionStatus = EditorActionStatus.UNSYNCED;
     private _listeners: Set<StatusChangeListener> = new Set();
+    protected _targetIds: Set<string> = new Set();
+
+    get targetIds() { return this._targetIds; }
 
     constructor(isClientside: boolean = false) {
         this.uid = nanoid(6);

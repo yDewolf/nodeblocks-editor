@@ -11,6 +11,7 @@ export class UpdateNodesAction extends Action<NodeGraphCommand> {
         isClientside: boolean = false
     ) {
         super(isClientside);
+        this._targetIds = new Set(Object.keys(updateData));
     }
 
     public toServerMessage(): NodeGraphCommand {

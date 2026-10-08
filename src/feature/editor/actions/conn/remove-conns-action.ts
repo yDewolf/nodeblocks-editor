@@ -12,6 +12,7 @@ export class RemoveConnectionsAction extends Action<ConnGraphCommand> {
         isClientside: boolean = false
     ) {
         super(isClientside);
+        this._targetIds = new Set(connectionUids);
     }
 
     public toServerMessage(): ConnGraphCommand {
