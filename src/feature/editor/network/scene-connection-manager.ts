@@ -45,7 +45,7 @@ export class SceneConnectionManager {
     }
 
     private async fetchSceneToken(scene_id: string): Promise<string> {
-        const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${scene_id}`, {
+        const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${scene_id}/token`, {
             headers: { "Content-Type": "application/json" },
             method: "POST",
             body: JSON.stringify({ user_id: this.appSession.sessionData?.user_id })
