@@ -124,7 +124,7 @@ export class NodeActionUtils {
         // TODO: Handle potential add errors
         if (!action_controller._client.is_connected() || action.is_clientside) {
             action.update_action_status(
-                EditorActionStatus.SUCCESSFULL
+                EditorActionStatus.SUCCESSFUL
             );
         }
     }
@@ -146,7 +146,7 @@ export class NodeActionUtils {
         // TODO: Handle potential add errors
         if (!action_controller._client.is_connected() || action.is_clientside) {
             action.update_action_status(
-                EditorActionStatus.SUCCESSFULL
+                EditorActionStatus.SUCCESSFUL
             );
         }
     }
@@ -173,7 +173,7 @@ export class NodeActionUtils {
         // TODO: Handle possible removal errors
         if (!action_controller._client.is_connected() || action.is_clientside) {
             action.update_action_status(
-                EditorActionStatus.SUCCESSFULL
+                EditorActionStatus.SUCCESSFUL
             );
         }
     }

@@ -13,6 +13,7 @@ export enum ServerMessages {
 }
 
 export enum ServerMessageTypes {
+    CLOSE_SOCKET = "close_socket",
     SCENE_EVENT = "scene_event",
     COMMAND_RESPONSE = "cmd_response"
 }
@@ -24,9 +25,10 @@ export enum WebsocketStatus {
 }
 
 export enum EditorActionStatus {
-    SUCCESSFULL = "SUCCESSFULL",
-    UNSYNCED = "UNSYNCED",
-    FAILED = "FAILED"
+    SUCCESSFUL = "successful",
+    UNSYNCED = "unsynced",
+    FAILED = "failed",
+    REVERTED = "reverted"
 }
 
 

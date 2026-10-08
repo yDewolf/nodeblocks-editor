@@ -1,7 +1,7 @@
 export interface NamespaceModel {
     namespace: string;
     id: string;
-    readonly fqn: string;
+    fqn: string;
 }
 
 export function createNamespaceModel(namespace: string, id: string): NamespaceModel {

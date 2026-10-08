@@ -9,22 +9,22 @@ export type CommandResponsePayload = {
     status: CmdStatusPack
 }
 
-export type GenericCmdPayload = {
+export type GenericCmdPayload = CommandResponsePayload & {
     type: ServerCmdResponseTypes.SCENE_WORKER
 }
 
-export type ExecutionCheckPayload = {
+export type ExecutionCheckPayload = CommandResponsePayload & {
     type: ServerCmdResponseTypes.EXECUTION_STATE_CHECK
     state: SceneWorkerExecutionState
     mode: SceneWorkerExecutionMode
 }
 
-export type AddNodePayload = {
+export type AddNodePayload = CommandResponsePayload & {
     type: ServerCmdResponseTypes.ADD_NODE
     nodes?: Array<string>
 }
 
-export type AddConnPayload = {
+export type AddConnPayload = CommandResponsePayload & {
     conns?: Array<string>
 }
 

@@ -17,15 +17,17 @@ export class TypeSpecRegistry {
 
     
     public registerDataType(spec: DataTypeSpec): void {
+        console.log("Registering datatype: ", spec.fqn, spec);
         if (spec.fqn in this.dataTypes) {
-        throw new Error(`DataType '${spec.fqn}' is already registered`);
+            throw new Error(`DataType '${spec.fqn}' is already registered`);
         }
         this.dataTypes[spec.fqn] = spec;
     }
 
     public registerNodeType(spec: NodeTypeSpec): void {
+        console.log("Registering nodetype: ", spec.fqn);
         if (spec.fqn in this.nodeTypes) {
-        throw new Error(`NodeType '${spec.fqn}' is already registered`);
+            throw new Error(`NodeType '${spec.fqn}' is already registered`);
         }
         this.nodeTypes[spec.fqn] = spec;
     }
@@ -35,7 +37,7 @@ export class TypeSpecRegistry {
         const targetSpec = this.dataTypes[targetType];
 
         if (!sourceSpec || !targetSpec) {
-        return false;
+            return false;
         }
 
         return DatatypeHelper.areTypesCompatible(sourceSpec, targetSpec);
@@ -53,14 +55,14 @@ export class TypeSpecRegistry {
     // Getters:
     public getNodeTypeSpec(fqn: string): NodeTypeSpec {
         if (!this.isNodeTypeRegistered(fqn)) {
-        throw new Error(`No NodeTypeSpec is registered as ${fqn}`);
+            throw new Error(`No NodeTypeSpec is registered as ${fqn}`);
         }
         return this.nodeTypes[fqn];
     }
 
     public getDataTypeSpec(fqn: string): DataTypeSpec {
         if (!this.isDataTypeRegistered(fqn)) {
-        throw new Error(`No DataTypeSpec is registered as ${fqn}`);
+            throw new Error(`No DataTypeSpec is registered as ${fqn}`);
         }
         return this.dataTypes[fqn];
     }

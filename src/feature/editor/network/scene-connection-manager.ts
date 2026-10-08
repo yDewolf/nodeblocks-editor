@@ -99,7 +99,7 @@ export class SceneConnectionManager {
             this.socket.onclose = () => {
                 this.isConnecting = false;
                 this.socket = null;
-                this.dispatchMessage({ type: ServerMessages.CLOSE_SOCKET});
+                this.dispatchMessage({type: ServerMessageTypes.CLOSE_SOCKET});
                 console.log("[SceneConnection] Disconnected.");
             };
         });

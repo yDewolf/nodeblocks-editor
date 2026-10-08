@@ -1,6 +1,5 @@
 import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { PackageManifest } from "~/protocols/nodeblocks/manifests/package-manifest";
-import { NodeInstance } from "../graph/node-instance";
 import { TypeSpecRegistry } from "../type-registry";
 
 export class PackageManager {
@@ -23,6 +22,7 @@ export class PackageManager {
         for (const pkg of packages) {
             if (pkg.data_types) {
                 for (const dataTypeSpec of Object.values(pkg.data_types)) {
+                    dataTypeSpec.fqn = `${dataTypeSpec.namespace}:${dataTypeSpec.id}`
                     if (!this.registry.isDataTypeRegistered(dataTypeSpec.fqn)) {
                         this.registry.registerDataType(dataTypeSpec);
                     }
@@ -31,6 +31,7 @@ export class PackageManager {
 
             if (pkg.node_types) {
                 for (const nodeSpec of Object.values(pkg.node_types)) {
+                    nodeSpec.fqn = `${nodeSpec.namespace}:${nodeSpec.id}`
                     if (!this.registry.isNodeTypeRegistered(nodeSpec.fqn)) {
                         this.registry.registerNodeType(nodeSpec);
                     }
