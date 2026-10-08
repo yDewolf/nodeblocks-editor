@@ -29,3 +29,11 @@ export enum EditorActionStatus {
     FAILED = "FAILED"
 }
 
+
+export enum ServerCmdResponseTypes {
+    SCENE_WORKER = "scene_worker",
+    
+    EXECUTION_STATE_CHECK = "execution_state_check",
+    ADD_NODE = "add_node",
+    ADD_CONN = "add_conn"
+}
