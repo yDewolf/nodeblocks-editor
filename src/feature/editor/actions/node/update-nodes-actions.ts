@@ -32,10 +32,8 @@ export class UpdateNodesAction extends Action<NodeGraphCommand> {
         for (const [uid, newData] of Object.entries(this.updateData)) {
             const node = scene.graph.getNode(uid);
             if (node) {
-                this._backupData[uid] = node.scene_data;
-
-                if (newData.position) node.scene_data.position = newData.position;
-                if (newData.data) node.scene_data.data = newData.data;
+                this._backupData[uid] = node.scene_data; // FIXME: talvez isso aqui deva ser copiado
+                node.updateSceneData(newData.data, newData.position);
             }
         }
     }
@@ -44,7 +42,7 @@ export class UpdateNodesAction extends Action<NodeGraphCommand> {
         for (const [uid, previousData] of Object.entries(this._backupData)) {
             const node = scene.graph.getNode(uid);
             if (node) {
-                node.scene_data = previousData;
+                node.updateSceneData(previousData.data, previousData.position);
             }
         }
         this._backupData = {};

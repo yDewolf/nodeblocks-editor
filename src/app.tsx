@@ -9,6 +9,8 @@ import { SceneConnectionManager } from "./feature/editor/network/scene-connectio
 import { SceneProvider } from "./feature/scene/scene-context";
 import { AppSessionManager } from "./network/app-session-manager";
 import { CommandGroups, ExecutionShortcuts, SceneExecutionCmdTypes } from "./protocols/nodeblocks/network/client-command-protocol";
+import { SceneCanvasProvider } from "./feature/scene/scene-canvas-context";
+import { TestSceneDisplayer } from "./feature/scene/components/node/test-scene-displayer";
 interface AppContextData {
   sceneConnection: SceneConnectionManager;
   actionController: ActionController;
@@ -75,6 +77,10 @@ export default function App() {
             }}>
               Create node
             </button>
+
+            <SceneCanvasProvider>
+              <TestSceneDisplayer />
+            </SceneCanvasProvider>
           </SceneProvider>
         )}
       </Show>

@@ -1,5 +1,6 @@
 import { NodeSceneData, SlotPathData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
 
 export class SlotInstance implements SlotPathData {
     node_id: string
@@ -26,7 +27,10 @@ export class SlotInstance implements SlotPathData {
     }
 }
 
+export type NodeDataListener = (data: NodeSceneData) => void;
 export class NodeInstance {
+    private _listeners: Set<NodeDataListener> = new Set();
+
     scene_data: NodeSceneData
     slots: Record<string, SlotInstance>
 
@@ -34,6 +38,29 @@ export class NodeInstance {
         this.slots = slots
         this.scene_data = scene_data;
     }
+
+    // Events
+
+    public subscribe(listener: NodeDataListener): () => void {
+        this._listeners.add(listener);
+        return () => this._listeners.delete(listener);
+    }
+
+
+    public updateSceneData(
+        new_params?: Record<string, any>, 
+        position?: Vector2,
+    ): void {
+        if (position) { this.scene_data.position = position; }
+        if (new_params) {
+            for (const [key, value] of Object.entries(new_params)) {
+                this.scene_data.data[key] = value;
+            }
+        }
+        this._listeners.forEach((listener) => listener(this.scene_data));
+    }
+
+    // Getters and utils
 
     get uid() { 
         if (!this.scene_data.uid) throw Error("Node is missing an uid.");
