@@ -47,11 +47,11 @@ export class RemoveNodesAction extends Action<NodeGraphCommand> {
 
     public revert(scene: NodeScene): void {
         for (const node of this._backupNodes) {
-            scene.graph.addNode(node);
+            scene.addNode(node);
         }
 
         for (const conn of this._backupConnections) {
-            scene.graph.addConnection(conn);
+            scene.addConnection(conn);
         }
 
         this._backupNodes = [];

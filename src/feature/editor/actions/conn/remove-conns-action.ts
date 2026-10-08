@@ -34,14 +34,14 @@ export class RemoveConnectionsAction extends Action<ConnGraphCommand> {
             const conn = scene.graph.getConnection(uid);
             if (conn) {
                 this._backupConnections.push(conn);
-                scene.graph.disconnect(uid);
+                scene.removeConnection(uid);
             }
         }
     }
 
     public revert(scene: NodeScene): void {
         for (const conn of this._backupConnections) {
-            scene.graph.addConnection(conn);
+            scene.addConnection(conn);
         }
         this._backupConnections = [];
     }

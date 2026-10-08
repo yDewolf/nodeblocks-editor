@@ -26,13 +26,13 @@ export class AddConnectionsAction extends Action<ConnGraphCommand> {
 
     public apply(scene: NodeScene): void {
         for (const connData of Object.values(this.connsData)) {
-            scene.graph.addConnection(connData);
+            scene.addConnection(connData);
         }
     }
 
     public revert(scene: NodeScene): void {
         for (const connData of Object.values(this.connsData)) {
-            scene.graph.disconnect(connData.uid);
+            scene.removeConnection(connData.uid);
         }
     }
 }

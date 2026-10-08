@@ -55,11 +55,11 @@ export class SceneGraph {
         connData: ConnectionSceneData
     ): ConnectionSceneData | undefined {
         return this.connect(
-        connData.from_slot.node_id,
-        connData.from_slot.slot_id,
-        connData.to_slot.node_id,
-        connData.to_slot.slot_id,
-        connData.uid
+            connData.from_slot.node_id,
+            connData.from_slot.slot_id,
+            connData.to_slot.node_id,
+            connData.to_slot.slot_id,
+            connData.uid
         );
     }
 
@@ -90,7 +90,7 @@ export class SceneGraph {
     public disconnect(connId: string): boolean {
         const conn = this._connections.remove(connId);
         if (!conn) {
-        return false;
+            return false;
         }
 
         const fromNode = this._nodes.get(conn.from_slot.node_id);
