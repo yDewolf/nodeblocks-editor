@@ -1,7 +1,7 @@
 import { SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data"
-import { SceneWorkerExecutionMode, SceneWorkerExecutionState } from "../../scene-worker-protocol"
-import { ServerCmdResponseTypes } from "../../server-message-protocol"
-import { CmdStatusPack } from "./server-event-protocol"
+import { SceneWorkerExecutionMode, SceneWorkerExecutionState } from "../../../scene-worker-protocol"
+import { ServerCmdResponseTypes } from "../../../server-message-protocol"
+import { CmdStatusPack } from "../../../../engine/server-ipc-event-protocol"
 
 export type CommandResponsePayload = {
     type: ServerCmdResponseTypes

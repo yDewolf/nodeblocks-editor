@@ -1,7 +1,8 @@
 import { ServerMessageTypes } from "../../server-message-protocol";
 import { BaseServerMessage } from "./base-server-message";
-import { EngineEventPayload } from "./engine-event-messages";
-import { ServerCmdResponsePayload } from "./server-response-payloads";
+import { EngineEventPayload } from "./payloads/engine-event-payloads";
+import { ServerCmdResponsePayload } from "./payloads/server-response-payloads";
+import { WorkerEventPayload } from "./payloads/worker-event-payloads";
 
 
 export type ServerCmdResponse = BaseServerMessage & {
@@ -12,8 +13,7 @@ export type ServerCmdResponse = BaseServerMessage & {
 
 export type ServerWorkerEvent = BaseServerMessage & {
     type: ServerMessageTypes.SCENE_EVENT
-    event: string
-    data?: any // TODO: worker events
+    event_payload: WorkerEventPayload
 }
 
 export type ServerEngineEvent = BaseServerMessage & {

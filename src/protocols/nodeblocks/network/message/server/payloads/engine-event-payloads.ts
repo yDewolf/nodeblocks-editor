@@ -1,5 +1,5 @@
 import { JobStatus, NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols"
-import { ServerEngineEventTypes } from "../../server-message-protocol"
+import { ServerEngineEventTypes } from "../../../server-message-protocol"
 
 type BaseEngineEventPayload = {
     type: ServerEngineEventTypes
@@ -19,6 +19,7 @@ export type JobStatusPayload = BaseEngineEventPayload & {
 }
 
 export type FailedProcessPayload = BaseEngineEventPayload & {
+    type: ServerEngineEventTypes.FAILED_PROCESS
     error: string
 }
 

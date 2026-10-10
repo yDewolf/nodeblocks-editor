@@ -3,7 +3,7 @@ import { EditorActionStatus, ServerMessageTypes } from "~/protocols/nodeblocks/n
 import { NodeScene } from "../engine/node_scene";
 import { SceneConnectionManager } from "../network/scene-connection-manager";
 import { Action } from "./action";
-import { CmdStatusPack, CommandStatus } from "~/protocols/nodeblocks/network/message/server/server-event-protocol";
+import { CmdStatusPack, CommandStatus } from "~/protocols/nodeblocks/engine/server-ipc-event-protocol";
 
 type PendingChangeListener = (targetIds: Set<string>) => void;
 export class ActionController {
