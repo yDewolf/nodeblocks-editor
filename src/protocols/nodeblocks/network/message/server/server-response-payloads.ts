@@ -1,3 +1,4 @@
+import { SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data"
 import { SceneWorkerExecutionMode, SceneWorkerExecutionState } from "../../scene-worker-protocol"
 import { ServerCmdResponseTypes } from "../../server-message-protocol"
 import { CmdStatusPack } from "./server-event-protocol"
@@ -25,10 +26,16 @@ export type AddNodePayload = CommandResponsePayload & {
 }
 
 export type AddConnPayload = CommandResponsePayload & {
+    type: ServerCmdResponseTypes.ADD_CONN
     conns?: Array<string>
 }
 
+export type GetSceneDataPayload = CommandResponsePayload & {
+    type: ServerCmdResponseTypes.GET_SCENE_DATA
+    scene_data?: SceneData
+}
 
 export type ServerCmdResponsePayload = 
     | GenericCmdPayload | ExecutionCheckPayload 
     | AddNodePayload | AddConnPayload
+    | GetSceneDataPayload

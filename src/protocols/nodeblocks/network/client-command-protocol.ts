@@ -18,7 +18,9 @@ export enum ClientGraphCommandTypes {
 }
 
 export enum ClientSceneCommandTypes {
-    LOAD_SCENE = "load_scene"
+    LOAD_SCENE = "load_scene",
+    SAVE_SCENE = "save_scene",
+    GET_SCENE_DATA = "get_scene_data"
 }
 
 export enum SceneExecutionCmdTypes {

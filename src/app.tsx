@@ -8,9 +8,11 @@ import { TypeSpecRegistry } from "./feature/editor/engine/type-registry";
 import { SceneConnectionManager } from "./feature/editor/network/scene-connection-manager";
 import { SceneProvider } from "./feature/scene/scene-context";
 import { AppSessionManager } from "./network/app-session-manager";
-import { CommandGroups, ExecutionShortcuts, SceneExecutionCmdTypes } from "./protocols/nodeblocks/network/client-command-protocol";
+import { ClientSceneCommandTypes, CommandGroups, ExecutionShortcuts, SceneExecutionCmdTypes } from "./protocols/nodeblocks/network/client-command-protocol";
 import { SceneCanvasProvider } from "./feature/scene/scene-canvas-context";
 import { TestSceneDisplayer } from "./feature/scene/components/node/test-scene-displayer";
+import { ServerCmdResponseTypes, ServerMessageTypes } from "./protocols/nodeblocks/network/server-message-protocol";
+import { nanoid } from "nanoid";
 interface AppContextData {
   sceneConnection: SceneConnectionManager;
   actionController: ActionController;
@@ -33,11 +35,15 @@ export default function App() {
       const sceneConnection = new SceneConnectionManager(appSession, packageManager);
       
       await sceneConnection.connect("test_scene");
-
+      sceneConnection.onMessage(ServerMessageTypes.COMMAND_RESPONSE, (msg) => {
+          if (msg.response_payload.type == ServerCmdResponseTypes.GET_SCENE_DATA) {
+            if (msg.response_payload.scene_data) {
+              scene.loadFromSceneData(msg.response_payload.scene_data, true);
+            }
+          }
+      })
       const actionController = new ActionController(scene, sceneConnection);
-
       setContext({ sceneConnection, actionController, scene, registry });
-    
     } catch (error) {
       console.error("[App] Failed during initialization:", error);
     }
@@ -76,6 +82,13 @@ export default function App() {
               }, context_data().registry));
             }}>
               Create node
+            </button>
+            <button onClick={() => {
+              context_data().sceneConnection.sendCommand({
+                cmd_group: CommandGroups.SCENE, type: ClientSceneCommandTypes.GET_SCENE_DATA, cmd_uid: nanoid(4)
+              })
+            }}>
+              Get Scene
             </button>
 
             <SceneCanvasProvider>

@@ -37,5 +37,6 @@ export enum ServerCmdResponseTypes {
     
     EXECUTION_STATE_CHECK = "execution_state_check",
     ADD_NODE = "add_node",
-    ADD_CONN = "add_conn"
+    ADD_CONN = "add_conn",
+    GET_SCENE_DATA = "get_scene_data"
 }

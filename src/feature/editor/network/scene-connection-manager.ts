@@ -122,6 +122,7 @@ export class SceneConnectionManager {
         }
     }
 
+    // TODO: adicionar um método para adicionar handlers de tipos de comando específicos
     public onMessage<MessageType extends ServerMessageTypes>(type: MessageType, handler_func: (msg: MessageByType<MessageType>) => void): () => void {
         if (!this.messageListeners.has(type)) {
             this.messageListeners.set(type, new Set());
