@@ -1,13 +1,8 @@
 import { ServerMessageTypes } from "../../server-message-protocol";
 import { BaseServerMessage } from "./base-server-message";
+import { EngineEventPayload } from "./engine-event-messages";
 import { ServerCmdResponsePayload } from "./server-response-payloads";
 
-
-export type ServerEngineEvent = BaseServerMessage & {
-    type: ServerMessageTypes.SCENE_EVENT
-    event_type: string
-    data: any // TODO: adicionar os engine events
-}
 
 export type ServerCmdResponse = BaseServerMessage & {
     type: ServerMessageTypes.COMMAND_RESPONSE
@@ -15,4 +10,15 @@ export type ServerCmdResponse = BaseServerMessage & {
     response_payload: ServerCmdResponsePayload
 }
 
-export type ServerSceneMessages = ServerEngineEvent | ServerCmdResponse;
+export type ServerWorkerEvent = BaseServerMessage & {
+    type: ServerMessageTypes.SCENE_EVENT
+    event: string
+    data?: any // TODO: worker events
+}
+
+export type ServerEngineEvent = BaseServerMessage & {
+    type: ServerMessageTypes.GRAPH_EVENT
+    event_payload: EngineEventPayload
+}
+
+export type ServerSceneMessages = ServerEngineEvent | ServerCmdResponse | ServerWorkerEvent;

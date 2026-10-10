@@ -14,6 +14,7 @@ export enum ServerMessages {
 
 export enum ServerMessageTypes {
     CLOSE_SOCKET = "close_socket",
+    GRAPH_EVENT = "graph_event",
     SCENE_EVENT = "scene_event",
     COMMAND_RESPONSE = "cmd_response"
 }
@@ -39,4 +40,10 @@ export enum ServerCmdResponseTypes {
     ADD_NODE = "add_node",
     ADD_CONN = "add_conn",
     GET_SCENE_DATA = "get_scene_data"
+}
+
+export enum ServerEngineEventTypes {
+    NODE_STATUS = "node_status_changed",
+    JOB_STATUS = "job_status_changed",
+    FAILED_PROCESS = "failed_process"
 }

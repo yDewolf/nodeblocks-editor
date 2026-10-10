@@ -15,3 +15,4 @@ export type ServerCommandResponse = ServerEvent & {
     status: CmdStatusPack
 }
 
+export type ServerWorkerEvent = ServerEvent & {}
