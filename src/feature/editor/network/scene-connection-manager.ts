@@ -4,8 +4,22 @@ import { ServerMessages, ServerMessageTypes } from "~/protocols/nodeblocks/netwo
 import { PackageManager } from "../engine/packages/package-manager";
 import { PackageManifest } from "~/protocols/nodeblocks/manifests/package-manifest";
 import { ServerMessage } from "~/protocols/nodeblocks/network/message/server-messages";
+import { WorkerEventPayload } from "~/protocols/nodeblocks/network/message/server/payloads/worker-event-payloads";
+import { ServerCmdResponse, ServerEngineEvent, ServerSceneMessages, ServerWorkerEvent } from "~/protocols/nodeblocks/network/message/server/server-scene-messages";
+import { EngineEventPayload } from "~/protocols/nodeblocks/network/message/server/payloads/engine-event-payloads";
+import { ServerCmdResponsePayload } from "~/protocols/nodeblocks/network/message/server/payloads/server-response-payloads";
 
-type MessageByType<MessageType extends ServerMessages | ServerMessageTypes> = Extract<ServerMessage, {type: MessageType}>
+type MessageByType<MessageType extends ServerMessages | ServerMessageTypes> = 
+    Extract<ServerMessage, {type: MessageType}>;
+
+type ExtractCmdResponse<T extends ServerCmdResponsePayload["type"]> = 
+    {response_payload: Extract<ServerCmdResponsePayload, { type: T }>;};
+
+type ExtractWorkerEvent<T extends WorkerEventPayload["type"]> = 
+    {event_payload: Extract<WorkerEventPayload, { type: T }>;};
+
+type ExtractEngineEvent<T extends EngineEventPayload["type"]> = 
+    {event_payload: Extract<EngineEventPayload, { type: T }>;};
 
 export class SceneConnectionManager {
     private socket: WebSocket | null  = null;
@@ -16,6 +30,10 @@ export class SceneConnectionManager {
     private commandQueue: ClientCommand[] = [];
     private messageListeners: Map<ServerMessageTypes, Set<(msg: any) => void>> = new Map();
 
+    private commandResponseListeners: Map<string, Set<(msg: ServerCmdResponse) => void>> = new Map();
+    private workerEventListeners: Map<string, Set<(msg: ServerWorkerEvent) => void>> = new Map();
+    private engineEventListeners: Map<string, Set<(msg: ServerEngineEvent) => void>> = new Map();
+    
     constructor(
         private appSession: AppSessionManager,
         private packageManager: PackageManager
@@ -122,8 +140,10 @@ export class SceneConnectionManager {
         }
     }
 
-    // TODO: adicionar um método para adicionar handlers de tipos de comando específicos
-    public onMessage<MessageType extends ServerMessageTypes>(type: MessageType, handler_func: (msg: MessageByType<MessageType>) => void): () => void {
+    public onMessage<MessageType extends ServerMessageTypes>(
+        type: MessageType, 
+        handler_func: (msg: MessageByType<MessageType>) => void
+    ): () => void {
         if (!this.messageListeners.has(type)) {
             this.messageListeners.set(type, new Set());
         }
@@ -134,11 +154,83 @@ export class SceneConnectionManager {
         };
     }
 
+    public onCommandResponse<T extends ServerCmdResponsePayload["type"]>(
+        responseType: T,
+        handler_func: (msg: ExtractCmdResponse<T>) => void
+    ): () => void {
+        const subType = responseType as string;
+        if (!this.commandResponseListeners.has(subType)) {
+            this.commandResponseListeners.set(subType, new Set());
+        }
+        
+        this.commandResponseListeners.get(subType)!.add(handler_func as any);
+        return () => {
+            this.commandResponseListeners.get(subType)?.delete(handler_func as any);
+        };
+    }
+
+    public onWorkerEvent<T extends WorkerEventPayload["type"]>(
+        eventType: T,
+        handler_func: (msg: ExtractWorkerEvent<T>) => void
+    ): () => void {
+        const subType = eventType as string;
+        if (!this.workerEventListeners.has(subType)) {
+            this.workerEventListeners.set(subType, new Set());
+        }
+        
+        this.workerEventListeners.get(subType)!.add(handler_func as any);
+        return () => {
+            this.workerEventListeners.get(subType)?.delete(handler_func as any);
+        };
+    }
+
+    public onEngineEvent<T extends EngineEventPayload["type"]>(
+        eventType: T,
+        handler_func: (msg: ExtractEngineEvent<T>) => void
+    ): () => void {
+        const subType = eventType as string;
+        if (!this.engineEventListeners.has(subType)) {
+            this.engineEventListeners.set(subType, new Set());
+        }
+        
+        this.engineEventListeners.get(subType)!.add(handler_func as any);
+        return () => {
+            this.engineEventListeners.get(subType)?.delete(handler_func as any);
+        };
+    }
+
     private dispatchMessage(message: ServerMessage): void {
         const typeListeners = this.messageListeners.get(message.type);
         if (typeListeners) {
             for (const listener of typeListeners) {
                 listener(message);
+            }
+        }
+
+        if (message.type === ServerMessageTypes.COMMAND_RESPONSE && message.response_payload) {
+            const subListeners = this.commandResponseListeners.get(message.response_payload.type);
+            if (subListeners) {
+                for (const listener of subListeners) {
+                    listener(message);
+                }
+            }
+        }
+
+        if (message.type === ServerMessageTypes.SCENE_EVENT && message.event_payload) {
+            const subListeners = this.workerEventListeners.get(message.event_payload.type);
+            if (subListeners) {
+                for (const listener of subListeners) {
+                    listener(message);
+                }
+            }
+        }
+
+        if (message.type === ServerMessageTypes.GRAPH_EVENT && message.event_payload) {
+            const subListeners = this.engineEventListeners.get(message.event_payload.type);
+            if (subListeners) {
+                for (const listener of subListeners) {
+                    listener(message);
+                }
             }
         }
     }

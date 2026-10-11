@@ -35,11 +35,9 @@ export default function App() {
       const sceneConnection = new SceneConnectionManager(appSession, packageManager);
       
       await sceneConnection.connect("test_scene");
-      sceneConnection.onMessage(ServerMessageTypes.COMMAND_RESPONSE, (msg) => {
-          if (msg.response_payload.type == ServerCmdResponseTypes.GET_SCENE_DATA) {
-            if (msg.response_payload.scene_data) {
+      sceneConnection.onCommandResponse(ServerCmdResponseTypes.GET_SCENE_DATA, (msg) => {
+          if (msg.response_payload.scene_data) {
               scene.loadFromSceneData(msg.response_payload.scene_data, true);
-            }
           }
       })
       const actionController = new ActionController(scene, sceneConnection);
