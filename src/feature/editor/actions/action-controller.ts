@@ -38,7 +38,7 @@ export class ActionController {
 
     public isEntityPending(targetId: string): boolean {
         const actionSet = this._target_actions_map.get(targetId);
-        return Boolean(actionSet && actionSet.size > 0);
+        return actionSet ? Boolean(actionSet && actionSet.size > 0) : true;
     }
 
 

@@ -33,10 +33,14 @@ export class NodeInstance {
 
     scene_data: NodeSceneData
     slots: Record<string, SlotInstance>
+    _input_slots: Array<SlotInstance>
+    _output_slots: Array<SlotInstance>
 
     constructor(scene_data: NodeSceneData, slots: Record<string, SlotInstance>) {
         this.slots = slots
         this.scene_data = scene_data;
+        this._input_slots = Object.values(slots).filter((slot) => slot.is_input);
+        this._output_slots = Object.values(slots).filter((slot) => !slot.is_input);
     }
 
     // Events
@@ -61,6 +65,8 @@ export class NodeInstance {
     }
 
     // Getters and utils
+    get input_slots() { return this._input_slots; }
+    get output_slots() { return this._output_slots; }
 
     get uid() { 
         if (!this.scene_data.uid) throw Error("Node is missing an uid.");
@@ -70,6 +76,12 @@ export class NodeInstance {
 
     public add_slot(slot_id: string, spec: NodeSlotSpec): SlotInstance {
         const slot = new SlotInstance(this.uid, slot_id, spec);
+        if (slot.is_input) {
+            this._input_slots.push(slot);
+        } else {
+            this._output_slots.push(slot);
+        }
+        
         this.slots[slot_id] = slot;
         return slot;
     }

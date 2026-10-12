@@ -31,16 +31,24 @@ export class NodeInstanceFactory {
                 }
             }
         }
-
-        if (nodeSceneData.uid === undefined) {
-            nodeSceneData.uid = nanoid();
-        }
-
-        const slots = this._createSlotsFromSpec(spec, nodeSceneData.uid);
-        return new NodeInstance(nodeSceneData, slots);
+        return NodeInstanceFactory.fromSpec(spec, nodeSceneData.uid, nodeSceneData);
     }
 
-    protected _createSlotsFromSpec(spec: NodeTypeSpec, nodeUid: string): Record<string, SlotInstance> {
+    static fromSpec(spec: NodeTypeSpec, uid?: string, nodeSceneData?: NodeSceneData): NodeInstance {
+        const node_id = uid ?? nanoid();
+        const scene_data = nodeSceneData ?? {
+            uid: node_id, nodetype_fqn: spec.fqn, 
+            position: {x: 0, y: 0}, data: {}
+        };
+        scene_data.uid = node_id;
+        
+        const slots = NodeInstanceFactory._createSlotsFromSpec(spec, node_id);
+        return new NodeInstance(
+            scene_data, slots
+        );
+    }
+
+    static _createSlotsFromSpec(spec: NodeTypeSpec, nodeUid: string): Record<string, SlotInstance> {
         const slots: Record<string, SlotInstance> = {};
 
         // Iteração limpa sobre [slotId, slotSpec] de spec.slots

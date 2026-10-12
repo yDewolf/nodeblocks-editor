@@ -1,71 +1,41 @@
 import { Show } from "solid-js";
-import { metadata } from "~/singletons/metadata";
+import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
-import { NodeTypeMeta, SlotMeta } from "~/wrapper/metadata/type_metadata";
-import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 
-// TODO: Reference this on NodeSlot and stop using NodeSlot.View()
-// export const SlotComponentReferences = new ReactiveMap<NodeSlot, Array<SlotComponent>>();
-export class SlotComponent {
-    slot: NodeSlot;
-    node_meta?: NodeTypeMeta;
-    slot_meta?: SlotMeta
-
-    constructor(slot: NodeSlot, node_meta?: NodeTypeMeta) {
-        this.slot = slot;
-        this.node_meta = node_meta ? node_meta : metadata.get_node_meta(this.slot.parent_node.type_id);;
-        this.slot_meta = undefined;
-        if (this.node_meta) {
-            this.slot_meta = this.node_meta.slot_meta[this.slot.slot_id]
-        }
-        
-        // const components = SlotComponentReferences.get(this.slot) ?? [];
-        // SlotComponentReferences.set(this.slot, [...components, this]);
-    }
-
-    public View = (
-        set_reference: boolean,
-        show_label: boolean,
-        onClick: (slot: NodeSlot) => void,
-        onHover: (slot: NodeSlot) => void
-    ) => {
-        return <_SlotComponent highlightable={true} onHover={onHover} onClick={onClick} show_label={show_label} slot={this.slot}/>
-    }
-
-}
-export const _SlotComponent = (props: {
-    slot: NodeSlot,
+export const SlotComponent = (props: {
+    slot: SceneNodeSlot,
     show_label: boolean,
     highlightable?: boolean,
-    node_meta?: NodeTypeMeta,
-    onClick: (slot: NodeSlot) => void,
-    onHover: (slot: NodeSlot) => void,
+    // node_meta?: NodeTypeMeta,
+    // onClick: (slot: NodeSlot) => void,
+    // onHover: (slot: NodeSlot) => void,
 }) => {
-    const node_meta = props.node_meta ? props.node_meta : metadata.get_node_meta(props.slot.parent_node.type_id);
-    const slot_meta = node_meta != undefined ? node_meta.slot_meta[props.slot.slot_id] : undefined;
-    const slot_label = slot_meta ? slot_meta.capitalized_name : props.slot.slot_id;
+    // const node_meta = props.node_meta ? props.node_meta : metadata.get_node_meta(props.slot.parent_node.type_id);
+    // const slot_meta = node_meta != undefined ? node_meta.slot_meta[props.slot.slot_id] : undefined;
+    // const slot_label = slot_meta ? slot_meta.capitalized_name : props.slot.slot_id;
+    const slot_label = props.slot.path.slot_id;
     return (
         <div
             has-docs={true}
             onMouseOver={(e) => {
                 e.stopPropagation();
-                props.onHover(props.slot);
+                // props.onHover(props.slot);
             }}
             title={slot_label}
             class="node-slot"
             classList={{
-                "connected-slot": props.slot.connections.size > 0,
-                "selected-slot": props.slot.selected,
-                "input-slot": props.slot.is_input,
-                "output-slot": !props.slot.is_input,
+                "connected-slot": props.slot.connection_count > 0,
+                "selected-slot": props.slot.isSelected,
+                "input-slot": props.slot.isInput,
+                "output-slot": !props.slot.isInput,
             }}
         >
             <div 
-                ref={props.slot._element}
+                ref={props.slot._element} 
                 class="slot-dot"
                 onPointerDown={(e) => {
                     e.stopPropagation();
-                    props.onClick(props.slot);
+                    // props.onClick(props.slot);
                 }}
             ></div>
             <Show when={props.show_label}>
@@ -77,11 +47,13 @@ export const _SlotComponent = (props: {
 
 export const SlotHeader = (props: {
     slot_data: NodeSlotSpec,
-    slot_meta: SlotMeta,
+    // slot_meta: SlotMeta,
     slot_id: string,
     highlightable?: boolean,
 }) => { 
-    const slot_label = props.slot_meta ? props.slot_meta.capitalized_name : props.slot_id;
+    // const slot_label = props.slot_meta ? props.slot_meta.capitalized_name : props.slot_id;
+    const slot_label = props.slot_id;
+
     return (
         <div 
             class="node-slot"
