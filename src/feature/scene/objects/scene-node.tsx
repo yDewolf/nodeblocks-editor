@@ -8,6 +8,7 @@ export interface NodeUiState {
     // isCurrentStep: boolean; // talvez isso aqui nem deva ficar aqui
     isSelected: boolean;
     size: Vector2;
+    uiPosition: Vector2;
     // zIndex: number;
 }
 
@@ -42,6 +43,7 @@ export class SceneNode {
         [this._uiStore, this._setUiStore] = createStore<NodeUiState>({
             isSelected: false,
             size: { x: 100, y: 150 },
+            uiPosition: { x: 0, y: 0 }
         });
     }
     
@@ -51,9 +53,11 @@ export class SceneNode {
     
     get uid() { return this._dataStore.uid; }
     get fqn() { return this._dataStore.nodetype_fqn; }
+
     get position() { return this._dataStore.position; }
     set position(new_pos: Vector2) { this.instance.updateSceneData(undefined, new_pos); }
     
+
     get parameters() { return this._dataStore.data; }
     
     public setParam(param_key: string, value: any) {
@@ -69,6 +73,9 @@ export class SceneNode {
     set size(new_size: Vector2) { this._setUiStore("size", new_size); }
 
     get rect() { return new Rect(this.position, this.size)}
+
+    get uiPosition() { return this._uiStore.uiPosition; }
+    set uiPosition(pos: Vector2) { this._setUiStore("uiPosition", pos); }
 
     // Other getters
     get all_slots() { return Object.values(this.node_slots); }

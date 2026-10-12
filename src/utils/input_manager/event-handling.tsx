@@ -1,6 +1,5 @@
-import { SlotComponent } from "~/editor/ui/editor/components/node/slot-components";
-import { GraphNode } from "~/wrapper/nodes/graph-node";
-import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
+import { SceneNode } from "~/feature/scene/objects/scene-node";
+import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 
 export enum InputEvents {
     POINTER_MOVING,
@@ -13,8 +12,8 @@ export enum InputEvents {
 
 export interface EventData {
     event?: UIEvent
-    node?: GraphNode,
-    slot?: NodeSlot
+    node?: SceneNode,
+    slot?: SceneNodeSlot
 }
 
 export interface EventHandlerInterface {

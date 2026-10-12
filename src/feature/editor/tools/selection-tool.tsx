@@ -24,7 +24,7 @@ export class SelectionTool extends BaseEditorTool {
         this.selection_controller.selected_node_type = preview != null ? preview.node_constructor.type_id : undefined;
     }
 
-    constructor(node_editor: NodeEditor) {
+    constructor() {
         super(node_editor);
         const [selectedPreview, setSelectedPreview] = createSignal(null);
         this._selected_preview = selectedPreview;

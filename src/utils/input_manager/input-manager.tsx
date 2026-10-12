@@ -1,7 +1,7 @@
-import { BaseEventHandler } from "../../tools/base-tool";
 import { createStore, SetStoreFunction } from "solid-js/store";
 import { Keybind, KeyEventData, KeyModifiers, MBUTTON_CODES, MouseButtons } from "./keybind-events";
 import { EventData, EventHandler, InputEvents } from "./event-handling";
+import { BaseEventHandler } from "~/feature/editor/tools/base-tool";
 
 export interface KeyHandlersInterface {
     just_activated?: (data: KeyEventData) => void;

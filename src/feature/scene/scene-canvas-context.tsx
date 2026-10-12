@@ -3,6 +3,7 @@ import { createStore } from "solid-js/store";
 import { useScene } from "./scene-context";
 import { SceneNode } from "./objects/scene-node";
 import { ConnectionSceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
+import { CanvasSpace } from '../editor/canvas/editor-space';
 
 interface SceneCanvasStore {
     nodes: Record<string, SceneNode>
@@ -12,10 +13,13 @@ interface SceneCanvasStore {
 interface SceneCanvasContextValue {
     nodes: Record<string, SceneNode>
     conns: Record<string, ConnectionSceneData>
+    canvasSpace: CanvasSpace
 }
 
 const SceneCanvasContext = createContext<SceneCanvasContextValue>();
-export const SceneCanvasProvider: ParentComponent = (props) => {
+export const SceneCanvasProvider: ParentComponent<{
+    canvasSpace?: CanvasSpace
+}> = (props) => {
     const { scene } = useScene();
     const [canvasStore, setCanvasStore] = createStore<SceneCanvasStore>({
         nodes: {},
@@ -52,10 +56,13 @@ export const SceneCanvasProvider: ParentComponent = (props) => {
 
         onCleanup(() => unsubscribe());
     });
+    
+    const canvasSpace = props.canvasSpace ?? new CanvasSpace();
 
     const value: SceneCanvasContextValue = {
         get nodes() { return canvasStore.nodes; },
         get conns() { return canvasStore.conns; },
+        canvasSpace
     };
 
     return (

@@ -1,9 +1,9 @@
 import { Rect, Vector2 } from "~/protocols/nodeblocks/geometry";
-import { GraphNode } from "../../wrapper/nodes/graph-node";
-import { createSignal } from 'solid-js';
+import { createSignal, Accessor } from 'solid-js';
 
-export class EditorCamera {
-    private raw_size: Vector2
+export class CanvasCamera {
+    private _rawSize: Accessor<Vector2>;
+    private _setRawSize: (value: Vector2) => void;
 
     private _camera_rect: () => Rect;
     private _set_camera_rect: (value: Rect) => void;
@@ -11,31 +11,37 @@ export class EditorCamera {
     private _zoom: () => number;
     private _setZoom: (v: number) => void;
 
-    constructor(size: Vector2) {
-        const [zoom, setZoom] = createSignal(1.0);
-        this._zoom = zoom;
-        this._setZoom = setZoom;
-        
-        this.raw_size = size;
-        const [cameraRect, setCameraRect] = createSignal(new Rect({x: 0, y: 0}, {x: this.raw_size.x / zoom(), y: this.raw_size.y / zoom()}));
-        this._camera_rect = cameraRect;
-        this._set_camera_rect = setCameraRect;
+    constructor(initialSize: Vector2) {
+        [this._zoom, this._setZoom] = createSignal(1.0);
+        [this._rawSize, this._setRawSize] = createSignal(initialSize);
+
+        [this._camera_rect, this._set_camera_rect] = createSignal(
+            new Rect({ x: 0, y: 0 }, { 
+                x: this._rawSize().x / this._zoom(), 
+                y: this._rawSize().y / this._zoom() 
+            })
+        );
     }
 
     get camera_rect() { return this._camera_rect(); }
-    set camera_rect(value: Rect) { this._set_camera_rect(value) }
+    set camera_rect(value: Rect) { this._set_camera_rect(value); }
 
     get offset() { return this.camera_rect.offset; }
     get zoom() { return this._zoom(); }
 
     set zoom(new_zoom: number) { 
-        this._setZoom(Math.max(0.1, Math.min(new_zoom, 5.0)));
-        this.camera_rect.size = {x: this.raw_size.x / new_zoom, y: this.raw_size.y / new_zoom}
+        const clampedZoom = Math.max(0.1, Math.min(new_zoom, 5.0));
+        this._setZoom(clampedZoom);
+        
+        const size = this._rawSize();
+        this.camera_rect.size = { x: size.x / clampedZoom, y: size.y / clampedZoom };
     }
 
-    get size() { return this.raw_size; }
+    get size() { return this._rawSize(); }
     set size(new_size: Vector2) {
-        this.raw_size = new_size;
+        this._setRawSize(new_size);
+        const z = this.zoom;
+        this.camera_rect.size = { x: new_size.x / z, y: new_size.y / z };
     }
 
     public move(delta: Vector2) {
@@ -50,24 +56,21 @@ export class EditorCamera {
     }
 
     public addOffset(new_offset: Vector2) {
-        this.camera_rect.offset = {x: this.camera_rect.offset.x + new_offset.x, y: this.camera_rect.offset.y + new_offset.y}
+        this.camera_rect.offset = {
+            x: this.camera_rect.offset.x + new_offset.x, 
+            y: this.camera_rect.offset.y + new_offset.y
+        };
     }
 }
 
+export class CanvasSpace {  
+    camera: CanvasCamera;
+    _cursor_world_pos: () => Vector2;
+    _set_cursor_world_pos: (pos: Vector2) => void; 
 
-export class EditorSpace {  
-    camera: EditorCamera
-    
-    constructor() {
-        this.camera = new EditorCamera({x: 1920, y: 1080});
-    }
-
-    public filter_visible_nodes(nodes: Array<GraphNode>) {
-        const filtered_nodes = nodes.filter(node => {
-            return this.is_point_visible(node.pos) // FIXME Alterar isso aqui para usar um rect do node 
-        });
-
-        return filtered_nodes
+    constructor(initialSize: Vector2 = { x: 1920, y: 1080 }) {
+        this.camera = new CanvasCamera(initialSize);
+        [this._cursor_world_pos, this._set_cursor_world_pos] = createSignal({x: 0, y: 0});
     }
 
     public is_point_visible(point: Vector2) {
@@ -83,8 +86,8 @@ export class EditorSpace {
         const mouse_x = e.clientX - rect.left;
         const mouse_y = e.clientY - rect.top;
 
-        const screen_pos = {x: mouse_x, y: mouse_y}
-        return [screen_pos, this.screen_pos_to_world_pos(screen_pos)]
+        const screen_pos = { x: mouse_x, y: mouse_y };
+        return [screen_pos, this.screen_pos_to_world_pos(screen_pos)];
     }
 
     public screen_pos_to_world_pos(screen_pos: Vector2) {

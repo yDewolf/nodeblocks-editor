@@ -1,17 +1,8 @@
-import { EditorTool } from "~/editor/tools/base-tool";
-import { SelectionTool } from "~/editor/tools/selection-tool";
-import { ConnectionController } from "~/wrapper/controllers/connection-controller";
-import { NodeEditor } from "../node-editor";
-import { SelectionController } from "../canvas/selection-controller";
 import { createSignal } from "solid-js";
-import { DocsTool } from "../tools/docs-tool";
-import { CommentTool } from "../tools/comment-tool";
+import { SelectionController } from "../canvas/selection-controller";
+import { EditorTool } from "../tools/base-tool";
 
 export class ToolController {
-    selection_controller: SelectionController;
-    connection_controller: ConnectionController;
-    node_editor: NodeEditor;
-
     private _current_tool: () => EditorTool | undefined
     private _set_current_tool: (tool: EditorTool | undefined) => void;
     private _tools: () => Array<EditorTool>;
@@ -21,26 +12,16 @@ export class ToolController {
     get tools() { return this._tools(); }
     protected set tools(tools: Array<EditorTool>) {this._set_tools(tools);}
 
-    constructor(node_editor: NodeEditor) {
-        const [currentTool, setCurrentTool] = createSignal<EditorTool | undefined>(undefined);
-        this._current_tool = currentTool;
-        this._set_current_tool = setCurrentTool;
-
-        this.selection_controller = node_editor.selection_controller;
-        this.connection_controller = node_editor.scene_controller.connection_controller;
-        this.node_editor = node_editor;
-        const [tools, setTools] = createSignal([]);
-        this._tools = tools;
-        this._set_tools = setTools;
-        this.add_default_tools();
+    constructor(
+        private selectionController: SelectionController,
+        
+    ) {
+        [this._current_tool, this._set_current_tool] = createSignal<EditorTool | undefined>(undefined);
+        [this._tools, this._set_tools] = createSignal([]);
     }
 
-    protected add_default_tools() {
-        this.tools.push(new SelectionTool(this.node_editor));
-        this.tools.push(new CommentTool(this.node_editor));
-        this.tools.push(new DocsTool(this.node_editor));
-        
-        this.change_tool(this.tools[0]);
+    public add_tool(tool: EditorTool) {
+        this.tools.push(tool);
     }
 
     public change_tool = (tool: EditorTool) => {

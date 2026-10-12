@@ -15,27 +15,6 @@ export const TestSceneDisplayer = () => {
                 {(node) => {
                     return (
                         <NodeComponent node={node}/>
-                        // <div>
-                        //     <h2>{node.instance.fqn}</h2>
-                        //     <p>{JSON.stringify(node.data)}</p>
-                        //     <For each={Object.entries(node.parameters)}>
-                        //         {([param_key, value]) => {
-                        //             return (
-                        //                 <div class="container-row">
-                        //                     <label>{param_key}</label>
-                        //                     <input 
-                        //                         onchange={(event) => {
-                        //                             const new_value = event.target.value;
-                        //                             node.setParam(param_key, new_value);
-                        //                         }}
-                        //                         type="text" 
-                        //                         value={value}
-                        //                     />
-                        //                 </div>
-                        //             )
-                        //         }}
-                        //     </For>
-                        // </div>
                     )
                 }}
             </For>

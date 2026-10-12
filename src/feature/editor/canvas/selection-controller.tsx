@@ -1,35 +1,30 @@
-import { createEffect, createRoot, createSignal } from "solid-js";
-import { EditorSpace } from "~/editor/internal/editor-space";
-import { Vector2 } from "~/protocols/nodeblocks/geometry";
-import { GraphNode } from "~/wrapper/nodes/graph-node";
+import { SceneNode } from "~/feature/scene/objects/scene-node";
+import { CanvasSpace } from "./editor-space";
+import { createSignal } from "solid-js";
+import { debounce } from "~/utils/debounce-utils";
 import { Grid } from "../components/canvas/grid";
 import { SelectionRect } from "../components/canvas/selection_rect";
-import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { ConnectionController } from "~/wrapper/controllers/connection-controller";
-import { ConnActionUtils } from '../../network/controllers/actions/conn-actions';
-import { NodeEditor } from "../node-editor";
-import { ConnSceneRequestData } from "~/network/websocket/request-types";
-import { NodeSceneFile } from '../../wrapper/helpers/node-scene-file';
-import { NodeActionUtils } from "~/network/controllers/actions/node-actions";
-import { debounce, throttle } from "../../../utils/debounce-utils";
+import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
+import { ActionController } from "../actions/action-controller";
+import { UpdateNodesAction } from "../actions/node/update-nodes-actions";
+import { NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
+import { Vector2 } from "~/protocols/nodeblocks/geometry";
+
 
 export class SelectionController {
     selection_rect: SelectionRect
-    editor_space: EditorSpace
-    editor_grid: Grid
-    _editor: NodeEditor
 
-    _selected_nodes: () => GraphNode[];
-    _set_selected_nodes: (nodes: GraphNode[]) => void;
+    _selected_nodes: () => SceneNode[];
+    _set_selected_nodes: (nodes: SceneNode[]) => void;
     
-    _hovered_node: () => GraphNode | null;
-    _set_hovered_node: (node: GraphNode | null) => void;
+    _hovered_node: () => SceneNode | null;
+    _set_hovered_node: (node: SceneNode | null) => void;
     
-    _selected_slot: () => NodeSlot | null;
-    _set_selected_slot: (slot: NodeSlot | null) => void;
+    _selected_slot: () => SceneNodeSlot | null;
+    _set_selected_slot: (slot: SceneNodeSlot | null) => void;
 
-    _hovered_slot: () => NodeSlot | null;
-    _set_hovered_slot: (slot: NodeSlot | null) => void;
+    _hovered_slot: () => SceneNodeSlot | null;
+    _set_hovered_slot: (slot: SceneNodeSlot | null) => void;
 
     area_selection: boolean = false;
     selecting: boolean = false;
@@ -40,69 +35,54 @@ export class SelectionController {
     protected _selected_node_type: () => string | undefined;
     protected _set_selected_node_type: (type: string | undefined) => void;
     
-    constructor(editor_space: EditorSpace, editor_grid: Grid, editor: NodeEditor) {
-        this._editor = editor;
-        this.editor_space = editor_space
-        this.editor_grid = editor_grid;
-        
-        const [selectedNode, setSelectedNode] = createSignal<GraphNode[]>([]);
-        this._selected_nodes = selectedNode
-        this._set_selected_nodes = setSelectedNode
+    constructor(
+        private space: CanvasSpace,
+        private grid: Grid,
+        private actionController: ActionController
+    ) {
+        [this._selected_nodes, this._set_selected_nodes] = createSignal<SceneNode[]>([]);
+        [this._selected_node_type, this._set_selected_node_type] = createSignal<string | undefined>(undefined);
+        [this._hovered_node, this._set_hovered_node] = createSignal(null);
 
-        const [selectedNodeType, setSelectedNodeType] = createSignal<string | undefined>(undefined);
-        this._selected_node_type = selectedNodeType;
-        this._set_selected_node_type = setSelectedNodeType;
+        [this._selected_slot, this._set_selected_slot] = createSignal(null);
 
-        const [hoveredNode, sethoveredNode] = createSignal(null);
-        this._hovered_node = hoveredNode;
-        this._set_hovered_node = sethoveredNode;
+        [this._hovered_slot, this._set_hovered_slot] = createSignal(null);
 
-        const [selectedSlot, setSelectedSlot] = createSignal(null);
-        this._selected_slot = selectedSlot;
-        this._set_selected_slot = setSelectedSlot;
-
-        const [hoveredSlot, sethoveredSlot] = createSignal(null);
-        this._hovered_slot = hoveredSlot;
-        this._set_hovered_slot = sethoveredSlot;
-
-        const [moving, setMoving] = createSignal(false);
-        this._moving = moving
-        this._setMoving = setMoving
-        
-        this.debounced_request_update = debounce((nodes: any) => {
-            NodeActionUtils.request_update_nodes(nodes, this._editor._action_controller);
+        [this._moving, this._setMoving] = createSignal(false);
+        this.debounced_request_update = debounce((nodes: NodeSceneRequestData) => {
+            this.actionController.dispatch(new UpdateNodesAction(nodes));
         }, 100);
 
-        this.selection_rect = new SelectionRect(this.editor_space.camera);
+        this.selection_rect = new SelectionRect();
         
-        createRoot(() => {
-            // Listen to file updates so it clears selections when file changes
-            createEffect(() => {
-                this._editor.scene_controller.node_type_reader.keep_track();
-                this._editor.scene_controller.node_scene_reader.keep_track();
-                this.clear();
-            })
-        });
+        // createRoot(() => {
+        //     // Listen to file updates so it clears selections when file changes
+        //     createEffect(() => {
+        //         this._editor.scene_controller.node_type_reader.keep_track();
+        //         this._editor.scene_controller.node_scene_reader.keep_track();
+        //         this.clear();
+        //     })
+        // });
     }
     
     get moving() { return this._moving(); }
     set moving(value: boolean) { this._setMoving(value) }
 
     get hovered_node() { return this._hovered_node(); }
-    set hovered_node(node: GraphNode | null) { this._set_hovered_node(node); }
+    set hovered_node(node: SceneNode | null) { this._set_hovered_node(node); }
 
     get selected_node_type() { return this._selected_node_type(); }
     set selected_node_type(node_type: string | undefined) { this._set_selected_node_type(node_type); }
 
 
     get selected_nodes() { return this._selected_nodes() }
-    private set selected_nodes(value: GraphNode[]) { this._set_selected_nodes(value) }
+    private set selected_nodes(value: SceneNode[]) { this._set_selected_nodes(value) }
 
     get selected_slot() { return this._selected_slot() }
-    set selected_slot(slot: NodeSlot | null) { this._set_selected_slot(slot) }
+    set selected_slot(slot: SceneNodeSlot | null) { this._set_selected_slot(slot) }
 
     get hovered_slot() { return this._hovered_slot() }
-    set hovered_slot(slot: NodeSlot | null) { this._set_hovered_slot(slot) }
+    set hovered_slot(slot: SceneNodeSlot | null) { this._set_hovered_slot(slot) }
 
     get has_selected() { return this.selected_nodes.length > 0; }
 
@@ -130,7 +110,7 @@ export class SelectionController {
         this.selecting = false;
     }
 
-    public onClickOnNode(node: GraphNode) {
+    public onClickOnNode(node: SceneNode) {
         if (this.selected_nodes.includes(node)) {
             this.selecting = false;
             this.moving = true;
@@ -141,11 +121,11 @@ export class SelectionController {
         this.selecting = true;
         
         this.selected_nodes.forEach(node => {
-            node.selected = false;
+            node.isSelected = false;
         });
 
         this._set_selected_nodes([node]);
-        node.selected = true;
+        node.isSelected = true;
     }
 
     public stopSelection() { 
@@ -158,18 +138,22 @@ export class SelectionController {
 
     public clearSelection() { 
         this.selected_nodes.forEach(node => {
-            node.selected = false;
+            node.isSelected = false;
         });
         this._set_selected_nodes([])
     }
 
-    public onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: GraphNode[]) {
+    public onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: SceneNode[]) {
         if (this.moving) {
             this.selected_nodes.forEach(node => {
-                node.move({
-                    x: delta.x / this.editor_space.camera.zoom,
-                    y: delta.y / this.editor_space.camera.zoom
-                }, this.editor_grid.grid);
+                node.position = {
+                    x: node.position.x + delta.x / this.space.camera.zoom,
+                    y: node.position.y + delta.y / this.space.camera.zoom
+                }
+                node.uiPosition = {
+                    x: Math.round(node.position.x / this.grid.grid.x) * this.grid.grid.x,
+                    y: Math.round(node.position.y / this.grid.grid.y) * this.grid.grid.y
+                }
             });
             this.debounced_request_update(this.selected_nodes);
         }
@@ -195,12 +179,12 @@ export class SelectionController {
             this.selection_rect.size = new_size;
 
             const overlapping_nodes = this.selection_rect.get_overlapping_nodes(all_nodes);
-            let nodes_to_remove = new Array<GraphNode>()
+            let nodes_to_remove = new Array<SceneNode>()
             this.selected_nodes.forEach(node => {
                 if (overlapping_nodes.includes(node)) { 
                     return;
                 }
-                node.selected = false;
+                node.isSelected = false;
                 nodes_to_remove.push(node);
             });
             this.selected_nodes = this.selected_nodes.filter((node) => {!nodes_to_remove.includes(node)})
@@ -210,40 +194,40 @@ export class SelectionController {
                 }
 
                 this._set_selected_nodes([...this.selected_nodes, node])
-                node.selected = true;
-                node.select();
+                node.isSelected = true;
             });
         }
     }
 
-    public select_slot(slot: NodeSlot) {
-        if (this.selected_slot != null) {
-            const conn = this._editor.scene_controller.connection_controller.are_connected(this.selected_slot, slot)
-            if (conn != undefined) {
-                ConnActionUtils.request_disconnect([conn], this._editor._action_controller);
-                this.unselect_slot();
-                return;
-            }
+    public select_slot(slot: SceneNodeSlot) {
+        // if (this.selected_slot != null) {
+            
+        //     const conn = this._editor.scene_controller.connection_controller.are_connected(this.selected_slot, slot)
+        //     if (conn != undefined) {
+        //         ConnActionUtils.request_disconnect([conn], this._editor._action_controller);
+        //         this.unselect_slot();
+        //         return;
+        //     }
 
-            let conns: ConnSceneRequestData = {};
-            conns[ConnectionController.make_conn_uid()] = {
-                from_slot: NodeSceneFile.make_slot_path(this.selected_slot), 
-                to_slot: NodeSceneFile.make_slot_path(slot)
-            };
-            ConnActionUtils.request_connect(conns, this._editor._action_controller);
-            // TODO: Desselect slot only if shift is not pressed
-            this.unselect_slot();
-            return;
-        }
+        //     let conns: ConnSceneRequestData = {};
+        //     conns[ConnectionController.make_conn_uid()] = {
+        //         from_slot: NodeSceneFile.make_slot_path(this.selected_slot), 
+        //         to_slot: NodeSceneFile.make_slot_path(slot)
+        //     };
+        //     ConnActionUtils.request_connect(conns, this._editor._action_controller);
+        //     // TODO: Desselect slot only if shift is not pressed
+        //     this.unselect_slot();
+        //     return;
+        // }
 
         this.unselect_slot();
         this.selected_slot = slot;
-        this.selected_slot.selected = true;
+        this.selected_slot.isSelected = true;
     }
 
     public unselect_slot() {
         if (this.selected_slot != null) {
-            this.selected_slot.selected = false;
+            this.selected_slot.isSelected = false;
         } 
         this.selected_slot = null;
     }

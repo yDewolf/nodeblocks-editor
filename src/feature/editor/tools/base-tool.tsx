@@ -1,8 +1,7 @@
-import { GraphNode } from "~/wrapper/nodes/graph-node";
-import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
+import { SceneNode } from "~/feature/scene/objects/scene-node";
+import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
-import { NodeEditor } from "../node-editor";
-import { NodeTypePreview } from "../components/node-type-selector";
+
 
 export interface ComponentEventHandler {
     onKeyDown(e: KeyboardEvent): void;
@@ -21,66 +20,52 @@ export interface ComponentEventHandler {
     globalOnPointerUp(e: PointerEvent): void
     globalOnPointerMove(e: PointerEvent): void
 
-    onClickOnNode(node: GraphNode): void;
+    onClickOnNode(node: SceneNode): void;
 
-    onClickOnNodeSlot(slot: NodeSlot): void;
+    onClickOnNodeSlot(slot: SceneNodeSlot): void;
 
-    onHoverNode(node: GraphNode): void;
+    onHoverNode(node: SceneNode): void;
     
-    onHoverSlot(slot: NodeSlot): void;
+    onHoverSlot(slot: SceneNodeSlot): void;
     
-    onClickOnNodePreview(node_preview: NodeTypePreview): void;
+    // onClickOnNodePreview(node_preview: NodeTypePreview): void;
 
     onHoverBackground(): void;
-
 }
 
 export abstract class BaseEventHandler implements ComponentEventHandler {
     
-    onClickOnNodePreview(node_preview: NodeTypePreview): void {
-    }
-    onKeyDown(e: KeyboardEvent): void {
-    }
-    onKeyUp(e: KeyboardEvent): void {
-    }
-    onWheel(e: WheelEvent): void {
-    }
+    // onClickOnNodePreview(node_preview: NodeTypePreview): void {}
+    onKeyDown(e: KeyboardEvent): void { }
+    onKeyUp(e: KeyboardEvent): void { }
+    onWheel(e: WheelEvent): void { }
 
-    onPointerMove(e: PointerEvent): void {
-    }
-    onPointerDown(e: PointerEvent): void {
-    }
-    onPointerUp(e: PointerEvent): void {
-    }
+    onPointerMove(e: PointerEvent): void { }
+    onPointerDown(e: PointerEvent): void { }
+    onPointerUp(e: PointerEvent): void { }
 
-    globalOnPointerDown(e: PointerEvent): void {}
-    globalOnPointerUp(e: PointerEvent): void {}
-    globalOnPointerMove(e: PointerEvent): void {}
+    globalOnPointerDown(e: PointerEvent): void { }
+    globalOnPointerUp(e: PointerEvent): void { }
+    globalOnPointerMove(e: PointerEvent): void { }
 
-    onClickOnNode(node: GraphNode): void {
-    }
-    onClickOnNodeSlot(slot: NodeSlot): void {
-    }
-    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: GraphNode[]): void {
-    }
+    onClickOnNode(node: SceneNode): void { }
+    onClickOnNodeSlot(slot: SceneNodeSlot): void { }
+    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: SceneNode[]): void { }
     
-    onHoverNode(node: GraphNode): void {
-    }
-    onHoverSlot(slot: NodeSlot): void {
-    }
-    onHoverBackground(): void {
-    }
+    onHoverNode(node: SceneNode): void { }
+    onHoverSlot(slot: SceneNodeSlot): void { }
+    onHoverBackground(): void { }
 }
 
 export interface EditorTool extends ComponentEventHandler {
-    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: GraphNode[]): void;
+    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: SceneNode[]): void;
 }
 
 export abstract class BaseEditorTool extends BaseEventHandler {
-    node_editor: NodeEditor
+    // node_editor: NodeEditor
 
-    constructor(node_editor: NodeEditor) {
-        super();
-        this.node_editor = node_editor;
-    }
+    // constructor(node_editor: NodeEditor) {
+    //     super();
+    //     this.node_editor = node_editor;
+    // }
 }

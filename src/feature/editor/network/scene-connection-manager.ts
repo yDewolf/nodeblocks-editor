@@ -24,6 +24,7 @@ type ExtractEngineEvent<T extends EngineEventPayload["type"]> =
 export class SceneConnectionManager {
     private socket: WebSocket | null  = null;
     private sceneToken: string | null = null;
+    private _sceneId: string | null = null;
     
     public isConnecting: boolean = false;
     
@@ -34,6 +35,8 @@ export class SceneConnectionManager {
     private workerEventListeners: Map<string, Set<(msg: ServerWorkerEvent) => void>> = new Map();
     private engineEventListeners: Map<string, Set<(msg: ServerEngineEvent) => void>> = new Map();
     
+    get sceneId() { return this._sceneId; }
+
     constructor(
         private appSession: AppSessionManager,
         private packageManager: PackageManager
@@ -52,11 +55,13 @@ export class SceneConnectionManager {
 
         try {
             this.sceneToken = await this.fetchSceneToken(sceneId);
-
+            this._sceneId = sceneId;
+            
             await this.fetchAndLoadManifests();
             await this.establishWebSocketConnection();
         } catch (error) {
             this.isConnecting = false;
+            this._sceneId = null;
             console.error("[SceneConnection] Failed to connect to scene:", error);
             throw error;
         }

@@ -1,7 +1,6 @@
 import { createSignal } from "solid-js";
-import { EditorCamera } from "~/editor/internal/editor-space";
+import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { Rect, Vector2 } from "~/protocols/nodeblocks/geometry";
-import { GraphNode } from "~/wrapper/nodes/graph-node";
 
 export class SelectionRect {
     _rect: () => Rect
@@ -9,21 +8,16 @@ export class SelectionRect {
 
     origin: Vector2
 
-    ref_cam: EditorCamera
     _active: () => boolean;
     _set_active: (b: boolean) => void;
 
-    constructor(ref_cam: EditorCamera) {
-        this.ref_cam = ref_cam;
+    constructor() {
         this.origin = {x: 0, y: 0};
 
-        const [active, setActive] = createSignal(false);
-        this._active = active;
-        this._set_active = setActive;
-
-        const [rect, setRect] = createSignal(new Rect({x: 0, y: 0}, {x: 0, y: 0}));
-        this._rect = rect;
-        this._set_rect = setRect;
+        [this._active, this._set_active] = createSignal(false);
+        [this._rect, this._set_rect] = createSignal(
+            new Rect({x: 0, y: 0}, {x: 0, y: 0})
+        );
     }
 
     get rect() { return this._rect() }
@@ -36,8 +30,8 @@ export class SelectionRect {
     set pos(pos: Vector2) { this.rect.offset = pos }
     set size(size: Vector2) { this.rect.size = size }
 
-    public get_overlapping_nodes(all_nodes: GraphNode[]): Array<GraphNode> {
-        let selected_nodes: Array<GraphNode> = new Array<GraphNode>();
+    public get_overlapping_nodes(all_nodes: SceneNode[]): Array<SceneNode> {
+        let selected_nodes: Array<SceneNode> = new Array<SceneNode>();
         all_nodes.forEach(node => {
             if (this.has_node(node)) {
                 selected_nodes.push(node);
@@ -47,7 +41,7 @@ export class SelectionRect {
         return selected_nodes;
     }
 
-    public has_node(node: GraphNode): boolean {
+    public has_node(node: SceneNode): boolean {
         if (this.rect.overlaps(node.rect)) {
             return true;
         }
