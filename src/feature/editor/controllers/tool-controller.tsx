@@ -24,7 +24,11 @@ export class ToolController {
         this.tools.push(tool);
     }
 
-    public change_tool = (tool: EditorTool) => {
+    public change_tool(tool_idx: number) {
+        this._set_current_tool(this.tools.at(tool_idx));
+    }
+
+    public set_tool = (tool: EditorTool) => {
         this._set_current_tool(tool);
     }
 }

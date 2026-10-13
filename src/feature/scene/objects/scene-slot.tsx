@@ -7,6 +7,7 @@ import { TypeSpecRegistry } from "~/feature/editor/engine/type-registry";
 export interface SlotUIStore {
     isSelected: boolean;
     anchor: Vector2;
+    defaultAnchor: Vector2;
     worldPos: Vector2 | null
     // zIndex: number;
 }
@@ -23,6 +24,7 @@ export class SceneNodeSlot {
         [this._uiStore, this._setUiStore] = createStore<SlotUIStore>({
             isSelected: false,
             anchor: {x: 0, y: 0},
+            defaultAnchor: {x: instance.is_input ? -1 : 1, y: 0},
             worldPos: null
         });
     }
@@ -43,6 +45,9 @@ export class SceneNodeSlot {
 
     get anchor() { return this._uiStore.anchor; }
     set anchor(anchor: Vector2) { this._setUiStore("anchor", anchor); }
+
+    get defaultAnchor() { return this._uiStore.defaultAnchor; }
+    set defaultAnchor(anchor: Vector2) { this._setUiStore("defaultAnchor", anchor); }
 
     get worldPos(): Vector2 | null { return this._uiStore.worldPos; }
     set worldPos(pos: Vector2) { this._setUiStore("worldPos", pos); }

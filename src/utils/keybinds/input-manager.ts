@@ -34,6 +34,7 @@ export class InputManager {
     public onMouseMove(event: PointerEvent): void {
         const bindings = this.getActiveBindings();
         for (const name of this.pressedKeybinds) {
+            console.log(name);
             const binding = bindings.get(name);
             if (binding?.handlers.while_active) {
                 binding.handlers.while_active(event);

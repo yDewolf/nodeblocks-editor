@@ -22,6 +22,14 @@ export const InputManagerProvider: ParentComponent<{ manager: InputManager }> = 
     );
 };
 
+export const DefinedInputScope: ParentComponent<{ context: InputContext }> = (props) => {
+    return (
+        <InputContextContainer.Provider value={props.context}>
+            {props.children}
+        </InputContextContainer.Provider>
+    );
+}
+
 export const InputScope: ParentComponent<{ name: string }> = (props) => {
     const parentContext = useParentInputContext();
     const inputManager = useInputManager();

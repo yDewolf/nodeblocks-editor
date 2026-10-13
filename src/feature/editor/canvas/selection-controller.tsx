@@ -9,6 +9,7 @@ import { ActionController } from "../actions/action-controller";
 import { UpdateNodesAction } from "../actions/node/update-nodes-actions";
 import { NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
+import { NodeSceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 
 
 export class SelectionController {
@@ -36,7 +37,7 @@ export class SelectionController {
     protected _set_selected_node_type: (type: string | undefined) => void;
     
     constructor(
-        private space: CanvasSpace,
+        private _space: CanvasSpace,
         private _grid: Grid,
         private actionController: ActionController
     ) {
@@ -64,6 +65,8 @@ export class SelectionController {
         //     })
         // });
     }
+
+    get space() { return this._space }
     
     get grid() { return this._grid; }
 
@@ -149,15 +152,19 @@ export class SelectionController {
         if (this.moving) {
             this.selected_nodes.forEach(node => {
                 node.position = {
-                    x: node.position.x + delta.x / this.space.camera.zoom,
-                    y: node.position.y + delta.y / this.space.camera.zoom
+                    x: node.position.x + delta.x / this._space.camera.zoom,
+                    y: node.position.y + delta.y / this._space.camera.zoom
                 }
                 node.uiPosition = {
                     x: Math.round(node.position.x / this._grid.grid.x) * this._grid.grid.x,
                     y: Math.round(node.position.y / this._grid.grid.y) * this._grid.grid.y
                 }
             });
-            this.debounced_request_update(this.selected_nodes);
+            let node_datas: Record<string, NodeSceneData> = {};
+            this.selected_nodes.forEach((node) => {
+                node_datas[node.uid] = node.data;
+            });
+            this.debounced_request_update(node_datas);
         }
 
         if (Math.abs(delta.x) < 1 && Math.abs(delta.y) < 1) {

@@ -4,7 +4,6 @@ import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 import { useScene } from "~/feature/scene/scene-context";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
-import { ConnActionPayload } from '../../../../protocols/nodeblocks/network/message/commands/node-graph-commands';
 
 export function make_simple_curved_path(start: Vector2, end: Vector2, anchor_a: Vector2, anchor_b: Vector2) {
     const intensity = 50;
@@ -58,7 +57,6 @@ export const ConnectionLines = (props: { connection: SceneConnection, onDisconne
 
     const pathId = `path-${props.connection.uid}`;
     const path = createMemo(() => {
-        
         const start = scene_canvas.elementController.get_slot_position(props.connection.output_slot);
         const end = scene_canvas.elementController.get_slot_position(props.connection.input_slot);
         const anchor_a = props.connection.output_slot.anchor;

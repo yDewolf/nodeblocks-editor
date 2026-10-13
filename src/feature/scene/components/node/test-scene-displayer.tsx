@@ -6,12 +6,13 @@ import "~/style/containers.css";
 import "~/style/screens/editor.css";
 import {} from "~/feature/ui-themes";
 import { useEditor } from "~/feature/scene-editor-context";
-import { InputEvents } from "~/utils/events/event-handling";
+import { EventHandler, InputEvents } from "~/utils/events/event-handling";
 import { ConnectionLines, ConnectionPreview } from "~/feature/editor/components/canvas/connection-lines";
 import { useScene } from "../../scene-context";
 import { RemoveConnectionsAction } from "~/feature/editor/actions/conn/remove-conns-action";
-import { InputScope, useKeybind } from "~/utils/keybinds/input-provider";
-import { KeybindTrigger, MouseButton } from "~/utils/keybinds/keybind-trigger";
+import { InputScope, useInputManager, useKeybind } from "~/utils/keybinds/input-provider";
+import { KeybindTrigger, MouseButtons } from "~/utils/keybinds/keybind-trigger";
+import { useEventManager } from "~/utils/events/event-provider";
 
 export const TestSceneDisplayer = () => {
     const editor = useEditor();
@@ -21,7 +22,7 @@ export const TestSceneDisplayer = () => {
 
     return (
         <InputScope name="SceneCanvas">
-            <SceneCanvasKeybinds />
+            <SceneCanvasKeybindsAndEvents />
             <div 
                 // ref={viewportRef}
                 class="viewport"
@@ -43,6 +44,7 @@ export const TestSceneDisplayer = () => {
 
                 onPointerMove={(e) => editor.eventManager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
                 onPointerDown={(e) => editor.inputManager.onPointerDown(e)} 
+                onPointerUp={(e) => editor.inputManager.onPointerUp(e)}
 
                 onPointerLeave={(e) => editor.inputManager.onPointerUp(e)}
                 onMouseOver={() => {
@@ -125,11 +127,14 @@ export const TestSceneDisplayer = () => {
 }
 
 
-export const SceneCanvasKeybinds: ParentComponent = () => {
+export const SceneCanvasKeybindsAndEvents: ParentComponent = () => {
     const scene_canvas = useSceneCanvas();
+    const inputManager = useInputManager();
+    const eventManager = useEventManager();
+
     useKeybind(
         "PanCamera", 
-        new KeybindTrigger({ mouseButtons: [MouseButton.Middle] }),
+        new KeybindTrigger({ mouseButtons: [MouseButtons.Middle] }),
         {while_active: (e) => {
             if (e instanceof PointerEvent) {
                 scene_canvas.canvasSpace.camera.move({
@@ -139,6 +144,23 @@ export const SceneCanvasKeybinds: ParentComponent = () => {
             }
         }}
     )
+    eventManager?.addEventHandler(
+        InputEvents.POINTER_MOVING,
+        new EventHandler("handleCameraPan", (data) => {
+            const e = data.event;
+            if (e instanceof PointerEvent) {
+                if (inputManager.getKeybindState("PanCamera")) {
+                    scene_canvas.canvasSpace.camera.move({
+                        x: -e.movementX / scene_canvas.canvasSpace.camera.zoom,
+                        y: -e.movementY / scene_canvas.canvasSpace.camera.zoom
+                    });
+                    return;
+                }
+            }
+        })
+    )
+
+
     useKeybind(
         "Zoom",
         new KeybindTrigger({ isWheel: true, modifiers: {ctrl: true} }),

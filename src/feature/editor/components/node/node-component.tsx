@@ -58,7 +58,7 @@ export const NodeComponent = (props: {
                     ref={(el) => handleRef(el)}
                     style={{
                         position: "absolute",
-                        transform: `translate(${props.node.position.x}px, ${props.node.position.y}px)`,
+                        transform: `translate(${props.node.uiPosition.x}px, ${props.node.uiPosition.y}px)`,
                         // "pointer-events": "none"
                     }}
                     classList={{

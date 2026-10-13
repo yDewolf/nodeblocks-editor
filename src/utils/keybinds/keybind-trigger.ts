@@ -1,6 +1,6 @@
-export enum MouseButton {
-    Left = 0,
-    Middle = 1,
+export enum MouseButtons {
+    Left = 1,
+    Middle = 4,
     Right = 2
 }
 
@@ -13,11 +13,12 @@ export interface KeyModifiers {
 
 export interface TriggerConfig {
     keys?: string[];
-    mouseButtons?: MouseButton[];
+    mouseButtons?: MouseButtons[];
     modifiers?: KeyModifiers;
     isWheel?: boolean;
 }
 
+// TODO: revisar esses triggers porque eles tão mt bugado
 export class KeybindTrigger {
     constructor(public readonly config: TriggerConfig) {}
 
@@ -39,7 +40,7 @@ export class KeybindTrigger {
         }
 
         if (this.config.mouseButtons && (event instanceof MouseEvent || event instanceof PointerEvent)) {
-            if (!this.config.mouseButtons.includes(event.button)) return false;
+            if (!this.config.mouseButtons.includes(event.buttons)) return false;
         }
 
         if (this.config.isWheel && event instanceof WheelEvent) {

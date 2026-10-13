@@ -33,17 +33,16 @@ export class InputContext {
 
     public getAllBindings(): Map<string, KeybindBinding> {
         const merged = new Map<string, KeybindBinding>();
-
         if (this.parent) {
             for (const [name, binding] of this.parent.getAllBindings()) {
                 merged.set(name, binding);
             }
         }
-
+        
         for (const [name, binding] of this.bindings) {
             merged.set(name, binding);
         }
-
+        
         return merged;
     }
 }

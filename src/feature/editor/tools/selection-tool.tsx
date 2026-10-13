@@ -1,112 +1,94 @@
+import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
+import { SelectionController } from "../canvas/selection-controller";
 import { BaseEditorTool } from "./base-tool";
-import { GraphNode } from "~/wrapper/nodes/graph-node";
+import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
-import { NodeEditor } from "../node-editor";
-import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { ConnectionController } from "../../wrapper/controllers/connection-controller";
-import { NodeController } from "~/wrapper/controllers/node-controller";
-import { SelectionController } from "~/editor/controllers/selection-controller";
-import { createSignal } from "solid-js";
-import { NodeTypePreview } from "../components/node-type-selector";
+import { CanvasElementController } from "~/feature/scene/controllers/canvas-element-controller";
+
 
 export class SelectionTool extends BaseEditorTool {
-    selection_controller: SelectionController
-    connection_controller: ConnectionController;
-    node_controller: NodeController;
-    node_editor: NodeEditor
+    // protected _selected_preview: () => NodeTypePreview | null;
+    // protected _set_selected_preview: (preview: NodeTypePreview | null) => void;
 
-    protected _selected_preview: () => NodeTypePreview | null;
-    protected _set_selected_preview: (preview: NodeTypePreview | null) => void;
-    
-    get selected_preview() {return this._selected_preview()}
-    protected set selected_preview(preview: NodeTypePreview | null) {
-        this._set_selected_preview(preview)
-        this.selection_controller.selected_node_type = preview != null ? preview.node_constructor.type_id : undefined;
+    constructor(
+        private readonly selectionController: SelectionController,
+        private readonly elementController: CanvasElementController
+    ) {
+        super();
+        // const [selectedPreview, setSelectedPreview] = createSignal(null);
+        // this._selected_preview = selectedPreview;
+        // this._set_selected_preview = setSelectedPreview;
     }
 
-    constructor() {
-        super(node_editor);
-        const [selectedPreview, setSelectedPreview] = createSignal(null);
-        this._selected_preview = selectedPreview;
-        this._set_selected_preview = setSelectedPreview;
-
-        this.selection_controller = node_editor.selection_controller;
-        this.connection_controller = node_editor.scene_controller.connection_controller;
-        this.node_controller = node_editor.scene_controller.node_controller;
-        
-        this.node_editor = node_editor;
-    }
-
-    onClickOnNodeSlot(slot: NodeSlot): void {
-        this.selection_controller.select_slot(slot);
-        this.selection_controller.clearSelection();
+    onClickOnNodeSlot(slot: SceneNodeSlot): void {
+        this.selectionController.select_slot(slot);
+        this.selectionController.clearSelection();
     }
 
     onPointerDown(e: PointerEvent): void {
-        const [screen_pos, world_pos] = this.selection_controller.editor_space.get_cursor_pos(e)
+        const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(e)
         if (e.button == 0) {
-            if (this.selection_controller.has_selected) {
-                this.selection_controller.clearSelection();
+            if (this.selectionController.has_selected) {
+                this.selectionController.clearSelection();
             }
-            this.selection_controller.unselect_slot();
+            this.selectionController.unselect_slot();
 
             (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-            this.selection_controller.onStartAreaSelection({x: world_pos.x, y: world_pos.y});
+            this.selectionController.onStartAreaSelection({x: world_pos.x, y: world_pos.y});
         }
     }
 
     onPointerUp(e: PointerEvent): void {
-        this.selection_controller.moving = false;
-        if (this.selection_controller.selecting) {
-            this.selection_controller.stopSelection();
+        this.selectionController.moving = false;
+        if (this.selectionController.selecting) {
+            this.selectionController.stopSelection();
         }
 
-        if (this.selected_preview) {
-            this.selected_preview.selected = false;
-            this.selected_preview = null;
-        }
+        // if (this.selected_preview) {
+        //     this.selected_preview.selected = false;
+        //     this.selected_preview = null;
+        // }
     }
 
-    onClickOnNode(node: GraphNode): void {
-        this.selection_controller.unselect_slot();
-        this.selection_controller.onClickOnNode(node)
+    onClickOnNode(node: SceneNode): void {
+        this.selectionController.unselect_slot();
+        this.selectionController.onClickOnNode(node)
     }
 
-    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: GraphNode[]): void {
-        this.selection_controller.onMoveCursor(
+    onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: SceneNode[]): void {
+        this.selectionController.onMoveCursor(
             pos, 
             delta,
             all_nodes
         )
-
-        if (this.selection_controller.moving) {
-            this.selection_controller.selected_nodes.forEach(node => {
+        if (this.selectionController.moving) {
+            this.selectionController.selected_nodes.forEach(node => {
                 node.all_slots.forEach(slot => {
-                    slot.update_anchor();
+                    this.elementController.update_slot_anchor(slot);
                 });
             });
         }
     }
 
-    onClickOnNodePreview(node_preview: NodeTypePreview): void {
-        if (this.selected_preview != null) {
-            this.selected_preview.selected = false
-        }
-        node_preview.selected = true;
-        this.selected_preview = node_preview
+    // onClickOnNodePreview(node_preview: NodeTypePreview): void {
+        // if (this.selected_preview != null) {
+        //     this.selected_preview.selected = false
+        // }
+        // node_preview.selected = true;
+        // this.selected_preview = node_preview
+    // }
+
+    onHoverSlot(slot: SceneNodeSlot): void {
+        this.selectionController.hovered_slot = slot;
+        this.selectionController.hovered_node = this.elementController.nodes[slot.node_id];
     }
 
-    onHoverSlot(slot: NodeSlot): void {
-        this.selection_controller.hovered_slot = slot;
-        this.selection_controller.hovered_node = slot.parent_node;
-    }
-
-    onHoverNode(node: GraphNode): void {
-        this.selection_controller.hovered_node = node;
+    onHoverNode(node: SceneNode): void {
+        this.selectionController.hovered_node = node;
     }
 
     onHoverBackground(): void {
-        this.selection_controller.hovered_node = null;
-        this.selection_controller.hovered_slot = null;
+        this.selectionController.hovered_node = null;
+        this.selectionController.hovered_slot = null;
     }
 }
