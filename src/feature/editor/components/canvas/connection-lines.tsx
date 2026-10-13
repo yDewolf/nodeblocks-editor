@@ -1,7 +1,10 @@
 import { createMemo } from "solid-js";
+import { SceneConnection } from "~/feature/scene/objects/scene-connection";
+import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
+import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
+import { useScene } from "~/feature/scene/scene-context";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
-import { NodeConnection } from "~/wrapper/nodes/node-connection";
-import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
+import { ConnActionPayload } from '../../../../protocols/nodeblocks/network/message/commands/node-graph-commands';
 
 export function make_simple_curved_path(start: Vector2, end: Vector2, anchor_a: Vector2, anchor_b: Vector2) {
     const intensity = 50;
@@ -19,23 +22,27 @@ export function make_simple_curved_path(start: Vector2, end: Vector2, anchor_a: 
 }
 
 
-export const ConnectionPreview = (props: { start_slot: NodeSlot | null, hovered_slot: NodeSlot | null, cursor_pos: Vector2 }) => {
+export const ConnectionPreview = (props: { start_slot: SceneNodeSlot | null, hovered_slot: SceneNodeSlot | null, cursor_pos: Vector2 }) => {
+    const { scene } = useScene();
+    const scene_canvas = useSceneCanvas();
+
     const path = createMemo(() => {
         if (props.start_slot == null) {
             return;
         }
-        const start = props.start_slot.get_world_position();
-        const anchor_a = props.start_slot.style.anchor;
+        const start = scene_canvas.elementController.get_slot_position(props.start_slot);
+        
+        const start_anchor = props.start_slot.anchor;
         
         let end = props.cursor_pos;
-        let anchor_b = anchor_a;
-        if (props.hovered_slot != null && props.hovered_slot.can_connect_to(props.start_slot)) {
-            end = props.hovered_slot.get_world_position();
-            anchor_b = props.hovered_slot.style.anchor;
+        let end_anchor = start_anchor;
+
+        if (props.hovered_slot != null && props.start_slot.canConnectTo(props.hovered_slot, scene.registry)) {
+            end = scene_canvas.elementController.get_slot_position(props.hovered_slot);
+            end_anchor = props.hovered_slot.anchor;
         }
 
-        // FIXME: anchor_b should be hovered node
-        return make_simple_curved_path(start, end, anchor_a, anchor_b);
+        return make_simple_curved_path(start, end, start_anchor, end_anchor);
     });
 
     return (
@@ -45,13 +52,17 @@ export const ConnectionPreview = (props: { start_slot: NodeSlot | null, hovered_
     );
 };
 
-export const ConnectionLines = (props: { connection: NodeConnection, onDisconnect: (connection: NodeConnection) => void }) => {
+export const ConnectionLines = (props: { connection: SceneConnection, onDisconnect: (connection: SceneConnection) => void }) => {
+    const scene = useScene();
+    const scene_canvas = useSceneCanvas();
+
     const pathId = `path-${props.connection.uid}`;
     const path = createMemo(() => {
-        const start = props.connection.output_slot.get_world_position();
-        const end = props.connection.input_slot.get_world_position();
-        const anchor_a = props.connection.output_slot.style.anchor;
-        const anchor_b = props.connection.input_slot.style.anchor;
+        
+        const start = scene_canvas.elementController.get_slot_position(props.connection.output_slot);
+        const end = scene_canvas.elementController.get_slot_position(props.connection.input_slot);
+        const anchor_a = props.connection.output_slot.anchor;
+        const anchor_b = props.connection.input_slot.anchor;
 
         return make_simple_curved_path(start, end, anchor_a, anchor_b);
     });
@@ -63,17 +74,17 @@ export const ConnectionLines = (props: { connection: NodeConnection, onDisconnec
         props.onDisconnect(props.connection);
     };
 
-    const is_current_step = createMemo(() => {
-        const parent_node_step = props.connection.input_slot.parent_node.is_current_step;
-        return parent_node_step;
-    });
+    // const is_current_step = createMemo(() => {
+    //     const parent_node = scene_canvas.nodes[props.connection.input_slot.node_id];
+    //     return parent_node.isCurrentStep;
+    // });
 
     return (
         <g 
             class={"connection-group"} 
             classList={{
-                "unsynced": !props.connection.is_synced,
-                "current-step": is_current_step()
+                "unsynced": !scene.isPending(props.connection.uid),
+                // "current-step": is_current_step()
             }}
         >
             <text class="connection-arrow-text" dy="3.5"> 

@@ -72,11 +72,6 @@ const TestComponent = () => {
           Connect
         </button>
       </div>
-      <Show when={editor.sceneConnection.isConnected()} fallback={
-        "not_connected"
-      }>
-        Connected to {editor.sceneConnection.sceneId}
-      </Show>
       <button onClick={() => {
         editor.sceneConnection.sendCommand({
           cmd_group: CommandGroups.EXECUTION,

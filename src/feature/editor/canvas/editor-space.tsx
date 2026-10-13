@@ -65,13 +65,16 @@ export class CanvasCamera {
 
 export class CanvasSpace {  
     camera: CanvasCamera;
-    _cursor_world_pos: () => Vector2;
-    _set_cursor_world_pos: (pos: Vector2) => void; 
+    private _cursor_world_pos: () => Vector2;
+    private _set_cursor_world_pos: (pos: Vector2) => void; 
 
     constructor(initialSize: Vector2 = { x: 1920, y: 1080 }) {
         this.camera = new CanvasCamera(initialSize);
         [this._cursor_world_pos, this._set_cursor_world_pos] = createSignal({x: 0, y: 0});
     }
+
+    get cursorWorldPos() { return this._cursor_world_pos(); }
+    set cursorWorldPos(pos: Vector2) { this._set_cursor_world_pos(pos); }
 
     public is_point_visible(point: Vector2) {
         return this.camera.camera_rect.has_point(point);

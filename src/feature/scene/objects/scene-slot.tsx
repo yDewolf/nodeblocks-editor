@@ -2,10 +2,12 @@ import { createStore, SetStoreFunction } from "solid-js/store";
 import { SlotInstance } from "~/feature/editor/engine/graph/node-instance";
 import { SlotPathData } from '../../../protocols/nodeblocks/manifests/node/node-graph-data';
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
+import { TypeSpecRegistry } from "~/feature/editor/engine/type-registry";
 
 export interface SlotUIStore {
     isSelected: boolean;
-    anchor: Vector2
+    anchor: Vector2;
+    worldPos: Vector2 | null
     // zIndex: number;
 }
 
@@ -20,7 +22,8 @@ export class SceneNodeSlot {
     ) {
         [this._uiStore, this._setUiStore] = createStore<SlotUIStore>({
             isSelected: false,
-            anchor: {x: 0, y: 0}
+            anchor: {x: 0, y: 0},
+            worldPos: null
         });
     }
     
@@ -41,10 +44,26 @@ export class SceneNodeSlot {
     get anchor() { return this._uiStore.anchor; }
     set anchor(anchor: Vector2) { this._setUiStore("anchor", anchor); }
 
+    get worldPos(): Vector2 | null { return this._uiStore.worldPos; }
+    set worldPos(pos: Vector2) { this._setUiStore("worldPos", pos); }
 
     public updateUi(patch: Partial<SlotUIStore>): void {
         this._setUiStore((prev) => ({ ...prev, ...patch }));
     }
+
+
+    public canConnectTo(slot: SceneNodeSlot, registry: TypeSpecRegistry) {
+        if (!this.instance.can_connect || !slot.instance.can_connect) {
+            return false;
+        }
+
+        if (!registry.areTypesCompatible(this.instance.data_type_fqn, slot.instance.data_type_fqn)) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     public dispose(): void {
         // this._cleanupDataSub();
