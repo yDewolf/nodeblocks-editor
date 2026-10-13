@@ -1,6 +1,8 @@
 import { Show } from "solid-js";
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
+import { InputEvents } from "~/utils/events/event-handling";
+import { useEventManager } from "~/utils/events/event-provider";
 
 export const SlotComponent = (props: {
     slot: SceneNodeSlot,
@@ -13,12 +15,16 @@ export const SlotComponent = (props: {
     // const node_meta = props.node_meta ? props.node_meta : metadata.get_node_meta(props.slot.parent_node.type_id);
     // const slot_meta = node_meta != undefined ? node_meta.slot_meta[props.slot.slot_id] : undefined;
     // const slot_label = slot_meta ? slot_meta.capitalized_name : props.slot.slot_id;
+    const eventManager = useEventManager();
     const slot_label = props.slot.path.slot_id;
     return (
         <div
             has-docs={true}
             onMouseOver={(e) => {
                 e.stopPropagation();
+                eventManager?.generalizedEventHandler({
+                    slot: props.slot
+                }, InputEvents.HOVER_SLOT);
                 // props.onHover(props.slot);
             }}
             title={slot_label}
@@ -35,6 +41,9 @@ export const SlotComponent = (props: {
                 class="slot-dot"
                 onPointerDown={(e) => {
                     e.stopPropagation();
+                    eventManager?.generalizedEventHandler({
+                        slot: props.slot
+                    }, InputEvents.CLICK_ON_NODE_SLOT);
                     // props.onClick(props.slot);
                 }}
             ></div>

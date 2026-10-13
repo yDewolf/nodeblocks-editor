@@ -1,4 +1,3 @@
-import { KeyEventManager } from "~/utils/input_manager/input-manager";
 import { ActionController } from './actions/action-controller';
 import { SceneConnectionManager } from "./network/scene-connection-manager";
 import { PackageManager } from "./engine/packages/package-manager";
@@ -6,19 +5,24 @@ import { NodeScene } from "./engine/node_scene";
 import { PackageNodeProvider } from "./engine/providers/package-node-provider";
 import { AppSessionManager } from "~/network/app-session-manager";
 import { ServerCmdResponseTypes, ServerMessages } from "~/protocols/nodeblocks/network/server-message-protocol";
-import { InputEvents, EventHandler } from "~/utils/input_manager/event-handling";
+import { InputEvents, EventHandler } from "~/utils/events/event-handling";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./canvas/selection-controller";
 import { CanvasSpace } from './canvas/editor-space';
 import { Grid } from "./components/canvas/grid";
-import { Keybind, KeybindMap, MouseButtons } from "~/utils/input_manager/keybind-events";
-import { NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
-import { nanoid } from "nanoid";
 import { RemoveNodesAction } from "./actions/node/remove-nodes-action";
+import { InputManager } from '~/utils/keybinds/input-manager';
+import { EventManager } from '~/utils/events/event-manager';
+import { KeybindTrigger, MouseButton } from '~/utils/keybinds/keybind-trigger';
+import { InputContext } from '~/utils/keybinds/input-context';
 
 export class SceneEditor {
     private _scene: NodeScene;
-    private _inputManager: KeyEventManager
+
+    private _globalInputContext: InputContext;
+    private _inputManager: InputManager;
+    private _eventManager: EventManager;
+
     private _sceneConnection: SceneConnectionManager
 
     private _actionController: ActionController
@@ -29,7 +33,10 @@ export class SceneEditor {
         private _appSession: AppSessionManager,
         private _packageManager: PackageManager
     ) {
-        this._inputManager = new KeyEventManager();
+        this._globalInputContext = new InputContext("global");
+        this._inputManager = new InputManager();
+        this._eventManager = new EventManager();
+
         this._scene = new NodeScene(_packageManager.registry, new PackageNodeProvider(_packageManager));
         this._sceneConnection = new SceneConnectionManager(_appSession, _packageManager);
 
@@ -57,7 +64,10 @@ export class SceneEditor {
 
     get appSession() { return this._appSession; }
     get packageManager() { return this._packageManager; }
+    
     get inputManager() { return this._inputManager; }
+    get eventManager() { return this._eventManager; }
+
     get selectionController() { return this._selectionController; }
 
     get  grid() { return this._selectionController.grid; }
@@ -81,28 +91,27 @@ export class SceneEditor {
     // Input Events
 
     private setup_keybinds() {
-        this.inputManager.set_keybind_handler(
-            new Keybind("MainToolAction", [new KeybindMap({mouse_buttons: new Map([[MouseButtons.LEFT, true]])})]),
-            {just_activated: (data) => {
-                const e = data.event;
+        this._globalInputContext.bind(
+            "MainToolAction", 
+            new KeybindTrigger({mouseButtons: [MouseButton.Left]}),
+            {just_activated: (e) => {
                 if (e instanceof PointerEvent) {
                     if (e.target !== e.currentTarget) return;
     
                     this.toolController.current_tool?.onPointerDown(e);
                 }
             },
-            cleanup: (data) => {
-                const e = data.event;
+            just_released: (e) => {
                 if (e instanceof PointerEvent) {
                     this.toolController.current_tool?.onPointerUp(e);
                     (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
                 }
-            }}
-        );
-        
-        this.inputManager.set_keybind_handler(
-            new Keybind("DeleteNode", [new KeybindMap({keys: new Map([["Delete", true]]), modifiers: new Map()})]),
-            {just_activated: (data) => {
+            }
+        })
+
+        this._globalInputContext.bind("DeleteNode", 
+            new KeybindTrigger({keys: ["Delete"]}),
+            {just_activated: (e) => {
                 if (this.selectionController.selected_nodes.length > 0) {
                     let node_ids: string[] = [];
                     for (const node of this.selectionController.selected_nodes) {
@@ -112,12 +121,12 @@ export class SceneEditor {
                         new RemoveNodesAction(node_ids)
                     )
                 }
-            }}
-        );
+            }
+        })
     }
     
     private setup_event_handlers() {
-        this._inputManager.set_event_handler(
+        this._eventManager.addEventHandler(
             InputEvents.CLICK_ON_NODE,
             new EventHandler("onClickOnNode", (data) => {
                 if (data.node != null) {
@@ -126,7 +135,7 @@ export class SceneEditor {
             })
         );
 
-        this._inputManager.set_event_handler(
+        this._eventManager.addEventHandler(
             InputEvents.CLICK_ON_NODE_SLOT,
             new EventHandler("onClickOnSlot", (data) => {
                 if (data.slot) {
@@ -135,7 +144,7 @@ export class SceneEditor {
             })
         );
 
-        this._inputManager.set_event_handler(
+        this._eventManager.addEventHandler(
             InputEvents.HOVER_NODE,
             new EventHandler("onHoverNode", (data) => {
                 if (data.node != null) {
@@ -144,7 +153,7 @@ export class SceneEditor {
             })
         );
 
-        this._inputManager.set_event_handler(
+        this._eventManager.addEventHandler(
             InputEvents.HOVER_SLOT,
             new EventHandler("onHoverSlot", (data) => {
                 if (data.slot) {
@@ -153,7 +162,7 @@ export class SceneEditor {
             })
         );
 
-        this._inputManager.set_event_handler(
+        this._eventManager.addEventHandler(
             InputEvents.HOVER_BACKGROUND,
             new EventHandler("onHoverBackground", (data) => {
                 this.toolController.current_tool?.onHoverBackground();

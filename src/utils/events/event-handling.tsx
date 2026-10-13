@@ -16,19 +16,12 @@ export interface EventData {
     slot?: SceneNodeSlot
 }
 
-export interface EventHandlerInterface {
-    handler_func: (event_data: EventData) => void;
-    name: string
-}
-
+export type EventHandlerFunc = (event_data: EventData) => void;
 export class EventHandler {
-    name: string;
-    private func: (event_data: EventData) => void;
+    constructor(
+        public readonly name: string,
+        public func: EventHandlerFunc
+    ) {
 
-    constructor(handler_name: string, handler_func: (event_data: EventData) => void) {
-        this.name = handler_name;
-        this.func = handler_func;
     }
-
-    get handler() { return this.func; }
 }

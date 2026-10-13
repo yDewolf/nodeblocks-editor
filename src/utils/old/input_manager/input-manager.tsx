@@ -1,6 +1,6 @@
 import { createStore, SetStoreFunction } from "solid-js/store";
 import { Keybind, KeyEventData, KeyModifiers, MBUTTON_CODES, MouseButtons } from "./keybind-events";
-import { EventData, EventHandler, InputEvents } from "./event-handling";
+import { EventData, EventHandler, InputEvents } from "../../events/event-handling";
 import { BaseEventHandler } from "~/feature/editor/tools/base-tool";
 
 export interface KeyHandlersInterface {
@@ -173,7 +173,7 @@ export class KeyEventManager extends BaseEventHandler {
     generalizedEventHandler(data: EventData, event_type: InputEvents) {
         const handlers = this.event_handlers.get(event_type)
         handlers?.forEach(handler => {
-            handler.handler(data);
+            handler.func(data);
         });
     }
 }

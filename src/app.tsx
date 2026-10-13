@@ -15,6 +15,8 @@ import { ServerCmdResponseTypes, ServerMessageTypes } from "./protocols/nodebloc
 import { nanoid } from "nanoid";
 import { SceneEditor } from "./feature/editor/scene-editor";
 import { EditorProvider, useEditor } from './feature/scene-editor-context';
+import { InputManagerProvider } from "./utils/keybinds/input-provider";
+import { EventManagerProvider } from './utils/events/event-provider';
 interface AppContextData {
   appSession: AppSessionManager,
   packageManager: PackageManager // This shouldn't be here
@@ -57,55 +59,59 @@ const TestComponent = () => {
   const [targetScene, setTargetScene] = createSignal<string | null>(null);
 
   return (
-    <SceneProvider 
-      scene={editor.scene} 
-      actionController={editor.actionController}
-    >
-      <div class="container">
-        <input type="text" onchange={(event) => {setTargetScene(event.target.value)}}/>
-        <button onclick={() => {
-          const scene_id = targetScene();
-          if (scene_id) {
-            editor.sceneConnection.connect(scene_id);
-          }
-        }}>
-          Connect
-        </button>
-      </div>
-      <button onClick={() => {
-        editor.sceneConnection.sendCommand({
-          cmd_group: CommandGroups.EXECUTION,
-          cmd_uid: "test_command",
-          type: SceneExecutionCmdTypes.EXECUTION_SHORTCUT,
-          shortcut: ExecutionShortcuts.EXECUTION_STEP
-        });
-      }}>
-        Step
-      </button>
+    <InputManagerProvider manager={editor.inputManager}>
+      <EventManagerProvider manager={editor.eventManager}>
+        <SceneProvider 
+          scene={editor.scene} 
+          actionController={editor.actionController}
+        >
+          <div class="container">
+            <input type="text" onchange={(event) => {setTargetScene(event.target.value)}}/>
+            <button onclick={() => {
+              const scene_id = targetScene();
+              if (scene_id) {
+                editor.sceneConnection.connect(scene_id);
+              }
+            }}>
+              Connect
+            </button>
+          </div>
+          <button onClick={() => {
+            editor.sceneConnection.sendCommand({
+              cmd_group: CommandGroups.EXECUTION,
+              cmd_uid: "test_command",
+              type: SceneExecutionCmdTypes.EXECUTION_SHORTCUT,
+              shortcut: ExecutionShortcuts.EXECUTION_STEP
+            });
+          }}>
+            Step
+          </button>
 
-      <button onClick={() => {
-        editor.actionController.dispatch(new AddNodesAction({
-          "test_0": {
-            uid: "test_0", 
-            nodetype_fqn: "test_plugin:TestNode", 
-            position: { x: 0, y: 0 }, 
-            data: {}
-          }
-        }, editor.packageManager.registry));
-      }}>
-        Create node
-      </button>
-      <button onClick={() => {
-        editor.sceneConnection.sendCommand({
-          cmd_group: CommandGroups.SCENE, type: ClientSceneCommandTypes.GET_SCENE_DATA, cmd_uid: nanoid(4)
-        })
-      }}>
-        Get Scene
-      </button>
+          <button onClick={() => {
+            editor.actionController.dispatch(new AddNodesAction({
+              "test_0": {
+                uid: "test_0", 
+                nodetype_fqn: "test_plugin:TestNode", 
+                position: { x: 0, y: 0 }, 
+                data: {}
+              }
+            }, editor.packageManager.registry));
+          }}>
+            Create node
+          </button>
+          <button onClick={() => {
+            editor.sceneConnection.sendCommand({
+              cmd_group: CommandGroups.SCENE, type: ClientSceneCommandTypes.GET_SCENE_DATA, cmd_uid: nanoid(4)
+            })
+          }}>
+            Get Scene
+          </button>
 
-      <SceneCanvasProvider>
-        <TestSceneDisplayer />
-      </SceneCanvasProvider>
-    </SceneProvider>
+          <SceneCanvasProvider>
+            <TestSceneDisplayer />
+          </SceneCanvasProvider>
+        </SceneProvider>
+      </EventManagerProvider>
+    </InputManagerProvider>
   )
 }

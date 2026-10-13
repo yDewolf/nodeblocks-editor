@@ -7,6 +7,8 @@ import { NodeInstanceFactory } from "../../engine/helpers/node-instance-factory"
 import { NodeAnchor } from "./node-anchors";
 import { NodeOutput } from "./output/node-output";
 import { SlotComponent } from "./slot-components";
+import { useEventManager } from "~/utils/events/event-provider";
+import { InputEvents } from "~/utils/events/event-handling";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -188,6 +190,7 @@ const NodeHeader = (props: {
     // onClick: (node: GraphNode) => void, 
     // onHover: (node: GraphNode) => void
 }) => {
+    const eventManager = useEventManager();
     return (
         <div
             class="node-header space-between"
@@ -196,6 +199,9 @@ const NodeHeader = (props: {
                     return;
                 }
                 (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+                eventManager?.generalizedEventHandler({
+                    node: props.node,
+                }, InputEvents.CLICK_ON_NODE);
                 // props.onClick(props.node);
             }}
             onMouseOver={(e) => {
@@ -203,6 +209,9 @@ const NodeHeader = (props: {
                 e.stopPropagation();
                 
                 props.setIsHovered(true);
+                eventManager?.generalizedEventHandler({
+                    node: props.node,
+                }, InputEvents.HOVER_NODE);
                 // props.onHover(props.node);
             }}
         >
