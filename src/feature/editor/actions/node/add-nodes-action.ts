@@ -1,7 +1,6 @@
 import { CommandGroups, ClientGraphCommandTypes, GraphActionTypes } from "~/protocols/nodeblocks/network/client-command-protocol";
 import { NodeGraphCommand, NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
 import { NodeInstance, SlotInstance } from "../../engine/graph/node-instance";
-import { TypeSpecRegistry } from "../../engine/type-registry";
 import { Action } from "../action";
 import { NodeScene } from "../../engine/node_scene";
 
@@ -11,7 +10,6 @@ export class AddNodesAction extends Action<NodeGraphCommand> {
 
     constructor(
         private nodesData: NodeSceneRequestData,
-        private registry: TypeSpecRegistry,
         isClientside: boolean = false
     ) {
         super(isClientside);

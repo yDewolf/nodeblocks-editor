@@ -57,6 +57,8 @@ export class SceneNode {
     get position() { return this._dataStore.position; }
     set position(new_pos: Vector2) { this.instance.updateSceneData(undefined, new_pos); }
     
+    get width() { return this.size.x; }
+    get height() { return this.size.y; }
 
     get parameters() { return this._dataStore.data; }
     

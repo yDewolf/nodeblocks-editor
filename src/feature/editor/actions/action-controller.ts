@@ -44,7 +44,7 @@ export class ActionController {
 
     public dispatch<T extends ClientCommand>(action: Action<T>): void {
         action.apply(this.scene);
-        if (action.isClientside || !this.sceneClient.isConnected()) {
+        if (action.isClientside || !this.sceneClient.isConnected) {
             action.setStatus(EditorActionStatus.SUCCESSFUL);
             this.recordHistory(action);
             return;

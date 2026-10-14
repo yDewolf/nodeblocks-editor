@@ -17,6 +17,7 @@ import { KeybindTrigger, MouseButtons } from '~/utils/keybinds/keybind-trigger';
 import { InputContext } from '~/utils/keybinds/input-context';
 import { SelectionTool } from './tools/selection-tool';
 import { CanvasElementController } from '../scene/controllers/canvas-element-controller';
+import { StateController } from './controllers/state_controller';
 
 export class SceneEditor {
     private _scene: NodeScene;
@@ -26,12 +27,13 @@ export class SceneEditor {
     private _eventManager: EventManager;
 
     private _sceneConnection: SceneConnectionManager;
+    private _stateController: StateController;
 
     private _elementController: CanvasElementController;
 
     private _actionController: ActionController;
     private _selectionController: SelectionController;
-    private toolController: ToolController;
+    private _toolController: ToolController;
 
     constructor(
         private _appSession: AppSessionManager,
@@ -43,29 +45,31 @@ export class SceneEditor {
 
         this._scene = new NodeScene(_packageManager.registry, new PackageNodeProvider(_packageManager));
         this._sceneConnection = new SceneConnectionManager(_appSession, _packageManager);
+        this._stateController = new StateController(this._sceneConnection);
 
         this._actionController = new ActionController(this._scene, this._sceneConnection);    
         this._selectionController = new  SelectionController(
-            new CanvasSpace(), new Grid({x: 20, y: 20}),
+            new CanvasSpace(),
             this._actionController
         )
         
-        this._elementController = new CanvasElementController(this._scene);
-
-        this.toolController = new ToolController(this._selectionController);
-        // this.toolController.add_tool(new CommentTool(this.node_editor));
-        // this.toolController.add_tool(new DocsTool(this.node_editor));
-        this.toolController.add_tool(new SelectionTool(this.selectionController, this._elementController));
-        this.toolController.change_tool(0)
+        this._elementController = new CanvasElementController(this._scene, this.grid);
 
         this._register_handlers();
         this.setup_event_handlers();
         this.setup_keybinds();
+        
+        // this.toolController.add_tool(new CommentTool(this.node_editor));
+        // this.toolController.add_tool(new DocsTool(this.node_editor));
+        this._toolController = new ToolController(this.globalInputContext);
+        this._toolController.add_tool(new SelectionTool(this.actionController, this.selectionController, this._elementController));
+        this._toolController.change_tool(0)
     }
 
     // Getters
     get scene() { return this._scene; }
     get sceneConnection() { return this._sceneConnection; }
+    get stateController() { return this._stateController; }
     get actionController() { return this._actionController; }
 
     get appSession() { return this._appSession; }
@@ -74,6 +78,8 @@ export class SceneEditor {
     get inputManager() { return this._inputManager; }
     get globalInputContext() { return this._globalInputContext; }
     get eventManager() { return this._eventManager; }
+    
+    get toolController() { return this._toolController; }
 
     get selectionController() { return this._selectionController; }
     get elementController() { return this._elementController; }
@@ -106,16 +112,21 @@ export class SceneEditor {
                 if (e instanceof PointerEvent) {
                     if (e.target !== e.currentTarget) return;
     
-                    this.toolController.current_tool?.onPointerDown(e);
+                    this._toolController.current_tool?.onPointerDown(e);
                 }
             },
             just_released: (e) => {
                 if (e instanceof PointerEvent) {
-                    this.toolController.current_tool?.onPointerUp(e);
+                    this._toolController.current_tool?.onPointerUp(e);
                     (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
                 }
             }
         })
+        this._globalInputContext.bind(
+            "SecondaryToolAction",
+            new KeybindTrigger({mouseButtons: [MouseButtons.Right]}),
+            {}
+        )
 
         this._globalInputContext.bind("DeleteNode", 
             new KeybindTrigger({keys: ["Delete"]}),
@@ -138,7 +149,7 @@ export class SceneEditor {
             InputEvents.CLICK_ON_NODE,
             new EventHandler("onClickOnNode", (data) => {
                 if (data.node != null) {
-                    this.toolController.current_tool?.onClickOnNode(data.node);
+                    this._toolController.current_tool?.onClickOnNode(data.node);
                 }
             })
         );
@@ -147,7 +158,7 @@ export class SceneEditor {
             InputEvents.CLICK_ON_NODE_SLOT,
             new EventHandler("onClickOnSlot", (data) => {
                 if (data.slot) {
-                    this.toolController.current_tool?.onClickOnNodeSlot(data.slot);
+                    this._toolController.current_tool?.onClickOnNodeSlot(data.slot);
                 }
             })
         );
@@ -156,7 +167,7 @@ export class SceneEditor {
             InputEvents.HOVER_NODE,
             new EventHandler("onHoverNode", (data) => {
                 if (data.node != null) {
-                    this.toolController.current_tool?.onHoverNode(data.node);
+                    this._toolController.current_tool?.onHoverNode(data.node);
                 }
             })
         );
@@ -165,7 +176,7 @@ export class SceneEditor {
             InputEvents.HOVER_SLOT,
             new EventHandler("onHoverSlot", (data) => {
                 if (data.slot) {
-                    this.toolController.current_tool?.onHoverSlot(data.slot);
+                    this._toolController.current_tool?.onHoverSlot(data.slot);
                 }
             })
         );
@@ -173,7 +184,7 @@ export class SceneEditor {
         this._eventManager.addEventHandler(
             InputEvents.HOVER_BACKGROUND,
             new EventHandler("onHoverBackground", (data) => {
-                this.toolController.current_tool?.onHoverBackground();
+                this._toolController.current_tool?.onHoverBackground();
             })
         );
 
@@ -185,7 +196,7 @@ export class SceneEditor {
                     const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(e)
                     this.selectionController.space.cursorWorldPos = world_pos;
 
-                    this.toolController.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, Object.values(this.elementController.nodes));
+                    this._toolController.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, Object.values(this.elementController.nodes));
                 }
             })
         )

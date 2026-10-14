@@ -1,20 +1,20 @@
 import { Component, For, JSXElement } from "solid-js";
-import { ToolController } from "~/editor/controllers/tool-controller";
-import { EditorTool } from "~/editor/tools/base-tool";
-import { SelectionTool } from "~/editor/tools/selection-tool";
 import CursorIcon from "~/assets/icons/cursor.svg";
-import CommentIcon from "~/assets/icons/comment.svg";
-import AskDocsIcon from "~/assets/icons/ask-about.svg";
-import { DocsTool } from "~/editor/tools/docs-tool";
-import { CommentTool } from "~/editor/tools/comment-tool";
+import { EditorTool } from "~/feature/editor/tools/base-tool";
+import { SelectionTool } from "~/feature/editor/tools/selection-tool";
+// import CommentIcon from "~/assets/icons/comment.svg";
+// import AskDocsIcon from "~/assets/icons/ask-about.svg";
+// import { DocsTool } from "~/editor/tools/docs-tool";
+// import { CommentTool } from "~/editor/tools/comment-tool";
+import { useEditor } from "~/feature/scene-editor-context";
 
 interface EditorToolStyle {
     icon: Component,
 }
 const TOOL_ICON_MAP = new Map<string, EditorToolStyle>([
     [SelectionTool.name, {icon: CursorIcon}],
-    [DocsTool.name, {icon: AskDocsIcon}],
-    [CommentTool.name, {icon: CommentIcon}]
+    // [DocsTool.name, {icon: AskDocsIcon}],
+    // [CommentTool.name, {icon: CommentIcon}]
 ]);
 
 const ToolSelector = (props: {tool: EditorTool, current_tool?: EditorTool, set_selected_tool: (tool: EditorTool) => void, icon?: JSXElement}) => {
@@ -34,15 +34,16 @@ const ToolSelector = (props: {tool: EditorTool, current_tool?: EditorTool, set_s
     )
 }
 
-export const EditorToolbar = (props: {tool_controller: ToolController}) => {
+export const EditorToolbar = () => {
+    const toolController = useEditor().toolController
     return (
         <div class="toolbar-holder" data-theme="dark">
             <div class="toolbar-content">
                 <div class="toolbar-tools">
-                    <For each={props.tool_controller.tools}>
+                    <For each={toolController.tools}>
                         {(tool: EditorTool) => {
                             return (
-                                <ToolSelector tool={tool} current_tool={props.tool_controller.current_tool} set_selected_tool={props.tool_controller.change_tool}/>
+                                <ToolSelector tool={tool} current_tool={toolController.current_tool} set_selected_tool={toolController.set_tool}/>
                             )
                         }}
                     </For>

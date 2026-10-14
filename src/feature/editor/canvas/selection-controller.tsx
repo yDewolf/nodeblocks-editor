@@ -38,7 +38,6 @@ export class SelectionController {
     
     constructor(
         private _space: CanvasSpace,
-        private _grid: Grid,
         private actionController: ActionController
     ) {
         [this._selected_nodes, this._set_selected_nodes] = createSignal<SceneNode[]>([]);
@@ -67,8 +66,7 @@ export class SelectionController {
     }
 
     get space() { return this._space }
-    
-    get grid() { return this._grid; }
+    get grid() { return this.space.grid; }
 
     get moving() { return this._moving(); }
     set moving(value: boolean) { this._setMoving(value) }
@@ -156,8 +154,8 @@ export class SelectionController {
                     y: node.position.y + delta.y / this._space.camera.zoom
                 }
                 node.uiPosition = {
-                    x: Math.round(node.position.x / this._grid.grid.x) * this._grid.grid.x,
-                    y: Math.round(node.position.y / this._grid.grid.y) * this._grid.grid.y
+                    x: Math.round(node.position.x / this.grid.grid.x) * this.grid.grid.x,
+                    y: Math.round(node.position.y / this.grid.grid.y) * this.grid.grid.y
                 }
             });
             let node_datas: Record<string, NodeSceneData> = {};

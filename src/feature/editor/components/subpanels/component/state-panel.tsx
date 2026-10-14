@@ -1,41 +1,34 @@
-import { Match, Switch } from "solid-js"
-import { StateController } from "~/network/controllers/state_controller"
-import { InstanceStates, LoopStates } from "~/protocols/nodeblocks/network/server-message-protocol"
+import { Match, Show, Switch } from "solid-js"
 import PauseIcon from "~/assets/icons/pause.svg";
 import RefreshIcon from "~/assets/icons/refresh.svg";
 import PlayIcon from "~/assets/icons/play.svg";
+import { StateController } from "~/feature/editor/controllers/state_controller";
+import { SceneWorkerExecutionMode } from "~/protocols/nodeblocks/network/scene-worker-protocol";
 
+// TODO: adicionar o run continuously
 export const StatePanel = (props: {state_controller: StateController}) => {
     return (
         <div class="keep row-container">
-            <Switch fallback={<span>Not Connected</span>}>
-                <Match when={props.state_controller.instance_state == InstanceStates.RUNNING}>
-                    <button class="icon-button small-icon" onclick={() => props.state_controller.request_stop()}>
-                        <PauseIcon/>
-                    </button>
-                </Match>
-                <Match when={props.state_controller.instance_state == InstanceStates.WAITING}>
-                    <button class="icon-button small-icon" onclick={() => props.state_controller.request_play()}>
-                        <PlayIcon/>
-                    </button>
-                </Match>
-            </Switch>
-            {/* Loop States: */}
+            <Show when={props.state_controller.isRunning()} fallback={
+                <button class="icon-button small-icon" onclick={() => props.state_controller.request_play()}>
+                    <PlayIcon/>
+                </button>
+            }>
+                <button class="icon-button small-icon" onclick={() => props.state_controller.request_stop()}>
+                    <PauseIcon/>
+                </button>
+            </Show>
+
             <Switch>
-                <Match when={props.state_controller.loop_state == LoopStates.AUTO_LOOP}>
-                    <button class="icon-button small-icon">
-                        <RefreshIcon class="auto-loop"/>
-                    </button>
-                </Match>
-                <Match when={props.state_controller.loop_state == LoopStates.WAIT_RESUME}>
+                <Match when={props.state_controller.runtime_mode == SceneWorkerExecutionMode.FULL_GRAPH}>
                     <button class="icon-button small-icon">
                         <RefreshIcon class="wait-resume"/>
-                    </button>    
+                    </button>
                 </Match>
-                <Match when={props.state_controller.loop_state == LoopStates.WAIT_STEP}>
+                <Match when={props.state_controller.runtime_mode == SceneWorkerExecutionMode.GRAPH_STEP}>
                     <button class="icon-button small-icon">
                         <RefreshIcon class="wait-step"/>
-                    </button>
+                    </button>    
                 </Match>
             </Switch>
         </div>

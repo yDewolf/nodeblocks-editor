@@ -1,25 +1,25 @@
 import { createMemo, createSignal, For } from "solid-js";
-import { EditorSpace } from "~/editor/internal/editor-space";
-import { GraphNode } from "~/wrapper/nodes/graph-node";
+import { useEditor } from "~/feature/scene-editor-context";
 
-export const SceneMinimap = (props: {
-    editor_space: EditorSpace, 
-    nodes: GraphNode[]
-}) => {
+export const SceneMinimap = () => {
+    const editor = useEditor();
+    const editor_space = editor.selectionController.space;
+    const nodes = Object.values(editor.elementController.nodes);
+
     const [isFittingEverything, setIsFittingEverything] = createSignal(true);
     const cameraBounds = createMemo(() => {
-        const camera_rect = props.editor_space.camera.camera_rect;
+        const camera_rect = editor_space.camera.camera_rect;
         let minX = camera_rect.offset.x;
         let minY = camera_rect.offset.y;
         let maxX = camera_rect.offset.x + camera_rect.size.x;
         let maxY = camera_rect.offset.y + camera_rect.size.y;
 
         let is_fitting: boolean = true;
-        props.nodes.forEach(node => {
-            if (node.x < minX) {minX = node.x; is_fitting = false};
-            if (node.y < minY) {minY = node.y; is_fitting = false};
-            if (node.x + node.width > maxX) {maxX = node.x + node.width; is_fitting = false};
-            if (node.y + node.height > maxY) {maxY = node.y + node.height; is_fitting = false};
+        nodes.forEach(node => {
+            if (node.position.x < minX) {minX = node.position.x; is_fitting = false};
+            if (node.position.y < minY) {minY = node.position.y; is_fitting = false};
+            if (node.position.x + node.width > maxX) {maxX = node.position.x + node.width; is_fitting = false};
+            if (node.position.y + node.height > maxY) {maxY = node.position.y + node.height; is_fitting = false};
         });
         
         setIsFittingEverything(is_fitting);
@@ -45,25 +45,25 @@ export const SceneMinimap = (props: {
                 class="minimap-svg"
             >
                 <g class="minimap-nodes">
-                    <For each={props.nodes}>
+                    <For each={nodes}>
                         {(node) => (
                             <rect 
-                                x={node.x} 
-                                y={node.y} 
+                                x={node.position.x} 
+                                y={node.position.y} 
                                 width={node.width} 
                                 height={node.height} 
                                 rx={6}
-                                classList={{ "selected-node": node.selected }}
+                                classList={{ "selected-node": node.isSelected }}
                             />
                         )}
                     </For>
                 </g>
                 <rect 
                     class="minimap-camera"
-                    x={props.editor_space.camera.camera_rect.offset.x} 
-                    y={props.editor_space.camera.camera_rect.offset.y} 
-                    width={props.editor_space.camera.camera_rect.size.x} 
-                    height={props.editor_space.camera.camera_rect.size.y} 
+                    x={editor_space.camera.camera_rect.offset.x} 
+                    y={editor_space.camera.camera_rect.offset.y} 
+                    width={editor_space.camera.camera_rect.size.x} 
+                    height={editor_space.camera.camera_rect.size.y} 
                 />
             </svg>
         </div>

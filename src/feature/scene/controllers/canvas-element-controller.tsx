@@ -3,6 +3,7 @@ import { SceneConnection } from "../objects/scene-connection";
 import { SceneNode } from "../objects/scene-node";
 import { SceneNodeSlot } from "../objects/scene-slot";
 import { NodeScene, SceneEvent } from "~/feature/editor/engine/node_scene";
+import { Grid } from "~/feature/editor/components/canvas/grid";
 
 interface CanvasElementStore {
     nodes: Record<string, SceneNode>
@@ -16,7 +17,8 @@ export class CanvasElementController {
     private unsubscribeScene?: () => void;
 
     constructor(
-        scene: NodeScene
+        scene: NodeScene,
+        private readonly grid: Grid
     ) {
         [this._store, this._setStore] = createStore<CanvasElementStore>({
             nodes: {},
@@ -48,7 +50,9 @@ export class CanvasElementController {
 
         this.unsubscribeScene = scene.subscribe((event: SceneEvent) => {
             if (event.type === "node_added") {
-                this._setStore("nodes", event.node.uid, new SceneNode(event.node));
+                const scene_node = new SceneNode(event.node)
+                scene_node.uiPosition = this.grid.roundPos(scene_node.position);
+                this._setStore("nodes", event.node.uid, scene_node);
             
             } else if (event.type === "node_removed") {
                 this._setStore("nodes", event.node_id, undefined as any);

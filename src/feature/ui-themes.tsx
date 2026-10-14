@@ -1,5 +1,4 @@
 import { makePersisted } from "@solid-primitives/storage";
-import { createEffect } from "solid-js";
 import { createStore } from "solid-js/store";
 import { isServer } from "solid-js/web";
 

@@ -1,61 +1,60 @@
-import { createMemo, createSignal, For, mapArray, Show } from "solid-js";
-import { SceneController } from "~/wrapper/controllers/scene-controller";
-import { CustomNodeConstructor } from "~/wrapper/helpers/node-constructor";
-import { NodePreview } from "../../node/node-component";
-import CloseIcon from "~/assets/icons/close.svg";
+import { createSignal, createMemo, mapArray, Show, For } from "solid-js";
+import { useScene } from "~/feature/scene/scene-context";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
-import { SelectionController } from "~/editor/controllers/selection-controller";
-import { NodeCategory } from "~/wrapper/metadata/node_filters";
-import { metadata } from "~/singletons/metadata";
+import { NodePreview } from "../../node/node-component";
+import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
+import { useEditor } from "~/feature/scene-editor-context";
+
 
 export const NodeTypeSelector = (props: {
-    scene_controller: SceneController,
     onClickOnPreview: (node_preview: NodeTypePreview) => void
 }) => {
-    const [categoryFilter, setCategoryFilter] = createSignal<string | undefined>(undefined);
-    const constructors = createMemo(() => {
-        props.scene_controller.node_type_reader.keep_track();
-        return Array.from(props.scene_controller.node_type_reader.node_constructors.values());
+    const scene = useScene();
+    // const [categoryFilter, setCategoryFilter] = createSignal<string | undefined>(undefined);
+    const specs = createMemo(() => {
+        // TODO: usar o packageManager e as dependências da cena para
+        // passar os specs dos nodes
+        return Object.values(scene.scene.registry.nodeTypes);
     });
 
-    const categories = createMemo(() => {
-        let category_index = new Map<string, NodeCategory>()
-        constructors().forEach((constructor) => {
-            const node_meta = metadata.get_node_meta(constructor.type_id, constructor.root_id);
-            if (node_meta?.category) {
-                if (typeof node_meta.category == "string") {
-                    return;
-                }
+    // const categories = createMemo(() => {
+    //     let category_index = new Map<string, NodeCategory>()
+    //     constructors().forEach((constructor) => {
+    //         const node_meta = metadata.get_node_meta(constructor.type_id, constructor.root_id);
+    //         if (node_meta?.category) {
+    //             if (typeof node_meta.category == "string") {
+    //                 return;
+    //             }
 
-                category_index.set(
-                    node_meta.category.category_id,
-                    node_meta.category
-                )
-            }
-        });
+    //             category_index.set(
+    //                 node_meta.category.category_id,
+    //                 node_meta.category
+    //             )
+    //         }
+    //     });
 
-        return category_index;
-    });
+    //     return category_index;
+    // });
     
-    const node_previews = mapArray(constructors, (constructor) => {
-        return new NodeTypePreview(constructor);
+    const node_previews = mapArray(specs, (spec) => {
+        return new NodeTypePreview(spec);
     });
-    const filtered_previews = createMemo(() => {
-        return node_previews().filter((preview) => {
-            const category = metadata.get_node_meta(preview.node_constructor.type_id, preview.node_constructor.root_id)?.category;
-            if (typeof category == "string") {
-                return false;
-            }
-            return categoryFilter() === undefined || category?.category_id == categoryFilter()
-        })
-    })
+    // const filtered_previews = createMemo(() => {
+    //     return node_previews().filter((preview) => {
+    //         const category = metadata.get_node_meta(preview.node_constructor.type_id, preview.node_constructor.root_id)?.category;
+    //         if (typeof category == "string") {
+    //             return false;
+    //         }
+    //         return categoryFilter() === undefined || category?.category_id == categoryFilter()
+    //     })
+    // })
 
     return (
         <div class="container" style={{
             "overflow-x": "hidden",
             width: "auto"
         }}>
-            <div class="container fill" style={{color: "white"}}>
+            {/* <div class="container fill" style={{color: "white"}}>
                 <div class="keep row-container">
                     <h3>Categories</h3>
                 </div>
@@ -72,8 +71,8 @@ export const NodeTypeSelector = (props: {
                         }}
                     </For>
                 </div>
-            </div>
-            <div class="keep fill row-container space-between" style={{"align-items": "center"}}>
+            </div> */}
+            {/* <div class="keep fill row-container space-between" style={{"align-items": "center"}}>
                 <h3>
                     {categoryFilter() ?? "All"} Nodes
                 </h3>
@@ -82,9 +81,9 @@ export const NodeTypeSelector = (props: {
                         <CloseIcon />
                     </button>
                 </Show>
-            </div>
+            </div> */}
             <div class="node-type-selector">
-                <For each={filtered_previews()}>
+                <For each={node_previews()}>
                     {(item) => item.View(props.onClickOnPreview)}
                 </For>
             </div>
@@ -94,18 +93,16 @@ export const NodeTypeSelector = (props: {
 
 
 export class NodeTypePreview {
-    node_constructor: CustomNodeConstructor
     private _set_selected: (v: boolean) => void;
     private _selected: () => boolean;
 
-    constructor(node_constructor: CustomNodeConstructor) {
-        this.node_constructor = node_constructor;
-        
-        const [selected, setSelected] = createSignal(false);
-        this._set_selected = setSelected;
-        this._selected = selected;
+    constructor(
+        private readonly spec: NodeTypeSpec
+    ) {
+        [this._selected, this._set_selected] = createSignal(false);
     }
 
+    get nodetype() { return this.spec.fqn; }
     set selected(value: boolean) { this._set_selected(value) }
 
     public View(onPointerDown: (node_preview: NodeTypePreview) => void) {
@@ -122,7 +119,7 @@ export class NodeTypePreview {
                 }}
             >
                 <div class="remove-input">
-                    <NodePreview constructor={this.node_constructor}/>
+                    <NodePreview spec={this.spec}/>
                 </div>
             </div>
         );
@@ -130,22 +127,16 @@ export class NodeTypePreview {
 }
 
 
-export const SelectedNodeType = (props: {world_mouse_pos: Vector2, scene_controller: SceneController, selection_controller: SelectionController}) => {
-    const node_constructor = createMemo(() => {
-        const node_type = props.selection_controller.selected_node_type;
-        if (!node_type) {
-            return undefined;
-        }
-        
-        return props.scene_controller.node_controller.node_constructors.get(node_type);
-    });
+export const SelectedNodeType = (props: {
+    node_pos: Vector2, 
+}) => {
+    const editor = useEditor();
     const PreviewComponent = () => {
-        const constructor = node_constructor();
-        if (constructor) {
-            return <NodePreview constructor={constructor}/>
+        if (!editor.selectionController.selected_node_type) {
+            return null;
         }
-
-        return undefined
+        const spec = editor.packageManager.registry.getNodeTypeSpec(editor.selectionController.selected_node_type);
+        return <NodePreview spec={spec}/>
     }
 
     return (
@@ -154,7 +145,7 @@ export const SelectedNodeType = (props: {world_mouse_pos: Vector2, scene_control
                 class="selected-type-preview"
                 style={{
                     position: "absolute",
-                    transform: `translate(${props.world_mouse_pos.x}px, ${props.world_mouse_pos.y}px)`,
+                    transform: `translate(${props.node_pos.x}px, ${props.node_pos.y}px)`,
                     "pointer-events": "none"
                 }}
             >

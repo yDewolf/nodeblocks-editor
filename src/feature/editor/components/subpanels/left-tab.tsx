@@ -1,13 +1,12 @@
-import { Accessor, createRoot, createSignal, JSXElement, onCleanup, Show } from "solid-js";
-import { session_controller } from "~/singletons/user_session";
-import { FileExplorer } from "./component/file-explorer";
-import LeftTabIcon from "~/assets/icons/left-tab.svg";
-import { DropsideItemData, Dropdown, DropsideManager, DropdownItemButton, DropdownSection } from "../../../../components/panels/dropdown";
-import { TabSelector } from "../../../../components/panels/tab-display";
-import { NodeEditor } from "~/editor/node-editor";
-import { PageViewer } from "../../../../components/page-controller";
+import { createSignal, JSXElement } from "solid-js";
+import { PageViewer } from "~/components/page-controller";
+import { useEditor } from "~/feature/scene-editor-context";
+import { NodeTypePreview, NodeTypeSelector } from "./component/node-type-selector";
+import { DropsideItemData, Dropdown, DropsideManager, DropdownItemButton, DropdownSection } from "~/components/panels/dropdown";
+import { TabSelector } from "~/components/panels/tab-display";
 import { SettingsView } from "../../screens/settings-view";
-import { NodeTypePreview, NodeTypeSelector } from '../node-type-selector';
+import LeftTabIcon from '~/assets/icons/left-tab.svg';
+
 
 const LeftTabDropdown = (props: {
     page_viewer: PageViewer
@@ -43,11 +42,13 @@ const LeftTabDropdown = (props: {
 
 export const EditorLeftTabHolder = (props: {
     main_page_viewer: PageViewer,
-    editor: NodeEditor,
 }) => {
+    const editor = useEditor();
     const tabs: Record<string, () => JSXElement> = {
-        "Nodes": () => <NodeTypeSelector scene_controller={props.editor.scene_controller} onClickOnPreview={(node_preview: NodeTypePreview) => props.editor.tool_controller.current_tool?.onClickOnNodePreview(node_preview)}/>,
-        "Workspace": () => <FileExplorer workspace={session_controller.user_workspace}/>
+        "Nodes": () => <NodeTypeSelector onClickOnPreview={
+            (node_preview: NodeTypePreview) => editor.toolController.current_tool?.onClickOnNodePreview(node_preview)}
+        />,
+        // "Workspace": () => <FileExplorer workspace={session_controller.user_workspace}/>
     }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
     return (

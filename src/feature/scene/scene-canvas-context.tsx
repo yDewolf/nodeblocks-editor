@@ -20,7 +20,7 @@ export const SceneCanvasProvider: ParentComponent<{
     const { scene } = useScene();
     
     const canvasSpace = props.canvasSpace ?? new CanvasSpace();
-    const elementController = props.elementController ?? new CanvasElementController(scene);
+    const elementController = props.elementController ?? new CanvasElementController(scene, canvasSpace.grid);
     const value: SceneCanvasContextValue = {
         get nodes() { return elementController.nodes; },
         get conns() { return elementController.conns; },

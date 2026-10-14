@@ -1,6 +1,9 @@
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
+import { NodeTypePreview } from "../components/subpanels/component/node-type-selector";
+import { InputManager } from "~/utils/keybinds/input-manager";
+import { InputContext } from "~/utils/keybinds/input-context";
 
 
 export interface ComponentEventHandler {
@@ -28,14 +31,14 @@ export interface ComponentEventHandler {
     
     onHoverSlot(slot: SceneNodeSlot): void;
     
-    // onClickOnNodePreview(node_preview: NodeTypePreview): void;
+    onClickOnNodePreview(node_preview: NodeTypePreview): void;
 
     onHoverBackground(): void;
 }
 
 export abstract class BaseEventHandler implements ComponentEventHandler {
     
-    // onClickOnNodePreview(node_preview: NodeTypePreview): void {}
+    onClickOnNodePreview(node_preview: NodeTypePreview): void {}
     onKeyDown(e: KeyboardEvent): void { }
     onKeyUp(e: KeyboardEvent): void { }
     onWheel(e: WheelEvent): void { }
@@ -58,14 +61,18 @@ export abstract class BaseEventHandler implements ComponentEventHandler {
 }
 
 export interface EditorTool extends ComponentEventHandler {
+    setupKeybinds(inputContext: InputContext): void;
+    cleanupKeybinds(inputContext: InputContext): void;
+    
     onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: SceneNode[]): void;
 }
 
 export abstract class BaseEditorTool extends BaseEventHandler {
-    // node_editor: NodeEditor
+    public setupKeybinds(inputContext: InputContext) {
 
-    // constructor(node_editor: NodeEditor) {
-    //     super();
-    //     this.node_editor = node_editor;
-    // }
+    }
+
+    public cleanupKeybinds(inputContext: InputContext) {
+
+    }
 }

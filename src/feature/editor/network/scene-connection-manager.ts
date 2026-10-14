@@ -1,6 +1,6 @@
 import { AppSessionManager } from "~/network/app-session-manager";
 import { ClientCommand } from "~/protocols/nodeblocks/network/message/client-commands";
-import { ServerMessages, ServerMessageTypes } from "~/protocols/nodeblocks/network/server-message-protocol";
+import { ServerMessages, ServerMessageTypes, WebsocketStatus } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { PackageManager } from "../engine/packages/package-manager";
 import { PackageManifest } from "~/protocols/nodeblocks/manifests/package-manifest";
 import { ServerMessage } from "~/protocols/nodeblocks/network/message/server-messages";
@@ -8,6 +8,7 @@ import { WorkerEventPayload } from "~/protocols/nodeblocks/network/message/serve
 import { ServerCmdResponse, ServerEngineEvent, ServerSceneMessages, ServerWorkerEvent } from "~/protocols/nodeblocks/network/message/server/server-scene-messages";
 import { EngineEventPayload } from "~/protocols/nodeblocks/network/message/server/payloads/engine-event-payloads";
 import { ServerCmdResponsePayload } from "~/protocols/nodeblocks/network/message/server/payloads/server-response-payloads";
+import { createSignal } from "solid-js";
 
 type MessageByType<MessageType extends ServerMessages | ServerMessageTypes> = 
     Extract<ServerMessage, {type: MessageType}>;
@@ -22,6 +23,9 @@ type ExtractEngineEvent<T extends EngineEventPayload["type"]> =
     {event_payload: Extract<EngineEventPayload, { type: T }>;};
 
 export class SceneConnectionManager {
+    private _status: () => WebsocketStatus;
+    private _setStatus: (status: WebsocketStatus) => void;
+
     private socket: WebSocket | null  = null;
     private sceneToken: string | null = null;
     private _sceneId: string | null = null;
@@ -40,7 +44,13 @@ export class SceneConnectionManager {
     constructor(
         private appSession: AppSessionManager,
         private packageManager: PackageManager
-    ) {}
+    ) {
+        [this._status, this._setStatus] = createSignal(WebsocketStatus.DISCONNECTED);
+    }
+
+    get status() { return this._status(); }
+    get isConnected() { return this._status() == WebsocketStatus.CONNECTED; }
+
 
     public async connect(sceneId: string): Promise<void> {
         if (!this.appSession.isAuthenticated()) {
@@ -52,6 +62,7 @@ export class SceneConnectionManager {
         }
 
         this.isConnecting = true;
+        this._setStatus(WebsocketStatus.CONNECTING);
 
         try {
             this.sceneToken = await this.fetchSceneToken(sceneId);
@@ -102,6 +113,7 @@ export class SceneConnectionManager {
             this.socket = new WebSocket(websocketUrl.toString());
 
             this.socket.onopen = () => {
+                this._setStatus(WebsocketStatus.CONNECTED);
                 this.isConnecting = false;
                 this.flushCommandQueue();
                 console.log("[SceneConnection] Connected to scene socket");
@@ -109,6 +121,7 @@ export class SceneConnectionManager {
             };
 
             this.socket.onerror = (error) => {
+                this._setStatus(WebsocketStatus.ERROR);
                 this.isConnecting = false;
                 this.socket = null;
                 reject(error);
@@ -120,6 +133,7 @@ export class SceneConnectionManager {
             };
 
             this.socket.onclose = () => {
+                this._setStatus(WebsocketStatus.DISCONNECTED);
                 this.isConnecting = false;
                 this.socket = null;
                 this.dispatchMessage({type: ServerMessageTypes.CLOSE_SOCKET});
@@ -245,9 +259,5 @@ export class SceneConnectionManager {
             this.socket.close(1000, "User disconnected from scene");
             this.socket = null;
         }
-    }
-
-    public isConnected(): boolean {
-        return this.socket?.readyState === WebSocket.OPEN;
     }
 }

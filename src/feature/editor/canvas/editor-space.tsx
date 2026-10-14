@@ -1,5 +1,6 @@
 import { Rect, Vector2 } from "~/protocols/nodeblocks/geometry";
 import { createSignal, Accessor } from 'solid-js';
+import { Grid } from "../components/canvas/grid";
 
 export class CanvasCamera {
     private _rawSize: Accessor<Vector2>;
@@ -65,11 +66,17 @@ export class CanvasCamera {
 
 export class CanvasSpace {  
     camera: CanvasCamera;
+    grid: Grid;
+
     private _cursor_world_pos: () => Vector2;
     private _set_cursor_world_pos: (pos: Vector2) => void; 
 
-    constructor(initialSize: Vector2 = { x: 1920, y: 1080 }) {
+    constructor(
+        initialSize: Vector2 = { x: 1920, y: 1080 },
+        gridSize: Vector2 = { x: 20, y: 20}
+    ) {
         this.camera = new CanvasCamera(initialSize);
+        this.grid = new Grid(gridSize);
         [this._cursor_world_pos, this._set_cursor_world_pos] = createSignal({x: 0, y: 0});
     }
 

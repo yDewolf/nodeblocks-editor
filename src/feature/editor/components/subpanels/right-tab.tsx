@@ -1,56 +1,57 @@
-import { StateController } from "~/network/controllers/state_controller"
-import { NodeEditor } from "~/editor/node-editor"
 import { createMemo, createSignal, For, JSXElement, Show } from "solid-js"
-import { BaseNotification, NotificationCard, SidebarNotifications } from "../notification-badges"
-import { session_controller } from "~/singletons/user_session"
-import { GraphNode } from "~/wrapper/nodes/graph-node"
 import { DropdownSection } from "../../../../components/panels/dropdown"
 import { TabSelector } from "../../../../components/panels/tab-display"
-import { ServerPanel } from "./component/server-panel"
+import { ScenePanel } from "./component/server-panel"
 import { NodeAttributes } from "./component/node-attributes"
+import { SceneNode } from "~/feature/scene/objects/scene-node"
+import { useEditor } from "~/feature/scene-editor-context"
 
-const NotificationLog = (props: {node?: GraphNode}) => {
-    const notification_controller = session_controller.notification_controller;
+// const NotificationLog = (props: {node?: SceneNode}) => {
+//     const notification_controller = session_controller.notification_controller;
     
-    const all_notifications = createMemo(() => [...notification_controller.forAll(),]);
-    const notifications = createMemo(() => {
-        if (props.node) {
-            return notification_controller.relatedToNode(props.node);
-        }
+//     const all_notifications = createMemo(() => [...notification_controller.forAll(),]);
+//     const notifications = createMemo(() => {
+//         if (props.node) {
+//             return notification_controller.relatedToNode(props.node);
+//         }
 
-        return all_notifications();
-    })
+//         return all_notifications();
+//     })
 
-    return (
-        <div class="fill container scrollable">
-            <div class="fill container notification-log">
-                <For each={notifications()}>
-                    {(notification) => {
-                        return <BaseNotification notification={notification} notification_controller={notification_controller}/>
-                    }}
-                </For>
-            </div>
-        </div>
-    )
-}
+//     return (
+//         <div class="fill container scrollable">
+//             <div class="fill container notification-log">
+//                 <For each={notifications()}>
+//                     {(notification) => {
+//                         return <BaseNotification notification={notification} notification_controller={notification_controller}/>
+//                     }}
+//                 </For>
+//             </div>
+//         </div>
+//     )
+// }
 
-export const EditorRightPanel = (props: {editor: NodeEditor, state_controller: StateController}) => {
+export const EditorRightPanel = () => {
+    const editor = useEditor();
     const [expanded, setExpanded] = createSignal(false);
-    const selectedNode = createMemo<GraphNode | undefined>(() => {
-        const node = props.editor.selection_controller.selected_nodes.at(-1);
+
+    const selectedNode = createMemo<SceneNode | undefined>(() => {
+        const node = editor.selectionController.selected_nodes.at(-1);
         setExpanded(node != undefined);
         return node;
     });
-    const tabs: Record<string, () => JSXElement> = {
-        "Attributes": () => <NodeAttributes editor={props.editor} node={selectedNode()}/>
-    }
 
-    const bottom_tabs: Record<string, () => JSXElement> = {
-        "Notifications": () => <NotificationLog node={selectedNode()}/>,
-        "History": () => <NotificationLog/>
+    const tabs: Record<string, () => JSXElement> = {
+        "Attributes": () => <NodeAttributes node={selectedNode()}/>
     }
+    
+    // TODO: reimplement notifications
+    // const bottom_tabs: Record<string, () => JSXElement> = {
+    //     "Notifications": () => <NotificationLog node={selectedNode()}/>,
+    //     "History": () => <NotificationLog/>
+    // }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
-    const [selectedTab1, setSelectedTab1] = createSignal<string>(Object.keys(bottom_tabs).at(0) ?? "");
+    // const [selectedTab1, setSelectedTab1] = createSignal<string>(Object.keys(bottom_tabs).at(0) ?? "");
     return (
         <div class="right-tab-holder" docs-id="editor-right-tab" docs-root="builtin">
             <DropdownSection
@@ -62,7 +63,7 @@ export const EditorRightPanel = (props: {editor: NodeEditor, state_controller: S
                 no_button={true}
                 header_content={() => {
                     return (
-                        <ServerPanel editor={props.editor} state_controller={props.state_controller}/>
+                        <ScenePanel state_controller={editor.stateController}/>
                     )
                 }}
                 content={
@@ -75,20 +76,20 @@ export const EditorRightPanel = (props: {editor: NodeEditor, state_controller: S
                             selected_tab={selectedTab} 
                             set_selected_tab={setSelectedTab}
                         />
-                        <TabSelector 
+                        {/* <TabSelector 
                             selector_class="right-tab-selector"
                             tab_displayer_class="sub-displayer"
     
                             tabs={bottom_tabs} 
                             selected_tab={selectedTab1} 
                             set_selected_tab={setSelectedTab1}
-                        />
+                        /> */}
                     </div>
                 }
             />
-            <Show when={!expanded()}>
+            {/* <Show when={!expanded()}>
                 <SidebarNotifications notification_controller={session_controller.notification_controller}/>
-            </Show>
+            </Show> */}
         </div>
     )
 }

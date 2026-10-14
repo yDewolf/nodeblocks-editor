@@ -14,8 +14,8 @@ export type GenericCmdPayload = CommandResponsePayload & {
     type: ServerCmdResponseTypes.SCENE_WORKER
 }
 
-export type ExecutionCheckPayload = CommandResponsePayload & {
-    type: ServerCmdResponseTypes.EXECUTION_STATE_CHECK
+export type ExecutionStateSyncPayload = CommandResponsePayload & {
+    type: ServerCmdResponseTypes.EXECUTION_STATE_SYNC
     state: SceneWorkerExecutionState
     mode: SceneWorkerExecutionMode
 }
@@ -36,6 +36,6 @@ export type GetSceneDataPayload = CommandResponsePayload & {
 }
 
 export type ServerCmdResponsePayload = 
-    | GenericCmdPayload | ExecutionCheckPayload 
+    | GenericCmdPayload | ExecutionStateSyncPayload 
     | AddNodePayload | AddConnPayload
     | GetSceneDataPayload

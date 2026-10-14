@@ -21,6 +21,15 @@ export class InputContext {
         public readonly parent?: InputContext
     ) {}
 
+    public setHandlers(keybind_name: string, handlers: KeybindHandlers) {
+        const keybind = this.bindings.get(keybind_name);
+        if (!keybind) {
+            console.warn("Couldn't find keybind: ", keybind_name, " in context: ", this.name);
+            return;
+        }
+        keybind.handlers = handlers;
+    }
+
     public bind(name: string, trigger: KeybindTrigger, handlers: KeybindHandlers): this {
         this.bindings.set(name, { trigger, handlers });
         return this;

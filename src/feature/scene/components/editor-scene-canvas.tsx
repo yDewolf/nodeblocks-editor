@@ -1,20 +1,20 @@
 import { For, ParentComponent, Show } from "solid-js";
-import { useSceneCanvas } from "../../scene-canvas-context"
+import { useSceneCanvas } from "../scene-canvas-context"
 import { NodeComponent } from "~/feature/editor/components/node/node-component";
-import "~/app.css";
-import "~/style/containers.css";
-import "~/style/screens/editor.css";
 import {} from "~/feature/ui-themes";
 import { useEditor } from "~/feature/scene-editor-context";
 import { EventHandler, InputEvents } from "~/utils/events/event-handling";
 import { ConnectionLines, ConnectionPreview } from "~/feature/editor/components/canvas/connection-lines";
-import { useScene } from "../../scene-context";
+import { useScene } from "../scene-context";
 import { RemoveConnectionsAction } from "~/feature/editor/actions/conn/remove-conns-action";
 import { InputScope, useInputManager, useKeybind } from "~/utils/keybinds/input-provider";
 import { KeybindTrigger, MouseButtons } from "~/utils/keybinds/keybind-trigger";
 import { useEventManager } from "~/utils/events/event-provider";
+import "~/style/containers.css";
+import "~/app.css";
+import { SelectedNodeType } from "~/feature/editor/components/subpanels/component/node-type-selector";
 
-export const TestSceneDisplayer = () => {
+export const SceneCanvas = () => {
     const editor = useEditor();
     const scene = useScene();
     const scene_canvas = useSceneCanvas();
@@ -94,7 +94,7 @@ export const TestSceneDisplayer = () => {
                         </Show>
                     </svg>
                     
-                    {/* <SelectedNodeType world_mouse_pos={editor.cursor_world_pos} scene_controller={editor.scene_controller} selection_controller={editor.selection_controller}/> */}
+                    <SelectedNodeType node_pos={editor.selectionController.space.cursorWorldPos}/>
                     <For each={Object.values(scene_canvas.nodes)}>
                         {(node) => <NodeComponent 
                                 node={node}

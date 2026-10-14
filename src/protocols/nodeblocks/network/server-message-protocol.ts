@@ -21,6 +21,7 @@ export enum ServerMessageTypes {
 
 export enum WebsocketStatus {
     ERROR = -1,
+    CONNECTING = 2,
     CONNECTED = 1,
     DISCONNECTED = 0
 }
@@ -36,7 +37,7 @@ export enum EditorActionStatus {
 export enum ServerCmdResponseTypes {
     SCENE_WORKER = "scene_worker",
     
-    EXECUTION_STATE_CHECK = "execution_state_check",
+    EXECUTION_STATE_SYNC = "execution_state_sync",
     ADD_NODE = "add_node",
     ADD_CONN = "add_conn",
     GET_SCENE_DATA = "get_scene_data"
