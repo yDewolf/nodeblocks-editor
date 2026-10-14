@@ -14,7 +14,7 @@ import "~/style/containers.css";
 import "~/app.css";
 import { SelectedNodeType } from "~/feature/editor/components/subpanels/component/node-type-selector";
 
-export const SceneCanvas = () => {
+export const EditorSceneCanvas = () => {
     const editor = useEditor();
     const scene = useScene();
     const scene_canvas = useSceneCanvas();
@@ -96,29 +96,7 @@ export const SceneCanvas = () => {
                     
                     <SelectedNodeType node_pos={editor.selectionController.space.cursorWorldPos}/>
                     <For each={Object.values(scene_canvas.nodes)}>
-                        {(node) => <NodeComponent 
-                                node={node}
-                                // notification_controller={session_controller.notification_controller}
-                                // workspace={session_controller.user_workspace}
-                                // camera={editor.editor_space.camera}
-                                // onClick={(node: GraphNode) => {
-                                //     editor.input_manager.generalizedEventHandler({node: node}, InputEvents.CLICK_ON_NODE)
-                                // }}
-                                // onClickSlot={(slot: NodeSlot) => {
-                                //     editor.input_manager.generalizedEventHandler({slot: slot}, InputEvents.CLICK_ON_NODE_SLOT)
-                                // }}
-                                // onHoverSlot={(slot: NodeSlot) => {
-                                //     editor.input_manager.generalizedEventHandler({slot: slot}, InputEvents.HOVER_SLOT)
-                                // }}
-                                // onHoverNode={(node: GraphNode) => {
-                                //     editor.input_manager.generalizedEventHandler({node: node}, InputEvents.HOVER_NODE)
-                                // }}
-                                // syncParameter={(node: GraphNode, parameter: NodeParameter) => {
-                                //     // TODO: Update only this parameter instead of the whole node
-                                //     NodeActionUtils.request_update_nodes([node], editor._action_controller);
-                                // }}
-                            />
-                        }
+                        {(node) => <NodeComponent node={node}/>}
                     </For>
                 </div>
             </div>

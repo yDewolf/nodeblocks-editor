@@ -13,13 +13,13 @@ export class Grid {
     get grid() { return this._grid_size() }
     set grid(grid_size: Vector2) { this._set_grid_size(grid_size) }
 
-    public roundPos(position: Vector2): Vector2 {
+    public roundVector(vector: Vector2): Vector2 {
         return {
-            x: Math.round(position.x / this.grid.x) * this.grid.x,
-            y: Math.round(position.y / this.grid.y) * this.grid.y
+            x: Math.round(vector.x / this.grid.x) * this.grid.x,
+            y: Math.round(vector.y / this.grid.y) * this.grid.y
         }
     }
-    
+
     public View(camera: CanvasCamera) {
         return (
             <div class="grid"

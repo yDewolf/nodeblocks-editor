@@ -81,7 +81,7 @@ export const ConnectionLines = (props: { connection: SceneConnection, onDisconne
         <g 
             class={"connection-group"} 
             classList={{
-                "unsynced": !scene.isPending(props.connection.uid),
+                "unsynced": scene.isPending(props.connection.uid),
                 // "current-step": is_current_step()
             }}
         >

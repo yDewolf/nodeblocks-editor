@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import { TypeSpecRegistry } from "./type-registry";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { SceneGraph } from "./graph/scene-graph";
-import { ConnectionSceneData, NodeSceneData, SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
+import { ConnectionSceneData, NodePathUtils, NodeSceneData, SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { INodeProvider } from "./interfaces/node-provider-interface";
 import { PackageManifest } from "~/protocols/nodeblocks/manifests/package-manifest";
 import { NodeInstance } from "./graph/node-instance";
@@ -95,12 +95,21 @@ export class NodeScene {
             this.graph.resetGraph();
         }
 
+        console.log("Loading scene data: ", scene_data);
         for (const node_data of Object.values(scene_data.nodes)) {
             this.createNodeFromData(node_data.nodetype_fqn, node_data);
         }
 
         for (const conn_data of Object.values(scene_data.connections)) {
-            this.graph.addConnection(conn_data);
+            if (typeof conn_data.from_slot === "string") {
+                const from_path = NodePathUtils.parse_node_path(conn_data.from_slot);
+                if (from_path) conn_data.from_slot = from_path;
+            }
+            if (typeof conn_data.to_slot === "string") {
+                const from_path = NodePathUtils.parse_node_path(conn_data.to_slot);
+                if (from_path) conn_data.to_slot = from_path;
+            }
+            this.addConnection(conn_data);
         }
     }
 

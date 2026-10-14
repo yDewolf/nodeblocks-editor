@@ -9,6 +9,7 @@ import { NodeOutput } from "./output/node-output";
 import { SlotComponent } from "./slot-components";
 import { useEventManager } from "~/utils/events/event-provider";
 import { InputEvents } from "~/utils/events/event-handling";
+import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -25,6 +26,8 @@ export const NodeComponent = (props: {
     // syncParameter: (node: GraphNode, parameter: NodeParameter) => void
 }) => {
     const { actionController } = useScene();
+    const { canvasSpace } = useSceneCanvas();
+
     const ro = new ResizeObserver((entries) => {
         const entry = entries[0];
         if (entry) {
@@ -33,59 +36,62 @@ export const NodeComponent = (props: {
                     x:  entry.contentRect.width, 
                     y: entry.contentRect.height
                 };
-            }, 0)
+            }, 30)
         }
     });
+
     const handleRef = (el: HTMLDivElement) => {
         const rect = el.getBoundingClientRect();
         props.node.size = {
             x: rect.width, // / props.camera.zoom, 
             y: rect.height // / props.camera.zoom
-        };
+        }
+        const rounded_size = canvasSpace.grid.roundVector(props.node.size);
+        props.node.minSize = rounded_size;
 
         ro.observe(el);
     };
     onCleanup(() => ro?.disconnect());
+
     const isVisible = createMemo(() => {
-        return true;
-        //     return props.camera.camera_rect.overlaps(props.node.rect);
+        return canvasSpace.camera.camera_rect.overlaps(props.node.rect);
     });
     
     return (
-            <Show when={isVisible()}>
-                <div 
-                    has-docs={true}
-                    ref={(el) => handleRef(el)}
-                    style={{
-                        position: "absolute",
-                        transform: `translate(${props.node.uiPosition.x}px, ${props.node.uiPosition.y}px)`,
-                        // "pointer-events": "none"
-                    }}
-                    classList={{
-                        "unsynced": !actionController.isEntityPending(props.node.uid),
-                        // "failed": props.node.has_failed_action,
-                        // "current-step": props.node.is_current_step,
-                        "selected-mode": props.node.isSelected,
-                    }}
-                >   
-                    <NodeComponentV2
-                        node={props.node} 
-                        // workspace={props.workspace}
+        <Show when={isVisible()}>
+            <div 
+                has-docs={true}
+                ref={(el) => handleRef(el)}
+                style={{
+                    position: "absolute",
+                    transform: `translate(${props.node.uiPosition.x}px, ${props.node.uiPosition.y}px)`,
+                    // "pointer-events": "none"
+                }}
+                classList={{
+                    "unsynced": actionController.isEntityPending(props.node.uid),
+                    // "failed": props.node.has_failed_action,
+                    // "current-step": props.node.is_current_step,
+                    "selected-mode": props.node.isSelected,
+                }}
+            >   
+                <NodeComponentV2
+                    node={props.node} 
+                    // workspace={props.workspace}
 
-                        // syncParameter={props.syncParameter}
-                        // onClick={props.onClick} 
-                        // onHover={props.onHoverNode} 
-                        // onClickSlot={props.onClickSlot} 
-                        // onHoverSlot={props.onHoverSlot}
-                    />
-                    {/* <NotificationPopupHolder 
-                        notification_controller={props.notification_controller}
-                        notifications={props.notification_controller.relatedToNode(props.node)}
-                        pos={{x: 0, y: props.node.rect.size.y}}
-                    /> */}
-                </div>
-            </Show>
-        );
+                    // syncParameter={props.syncParameter}
+                    // onClick={props.onClick} 
+                    // onHover={props.onHoverNode} 
+                    // onClickSlot={props.onClickSlot} 
+                    // onHoverSlot={props.onHoverSlot}
+                />
+                {/* <NotificationPopupHolder 
+                    notification_controller={props.notification_controller}
+                    notifications={props.notification_controller.relatedToNode(props.node)}
+                    pos={{x: 0, y: props.node.rect.size.y}}
+                /> */}
+            </div>
+        </Show>
+    );
 };
 
 export const NodePreview = (props: {spec: NodeTypeSpec}) => {
@@ -137,6 +143,9 @@ export const NodeComponentV2 = (props: {
                 "expanded": isExpanded(),
                 "hovered": isHovered(),
                 "selected-mode": ref_node.isSelected
+            }}
+            style={{
+                "min-width": `${ref_node.minSize.x}px`
             }}
         >
             <div class="node-contents">

@@ -1,7 +1,7 @@
 
 import MinimizeIcon from '~/assets/icons/minimize.svg';
 import { PageViewer } from '~/components/page-controller';
-import { SceneCanvas } from '../scene/components/editor-scene-canvas';
+import { EditorSceneCanvas } from '../scene/components/editor-scene-canvas';
 import { useEditor } from '../scene-editor-context';
 import { InputEvents } from '~/utils/events/event-handling';
 import { EditorLeftTabHolder } from './components/subpanels/left-tab';
@@ -74,7 +74,7 @@ export const EditorView = () => {
                     onPointerDown={(e) => {editor.toolController.current_tool?.globalOnPointerDown(e)}}
                     onPointerMove={(e) => editor.toolController.current_tool?.globalOnPointerMove(e)}
                 >
-                    <SceneCanvas></SceneCanvas>
+                    <EditorSceneCanvas></EditorSceneCanvas>
                     <div
                         class="editor-ui" 
                         onPointerMove={(e) => editor.eventManager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}

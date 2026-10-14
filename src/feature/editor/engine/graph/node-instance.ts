@@ -2,28 +2,47 @@ import { NodeSceneData, SlotPathData } from "~/protocols/nodeblocks/manifests/no
 import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 
+export interface SlotInstanceData {
+    connection_count: number
+}
+export type SlotDataListener = (data: SlotInstanceData) => void;
 export class SlotInstance implements SlotPathData {
+    private _listeners: Set<SlotDataListener> = new Set();
+    
     node_id: string
     slot_id: string
     spec: NodeSlotSpec
 
-    connection_count: number
+    private _connection_count: number
 
     constructor(node_id: string, slot_id: string, spec: NodeSlotSpec) {
         this.node_id = node_id;
         this.slot_id = slot_id;
         this.spec = spec;
 
-        this.connection_count = 0;
+        this._connection_count = 0;
+    }
+
+    public subscribe(listener: SlotDataListener): () => void {
+        this._listeners.add(listener);
+        return () => this._listeners.delete(listener);
     }
 
     get is_input() { return this.spec.is_input; }
     get can_connect() { 
         return this.spec.max_connections == 0 
-            || this.connection_count < this.spec.max_connections
+            || this._connection_count < this.spec.max_connections
     }
     get data_type_fqn() {
         return this.spec.data_type_id;
+    }
+
+    get connection_count() { return this._connection_count }
+    set connection_count(count: number) {
+        this._connection_count = Math.max(0, count);
+        this._listeners.forEach((listener) => listener({
+            connection_count: this._connection_count
+        }));
     }
 }
 

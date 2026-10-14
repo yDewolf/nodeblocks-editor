@@ -61,7 +61,7 @@
 
   justify-content: space-between;
   display: grid;
-  grid-template-rows: repeat(3, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 0.5fr) minmax(0, 1fr) minmax(0, 0.5fr);
   grid-template-columns: 3fr;
 
   width: 100%;

@@ -8,9 +8,6 @@ export const SlotComponent = (props: {
     slot: SceneNodeSlot,
     show_label: boolean,
     highlightable?: boolean,
-    // node_meta?: NodeTypeMeta,
-    // onClick: (slot: NodeSlot) => void,
-    // onHover: (slot: NodeSlot) => void,
 }) => {
     // const node_meta = props.node_meta ? props.node_meta : metadata.get_node_meta(props.slot.parent_node.type_id);
     // const slot_meta = node_meta != undefined ? node_meta.slot_meta[props.slot.slot_id] : undefined;
@@ -25,7 +22,6 @@ export const SlotComponent = (props: {
                 eventManager?.generalizedEventHandler({
                     slot: props.slot
                 }, InputEvents.HOVER_SLOT);
-                // props.onHover(props.slot);
             }}
             title={slot_label}
             class="node-slot"
@@ -44,7 +40,6 @@ export const SlotComponent = (props: {
                     eventManager?.generalizedEventHandler({
                         slot: props.slot
                     }, InputEvents.CLICK_ON_NODE_SLOT);
-                    // props.onClick(props.slot);
                 }}
             ></div>
             <Show when={props.show_label}>

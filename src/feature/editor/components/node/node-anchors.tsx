@@ -10,7 +10,7 @@ export const NodeAnchor = (props: {
     // onClickSlot: (slot: NodeSlot) => void, 
     // onHoverSlot: (slot: NodeSlot) => void
 }) => {
-    const filtered_nodes = createMemo(() => {
+    const filtered_slots = createMemo(() => {
         return props.all_slots.filter((slot) => slot.anchor.x == props.anchor_pos.x && slot.anchor.y == props.anchor_pos.y);
     })
     
@@ -21,7 +21,7 @@ export const NodeAnchor = (props: {
             "top-anchor": props.anchor_pos.y == -1,
             "bottom-anchor": props.anchor_pos.y == 1
         }}>
-            <For each={filtered_nodes()}>
+            <For each={filtered_slots()}>
                 {(slot) => {
                     return (
                         <SlotComponent slot={slot} show_label={false} highlightable={true}/>

@@ -9,7 +9,6 @@ import { InputEvents, EventHandler } from "~/utils/events/event-handling";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./canvas/selection-controller";
 import { CanvasSpace } from './canvas/editor-space';
-import { Grid } from "./components/canvas/grid";
 import { RemoveNodesAction } from "./actions/node/remove-nodes-action";
 import { InputManager } from '~/utils/keybinds/input-manager';
 import { EventManager } from '~/utils/events/event-manager';
@@ -62,7 +61,7 @@ export class SceneEditor {
         // this.toolController.add_tool(new CommentTool(this.node_editor));
         // this.toolController.add_tool(new DocsTool(this.node_editor));
         this._toolController = new ToolController(this.globalInputContext);
-        this._toolController.add_tool(new SelectionTool(this.actionController, this.selectionController, this._elementController));
+        this._toolController.add_tool(new SelectionTool(this.scene, this.actionController, this.selectionController, this._elementController));
         this._toolController.change_tool(0)
     }
 

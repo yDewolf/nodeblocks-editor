@@ -51,7 +51,7 @@ export class CanvasElementController {
         this.unsubscribeScene = scene.subscribe((event: SceneEvent) => {
             if (event.type === "node_added") {
                 const scene_node = new SceneNode(event.node)
-                scene_node.uiPosition = this.grid.roundPos(scene_node.position);
+                scene_node.uiPosition = this.grid.roundVector(scene_node.position);
                 this._setStore("nodes", event.node.uid, scene_node);
             
             } else if (event.type === "node_removed") {
@@ -81,7 +81,7 @@ export class CanvasElementController {
             } else if (event.type === "conn_removed") {
                 const conn = this.conns[event.conn_id];
                 this._setStore("conns", event.conn_id, undefined as any);
-                this.update_anchors_from_conn(conn);
+                this.onConnRemoved(conn);
             }
         });
     }
@@ -91,6 +91,11 @@ export class CanvasElementController {
             this.unsubscribeScene();
             this.unsubscribeScene = undefined;
         }
+    }
+
+
+    protected onConnRemoved(conn: SceneConnection) {
+        this.update_anchors_from_conn(conn);
     }
 
     public update_anchors_from_conn(conn: SceneConnection) {

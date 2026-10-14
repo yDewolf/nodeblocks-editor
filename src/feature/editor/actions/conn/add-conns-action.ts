@@ -2,6 +2,7 @@ import { CommandGroups, ClientGraphCommandTypes, GraphActionTypes } from "~/prot
 import { ConnGraphCommand, ConnSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
 import { Action } from "../action";
 import { NodeScene } from "../../engine/node_scene";
+import { MaxConnectionReached } from "../../engine/exceptions/graph-exceptions";
 
 export class AddConnectionsAction extends Action<ConnGraphCommand> {
     constructor(

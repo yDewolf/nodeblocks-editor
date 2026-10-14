@@ -43,7 +43,7 @@ export class NodePathUtils {
     static parse_node_path(path: string): SlotPathData | undefined {
         const regex = new RegExp("nodes:([a-z0-9-]+):slots:([^:\\s]+)", "i");
         const match = regex.exec(path);
-        if (match && match.length == 2) {
+        if (match && match.length == 3) {
             return {
                 node_id: match[1],
                 slot_id: match[2]

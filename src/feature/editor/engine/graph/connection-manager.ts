@@ -7,7 +7,9 @@ import { TypeSpecRegistry } from "../type-registry";
 export class ConnectionManager {
     private _connections: Record<string, ConnectionSceneData> = {};
     private _registry: TypeSpecRegistry;
-    private _endpointsIndex: Set<string> = new Set();
+
+    // path -> conn
+    private _endpointsIndex: Map<string, ConnectionSceneData> = new Map();
 
     constructor(typeRegistry: TypeSpecRegistry) {
         this._registry = typeRegistry;
@@ -59,15 +61,15 @@ export class ConnectionManager {
 
         const key = this.makeEndpointKey(connection.from_slot, connection.to_slot);
         this._connections[connection.uid] = connection;
-        this._endpointsIndex.add(key);
+        this._endpointsIndex.set(key, connection);
     }
 
     public remove(connectionUid: string): ConnectionSceneData | undefined {
         const conn = this._connections[connectionUid];
         if (conn) {
-        delete this._connections[connectionUid];
-        const key = this.makeEndpointKey(conn.from_slot, conn.to_slot);
-        this._endpointsIndex.delete(key);
+            delete this._connections[connectionUid];
+            const key = this.makeEndpointKey(conn.from_slot, conn.to_slot);
+            this._endpointsIndex.delete(key);
         }
         return conn;
     }
@@ -81,6 +83,16 @@ export class ConnectionManager {
         return Object.values(this._connections).filter(
         (conn) => conn.from_slot.node_id === nodeId || conn.to_slot.node_id === nodeId
         );
+    }
+
+    public areConnected(slot_a: SlotPathData, slot_b: SlotPathData): ConnectionSceneData | undefined {
+        const a_to_b = this.makeEndpointKey(slot_a, slot_b);
+        let conn = this._endpointsIndex.get(a_to_b);
+        if (!conn) {
+            const b_to_a = this.makeEndpointKey(slot_b, slot_a);
+            conn = this._endpointsIndex.get(b_to_a);
+        }
+        return conn;
     }
 
     public all(): Record<string, ConnectionSceneData> {
@@ -131,13 +143,13 @@ export class ConnectionManager {
 
     public canConnect(fromSlot: SlotInstance, toSlot: SlotInstance): boolean {
         try {
-        this.validateConnection(fromSlot, toSlot);
-        return true;
+            this.validateConnection(fromSlot, toSlot);
+            return true;
         } catch (error) {
-        if (error instanceof ConnectionValidationError) {
-            return false;
-        }
-        throw error;
+            if (error instanceof ConnectionValidationError) {
+                return false;
+            }
+            throw error;
         }
     }
 

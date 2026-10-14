@@ -8,7 +8,8 @@ export interface NodeUiState {
     // isCurrentStep: boolean; // talvez isso aqui nem deva ficar aqui
     isSelected: boolean;
     size: Vector2;
-    uiPosition: Vector2;
+    uiPosition: Vector2; // FIXME: talvez isso aqui seja um problema porque a posição do node fica dessincronizada por conta do grid snap
+    minSize: Vector2;
     // zIndex: number;
 }
 
@@ -43,7 +44,8 @@ export class SceneNode {
         [this._uiStore, this._setUiStore] = createStore<NodeUiState>({
             isSelected: false,
             size: { x: 100, y: 150 },
-            uiPosition: instance.scene_data.position
+            uiPosition: instance.scene_data.position,
+            minSize: { x: 0, y: 0 }
         });
     }
     
@@ -73,6 +75,15 @@ export class SceneNode {
 
     get size() { return this._uiStore.size; }
     set size(new_size: Vector2) { this._setUiStore("size", new_size); }
+
+    get minSize() { return this._uiStore.minSize; }
+    set minSize(new_size: Vector2) { 
+        this._setUiStore("minSize", new_size);
+        this.size = {
+            x: this.size.x > new_size.x ? this.size.x : new_size.x,
+            y: this.size.y > new_size.y ? this.size.y : new_size.y
+        } 
+    }
 
     get rect() { return new Rect(this.position, this.size)}
 

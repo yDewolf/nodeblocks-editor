@@ -7,6 +7,8 @@ import { DefinedInputScope, InputManagerProvider, InputScope } from './utils/key
 import { EventManagerProvider } from './utils/events/event-provider';
 import { EditorView } from "./feature/editor/editor-view";
 import { UpdateRootDataTheme } from "./feature/ui-themes";
+import { ClientSceneCommandTypes, CommandGroups } from "./protocols/nodeblocks/network/client-command-protocol";
+import { nanoid } from "nanoid";
 
 interface AppContextData {
   appSession: AppSessionManager,
@@ -51,8 +53,15 @@ export default function App() {
 
 const TestComponent = () => {
   const editor = useEditor();
-  editor.connectToScene("test_scene");
   const [targetScene, setTargetScene] = createSignal<string | null>(null);
+  onMount(async () => {
+    await editor.connectToScene("test_scene");
+    editor.sceneConnection.sendCommand({
+      cmd_uid: nanoid(),
+      cmd_group: CommandGroups.SCENE,
+      type: ClientSceneCommandTypes.GET_SCENE_DATA
+    })
+  }) 
 
   return (
     <InputManagerProvider manager={editor.inputManager}>

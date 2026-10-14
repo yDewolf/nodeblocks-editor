@@ -7,10 +7,13 @@ import { CanvasElementController } from "~/feature/scene/controllers/canvas-elem
 import { createSignal } from "solid-js";
 import { NodeTypePreview } from "../components/subpanels/component/node-type-selector";
 import { InputContext } from '../../../utils/keybinds/input-context';
-import { NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
+import { ConnSceneRequestData, NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
 import { nanoid } from "nanoid";
 import { ActionController } from "../actions/action-controller";
 import { AddNodesAction } from "../actions/node/add-nodes-action";
+import { NodeScene } from "../engine/node_scene";
+import { RemoveConnectionsAction } from "../actions/conn/remove-conns-action";
+import { AddConnectionsAction } from "../actions/conn/add-conns-action";
 
 
 export class SelectionTool extends BaseEditorTool {
@@ -18,6 +21,7 @@ export class SelectionTool extends BaseEditorTool {
     protected _set_selected_preview: (preview: NodeTypePreview | null) => void;
 
     constructor(
+        private readonly scene: NodeScene,
         private readonly actionController: ActionController,
         private readonly selectionController: SelectionController,
         private readonly elementController: CanvasElementController
@@ -56,6 +60,40 @@ export class SelectionTool extends BaseEditorTool {
     get selectedPreview() { return this._selected_preview(); }
 
     onClickOnNodeSlot(slot: SceneNodeSlot): void {
+        if (this.selectionController.selected_slot) {
+            // Disconnect Slots
+            const conn = this.scene.graph.areConnected(
+                this.selectionController.selected_slot.path,
+                slot.path
+            );
+            if (conn) {
+                this.actionController.dispatch(
+                    new RemoveConnectionsAction([conn.uid])
+                )
+                this.selectionController.unselect_slot();
+                return;
+
+            }
+            // Connect Slots
+            if (this.scene.graph.canConnect(
+                this.selectionController.selected_slot.instance,
+                slot.instance
+            )) {
+                let conns: ConnSceneRequestData = {};
+                const uid = nanoid(8);
+                conns[uid] = {
+                    uid: uid,
+                    from_slot: slot.isInput ? this.selectionController.selected_slot.path : slot.path,
+                    to_slot: slot.isInput ? slot.path : this.selectionController.selected_slot.path,
+                };
+                this.actionController.dispatch(
+                    new AddConnectionsAction(conns)
+                );
+    
+                this.selectionController.unselect_slot();
+                return;
+            }
+        }
         this.selectionController.select_slot(slot);
         this.selectionController.clearSelection();
     }

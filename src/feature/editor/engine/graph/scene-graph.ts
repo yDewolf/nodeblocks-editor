@@ -1,4 +1,4 @@
-import { ConnectionSceneData, NodeSceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
+import { ConnectionSceneData, NodeSceneData, SlotPathData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { TypeSpecRegistry } from "../type-registry";
 import { ConnectionManager } from "./connection-manager";
 import { NodeInstance, SlotInstance } from "./node-instance";
@@ -112,6 +112,10 @@ export class SceneGraph {
         return true;
     }
 
+    public canConnect(fromSlot: SlotInstance, toSlot: SlotInstance) {
+        return this._connections.canConnect(fromSlot, toSlot);
+    }
+
     // Node and Connection Getters
 
     public getNodesAsData(): Record<string, NodeSceneData> {
@@ -136,6 +140,10 @@ export class SceneGraph {
 
     public getNodeConnections(nodeId: string): ConnectionSceneData[] {
         return this._connections.getByNode(nodeId);
+    }
+
+    public areConnected(slot_a: SlotPathData, slot_b: SlotPathData) {
+        return this._connections.areConnected(slot_a, slot_b);
     }
 
     public get allNodes(): Record<string, NodeInstance> {
