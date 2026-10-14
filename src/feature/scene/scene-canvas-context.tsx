@@ -12,7 +12,7 @@ interface SceneCanvasContextValue {
     elementController: CanvasElementController
 }
 
-const SceneCanvasContext = createContext<SceneCanvasContextValue>();
+export const SceneCanvasContext = createContext<SceneCanvasContextValue>();
 export const SceneCanvasProvider: ParentComponent<{
     canvasSpace?: CanvasSpace,
     elementController?: CanvasElementController

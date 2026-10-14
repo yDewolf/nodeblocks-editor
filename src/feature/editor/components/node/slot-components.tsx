@@ -14,6 +14,7 @@ export const SlotComponent = (props: {
     // const slot_label = slot_meta ? slot_meta.capitalized_name : props.slot.slot_id;
     const eventManager = useEventManager();
     const slot_label = props.slot.path.slot_id;
+
     return (
         <div
             has-docs={true}
@@ -33,7 +34,12 @@ export const SlotComponent = (props: {
             }}
         >
             <div 
-                ref={props.slot._element} 
+                ref={(el) => {
+                    props.slot.element = el;
+                    requestAnimationFrame(() => {
+                        props.slot.forceUpdateLayout();
+                    });
+                }}
                 class="slot-dot"
                 onPointerDown={(e) => {
                     e.stopPropagation();

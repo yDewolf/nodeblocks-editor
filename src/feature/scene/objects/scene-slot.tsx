@@ -3,6 +3,7 @@ import { SlotInstance, SlotInstanceData } from "~/feature/editor/engine/graph/no
 import { SlotPathData } from '../../../protocols/nodeblocks/manifests/node/node-graph-data';
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { TypeSpecRegistry } from "~/feature/editor/engine/type-registry";
+import { createSignal } from "solid-js";
 
 export interface SlotUIStore {
     isSelected: boolean;
@@ -19,13 +20,19 @@ export class SceneNodeSlot {
     private _uiStore: SlotUIStore;
     private _setUiStore: SetStoreFunction<SlotUIStore>;
 
-    public _element?: HTMLDivElement;
+    private _element: () => HTMLDivElement | null;
+    private _set_element: (el: HTMLDivElement | null) => void;
     private _cleanupDataSub: () => void;
+
+    private _layoutVersion: () => number;
+    private _setLayoutVersion: (layout: number) => void;
 
     constructor(
         public readonly instance: SlotInstance
     ) {
         const defaultAnchor = {x: instance.is_input ? -1 : 1, y: 0};
+        [this._layoutVersion, this._setLayoutVersion] = createSignal(0);
+        [this._element, this._set_element] = createSignal<HTMLDivElement | null>(null);
         [this._dataStore, this._setDataStore] = createStore<SlotInstanceData>({
             connection_count: instance.connection_count
         });
@@ -66,10 +73,18 @@ export class SceneNodeSlot {
     get worldPos(): Vector2 | null { return this._uiStore.worldPos; }
     set worldPos(pos: Vector2) { this._setUiStore("worldPos", pos); }
 
+    get element() { return this._element(); }
+    set element(el: HTMLDivElement | null) { this._set_element(el); }
+
+    get layoutVersion() { return this._layoutVersion(); }
+
+    public forceUpdateLayout() {
+        this._setLayoutVersion(this._layoutVersion() + 1);
+    }
+
     public updateUi(patch: Partial<SlotUIStore>): void {
         this._setUiStore((prev) => ({ ...prev, ...patch }));
     }
-
 
     public canConnectTo(slot: SceneNodeSlot, registry: TypeSpecRegistry) {
         if (!this.instance.can_connect || !slot.instance.can_connect) {

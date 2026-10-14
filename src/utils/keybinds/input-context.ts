@@ -9,8 +9,9 @@ export interface KeybindHandlers {
 }
 
 export interface KeybindBinding {
-    trigger: KeybindTrigger;
+    triggers: KeybindTrigger[];
     handlers: KeybindHandlers;
+    maxSpecificity: number;
 }
 
 export class InputContext {
@@ -30,8 +31,14 @@ export class InputContext {
         keybind.handlers = handlers;
     }
 
-    public bind(name: string, trigger: KeybindTrigger, handlers: KeybindHandlers): this {
-        this.bindings.set(name, { trigger, handlers });
+    public bind(name: string, triggers: KeybindTrigger | KeybindTrigger[], handlers: KeybindHandlers): this {
+        const triggerArray = Array.isArray(triggers) ? triggers : [triggers];
+        const maxSpecificity = triggerArray.reduce(
+            (max, triger) => Math.max(max, triger.getSpecificityScore()), 
+            0
+        );
+
+        this.bindings.set(name, { triggers: triggerArray, handlers, maxSpecificity });
         return this;
     }
 
@@ -51,7 +58,9 @@ export class InputContext {
         for (const [name, binding] of this.bindings) {
             merged.set(name, binding);
         }
-        
-        return merged;
+        const sortedEntries = new Map(Array.from(merged.entries()).sort(([, a], [, b]) => {
+            return b.maxSpecificity - a.maxSpecificity;
+        }));
+        return sortedEntries;
     }
 }

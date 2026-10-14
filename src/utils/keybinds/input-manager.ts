@@ -4,6 +4,9 @@ export class InputManager {
     private activeContext: InputContext | null = null;
     private pressedKeybinds: Set<string> = new Set();
 
+    private pressedKeys: Set<string> = new Set();
+    private pressedMouseButtons: Set<number> = new Set();
+
     public setActiveContext(context: InputContext | null): void {
         this.activeContext = context;
     }
@@ -20,15 +23,18 @@ export class InputManager {
     // Events
 
     public onPointerDown(event: PointerEvent): void {
+        this.pressedMouseButtons.add(event.button)
         this.evaluatePress(event);
     }
 
     public onPointerUp(event: PointerEvent): void {
+        this.pressedMouseButtons.delete(event.button);
         this.evaluateRelease(event);
     }
 
     public onWheel(event: WheelEvent): void {
         this.evaluatePress(event);
+        this.evaluateRelease(event);
     }
 
     public onMouseMove(event: PointerEvent): void {
@@ -43,10 +49,12 @@ export class InputManager {
     }
 
     public onKeyDown(event: KeyboardEvent): void {
+        this.pressedKeys.add(event.code);
         this.evaluatePress(event);
     }
 
     public onKeyUp(event: KeyboardEvent): void {
+        this.pressedKeys.delete(event.code);
         this.evaluateRelease(event);
     }
 
@@ -54,11 +62,14 @@ export class InputManager {
 
     // Evaluators
 
-    private evaluatePress(event: KeyboardEvent | MouseEvent | WheelEvent | PointerEvent): void {
+    private evaluatePress(event: Event): void {
         const bindings = this.getActiveBindings();
-
         for (const [name, binding] of bindings.entries()) {
-            if (binding.trigger.matches(event)) {
+            const isSatisfied = binding.triggers.some(trigger => 
+                trigger.isSatisfied(this.pressedKeys, this.pressedMouseButtons, event)
+            );
+
+            if (isSatisfied) {
                 const handlers = binding.handlers;
 
                 if (!this.pressedKeybinds.has(name)) {
@@ -71,14 +82,19 @@ export class InputManager {
         }
     }
 
-    private evaluateRelease(event: KeyboardEvent | MouseEvent | WheelEvent | PointerEvent): void {
+    private evaluateRelease(event: Event): void {
         const bindings = this.getActiveBindings();
-
         for (const name of this.pressedKeybinds) {
             const binding = bindings.get(name);
-            if (binding && !binding.trigger.matches(event)) {
-                binding.handlers.just_released?.(event);
-                this.pressedKeybinds.delete(name);
+            if (binding) {
+                const stillActive = binding.triggers.some(trigger => 
+                    trigger.isSatisfied(this.pressedKeys, this.pressedMouseButtons, event)
+                );
+
+                if (!stillActive) {
+                    binding.handlers.just_released?.(event);
+                    this.pressedKeybinds.delete(name);
+                }
             }
         }
     }

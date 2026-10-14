@@ -144,12 +144,14 @@ export class CanvasElementController {
         });
     }
 
-    public get_slot_position = (slot: SceneNodeSlot) => {
+    public update_slot_position = (slot: SceneNodeSlot) => {
+        slot.layoutVersion;
         const parent_node = this._store.nodes[slot.node_id];
         if (!parent_node) return { x: 0, y: 0 };
         parent_node.size;
 
-        if (!slot._element) {
+        const el = slot.element;
+        if (!el) {
             const world_pos = {
                 x: parent_node.uiPosition.x + (slot.isInput == false ? parent_node.size.x : 0),
                 y: parent_node.uiPosition.y + (parent_node.size.y / 2)
@@ -159,8 +161,8 @@ export class CanvasElementController {
         }
 
         const world_pos = {
-            x: parent_node.uiPosition.x + slot._element.offsetLeft + slot._element.offsetWidth / 2,
-            y: parent_node.uiPosition.y + slot._element.offsetTop + slot._element.offsetHeight / 2
+            x: parent_node.uiPosition.x + el.offsetLeft + el.offsetWidth / 2,
+            y: parent_node.uiPosition.y + el.offsetTop + el.offsetHeight / 2
         }; 
 
         slot.worldPos = world_pos;

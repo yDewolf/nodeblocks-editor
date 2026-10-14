@@ -52,14 +52,14 @@ export const InputScope: ParentComponent<{ name: string }> = (props) => {
     );
 };
 
-export function useKeybind(name: string, trigger: KeybindTrigger, handlers: KeybindHandlers) {
+export function useKeybind(name: string, triggers: KeybindTrigger[] | KeybindTrigger, handlers: KeybindHandlers) {
     const context = useContext(InputContextContainer);
     if (!context) {
         console.warn(`useKeybind('${name}') called outside of <InputScope>.`);
         return;
     }
 
-    context.bind(name, trigger, handlers);
+    context.bind(name, triggers, handlers);
     onCleanup(() => {
         context.unbind(name);
     });

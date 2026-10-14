@@ -29,15 +29,14 @@ export const ConnectionPreview = (props: { start_slot: SceneNodeSlot | null, hov
         if (props.start_slot == null) {
             return;
         }
-        const start = scene_canvas.elementController.get_slot_position(props.start_slot);
-        
+        const start = scene_canvas.elementController.update_slot_position(props.start_slot);
         const start_anchor = props.start_slot.anchor;
         
         let end = props.cursor_pos;
         let end_anchor = start_anchor;
 
         if (props.hovered_slot != null && props.start_slot.canConnectTo(props.hovered_slot, scene.registry)) {
-            end = scene_canvas.elementController.get_slot_position(props.hovered_slot);
+            end = scene_canvas.elementController.update_slot_position(props.hovered_slot);
             end_anchor = props.hovered_slot.anchor;
         }
 
@@ -57,8 +56,8 @@ export const ConnectionLines = (props: { connection: SceneConnection, onDisconne
 
     const pathId = `path-${props.connection.uid}`;
     const path = createMemo(() => {
-        const start = scene_canvas.elementController.get_slot_position(props.connection.output_slot);
-        const end = scene_canvas.elementController.get_slot_position(props.connection.input_slot);
+        const start = scene_canvas.elementController.update_slot_position(props.connection.output_slot);
+        const end = scene_canvas.elementController.update_slot_position(props.connection.input_slot);
         const anchor_a = props.connection.output_slot.anchor;
         const anchor_b = props.connection.input_slot.anchor;
 

@@ -14,10 +14,11 @@ export class Grid {
     set grid(grid_size: Vector2) { this._set_grid_size(grid_size) }
 
     public roundVector(vector: Vector2): Vector2 {
-        return {
-            x: Math.round(vector.x / this.grid.x) * this.grid.x,
-            y: Math.round(vector.y / this.grid.y) * this.grid.y
+        const rounded = {
+            x: Math.ceil(vector.x / this.grid.x) * this.grid.x,
+            y: Math.ceil(vector.y / this.grid.y) * this.grid.y
         }
+        return rounded;
     }
 
     public View(camera: CanvasCamera) {

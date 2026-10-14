@@ -1,6 +1,6 @@
-export enum MouseButtons {
-    Left = 1,
-    Middle = 4,
+export enum MouseButton {
+    Left = 0,
+    Middle = 1,
     Right = 2
 }
 
@@ -13,16 +13,35 @@ export interface KeyModifiers {
 
 export interface TriggerConfig {
     keys?: string[];
-    mouseButtons?: MouseButtons[];
+    mouseButtons?: MouseButton[];
     modifiers?: KeyModifiers;
     isWheel?: boolean;
 }
 
-// TODO: revisar esses triggers porque eles tão mt bugado
 export class KeybindTrigger {
     constructor(public readonly config: TriggerConfig) {}
 
-    public matches(event: KeyboardEvent | MouseEvent | WheelEvent | PointerEvent): boolean {
+    public matches(event: Event): boolean {
+        if (this.config.isWheel && event instanceof WheelEvent && event.deltaY != 0.0) {
+            return true;
+        }
+
+        if (this.config.keys && event instanceof KeyboardEvent) {
+            return true;
+        }
+
+        if (this.config.mouseButtons && event instanceof PointerEvent) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public isSatisfied(
+        pressedKeys: Set<string>, 
+        pressedMouseButtons: Set<number>, 
+        event: Event
+    ): boolean {
         const expectedModifiers: KeyModifiers = {
             ctrl: this.config.modifiers?.ctrl ?? false,
             shift: this.config.modifiers?.shift ?? false,
@@ -30,23 +49,42 @@ export class KeybindTrigger {
             meta: this.config.modifiers?.meta ?? false,
         };
 
-        if (event.ctrlKey !== expectedModifiers.ctrl) return false;
-        if (event.shiftKey !== expectedModifiers.shift) return false;
-        if (event.altKey !== expectedModifiers.alt) return false;
-        if (event.metaKey !== expectedModifiers.meta) return false;
-
-        if (this.config.keys && event instanceof KeyboardEvent) {
-            if (!this.config.keys.includes(event.code)) return false;
+        if (event instanceof KeyboardEvent || event instanceof MouseEvent || event instanceof WheelEvent) {
+            if (event.ctrlKey !== expectedModifiers.ctrl) return false;
+            if (event.shiftKey !== expectedModifiers.shift) return false;
+            if (event.altKey !== expectedModifiers.alt) return false;
+            if (event.metaKey !== expectedModifiers.meta) return false;
         }
 
-        if (this.config.mouseButtons && (event instanceof MouseEvent || event instanceof PointerEvent)) {
-            if (!this.config.mouseButtons.includes(event.buttons)) return false;
+        if (this.config.keys) {
+            const hasAllKeys = this.config.keys.every(code => pressedKeys.has(code));
+            if (!hasAllKeys) return false;
         }
 
-        if (this.config.isWheel && event instanceof WheelEvent) {
-            return true;
+        if (this.config.mouseButtons) {
+            const hasAnyButton = this.config.mouseButtons.some(btn => pressedMouseButtons.has(btn));
+            if (!hasAnyButton) return false;
+        }
+
+        if (this.config.isWheel) {
+            if (!(event instanceof WheelEvent) || event.deltaY === 0) return false;
         }
 
         return true;
+    }
+
+    public getSpecificityScore(): number {
+        let score = 0;
+        if (this.config.keys) score += this.config.keys.length;
+        if (this.config.mouseButtons) score += this.config.mouseButtons.length;
+        if (this.config.isWheel) score += 1;
+        
+        if (this.config.modifiers) {
+            if (this.config.modifiers.ctrl) score += 2;
+            if (this.config.modifiers.shift) score += 2;
+            if (this.config.modifiers.alt) score += 2;
+            if (this.config.modifiers.meta) score += 2;
+        }
+        return score;
     }
 }

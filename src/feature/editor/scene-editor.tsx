@@ -12,7 +12,7 @@ import { CanvasSpace } from './canvas/editor-space';
 import { RemoveNodesAction } from "./actions/node/remove-nodes-action";
 import { InputManager } from '~/utils/keybinds/input-manager';
 import { EventManager } from '~/utils/events/event-manager';
-import { KeybindTrigger, MouseButtons } from '~/utils/keybinds/keybind-trigger';
+import { KeybindTrigger, MouseButton } from '~/utils/keybinds/keybind-trigger';
 import { InputContext } from '~/utils/keybinds/input-context';
 import { SelectionTool } from './tools/selection-tool';
 import { CanvasElementController } from '../scene/controllers/canvas-element-controller';
@@ -106,7 +106,7 @@ export class SceneEditor {
     private setup_keybinds() {
         this._globalInputContext.bind(
             "MainToolAction", 
-            new KeybindTrigger({mouseButtons: [MouseButtons.Left]}),
+            new KeybindTrigger({mouseButtons: [MouseButton.Left]}),
             {just_activated: (e) => {
                 if (e instanceof PointerEvent) {
                     if (e.target !== e.currentTarget) return;
@@ -123,7 +123,7 @@ export class SceneEditor {
         })
         this._globalInputContext.bind(
             "SecondaryToolAction",
-            new KeybindTrigger({mouseButtons: [MouseButtons.Right]}),
+            new KeybindTrigger({mouseButtons: [MouseButton.Right]}),
             {}
         )
 

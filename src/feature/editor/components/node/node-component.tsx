@@ -28,35 +28,37 @@ export const NodeComponent = (props: {
     const { actionController } = useScene();
     const { canvasSpace } = useSceneCanvas();
 
+    const isVisible = createMemo(() => {
+        return canvasSpace.camera.camera_rect.overlaps(props.node.rect);
+    });
+
     const ro = new ResizeObserver((entries) => {
         const entry = entries[0];
         if (entry) {
-            setTimeout(() => {
-                props.node.size = {
-                    x:  entry.contentRect.width, 
-                    y: entry.contentRect.height
-                };
-            }, 30)
+            if (!isVisible()) {
+                return;
+            }
+
+            props.node.size = {
+                x: entry.contentRect.width, 
+                y: entry.contentRect.height
+            };
         }
     });
 
     const handleRef = (el: HTMLDivElement) => {
         const rect = el.getBoundingClientRect();
         props.node.size = {
-            x: rect.width, // / props.camera.zoom, 
-            y: rect.height // / props.camera.zoom
+            x: rect.width,
+            y: rect.height
         }
-        const rounded_size = canvasSpace.grid.roundVector(props.node.size);
-        props.node.minSize = rounded_size;
-
+        
+        // const rounded_size = canvasSpace.grid.roundVector({x: rect.width, y: rect.height});
+        // props.node.minSize = rounded_size;
         ro.observe(el);
     };
     onCleanup(() => ro?.disconnect());
 
-    const isVisible = createMemo(() => {
-        return canvasSpace.camera.camera_rect.overlaps(props.node.rect);
-    });
-    
     return (
         <Show when={isVisible()}>
             <div 
@@ -144,9 +146,10 @@ export const NodeComponentV2 = (props: {
                 "hovered": isHovered(),
                 "selected-mode": ref_node.isSelected
             }}
-            style={{
-                "min-width": `${ref_node.minSize.x}px`
-            }}
+            // style={{
+            //     "min-width": `${ref_node.minSize.x}px`,
+            //     "min-height": `${ref_node.minSize.y}px`
+            // }}
         >
             <div class="node-contents">
                 <NodeHeader 

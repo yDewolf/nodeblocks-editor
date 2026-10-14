@@ -4,7 +4,7 @@ import { useEditor } from "~/feature/scene-editor-context";
 export const SceneMinimap = () => {
     const editor = useEditor();
     const editor_space = editor.selectionController.space;
-    const nodes = Object.values(editor.elementController.nodes);
+    const nodes = createMemo(() => Object.values(editor.elementController.nodes));
 
     const [isFittingEverything, setIsFittingEverything] = createSignal(true);
     const cameraBounds = createMemo(() => {
@@ -15,7 +15,7 @@ export const SceneMinimap = () => {
         let maxY = camera_rect.offset.y + camera_rect.size.y;
 
         let is_fitting: boolean = true;
-        nodes.forEach(node => {
+        nodes().forEach(node => {
             if (node.uiPosition.x < minX) {minX = node.uiPosition.x; is_fitting = false};
             if (node.uiPosition.y < minY) {minY = node.uiPosition.y; is_fitting = false};
             if (node.uiPosition.x + node.width > maxX) {maxX = node.uiPosition.x + node.width; is_fitting = false};
@@ -45,7 +45,7 @@ export const SceneMinimap = () => {
                 class="minimap-svg"
             >
                 <g class="minimap-nodes">
-                    <For each={nodes}>
+                    <For each={nodes()}>
                         {(node) => (
                             <rect 
                                 x={node.uiPosition.x} 

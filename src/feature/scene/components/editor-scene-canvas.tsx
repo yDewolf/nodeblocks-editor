@@ -8,7 +8,7 @@ import { ConnectionLines, ConnectionPreview } from "~/feature/editor/components/
 import { useScene } from "../scene-context";
 import { RemoveConnectionsAction } from "~/feature/editor/actions/conn/remove-conns-action";
 import { InputScope, useInputManager, useKeybind } from "~/utils/keybinds/input-provider";
-import { KeybindTrigger, MouseButtons } from "~/utils/keybinds/keybind-trigger";
+import { KeybindTrigger, MouseButton } from "~/utils/keybinds/keybind-trigger";
 import { useEventManager } from "~/utils/events/event-provider";
 import "~/style/containers.css";
 import "~/app.css";
@@ -40,7 +40,10 @@ export const EditorSceneCanvas = () => {
                 oncontextmenu={(e) => {e.preventDefault()}}
                 onKeyDown={(e) => editor.inputManager.onKeyDown(e)}
                 onKeyUp={(e) => editor.inputManager.onKeyUp(e)}
-                onWheel={(e) => editor.inputManager.onWheel(e)}
+                onWheel={(e) => {
+                    editor.inputManager.onWheel(e);
+                    e.preventDefault();
+                }}
 
                 onPointerMove={(e) => editor.eventManager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
                 onPointerDown={(e) => editor.inputManager.onPointerDown(e)} 
@@ -112,15 +115,11 @@ export const SceneCanvasKeybindsAndEvents: ParentComponent = () => {
 
     useKeybind(
         "PanCamera", 
-        new KeybindTrigger({ mouseButtons: [MouseButtons.Middle] }),
-        {while_active: (e) => {
-            if (e instanceof PointerEvent) {
-                scene_canvas.canvasSpace.camera.move({
-                    x: -e.movementX / scene_canvas.canvasSpace.camera.zoom,
-                    y: -e.movementY / scene_canvas.canvasSpace.camera.zoom
-                });
-            }
-        }}
+        [
+            new KeybindTrigger({ mouseButtons: [MouseButton.Middle]}),
+            new KeybindTrigger({ keys: ["Space"] })
+        ],
+        {}
     )
     eventManager?.addEventHandler(
         InputEvents.POINTER_MOVING,

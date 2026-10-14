@@ -74,7 +74,12 @@ export class SceneNode {
     set isSelected(selected: boolean) { this._setUiStore("isSelected", selected); }
 
     get size() { return this._uiStore.size; }
-    set size(new_size: Vector2) { this._setUiStore("size", new_size); }
+    set size(new_size: Vector2) { 
+        if (new_size.x == 0 && new_size.y == 0) {
+            return;
+        }
+        this._setUiStore("size", new_size); 
+    }
 
     get minSize() { return this._uiStore.minSize; }
     set minSize(new_size: Vector2) { 
