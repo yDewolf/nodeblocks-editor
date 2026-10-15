@@ -1,5 +1,5 @@
 import { NodeSceneData, SlotPathData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
-import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
+import { NodeSlotSpec, NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 
 export interface SlotInstanceData {
@@ -54,13 +54,19 @@ export class NodeInstance {
     slots: Record<string, SlotInstance>
     _input_slots: Array<SlotInstance>
     _output_slots: Array<SlotInstance>
-
-    constructor(scene_data: NodeSceneData, slots: Record<string, SlotInstance>) {
-        this.slots = slots
+    
+    constructor(
+        scene_data: NodeSceneData, 
+        slots: Record<string, SlotInstance>, 
+        private readonly _spec: NodeTypeSpec,
+    ) {
+        this.slots = slots;
         this.scene_data = scene_data;
         this._input_slots = Object.values(slots).filter((slot) => slot.is_input);
         this._output_slots = Object.values(slots).filter((slot) => !slot.is_input);
     }
+
+    get spec() { return this._spec; }
 
     // Events
 

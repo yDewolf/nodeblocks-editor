@@ -12,6 +12,7 @@ import { InputEvents } from "~/utils/events/event-handling";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 import { NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols";
 import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-context";
+import { NodeFieldSelector } from "./node-field";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -264,22 +265,14 @@ export const NodeBodySections = (props: {
             <Show when={Object.keys(props.node.parameters).length > 0}>
                 <DropdownSection header="Parameters" content={
                     <div class="field-grid-holder">
-                        <For each={Object.values(props.node.parameters)}>
-                            {
-                                () => {
-                                    return <span>Not implemented</span>
-                                }
-                            }
-                            {/* {(parameter: NodeParameter) => <NodeFieldSelector
+                        <For each={Object.entries(props.node.parameterSpecs)}>
+                            {([paramName, paramSpec]) => <NodeFieldSelector
                                     node={props.node}
-                                    workspace={props.workspace}
-                                    parameter={parameter}
-                                    parameter_sync={() => {
-                                        props.syncParameter(props.node, parameter)
-                                    }}
+                                    parameterName={paramName}
+                                    parameterSpec={paramSpec}
                                 />
-                            } */}
-                        </For>    
+                            }
+                        </For>
                     </div>
                 }/>
             </Show>

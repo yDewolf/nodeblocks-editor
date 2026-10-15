@@ -64,6 +64,7 @@ export class SceneNode {
     get height() { return this.size.y; }
 
     get parameters() { return this._dataStore.data; }
+    get parameterSpecs() { return this.instance.spec.parameters }
     
     public setParam(param_key: string, value: any) {
         this._setDataStore("data", param_key, value);

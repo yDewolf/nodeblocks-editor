@@ -43,7 +43,7 @@ export class NodeInstanceFactory {
         scene_data.uid = node_id;
         const slots = NodeInstanceFactory._createSlotsFromSpec(spec, node_id);
         return new NodeInstance(
-            scene_data, slots
+            scene_data, slots, spec
         );
     }
 
