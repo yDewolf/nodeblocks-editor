@@ -1,6 +1,6 @@
 import { Rect, Vector2 } from "~/protocols/nodeblocks/geometry";
 import { createSignal, Accessor } from 'solid-js';
-import { Grid } from "../components/canvas/grid";
+import { Grid } from "./grid";
 
 export class CanvasCamera {
     private _rawSize: Accessor<Vector2>;

@@ -13,6 +13,7 @@ import { useEventManager } from "~/utils/events/event-provider";
 import "~/style/containers.css";
 import "~/app.css";
 import { SelectedNodeType } from "~/feature/editor/components/subpanels/component/node-type-selector";
+import { GridView } from "~/feature/editor/components/canvas/grid-view";
 
 export const EditorSceneCanvas = () => {
     const editor = useEditor();
@@ -60,7 +61,7 @@ export const EditorSceneCanvas = () => {
                     inset: 0,
                     "pointer-events": "none"
                 }}>
-                    {editor.grid.View(scene_canvas.canvasSpace.camera)}
+                    <GridView camera={scene_canvas.canvasSpace.camera} grid={scene_canvas.canvasSpace.grid}/>
                 </div>
                 
                 <div 

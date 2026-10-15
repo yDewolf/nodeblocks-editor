@@ -2,7 +2,7 @@ import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { CanvasSpace } from "./editor-space";
 import { createSignal } from "solid-js";
 import { debounce } from "~/utils/debounce-utils";
-import { Grid } from "../components/canvas/grid";
+import { Grid } from "./grid";
 import { SelectionRect } from "../components/canvas/selection_rect";
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { ActionController } from "../actions/action-controller";
