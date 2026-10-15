@@ -1,7 +1,8 @@
 import { createMemo, createSignal, Match, Switch } from "solid-js";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import { DataTypeMeta } from "~/wrapper/metadata/type_metadata";
-import { _SlotOutputPack, DataTypeValueSelector } from '../../../components/node/output/node-output';
+import { _SlotOutputPack } from '../../../components/node/node-output';
+import { DataTypeValueSelector } from "~/feature/scene/components/value/datatype-value-view";
 import { FieldValueDisplayer, SimpleField } from "../../../../../components/input-fields";
 import { BaseDataType, DataTypeUtils, DefaultRenderers } from "~/wrapper/nodes/data/node-data-type";
 import { DataTypeGenParams, generate_datatype_random_value } from '../../../../wrapper/nodes/data/data-type-value-utils';

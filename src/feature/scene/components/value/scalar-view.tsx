@@ -1,4 +1,4 @@
-import { DataTypeValuePack } from "./node-output";
+import { DataTypeValuePack } from "./datatype-value-view";
 
 export const ScalarView = (props: { output_value?: DataTypeValuePack }) => {
     return (

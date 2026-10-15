@@ -1,6 +1,6 @@
 import { createEffect, createMemo, createSignal, For, Index, Match, Show, Switch } from "solid-js";
-import { DataTypeValuePack } from "./node-output";
-import { ScalarView } from "./scalar-output";
+import { DataTypeValuePack } from "./datatype-value-view";
+import { ScalarView } from "./scalar-view";
 
 // TODO: add a interpreter option on the UI so the user can select
 // how the array should be interpreted

@@ -5,7 +5,7 @@ import { useScene } from "~/feature/scene/scene-context";
 import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { NodeInstanceFactory } from "../../engine/helpers/node-instance-factory";
 import { NodeAnchor } from "./node-anchors";
-import { NodeOutput } from "./output/node-output";
+import { NodeOutput } from "./node-output";
 import { SlotComponent } from "./slot-components";
 import { useEventManager } from "~/utils/events/event-provider";
 import { InputEvents } from "~/utils/events/event-handling";
@@ -18,14 +18,6 @@ const USE_ANCHORED_NODES: boolean = true;
 
 export const NodeComponent = (props: { 
     node: SceneNode,
-    // camera: EditorCamera,
-    // workspace: UserWorkspace,
-    // notification_controller: NotificationController,
-    // onClick: (node: GraphNode) => void, 
-    // onHoverNode: (node: GraphNode) => void, 
-    // onClickSlot: (slot: NodeSlot) => void, 
-    // onHoverSlot: (slot: NodeSlot) => void,
-    // syncParameter: (node: GraphNode, parameter: NodeParameter) => void
 }) => {
     const { actionController } = useScene();
     const { canvasSpace } = useSceneCanvas();
@@ -79,16 +71,7 @@ export const NodeComponent = (props: {
                     "selected-mode": props.node.isSelected,
                 }}
             >   
-                <NodeComponentV2
-                    node={props.node} 
-                    // workspace={props.workspace}
-
-                    // syncParameter={props.syncParameter}
-                    // onClick={props.onClick} 
-                    // onHover={props.onHoverNode} 
-                    // onClickSlot={props.onClickSlot} 
-                    // onHoverSlot={props.onHoverSlot}
-                />
+                <NodeComponentV2 node={props.node}/>
                 {/* <NotificationPopupHolder 
                     notification_controller={props.notification_controller}
                     notifications={props.notification_controller.relatedToNode(props.node)}
@@ -103,12 +86,6 @@ export const NodePreview = (props: {spec: NodeTypeSpec}) => {
     return (
         <NodeComponentV2
             spec={props.spec}
-            // workspace={undefined}
-            // onClick={(node) => undefined}
-            // onHover={(node) => undefined}
-            // onClickSlot={(slot) => undefined}
-            // onHoverSlot={(slot) => undefined}
-            // syncParameter={(node, parameter) => undefined}
             default_show_output={false}
             default_show_slot_labels={true}
         />
@@ -117,12 +94,6 @@ export const NodePreview = (props: {spec: NodeTypeSpec}) => {
 
 export const NodeComponentV2 = (props: {
     node?: SceneNode, spec?: NodeTypeSpec
-    // workspace: UserWorkspace | undefined,
-    // onClick: (node: GraphNode) => void, 
-    // onHover: (node: GraphNode) => void,
-    // onClickSlot: (slot: NodeSlot) => void, 
-    // onHoverSlot: (slot: NodeSlot) => void,
-    // syncParameter: (node: GraphNode, parameter: NodeParameter) => void,
     default_show_output?: boolean
     default_show_slot_labels?: boolean
 }) => {
@@ -157,25 +128,14 @@ export const NodeComponentV2 = (props: {
             <div class="node-contents">
                 <NodeHeader 
                     node={ref_node} 
-                    // node_meta={node_meta}
                     isExpanded={isExpanded()} 
                     setExpanded={setIsExpanded}
                     setIsHovered={setIsHovered}
-                    // onClick={props.onClick}
-                    // onHover={props.onHover}
                 />
                 <NodeBody 
                     show_slots={isExpanded() || isHovered()} 
                     show_sections={isExpanded()} 
                     node={ref_node}
-                    // node_meta={node_meta}
-                    // workspace={props.workspace}
-                    // syncParameter={props.syncParameter}
-                    // onClickSlot={props.onClickSlot}
-                    // onHoverSlot={(slot: NodeSlot) => {
-                    //     setIsHovered(true);
-                    //     props.onHoverSlot(slot);
-                    // }}
                 />
                 <Show when={(!isExpanded() && nodeHasOutput(ref_node.uid)) || props.default_show_output && !isExpanded()}>
                     <NodeOutput node={ref_node}/>
@@ -184,10 +144,9 @@ export const NodeComponentV2 = (props: {
             <Show when={!isExpanded() && !isHovered()}>
                 <div class="slot-grid-overlay">
                     <Show when={USE_ANCHORED_NODES} fallback={
-                        <SlotGrid node={ref_node} slot_label={false} /> //node_meta={node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/>
+                        <SlotGrid node={ref_node} slot_label={false} />
                     }>
                         <AnchoredSlotGrid node={ref_node} /> 
-                        {/* node_meta={node_meta} onClickSlot={props.onClickSlot} onHoverSlot={props.onHoverSlot}/> */}
                     </Show>
                 </div>
             </Show>
@@ -197,12 +156,9 @@ export const NodeComponentV2 = (props: {
 
 const NodeHeader = (props: {
     node: SceneNode, 
-    // node_meta?: NodeTypeMeta, 
     isExpanded: boolean, 
     setExpanded: (value: boolean) => void, 
     setIsHovered: (value: boolean) => void,
-    // onClick: (node: GraphNode) => void, 
-    // onHover: (node: GraphNode) => void
 }) => {
     const eventManager = useEventManager();
     return (
@@ -216,7 +172,6 @@ const NodeHeader = (props: {
                 eventManager?.generalizedEventHandler({
                     node: props.node,
                 }, InputEvents.CLICK_ON_NODE);
-                // props.onClick(props.node);
             }}
             onMouseOver={(e) => {
                 e.preventDefault();
@@ -226,7 +181,6 @@ const NodeHeader = (props: {
                 eventManager?.generalizedEventHandler({
                     node: props.node,
                 }, InputEvents.HOVER_NODE);
-                // props.onHover(props.node);
             }}
         >
             {/* <span>{props.node_meta?.capitalized_name ?? props.node.fqn}</span> */}
@@ -244,34 +198,18 @@ const NodeHeader = (props: {
 
 const NodeBody = (props: {
     node: SceneNode, 
-    // node_meta?: NodeTypeMeta, 
     show_slots: boolean, 
     show_sections: boolean,
-    // workspace: UserWorkspace | undefined,
-    // syncParameter: (node: GraphNode, parameter: NodeParameter) => void,
-    // onClickSlot: (slot: NodeSlot) => void, 
-    // onHoverSlot: (slot: NodeSlot) => void
 }) => {
     return (
         <div
             class="node-body"
         >
             <Show when={props.show_slots}>
-                <SlotGrid 
-                    node={props.node} 
-                    slot_label={true} 
-                    // node_meta={props.node_meta} 
-                    // onClickSlot={props.onClickSlot} 
-                    // onHoverSlot={props.onHoverSlot}
-                />
+                <SlotGrid node={props.node} slot_label={true}/>
             </Show>
             <Show when={props.show_sections}>
-                <NodeBodySections 
-                    node={props.node} 
-                    // workspace={props.workspace} 
-                    // node_meta={props.node_meta} 
-                    // syncParameter={props.syncParameter}
-                />
+                <NodeBodySections node={props.node}/>
             </Show>
         </div>
     )
@@ -280,9 +218,6 @@ const NodeBody = (props: {
 const SlotGrid = (props: {
     node: SceneNode,
     slot_label: boolean,
-    // node_meta?: NodeTypeMeta,
-    // onClickSlot: (slot: NodeSlot) => void, 
-    // onHoverSlot: (slot: NodeSlot) => void
 }) => {
 
     return (
@@ -307,9 +242,6 @@ const SlotGrid = (props: {
 
 const AnchoredSlotGrid = (props: {
     node: SceneNode,
-    // node_meta?: NodeTypeMeta,
-    // onClickSlot: (slot: NodeSlot) => void, 
-    // onHoverSlot: (slot: NodeSlot) => void
 }) => {
     return (
         <div class="anchored-slot-grid">
@@ -326,9 +258,6 @@ const AnchoredSlotGrid = (props: {
 
 export const NodeBodySections = (props: {
     node: SceneNode, 
-    // workspace: UserWorkspace | undefined,
-    // syncParameter: (node: GraphNode, parameter: NodeParameter) => void,
-    // node_meta?: NodeTypeMeta
 }) => {
     return (
         <div class="node-body-sections container fill">

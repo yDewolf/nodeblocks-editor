@@ -6,9 +6,6 @@ import { SlotComponent } from "./slot-components";
 export const NodeAnchor = (props: {
     anchor_pos: Vector2, 
     all_slots: SceneNodeSlot[],
-    // node_meta?: NodeTypeMeta,
-    // onClickSlot: (slot: NodeSlot) => void, 
-    // onHoverSlot: (slot: NodeSlot) => void
 }) => {
     const filtered_slots = createMemo(() => {
         return props.all_slots.filter((slot) => slot.anchor.x == props.anchor_pos.x && slot.anchor.y == props.anchor_pos.y);

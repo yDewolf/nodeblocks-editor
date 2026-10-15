@@ -1,43 +1,9 @@
-import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
+import { createMemo, createSignal, For } from "solid-js";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-context";
-import { DefaultDataTypes, DefaultRenderers } from "~/old/wrapper/nodes/data/node-data-type";
+import { DefaultDataTypes } from "~/old/wrapper/nodes/data/node-data-type";
 import { useScene } from "~/feature/scene/scene-context";
-import { ScalarView } from "./scalar-output";
-import { ArrayView } from "./array-output";
-
-export interface DataTypeValuePack {
-    renderer: DefaultRenderers,
-    base_type: DefaultDataTypes
-    value: any
-}
-export const DataTypeValueSelector = (props: {value?: DataTypeValuePack}) => {
-    return (
-        <Show when={props.value} fallback={<span class="none">No Value</span>}>
-            {(output) => 
-                <Show when={props.value?.value != undefined} fallback={
-                    <span class="none">No Value</span>
-                }>
-                    <Switch>
-                        <Match when={output().renderer === DefaultRenderers.SCALAR}>
-                            <ScalarView output_value={props.value} />
-                        </Match>
-
-                        <Match when={output().renderer === DefaultRenderers.ARRAY}>
-                            <ArrayView output_value={props.value}/>
-                        </Match>
-                        <Match when={output().renderer === DefaultRenderers.TEXT}>
-                            <div class="custom-view">JSON: {JSON.stringify(props.value?.value)}</div>
-                        </Match>
-                        <Match when={output().renderer === DefaultRenderers.NOT_IMPLEMENTED}>
-                            <span>Can't render Unknown Type</span>
-                        </Match>
-                    </Switch>
-                </Show>
-            }
-        </Show>
-    )
-}
+import { DataTypeValueSelector } from "../../../scene/components/value/datatype-value-view";
 
 export const NodeOutput = (props: {node: SceneNode}) => {
     const runtime = useSceneRuntime();

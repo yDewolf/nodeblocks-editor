@@ -57,7 +57,6 @@ export const SlotComponent = (props: {
 
 export const SlotHeader = (props: {
     slot_data: NodeSlotSpec,
-    // slot_meta: SlotMeta,
     slot_id: string,
     highlightable?: boolean,
 }) => { 
