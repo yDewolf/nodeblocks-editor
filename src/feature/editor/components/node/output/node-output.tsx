@@ -1,54 +1,69 @@
-import { createMemo, createSignal, For, Match, Switch } from "solid-js";
-import { GraphNode } from "~/wrapper/nodes/graph-node";
-import { ArrayView } from "./array-output";
+import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
+import { SceneNode } from "~/feature/scene/objects/scene-node";
+import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-context";
+import { DefaultDataTypes, DefaultRenderers } from "~/old/wrapper/nodes/data/node-data-type";
+import { useScene } from "~/feature/scene/scene-context";
 import { ScalarView } from "./scalar-output";
-import { DefaultRenderers } from "~/wrapper/nodes/data/node-data-type";
-import { SlotOutputWrapper } from "~/wrapper/nodes/slot/node-slot";
+import { ArrayView } from "./array-output";
 
-export interface _SlotOutputPack {slot_id?: string, output?: SlotOutputWrapper}
-
-// TODO: desassociar isso aqui dos nodes e ser simplesmente um baglh que renderiza algum valor de acordo com o datatype
-export const OutputSelector = (props: {output_renderer: DefaultRenderers | undefined, output_value: _SlotOutputPack | undefined}) => {
+export interface DataTypeValuePack {
+    renderer: DefaultRenderers,
+    base_type: DefaultDataTypes
+    value: any
+}
+export const DataTypeValueSelector = (props: {value?: DataTypeValuePack}) => {
     return (
-        <Switch fallback={<span class="none">No Output</span>}>
-            <Match when={
-                props.output_renderer === DefaultRenderers.SCALAR
-            }>
-                <ScalarView output_value={props.output_value?.output} />
-            </Match>
+        <Show when={props.value} fallback={<span class="none">No Value</span>}>
+            {(output) => 
+                <Show when={props.value?.value != undefined} fallback={
+                    <span class="none">No Value</span>
+                }>
+                    <Switch>
+                        <Match when={output().renderer === DefaultRenderers.SCALAR}>
+                            <ScalarView output_value={props.value} />
+                        </Match>
 
-            <Match when={props.output_renderer === DefaultRenderers.ARRAY}>
-                <ArrayView output_value={props.output_value?.output}/>
-            </Match>
-            <Match when={props.output_renderer === DefaultRenderers.TEXT}>
-                <div class="custom-view">JSON: {JSON.stringify(props.output_value?.output)}</div>
-            </Match>
-            <Match when={props.output_renderer === DefaultRenderers.NOT_IMPLEMENTED}>
-                <span>Can't render Unknown Type</span>
-            </Match>
-        </Switch>
+                        <Match when={output().renderer === DefaultRenderers.ARRAY}>
+                            <ArrayView output_value={props.value}/>
+                        </Match>
+                        <Match when={output().renderer === DefaultRenderers.TEXT}>
+                            <div class="custom-view">JSON: {JSON.stringify(props.value?.value)}</div>
+                        </Match>
+                        <Match when={output().renderer === DefaultRenderers.NOT_IMPLEMENTED}>
+                            <span>Can't render Unknown Type</span>
+                        </Match>
+                    </Switch>
+                </Show>
+            }
+        </Show>
     )
 }
 
-export const NodeOutput = (props: {node: GraphNode}) => {
-    // Output do node: props.node.last_output (Map<NodeSlot, any>)
+export const NodeOutput = (props: {node: SceneNode}) => {
+    const runtime = useSceneRuntime();
+    const scene = useScene();
+    const [targetOutputSlot, setTargetOutputSlot] = createSignal<string | undefined>(
+        props.node.output_slots.at(0)?.slot_id
+    );
+
     const targetOutput = createMemo(() => {
-        const entries = Array.from(props.node.last_output.entries());
-        if (entries.length == 0) {
+        if (!runtime) { 
             return undefined;
         }
+        const outputs = runtime.getNodeOutputs(props.node.uid);
+        const target = targetOutputSlot();
+        
+        if (!outputs || !target || !(target in outputs)) return undefined;
 
-        const pack: _SlotOutputPack = {slot_id: props.node.target_slot_output, output: props.node.last_output.get(props.node.target_slot_output ?? "")};
-        return pack;
-    });
-
-    const output_renderer = createMemo(() => {
-        const out = targetOutput();
-        if (!out) return undefined;
-        const slot_id = out.slot_id;
-        const slot = slot_id != undefined ? props.node.get_slot(slot_id) : undefined
-
-        return slot?.data_type.renderer ?? DefaultRenderers.NOT_IMPLEMENTED;
+        const slot = props.node.slots[target];
+        const datatype = scene.scene.registry.getDataTypeSpec(slot.instance.data_type_fqn);
+        const value = outputs[target];
+        
+        return {
+            renderer: datatype.default_renderer,
+            base_type: datatype.base_id ?? DefaultDataTypes.UNKNOWN,
+            value: value
+        };
     });
 
     return (
@@ -59,13 +74,16 @@ export const NodeOutput = (props: {node: GraphNode}) => {
                 }}
                 class="fill keep row-container output-selector" style={{"pointer-events": "auto"}}
             >
-                <For each={props.node.last_output.entries().toArray()}>
-                    {([slot_id, _]) => {
+                <For each={(() => {
+                    const outputs = runtime?.getNodeOutputs(props.node.uid);
+                    return outputs ? Object.keys(outputs) : [];
+                })()}>
+                    {(slot_id) => {
                         return (
                             <button 
                                 class="icon-button selectable-button" 
-                                classList={{"active": props.node.target_slot_output == slot_id}}
-                                onclick={() => props.node.target_slot_output = slot_id}
+                                classList={{"active": targetOutputSlot() == slot_id}}
+                                onclick={() => setTargetOutputSlot(slot_id)}
                             >
                                 {slot_id}
                             </button>
@@ -74,7 +92,7 @@ export const NodeOutput = (props: {node: GraphNode}) => {
                 </For>
             </div>
             <div class="node-output node-output-container">
-                <OutputSelector output_renderer={output_renderer()} output_value={targetOutput()}/>
+                <DataTypeValueSelector value={targetOutput()}/>
             </div>
         </div>
     );

@@ -4,7 +4,7 @@ import { PackageManager } from "./engine/packages/package-manager";
 import { NodeScene } from "./engine/node_scene";
 import { PackageNodeProvider } from "./engine/providers/package-node-provider";
 import { AppSessionManager } from "~/network/app-session-manager";
-import { ServerCmdResponseTypes, ServerMessages } from "~/protocols/nodeblocks/network/server-message-protocol";
+import { ServerCmdResponseTypes } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { InputEvents, EventHandler } from "~/utils/events/event-handling";
 import { ToolController } from "./controllers/tool-controller";
 import { SelectionController } from "./canvas/selection-controller";
@@ -16,7 +16,7 @@ import { KeybindTrigger, MouseButton } from '~/utils/keybinds/keybind-trigger';
 import { InputContext } from '~/utils/keybinds/input-context';
 import { SelectionTool } from './tools/selection-tool';
 import { CanvasElementController } from '../scene/controllers/canvas-element-controller';
-import { StateController } from './controllers/state_controller';
+import { SceneRuntimeController } from '../scene/controllers/scene-runtime-controller';
 
 export class SceneEditor {
     private _scene: NodeScene;
@@ -26,9 +26,9 @@ export class SceneEditor {
     private _eventManager: EventManager;
 
     private _sceneConnection: SceneConnectionManager;
-    private _stateController: StateController;
 
     private _elementController: CanvasElementController;
+    private _runtimeController: SceneRuntimeController;
 
     private _actionController: ActionController;
     private _selectionController: SelectionController;
@@ -44,8 +44,7 @@ export class SceneEditor {
 
         this._scene = new NodeScene(_packageManager.registry, new PackageNodeProvider(_packageManager));
         this._sceneConnection = new SceneConnectionManager(_appSession, _packageManager);
-        this._stateController = new StateController(this._sceneConnection);
-
+        
         this._actionController = new ActionController(this._scene, this._sceneConnection);    
         this._selectionController = new  SelectionController(
             new CanvasSpace(),
@@ -53,6 +52,7 @@ export class SceneEditor {
         )
         
         this._elementController = new CanvasElementController(this._scene, this.grid);
+        this._runtimeController = new SceneRuntimeController(this.sceneConnection, this.elementController);
 
         this._register_handlers();
         this.setup_event_handlers();
@@ -68,8 +68,9 @@ export class SceneEditor {
     // Getters
     get scene() { return this._scene; }
     get sceneConnection() { return this._sceneConnection; }
-    get stateController() { return this._stateController; }
+    get stateController() { return this._runtimeController.stateController; }
     get actionController() { return this._actionController; }
+    get runtimeController() { return this._runtimeController; }
 
     get appSession() { return this._appSession; }
     get packageManager() { return this._packageManager; }

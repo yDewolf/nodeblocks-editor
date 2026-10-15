@@ -13,6 +13,7 @@ import "~/style/screens/editor.css";
 import "~/app.css";
 import { SceneCanvasProvider } from '../scene/scene-canvas-context';
 import { SceneProvider } from '../scene/scene-context';
+import { SceneRuntimeProvider } from '../scene/scene-runtime-context';
 
 export const EditorView = () => {
     const editor = useEditor();
@@ -66,26 +67,28 @@ export const EditorView = () => {
             scene={editor.scene} 
             actionController={editor.actionController}
           >
-            <SceneCanvasProvider canvasSpace={editor.selectionController.space} elementController={editor.elementController}>
-                <div 
-                    class="editor-view"
-                    ref={editor_view_ref}
-                    onPointerUp={(e) => {editor.inputManager.onPointerUp(e); editor.toolController.current_tool?.globalOnPointerUp(e)}}
-                    onPointerDown={(e) => {editor.toolController.current_tool?.globalOnPointerDown(e)}}
-                    onPointerMove={(e) => editor.toolController.current_tool?.globalOnPointerMove(e)}
-                >
-                    <EditorSceneCanvas></EditorSceneCanvas>
-                    <div
-                        class="editor-ui" 
-                        onPointerMove={(e) => editor.eventManager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
+            <SceneRuntimeProvider manager={editor.runtimeController}>
+                <SceneCanvasProvider canvasSpace={editor.selectionController.space} elementController={editor.elementController}>
+                    <div 
+                        class="editor-view"
+                        ref={editor_view_ref}
+                        onPointerUp={(e) => {editor.inputManager.onPointerUp(e); editor.toolController.current_tool?.globalOnPointerUp(e)}}
+                        onPointerDown={(e) => {editor.toolController.current_tool?.globalOnPointerDown(e)}}
+                        onPointerMove={(e) => editor.toolController.current_tool?.globalOnPointerMove(e)}
                     >
-                        <EditorLeftTabHolder main_page_viewer={main_page_viewer}/>
-                        <EditorMidTab page_viewer={main_page_viewer}/>
-                        <EditorRightPanel/>
+                        <EditorSceneCanvas></EditorSceneCanvas>
+                        <div
+                            class="editor-ui" 
+                            onPointerMove={(e) => editor.eventManager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
+                        >
+                            <EditorLeftTabHolder main_page_viewer={main_page_viewer}/>
+                            <EditorMidTab page_viewer={main_page_viewer}/>
+                            <EditorRightPanel/>
+                        </div>
+                        {/* <DocsElementIndicator open_docs_page={openDocsPage} docsPageVisible={isDocsPageVisible} input_manager={editor.input_manager} tool_controller={editor.tool_controller} editor_camera={editor.editor_space.camera} world_space_ref={world_space_ref} editor_view_ref={editor_view_ref}/> */}
                     </div>
-                    {/* <DocsElementIndicator open_docs_page={openDocsPage} docsPageVisible={isDocsPageVisible} input_manager={editor.input_manager} tool_controller={editor.tool_controller} editor_camera={editor.editor_space.camera} world_space_ref={world_space_ref} editor_view_ref={editor_view_ref}/> */}
-                </div>
-            </SceneCanvasProvider>
+                </SceneCanvasProvider>
+            </SceneRuntimeProvider>
           </SceneProvider>
     );
 }

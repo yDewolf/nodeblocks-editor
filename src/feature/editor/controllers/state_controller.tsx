@@ -23,7 +23,7 @@ export class StateController {
 
     private setup_handlers() {
         this._client.onCommandResponse(ServerCmdResponseTypes.EXECUTION_STATE_SYNC, (message) => {
-            console.log(message);
+            // console.log(message);
             const runtime_state = message.response_payload.state as SceneWorkerExecutionState;
             const runtime_mode = message.response_payload.mode as SceneWorkerExecutionMode;
             this._set_runtime_state(runtime_state);

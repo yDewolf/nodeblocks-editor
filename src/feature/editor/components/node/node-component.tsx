@@ -10,6 +10,8 @@ import { SlotComponent } from "./slot-components";
 import { useEventManager } from "~/utils/events/event-provider";
 import { InputEvents } from "~/utils/events/event-handling";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
+import { NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols";
+import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-context";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -27,6 +29,7 @@ export const NodeComponent = (props: {
 }) => {
     const { actionController } = useScene();
     const { canvasSpace } = useSceneCanvas();
+    const runtime = useSceneRuntime();
 
     const isVisible = createMemo(() => {
         return canvasSpace.camera.camera_rect.overlaps(props.node.rect);
@@ -72,7 +75,7 @@ export const NodeComponent = (props: {
                 classList={{
                     "unsynced": actionController.isEntityPending(props.node.uid),
                     // "failed": props.node.has_failed_action,
-                    // "current-step": props.node.is_current_step,
+                    "current-step": runtime?.getNodeStatus(props.node.uid) == NodeExecutionStatus.SUCCESS,
                     "selected-mode": props.node.isSelected,
                 }}
             >   
@@ -174,10 +177,9 @@ export const NodeComponentV2 = (props: {
                     //     props.onHoverSlot(slot);
                     // }}
                 />
-                {/* FIXME: contexto com os outputs do slot */}
-                {/* <Show when={(!isExpanded() && ref_node.last_output.size != 0) || props.default_show_output && !isExpanded()}>
+                <Show when={(!isExpanded() && nodeHasOutput(ref_node.uid)) || props.default_show_output && !isExpanded()}>
                     <NodeOutput node={ref_node}/>
-                </Show> */}
+                </Show>
             </div>
             <Show when={!isExpanded() && !isHovered()}>
                 <div class="slot-grid-overlay">
@@ -352,13 +354,13 @@ export const NodeBodySections = (props: {
                     </div>
                 }/>
             </Show>
-            {/* <DropdownSection 
+            <DropdownSection 
                 header="Output" 
                 content={
                     <NodeOutput node={props.node}/>
                 }
                 default_expanded={true}
-            /> */}
+            />
         </div>
     )
 }

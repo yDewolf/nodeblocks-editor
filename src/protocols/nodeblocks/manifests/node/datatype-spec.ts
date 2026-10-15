@@ -1,4 +1,4 @@
-import { DefaultDataTypes, DefaultRenderers } from "~/wrapper/nodes/data/node-data-type";
+import { DefaultDataTypes, DefaultRenderers } from "~/old/wrapper/nodes/data/node-data-type";
 import { NamespaceModel } from "../../namespace-model";
 
 

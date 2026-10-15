@@ -1,6 +1,6 @@
 import { createMemo, Show } from "solid-js"
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot"
-import { _SlotOutputPack, OutputSelector } from "./output/node-output";
+import { _SlotOutputPack, DataTypeValueSelector } from "./output/node-output";
 
 export const SlotOutput = (props: {slot: NodeSlot}) => {
     const slot_output = createMemo(() => {
@@ -20,7 +20,7 @@ export const SlotOutput = (props: {slot: NodeSlot}) => {
     return (
         <Show when={slot_output() != null}>
             <div class="slot-output">
-                <OutputSelector output_renderer={props.slot.data_type.renderer} output_value={slot_output()}/>
+                <DataTypeValueSelector output_renderer={props.slot.data_type.renderer} value={slot_output()}/>
             </div>
         </Show>
     )

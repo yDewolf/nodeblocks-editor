@@ -25,13 +25,7 @@ export const NodeAttributes = (props: {node?: SceneNode}) => {
                 () => <VectorField value={props.node!.position} field_id={props.node?.uid + "-pos"}/>
             }/>
             <NodeBodySections
-                // node_meta={node_meta()}
                 node={props.node} 
-                // workspace={session_controller.user_workspace}
-                // syncParameter={(node: GraphNode, parameter: NodeParameter) => {
-                //     if (!props.node) return
-                //     NodeActionUtils.request_update_nodes([props.node], props.editor._action_controller);
-                // }}
             />
         </div>
     )

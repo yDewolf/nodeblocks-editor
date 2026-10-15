@@ -1,6 +1,6 @@
 import { createEffect, createMemo, createSignal, For, Index, Match, Show, Switch } from "solid-js";
-import { ScalarView } from './scalar-output';
-import { SlotOutputWrapper } from "~/wrapper/nodes/slot/node-slot";
+import { DataTypeValuePack } from "./node-output";
+import { ScalarView } from "./scalar-output";
 
 // TODO: add a interpreter option on the UI so the user can select
 // how the array should be interpreted
@@ -89,7 +89,7 @@ const get_array_shape = (array: any): number[] => {
     return shape;
 };
 
-export const ArrayView = (props: { output_value: SlotOutputWrapper | undefined }) => {
+export const ArrayView = (props: { output_value?: DataTypeValuePack }) => {
     if (!props.output_value) return <div>Empty</div>;
     const [target_channel, setTargetChannel] = createSignal(0);
 

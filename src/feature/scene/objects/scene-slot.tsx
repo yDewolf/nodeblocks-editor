@@ -16,13 +16,13 @@ export interface SlotUIStore {
 export class SceneNodeSlot {
     private _setDataStore: SetStoreFunction<SlotInstanceData>;
     private _dataStore: SlotInstanceData;
+    private _cleanupDataSub: () => void;
 
     private _uiStore: SlotUIStore;
     private _setUiStore: SetStoreFunction<SlotUIStore>;
 
     private _element: () => HTMLDivElement | null;
     private _set_element: (el: HTMLDivElement | null) => void;
-    private _cleanupDataSub: () => void;
 
     private _layoutVersion: () => number;
     private _setLayoutVersion: (layout: number) => void;
@@ -48,7 +48,7 @@ export class SceneNodeSlot {
             worldPos: null
         });
     }
-    
+
     // Scene Data getters/setters
     get slot_id() { return this.instance.slot_id; }
     get node_id() { return this.instance.node_id; }

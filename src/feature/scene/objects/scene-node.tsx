@@ -3,8 +3,9 @@ import { NodeInstance } from "~/feature/editor/engine/graph/node-instance";
 import { Rect, Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeSceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { SceneNodeSlot } from "./scene-slot";
+import { NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols";
 
-export interface NodeUiState {
+export interface NodeUIState {
     // isCurrentStep: boolean; // talvez isso aqui nem deva ficar aqui
     isSelected: boolean;
     size: Vector2;
@@ -17,8 +18,8 @@ export class SceneNode {
     private _setDataStore: SetStoreFunction<NodeSceneData>;
     private _dataStore: NodeSceneData;
     
-    private _uiStore: NodeUiState;
-    private _setUiStore: SetStoreFunction<NodeUiState>;
+    private _uiStore: NodeUIState;
+    private _setUiStore: SetStoreFunction<NodeUIState>;
 
     private _cleanupDataSub: () => void;
     private node_slots: Record<string, SceneNodeSlot>;
@@ -41,7 +42,7 @@ export class SceneNode {
             this._setDataStore(new_data);
         });
         
-        [this._uiStore, this._setUiStore] = createStore<NodeUiState>({
+        [this._uiStore, this._setUiStore] = createStore<NodeUIState>({
             isSelected: false,
             size: { x: 100, y: 150 },
             uiPosition: instance.scene_data.position,
@@ -102,7 +103,7 @@ export class SceneNode {
     get input_slots() { return this._input_slots; }
     get output_slots() { return this._output_slots; }
 
-    public updateUi(patch: Partial<NodeUiState>): void {
+    public updateUi(patch: Partial<NodeUIState>): void {
         this._setUiStore((prev) => ({ ...prev, ...patch }));
     }
 
