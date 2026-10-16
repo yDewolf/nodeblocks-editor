@@ -13,6 +13,8 @@ import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 import { NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols";
 import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-context";
 import { NodeFieldSelector } from "./node-field";
+import { NotificationPopupHolder } from "../notification-badges";
+import { useNotifications } from "../../contexts/notification-context";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -73,11 +75,10 @@ export const NodeComponent = (props: {
                 }}
             >   
                 <NodeComponentV2 node={props.node}/>
-                {/* <NotificationPopupHolder 
-                    notification_controller={props.notification_controller}
-                    notifications={props.notification_controller.relatedToNode(props.node)}
+                <NotificationPopupHolder 
+                    notifications={useNotifications().relatedToNode(props.node)}
                     pos={{x: 0, y: props.node.rect.size.y}}
-                /> */}
+                />
             </div>
         </Show>
     );

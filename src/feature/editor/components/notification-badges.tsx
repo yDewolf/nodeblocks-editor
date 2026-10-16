@@ -1,7 +1,4 @@
 import { createMemo, createSignal, For, Match, Show, Switch } from "solid-js";
-import { timeSignal } from "~/editor/utils/time-utils";
-import { NotificationController } from "~/network/controllers/notification_controller";
-import { NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta, ServerNotification } from "~/network/websocket/requests/notifications";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import InfoIcon from "~/assets/icons/notification/info.svg";
 import DebugIcon from "~/assets/icons/notification/debug.svg";
@@ -11,6 +8,10 @@ import CheckMarkIcon from "~/assets/icons/checkmark.svg";
 import ArrowRightIcon from "~/assets/icons/arrow-right.svg";
 import ArrowDownIcon from "~/assets/icons/arrow-down.svg";
 import BellIcon from "~/assets/icons/notification/notification-bell.svg";
+import { useNotifications } from "../contexts/notification-context";
+import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
+import { NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta } from "~/protocols/notification-protocol";
+import { timeSignal } from "~/utils/time-utils";
 
 const NotificationIcon = (props: {level: NotificationLevel}) => {
     return (
@@ -33,15 +34,16 @@ const NotificationIcon = (props: {level: NotificationLevel}) => {
 
 export const BaseNotification = (props: {
     notification: NotificationWithMeta, 
-    notification_controller: NotificationController
 }) => {
+    const notificationController = useNotifications();
+    const sceneCanvas = useSceneCanvas();
     const [expanded, setExpanded] = createSignal(false);
     const mark_as_read = () => {
-        props.notification_controller.mark_as_read(props.notification);
+        notificationController.mark_as_read(props.notification);
     }
     const goto_root = () => {
         mark_as_read();
-        props.notification_controller.handle_goto(props.notification);
+        notificationController.handle_goto(props.notification, sceneCanvas.canvasSpace);
     }
 
     return (
@@ -99,20 +101,22 @@ export const BaseNotification = (props: {
 
 export const NotificationCard = (props: {
     notification: NotificationWithMeta, 
-    notification_controller: NotificationController, 
     is_popup?: boolean
 }) => {
+    const notificationController = useNotifications();
+    const scene_canvas = useSceneCanvas();
     const [is_compressed, setCompressed] = createSignal(props.is_popup ?? false);
     const [expanded, setExpanded] = createSignal(false);
 
     const mark_as_read = () => {
-        props.notification_controller.mark_as_read(props.notification);
+        notificationController.mark_as_read(props.notification);
     }
 
     const goto_root = () => {
         mark_as_read();
-        props.notification_controller.handle_goto(props.notification);
+        notificationController.handle_goto(props.notification, scene_canvas.canvasSpace);
     }
+
     return (
         <div 
             class="notification-badge animated container padded space-between"
@@ -175,7 +179,9 @@ export const NotificationCard = (props: {
     )
 }
 
-export const SidebarNotifications = (props: {notification_controller: NotificationController}) => {
+export const SidebarNotifications = () => {
+    const notificationController = useNotifications();
+    
     const [show, setShow] = createSignal(false);
     const [changingState, setChangingState] = createSignal(false);
     const set_show_delay = 300;
@@ -188,9 +194,8 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
     }
 
     const all_notifications = createMemo(() => {
-        const c = props.notification_controller;
         return [
-            ...c.forAll(),
+            ...notificationController.forAll(),
         ].sort((a, b) => (b.timestamp - a.timestamp)).sort((a, b) => NotificationLevelOrder.indexOf(a.level) - NotificationLevelOrder.indexOf(b.level));
     });
 
@@ -224,7 +229,7 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
                         <For each={recent_notifications()}>
                             {(notification: NotificationWithMeta) => {
                                 return (
-                                    <NotificationCard notification={notification} notification_controller={props.notification_controller}/>
+                                    <NotificationCard notification={notification}/>
                                 )
                             }}
                         </For>
@@ -232,7 +237,7 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
                         <For each={all_notifications()}>
                             {(notification: NotificationWithMeta) => {
                                 return (
-                                    <NotificationCard notification={notification} notification_controller={props.notification_controller}/>
+                                    <NotificationCard notification={notification}/>
                                 )
                             }}
                         </For>
@@ -243,7 +248,7 @@ export const SidebarNotifications = (props: {notification_controller: Notificati
     )
 }
 
-export const NotificationPopupHolder = (props: {notification_controller: NotificationController, notifications: NotificationWithMeta[], pos: Vector2}) => {
+export const NotificationPopupHolder = (props: {notifications: NotificationWithMeta[], pos: Vector2}) => {
     const unread = createMemo(() => props.notifications.filter(n => !n.read));
     // const history = createMemo(() => all_notifications().filter(n => n.read));
 
@@ -266,7 +271,6 @@ export const NotificationPopupHolder = (props: {notification_controller: Notific
                                 <NotificationCard 
                                     is_popup={true} 
                                     notification={notification} 
-                                    notification_controller={props.notification_controller}
                                 />
                             )
                         }}

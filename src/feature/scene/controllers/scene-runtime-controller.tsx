@@ -1,6 +1,6 @@
 import { SceneConnectionManager } from "~/feature/editor/network/scene-connection-manager";
 import { CanvasElementController } from "./canvas-element-controller";
-import { StateController } from "~/feature/editor/controllers/state_controller";
+import { StateController } from "~/feature/editor/controllers/state-controller";
 import { JobStatus, NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols";
 import { ServerEngineEventTypes } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { createStore, SetStoreFunction } from "solid-js/store";

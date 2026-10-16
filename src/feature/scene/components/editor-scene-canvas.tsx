@@ -1,4 +1,4 @@
-import { For, ParentComponent, Show } from "solid-js";
+import { For, onCleanup, onMount, ParentComponent, Show } from "solid-js";
 import { useSceneCanvas } from "../scene-canvas-context"
 import { NodeComponent } from "~/feature/editor/components/node/node-component";
 import {} from "~/feature/ui-themes";
@@ -19,13 +19,29 @@ export const EditorSceneCanvas = () => {
     const editor = useEditor();
     const scene = useScene();
     const scene_canvas = useSceneCanvas();
-    // let viewportRef: HTMLDivElement | undefined;
+    let viewportRef: HTMLDivElement | undefined;
+
+    onMount(() => {
+        if (viewportRef) {
+            const rect = viewportRef.getBoundingClientRect();
+            editor.selectionController.space.camera.size = { x: rect.width, y: rect.height };
+            const resizeObserver = new ResizeObserver((entries) => {
+                for (let entry of entries) {
+                    const { width, height } = entry.contentRect;
+                    editor.selectionController.space.camera.size = { x: width, y: height };
+                }
+            });
+            
+            resizeObserver.observe(viewportRef);
+            onCleanup(() => resizeObserver.disconnect());
+        }
+    });
 
     return (
         <InputScope name="SceneCanvas">
             <SceneCanvasKeybindsAndEvents />
             <div 
-                // ref={viewportRef}
+                ref={viewportRef}
                 class="viewport"
                 style={{
                     position: "absolute", 

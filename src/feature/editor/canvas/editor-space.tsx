@@ -38,6 +38,8 @@ export class CanvasCamera {
         this.camera_rect.size = { x: size.x / clampedZoom, y: size.y / clampedZoom };
     }
 
+    get rawSize() { return this._rawSize(); }
+
     get size() { return this._rawSize(); }
     set size(new_size: Vector2) {
         this._setRawSize(new_size);

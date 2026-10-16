@@ -46,5 +46,6 @@ export enum ServerCmdResponseTypes {
 export enum ServerEngineEventTypes {
     NODE_STATUS = "node_status_changed",
     JOB_STATUS = "job_status_changed",
-    FAILED_PROCESS = "failed_process"
+    FAILED_PROCESS = "failed_process",
+    RUNTIME_ERROR = "runtime_error"
 }

@@ -1,8 +1,17 @@
 import { JobStatus, NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols"
 import { ServerEngineEventTypes } from "../../../server-message-protocol"
 
+export interface EngineTracker {
+    node_id?: string
+    slot_id?: string
+    param_id?: string
+    conn_id?: string
+    other?: Record<string, string>
+}
+
 type BaseEngineEventPayload = {
     type: ServerEngineEventTypes
+    tracker: EngineTracker
     job_id: string
 }
 
@@ -23,4 +32,9 @@ export type FailedProcessPayload = BaseEngineEventPayload & {
     error: string
 }
 
-export type EngineEventPayload = NodeStatusPayload | JobStatusPayload | FailedProcessPayload
+export type RuntimeErrorPayload = BaseEngineEventPayload & {
+    type: ServerEngineEventTypes.RUNTIME_ERROR
+    message: string
+}
+
+export type EngineEventPayload = NodeStatusPayload | JobStatusPayload | FailedProcessPayload | RuntimeErrorPayload;

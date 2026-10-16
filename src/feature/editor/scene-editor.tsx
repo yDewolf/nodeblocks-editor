@@ -17,6 +17,7 @@ import { InputContext } from '~/utils/keybinds/input-context';
 import { SelectionTool } from './tools/selection-tool';
 import { CanvasElementController } from '../scene/controllers/canvas-element-controller';
 import { SceneRuntimeController } from '../scene/controllers/scene-runtime-controller';
+import { NotificationController } from './controllers/notification-controller';
 
 export class SceneEditor {
     private _scene: NodeScene;
@@ -33,6 +34,8 @@ export class SceneEditor {
     private _actionController: ActionController;
     private _selectionController: SelectionController;
     private _toolController: ToolController;
+
+    private _notificationController: NotificationController
 
     constructor(
         private _appSession: AppSessionManager,
@@ -53,6 +56,7 @@ export class SceneEditor {
         
         this._elementController = new CanvasElementController(this._scene, this.grid);
         this._runtimeController = new SceneRuntimeController(this.sceneConnection, this.elementController);
+        this._notificationController = new NotificationController(this.sceneConnection, this.elementController);
 
         this._register_handlers();
         this.setup_event_handlers();
@@ -71,6 +75,8 @@ export class SceneEditor {
     get stateController() { return this._runtimeController.stateController; }
     get actionController() { return this._actionController; }
     get runtimeController() { return this._runtimeController; }
+
+    get notificationController() { return this._notificationController; }
 
     get appSession() { return this._appSession; }
     get packageManager() { return this._packageManager; }

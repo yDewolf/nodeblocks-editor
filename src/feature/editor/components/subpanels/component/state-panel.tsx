@@ -2,7 +2,7 @@ import { Match, Show, Switch } from "solid-js"
 import PauseIcon from "~/assets/icons/pause.svg";
 import RefreshIcon from "~/assets/icons/refresh.svg";
 import PlayIcon from "~/assets/icons/play.svg";
-import { StateController } from "~/feature/editor/controllers/state_controller";
+import { StateController } from "~/feature/editor/controllers/state-controller";
 import { SceneWorkerExecutionMode } from "~/protocols/nodeblocks/network/scene-worker-protocol";
 
 // TODO: adicionar o run continuously

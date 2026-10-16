@@ -5,31 +5,33 @@ import { ScenePanel } from "./component/server-panel"
 import { NodeAttributes } from "./component/node-attributes"
 import { SceneNode } from "~/feature/scene/objects/scene-node"
 import { useEditor } from "~/feature/scene-editor-context"
+import { useNotifications } from "../../contexts/notification-context"
+import { BaseNotification, SidebarNotifications } from "../notification-badges"
 
-// const NotificationLog = (props: {node?: SceneNode}) => {
-//     const notification_controller = session_controller.notification_controller;
+const NotificationLog = (props: {node?: SceneNode}) => {
+    const notificationController = useNotifications();
     
-//     const all_notifications = createMemo(() => [...notification_controller.forAll(),]);
-//     const notifications = createMemo(() => {
-//         if (props.node) {
-//             return notification_controller.relatedToNode(props.node);
-//         }
+    const all_notifications = createMemo(() => [...notificationController.forAll(),]);
+    const notifications = createMemo(() => {
+        if (props.node) {
+            return notificationController.relatedToNode(props.node);
+        }
 
-//         return all_notifications();
-//     })
+        return all_notifications();
+    })
 
-//     return (
-//         <div class="fill container scrollable">
-//             <div class="fill container notification-log">
-//                 <For each={notifications()}>
-//                     {(notification) => {
-//                         return <BaseNotification notification={notification} notification_controller={notification_controller}/>
-//                     }}
-//                 </For>
-//             </div>
-//         </div>
-//     )
-// }
+    return (
+        <div class="fill container scrollable">
+            <div class="fill container notification-log">
+                <For each={notifications()}>
+                    {(notification) => {
+                        return <BaseNotification notification={notification}/>
+                    }}
+                </For>
+            </div>
+        </div>
+    )
+}
 
 export const EditorRightPanel = () => {
     const editor = useEditor();
@@ -45,13 +47,12 @@ export const EditorRightPanel = () => {
         "Attributes": () => <NodeAttributes node={selectedNode()}/>
     }
     
-    // TODO: reimplement notifications
-    // const bottom_tabs: Record<string, () => JSXElement> = {
-    //     "Notifications": () => <NotificationLog node={selectedNode()}/>,
-    //     "History": () => <NotificationLog/>
-    // }
+    const bottom_tabs: Record<string, () => JSXElement> = {
+        "Notifications": () => <NotificationLog node={selectedNode()}/>,
+        "History": () => <NotificationLog/>
+    }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
-    // const [selectedTab1, setSelectedTab1] = createSignal<string>(Object.keys(bottom_tabs).at(0) ?? "");
+    const [selectedTab1, setSelectedTab1] = createSignal<string>(Object.keys(bottom_tabs).at(0) ?? "");
     return (
         <div class="right-tab-holder" docs-id="editor-right-tab" docs-root="builtin">
             <DropdownSection
@@ -76,20 +77,20 @@ export const EditorRightPanel = () => {
                             selected_tab={selectedTab} 
                             set_selected_tab={setSelectedTab}
                         />
-                        {/* <TabSelector 
+                        <TabSelector 
                             selector_class="right-tab-selector"
                             tab_displayer_class="sub-displayer"
     
                             tabs={bottom_tabs} 
                             selected_tab={selectedTab1} 
                             set_selected_tab={setSelectedTab1}
-                        /> */}
+                        />
                     </div>
                 }
             />
-            {/* <Show when={!expanded()}>
-                <SidebarNotifications notification_controller={session_controller.notification_controller}/>
-            </Show> */}
+            <Show when={!expanded()}>
+                <SidebarNotifications/>
+            </Show>
         </div>
     )
 }
