@@ -53,3 +53,17 @@ export class IncompatibleSlotsError extends ConnectionValidationError {
     );
   }
 }
+
+export class IncompatibleSlotConfig extends ConnectionValidationError {
+  constructor(
+    public readonly fromNodeId: string,
+    public readonly fromSlotId: string,
+    public readonly toNodeId: string,
+    public readonly toSlotId: string,
+    public readonly isInput: boolean
+  ) {
+    super(
+      `Cannot connect ${isInput ? "input" : "output"} slot with another ${isInput ? "input" : "output"} slot`
+    );
+  }
+}

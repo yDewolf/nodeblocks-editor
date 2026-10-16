@@ -87,6 +87,10 @@ export class SceneNodeSlot {
     }
 
     public canConnectTo(slot: SceneNodeSlot, registry: TypeSpecRegistry) {
+        if (this.isInput == slot.isInput) {
+            return false;
+        }
+
         if (!this.instance.can_connect || !slot.instance.can_connect) {
             return false;
         }

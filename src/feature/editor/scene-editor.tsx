@@ -17,7 +17,7 @@ import { InputContext } from '~/utils/keybinds/input-context';
 import { SelectionTool } from './tools/selection-tool';
 import { CanvasElementController } from '../scene/controllers/canvas-element-controller';
 import { SceneRuntimeController } from '../scene/controllers/scene-runtime-controller';
-import { NotificationController } from './controllers/notification-controller';
+import { NotificationController } from './controllers/notification/notification-controller';
 
 export class SceneEditor {
     private _scene: NodeScene;

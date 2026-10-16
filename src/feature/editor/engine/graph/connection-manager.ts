@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
 import { SlotInstance } from "./node-instance";
 import { ConnectionSceneData, NodePathData, SlotPathData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
-import { DuplicateConnectionError, MaxConnectionReached, IncompatibleSlotsError, ConnectionValidationError } from "../exceptions/graph-exceptions";
+import { DuplicateConnectionError, MaxConnectionReached, IncompatibleSlotsError, ConnectionValidationError, IncompatibleSlotConfig } from "../exceptions/graph-exceptions";
 import { TypeSpecRegistry } from "../type-registry";
 
 export class ConnectionManager {
@@ -105,6 +105,15 @@ export class ConnectionManager {
 
     // Validation
     public validateConnection(fromSlot: SlotInstance, toSlot: SlotInstance): void {
+        if (fromSlot.is_input == toSlot.is_input) {
+            throw new IncompatibleSlotConfig(
+                fromSlot.node_id,
+                fromSlot.slot_id,
+                toSlot.node_id,
+                toSlot.slot_id,
+                fromSlot.is_input
+            )
+        }
         const key = this.makeEndpointKey(fromSlot, toSlot);
         if (this._endpointsIndex.has(key)) {
             throw new DuplicateConnectionError(

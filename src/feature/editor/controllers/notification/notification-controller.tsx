@@ -1,12 +1,12 @@
 import { SetStoreFunction, createStore, produce } from "solid-js/store";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
-import { NotificationWithMeta, NotificationLevel, NotificationTarget, isNodeNotify, isSlotNotify, isParamNotify, isConnNotify, NotificationLevelOrder, Notification, resolveNotificationTarget, resolveEventDescription, resolveNotificationLevel, resolveShortMessage } from "~/protocols/notification-protocol";
-import { SceneConnectionManager } from "../network/scene-connection-manager";
+import { NotificationWithMeta, NotificationLevel, NotificationTarget, isNodeNotify, isSlotNotify, isParamNotify, isConnNotify, NotificationLevelOrder, Notification } from "~/protocols/notification-protocol";
+import { SceneConnectionManager } from "../../network/scene-connection-manager";
 import { CanvasElementController } from "~/feature/scene/controllers/canvas-element-controller";
-import { CanvasSpace } from "../canvas/editor-space";
+import { CanvasSpace } from "../../canvas/editor-space";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { ServerMessageTypes } from "~/protocols/nodeblocks/network/server-message-protocol";
-import { nanoid } from "nanoid";
+import { NotificationFactory } from "./notification-factory";
 
 type NotificationStore = {
     nodes: Record<string, NotificationWithMeta[]>;
@@ -34,34 +34,25 @@ export class NotificationController {
             global: [] as NotificationWithMeta[]
         });
         this.setupEngineHandlers();
+        this.setupCommandResponseHandlers()
     }
     
     private setupEngineHandlers() {
         this.sceneConnection.onMessage(ServerMessageTypes.GRAPH_EVENT, (msg) => {
-            const payload = msg.event_payload;
-            if (!payload) return;
+            const notif = NotificationFactory.fromEngineEvent(msg.event_payload);
+            if (!notif || this.ignored_level.includes(notif.level)) return;
 
-            const tracker = payload.tracker || { node_id: null, slot_id: null, param_id: null, conn_id: null };
-            const target = resolveNotificationTarget(tracker);
-            
-            const level = resolveNotificationLevel(payload);
-            const message = resolveShortMessage(payload);
-            const description = resolveEventDescription(payload);
-                
-            if (this.ignored_level.includes(level)) return;
-            
-            this._handle_notification({
-                uid: nanoid(8),
-                level: level,
-                target: target,
-                message: message,
-                description: description,
-                node_id: tracker.node_id ?? undefined,
-                slot_id: tracker.slot_id ?? undefined,
-                param_id: tracker.param_id ?? undefined,
-                conn_id: tracker.conn_id ?? undefined,
-            });
+            this._handle_notification(notif);
         })
+    }
+
+    private setupCommandResponseHandlers() {
+        this.sceneConnection.onMessage(ServerMessageTypes.COMMAND_RESPONSE, (msg) => {
+            const notif = NotificationFactory.fromCommandResponse(msg.response_payload);
+            if (!notif || this.ignored_level.includes(notif.level)) return;
+
+            this._handle_notification(notif);
+        });
     }
 
     private _handle_notification = (msg: Notification) => {

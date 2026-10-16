@@ -1,5 +1,5 @@
 import { createContext, useContext, ParentComponent } from "solid-js";
-import { NotificationController } from "../controllers/notification-controller";
+import { NotificationController } from "../controllers/notification/notification-controller";
 
 const NotificationContext = createContext<NotificationController>();
 
