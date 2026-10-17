@@ -1,49 +1,45 @@
 import { createMemo, createSignal, Match, Switch } from "solid-js";
-import { SceneController } from "~/wrapper/controllers/scene-controller";
-import { DataTypeMeta } from "~/wrapper/metadata/type_metadata";
-import { _SlotOutputPack } from '../../../editor/components/node/node-output';
-import { DataTypeValueSelector } from "~/feature/scene/components/value/datatype-value-view";
+import { DataTypeValuePack, DataTypeValueSelector } from "~/feature/scene/components/value/datatype-value-view";
 import { FieldValueDisplayer, SimpleField } from "../../../../components/input-fields";
-import { BaseDataType, DataTypeUtils, DefaultRenderers } from "~/wrapper/nodes/data/node-data-type";
-import { DataTypeGenParams, generate_datatype_random_value } from '../../../../wrapper/nodes/data/data-type-value-utils';
 import RefreshIcon from '~/assets/icons/refresh.svg';
 import { createStore } from "solid-js/store";
 import { DocsHref } from "../docs-reference";
-import { SlotOutputWrapper } from "~/wrapper/nodes/slot/node-slot";
 import { DataTypeMetaProvider } from "~/feature/metadata/metadata-context";
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
-import { DefaultDataTypes } from '../../../../wrapper/nodes/data/node-data-type';
+import { DataTypeMeta } from "~/old/wrapper/metadata/type_metadata";
+import { PackageManager } from "~/feature/editor/engine/packages/package-manager";
+import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
+import { DataTypeSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
+import { DataTypeGenParams, generate_datatype_random_value } from "~/old/wrapper/nodes/data/data-type-value-utils";
+import { DefaultRenderers } from "~/old/wrapper/nodes/data/node-data-type";
 
 export const DataTypeDocsContent = (props: {
     path: string | undefined,
     data?: DataTypeMeta,
-    scene_controller: SceneController,
+    packageManager: PackageManager,
     devMode: boolean
 }) => {
     if (!props.data) {
         return <span>Couldn't load documentation</span>
     }
     
-    const datatype = createMemo(() => {
-        props.scene_controller.node_scene_reader.keep_track();
-        props.scene_controller.node_type_reader.keep_track();
-        const path = props.path ?? "";
-        const type_id = DocsPathUtils.extractTargetId(path);
-        if (type_id) {
-            if (props.data?.is_builtin) {
-                return DataTypeUtils._match_default_data_type(type_id);
-            }
-            const datatype = props.scene_controller.node_type_reader.data_types.get(type_id);
-            return datatype;
+    const spec = createMemo(() => {
+        const package_id = DocsPathUtils.extractRootId(props.path ?? "");
+        const type_id = DocsPathUtils.extractTargetId(props.path ?? "");
+
+        const fqn = NamespaceUtils.makeFqn(package_id, type_id ?? "");
+        if (!props.packageManager.registry.isDataTypeRegistered(fqn)) {
+            return undefined;
         }
-        return undefined;
-    });
+        const spec = props.packageManager.registry.getDataTypeSpec(fqn);
+        return spec;
+    })
 
     return (
-        <DataTypeMetaProvider value={{datatype_meta: props.data}}>
+        <DataTypeMetaProvider value={props.data}>
             <div class="keep fill container docs-sections">
-                <DataTypeAttributes meta={props.data} datatype={datatype()}/>
-                <DataTypePreview meta={props.data} datatype={datatype()}/>
+                <DataTypeAttributes meta={props.data} spec={spec()}/>
+                <DataTypePreview meta={props.data} spec={spec()}/>
             </div>
         </DataTypeMetaProvider>
     )
@@ -51,43 +47,38 @@ export const DataTypeDocsContent = (props: {
 
 const DataTypeAttributes = (props: {
     meta: DataTypeMeta,
-    datatype?: BaseDataType
+    spec?: DataTypeSpec
 }) => {
     // TODO: Mexer nisso aqui depois para não ficar repetitivo com os outros subcomponentes
-    if (!props.datatype) {
+    if (!props.spec) {
         return <div class="text-section">
             <h3>Attributes</h3>
             <p>Couldn't find a DataType Object</p>
         </div>
     }
 
-    const base_type = createMemo(() => {
-        if (!props.datatype) {
-            return undefined;
-        }
-        return DataTypeUtils._match_default_data_type(props.datatype.base
-    )});
-    
+    // TODO: arrumar essa referência do base id
+    const base_id = (props.spec ? props.spec.base_id as string : undefined) ?? "unknown";
     return (
         <div class="text-section">
             <h3>Attributes</h3>
             <SimpleField field_name="Base" field_displayer={
                 // TODO: maybe add a better visual for field links
-                () => <DocsHref class="field-link" route={{path: DocsPathUtils.makeDataTypePath(base_type()?.root_id ?? "unknown", base_type())}}><FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.base} id={props.datatype?.type_id + "-base"}/>}/></DocsHref>
-            } field_id={props.datatype?.type_id + "-base"}/>
+                () => <DocsHref class="field-link" route={{path: DocsPathUtils.makeDataTypePath("builtin", undefined, base_id)}}><FieldValueDisplayer value_element={() => <input readonly value={props.spec?.base_id} id={props.spec?.id + "-base"}/>}/></DocsHref>
+            } field_id={props.spec?.id + "-base"}/>
             <SimpleField field_name="Renderer" field_displayer={
-                () => <FieldValueDisplayer value_element={() => <input readonly value={props.datatype?.renderer} id={props.datatype?.type_id + "-renderer"}/>}/>
-            } field_id={props.datatype?.type_id + "-renderer"}/>
+                () => <FieldValueDisplayer value_element={() => <input readonly value={props.spec?.default_renderer} id={props.spec?.id + "-renderer"}/>}/>
+            } field_id={props.spec?.id + "-renderer"}/>
         </div>
     )
 }
 
 const DataTypePreview = (props: {
     meta: DataTypeMeta,
-    datatype?: BaseDataType
+    spec?: DataTypeSpec
 }) => {
     // TODO: Mexer nisso aqui depois para não ficar repetitivo com os outros subcomponentes
-    if (!props.datatype) {
+    if (!props.spec) {
         return <div class="text-section">
             <h3>Output Preview</h3>
             <p>Couldn't find a DataType Object</p>
@@ -100,13 +91,14 @@ const DataTypePreview = (props: {
         fetch_signal()
         refetch(false);
 
-        if (!props.datatype) return undefined;
-        const value = generate_datatype_random_value(props.datatype, genParams);
-        const output: SlotOutputWrapper = {
-            value: value[1]
-        }
-        const pack: _SlotOutputPack = {
-            output: output
+        if (!props.spec) return undefined;
+        if (!props.spec.base_id) return undefined;
+
+        const value = generate_datatype_random_value(props.spec, genParams);
+        const pack: DataTypeValuePack = {
+            value: value,
+            renderer: props.spec.default_renderer,
+            base_type: props.spec.base_id
         }
         return pack;
     });
@@ -122,11 +114,11 @@ const DataTypePreview = (props: {
 
             <div class="container fill">
                 <GenParamsEditor 
-                    renderer={props.datatype?.renderer} 
+                    renderer={props.spec?.default_renderer} 
                     params={genParams} 
                     setParams={setGenParams} 
                 />
-                <DataTypeValueSelector output_renderer={props.datatype?.renderer} value={preview_value()}/>
+                <DataTypeValueSelector value={preview_value()}/>
             </div>
         </div>
     )

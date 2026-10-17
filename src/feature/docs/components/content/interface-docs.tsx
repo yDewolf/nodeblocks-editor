@@ -4,7 +4,6 @@ import { SceneController } from "~/old/wrapper/controllers/scene-controller";
 export const InterfaceDocsContent = (props: {
     path: string | undefined,
     data?: InterfaceElementMeta,
-    scene_controller: SceneController,
     devMode: boolean
 }) => {
     if (!props.data) {

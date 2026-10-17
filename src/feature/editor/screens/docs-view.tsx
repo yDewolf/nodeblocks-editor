@@ -1,21 +1,21 @@
 import { createMemo, createSignal, Match, Show, Switch } from "solid-js";
 import { useDocs } from "~/feature/docs/docs-context";
-import { EditorTool } from "~/editor/tools/base-tool";
 import { DocsPath, DocsTags } from "../../docs/components/docs-components";
 import { DocPayload } from "~/feature/docs/docs-protocols";
-import { SceneController } from "~/wrapper/controllers/scene-controller";
 import CodeIcon from "~/assets/icons/code.svg";
 import { NodeDocsContent } from "../../docs/components/content/node-docs";
 import { InterfaceDocsContent } from '../../docs/components/content/interface-docs';
 import { DataTypeDocsContent } from "../../docs/components/content/datatype-docs";
 import { HeaderDocsContent } from "../../docs/components/content/header-docs";
-import { DocsSidebar } from "./docs-sidebar";
 import AskDocsIcon from "~/assets/icons/ask-about.svg";
 import { DynamicMetaProvider, MetaProvider } from "~/feature/metadata/metadata-context";
 import { ParsedMetaText } from '../../metadata/components/metadata-text';
+import { DocsSidebar } from "~/feature/docs/components/docs-sidebar";
+import { EditorTool } from "../tools/base-tool";
+import { PackageManager } from '../engine/packages/package-manager';
+import { useEditor } from "~/feature/scene-editor-context";
 
-// TODO: rename this to EditorDocsView
-export const DocsView = (props: {current_tool?: EditorTool, scene_controller: SceneController}) => {
+export const EditorDocsView = () => {
     const docs = useDocs();
     const docs_data = createMemo(() => {
         if (!docs.docsData) {
@@ -71,7 +71,7 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
                                 <h2>{(docs_data()?.data.capitalized_name)}</h2>
                                 <ParsedMetaText text={docs_data()?.data.description} default="No Description"/>
                             </div>
-                            <DocsContentSelector path={docs.docs_path} docs_data={docs_data()} scene_controller={props.scene_controller} devMode={devMode()}/>
+                            <DocsContentSelector path={docs.docs_path} docs_data={docs_data()} packageManager={useEditor().packageManager} devMode={devMode()}/>
                         </DynamicMetaProvider>
                     </Show>
                     <Show when={devMode()}>
@@ -88,7 +88,7 @@ export const DocsView = (props: {current_tool?: EditorTool, scene_controller: Sc
 const DocsContentSelector = (props: {
     path: string | undefined,
     docs_data?: DocPayload,
-    scene_controller: SceneController,
+    packageManager: PackageManager,
     devMode: boolean
 }) => {
     if (!props.docs_data) return undefined;
@@ -99,16 +99,16 @@ const DocsContentSelector = (props: {
             <span>No implementation for documentation type {props.docs_data.type}</span>
         }>
             <Match when={props.docs_data.type === "header"}>
-                <HeaderDocsContent path={props.path} scene_controller={props.scene_controller} data={props.docs_data.type === "header" ? props.docs_data.data : undefined} devMode={props.devMode}/>            
+                <HeaderDocsContent path={props.path} data={props.docs_data.type === "header" ? props.docs_data.data : undefined} devMode={props.devMode}/>            
             </Match>
             <Match when={props.docs_data.type === "node"}>
-                <NodeDocsContent path={props.path} scene_controller={props.scene_controller} data={props.docs_data.type === "node" ? props.docs_data.data : undefined} devMode={props.devMode}/>            
+                <NodeDocsContent path={props.path} data={props.docs_data.type === "node" ? props.docs_data.data : undefined} packageManager={props.packageManager} devMode={props.devMode}/>            
             </Match>
             <Match when={props.docs_data.type === "interface"}>
-                <InterfaceDocsContent path={props.path} scene_controller={props.scene_controller} data={props.docs_data.type === "interface" ? props.docs_data.data : undefined} devMode={props.devMode}/>            
+                <InterfaceDocsContent path={props.path} data={props.docs_data.type === "interface" ? props.docs_data.data : undefined} devMode={props.devMode}/>            
             </Match>
             <Match when={props.docs_data.type === "datatype"}>
-                <DataTypeDocsContent path={props.path} scene_controller={props.scene_controller} data={props.docs_data.type === "datatype" ? props.docs_data.data : undefined} devMode={props.devMode}/>            
+                <DataTypeDocsContent path={props.path} data={props.docs_data.type === "datatype" ? props.docs_data.data : undefined} packageManager={props.packageManager} devMode={props.devMode}/>            
             </Match>
         </Switch>
     )

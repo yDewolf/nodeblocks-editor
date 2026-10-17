@@ -114,7 +114,7 @@ const SlotDropdownItem = (props: {
             header_content={() => (
                 <div class="fill keep row-container space-between">
                     <div class="docs-slot-header">
-                        <SlotHeader slot_id={props.slot_id} slot_meta={props.slot_meta} slot_data={props.slot_data} />
+                        <SlotHeader slot_id={props.slot_id} slot_meta={props.slot_meta} slot_spec={props.slot_data} />
                         <div class="docs-header-badges">
                             <For each={badges()}>{(badge) => <BadgeTag badge={badge}/>}</For>
                         </div>

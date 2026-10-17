@@ -1,50 +1,49 @@
 import { createMemo, JSXElement, For, Show } from "solid-js";
-import { SceneController } from "~/wrapper/controllers/scene-controller";
-import { BaseNodeConstructor } from "~/wrapper/helpers/node-constructor";
-import { NodeDataModel } from "~/wrapper/helpers/node-type-file";
-import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
-import { NodeTypeMeta, ParameterMeta, SlotMeta } from "~/wrapper/metadata/type_metadata";
+import { NodeSlotSpec, NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { DropdownSection } from "../../../../components/panels/dropdown";
 import { NodePreview } from "../../../editor/components/node/node-component";
 import { SlotHeader } from "../../../editor/components/node/slot-components";
-import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { NodeFieldSelector } from '../../../editor/components/node/node-field';
 import InputIcon from "~/assets/icons/input.svg";
 import OutputIcon from "~/assets/icons/output.svg";
 import ToolIcon from "~/assets/icons/tool.svg";
 import FilterIcon from "~/assets/icons/filter.svg";
-import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
 import { DocsHref } from "../docs-reference";
 import { ParsedMetaText } from '../../../metadata/components/metadata-text';
 import { DocsPathUtils } from '../../helpers/docs-path-utils';
+import { NodeTypeMeta, ParameterMeta, SlotMeta } from "~/old/wrapper/metadata/type_metadata";
+import { PackageManager } from "~/feature/editor/engine/packages/package-manager";
+import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
+import { DataTypeSpec, ParameterSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
+import { NodeMetaProvider } from '../../../metadata/metadata-context';
 
 
 export const NodeDocsContent = (props: {
     path: string | undefined,
     data?: NodeTypeMeta,
-    scene_controller: SceneController,
+    packageManager: PackageManager,
     devMode: boolean
 }) => {
     if (!props.data) {
         return <span>Couldn't load documentation</span>
     }
 
-    const constructor = createMemo(() => {
-        props.scene_controller.node_scene_reader.keep_track();
-        props.scene_controller.node_type_reader.keep_track();
-        const path = props.path ?? "";
-        const type_id = DocsPathUtils.extractTargetId(path);
-        if (type_id) {
-            const node_constructor = props.scene_controller.node_controller.node_constructors.get(type_id)
-            return node_constructor;
+    const spec = createMemo(() => {
+        const package_id = DocsPathUtils.extractRootId(props.path ?? "");
+        const type_id = DocsPathUtils.extractTargetId(props.path ?? "");
+
+        const fqn = NamespaceUtils.makeFqn(package_id, type_id ?? "");
+        if (!props.packageManager.registry.isNodeTypeRegistered(fqn)) {
+            return undefined;
         }
-        return undefined;
-    });
+        const spec = props.packageManager.registry.getNodeTypeSpec(fqn);
+        return spec;
+    })
 
     const preview = createMemo(() => {
-        const node_constructor = constructor();
-        if (node_constructor) {
-            return <NodePreview constructor={node_constructor}/>
+        const nodespec = spec();
+        if (nodespec) {
+            return <NodePreview spec={nodespec}/>
         }
         return <span>Couldn't parse Node Preview</span>
     });
@@ -57,8 +56,17 @@ export const NodeDocsContent = (props: {
                     {preview()}            
                 </div>
             </div>
-            <NodeSlotSection data={props.data} constructor={constructor()} scene_controller={props.scene_controller} devMode={props.devMode}/>
-            <NodeParameterSection data={props.data} constructor={constructor()} devMode={props.devMode}/>
+            <NodeMetaProvider value={props.data}>
+                <Show when={spec()}>
+                    {(spec_data) => {
+                        if (!props.data) { return undefined; }
+                        return <>
+                            <NodeSlotSection data={props.data} spec={spec_data()} packageManager={props.packageManager} devMode={props.devMode}/>
+                            <NodeParameterSection data={props.data} spec={spec_data()} devMode={props.devMode}/>
+                        </>
+                    }}
+                </Show>
+            </NodeMetaProvider>
         </div>
     )
 }
@@ -69,41 +77,37 @@ interface DropdownBadge {
     label: string;
 }
 
-function resolve_slot_type_label(slotData: NodeSlotSpec): string {
-    if (slotData.data_type_id && slotData.data_type_id != "unknown") {
-        return slotData.data_type_id;
-    }
-
-    return slotData.type?.split(":").at(-1) ?? "unknown";
-}
-
 const BadgeTag = (props: { badge: DropdownBadge }) => (
     <div class="tag-holder">
         {props.badge.icon}
-        <DocsHref class="field-link" route={props.badge.href ? {path: props.badge.href} : undefined}>
-            {props.badge.label}
-        </DocsHref>
+        <Show when={props.badge.href} fallback={
+            <span>{props.badge.label}</span>
+        }>
+            <DocsHref class="field-link" route={props.badge.href ? {path: props.badge.href} : undefined}>
+                {props.badge.label}
+            </DocsHref>
+        </Show>
     </div>
 );
 
 const SlotDropdownItem = (props: {
     slot_id: string,
-    datatype?: BaseDataType,
-    slot_data: NodeSlotSpec,
+    datatype?: DataTypeSpec,
+    slot_spec: NodeSlotSpec,
     slot_meta: SlotMeta,
     devMode: boolean,
 }) => {
     const badges = createMemo<DropdownBadge[]>(() => {
         const badge_list: DropdownBadge[] = [
             {
-                label: resolve_slot_type_label(props.slot_data),
-                href: DocsPathUtils.makeDataTypePath(props.datatype?.root_id ?? "unknown", props.datatype),
-                icon: props.slot_data.is_input ? <InputIcon class="tag-icon" /> : <OutputIcon class="tag-icon" />
+                label: props.slot_spec.data_type_id,
+                href: DocsPathUtils.makeDataTypePath(props.datatype?.namespace ?? "unknown", props.datatype),
+                icon: props.slot_spec.is_input ? <InputIcon class="tag-icon" /> : <OutputIcon class="tag-icon" />
             }
         ];
 
-        if (props.slot_data.max_connections) {
-            badge_list.push({ label: `max: ${props.slot_data.max_connections}` });
+        if (props.slot_spec.max_connections) {
+            badge_list.push({ label: `max: ${props.slot_spec.max_connections}` });
         }
         return badge_list;
     });
@@ -114,7 +118,7 @@ const SlotDropdownItem = (props: {
             header_content={() => (
                 <div class="fill keep row-container space-between">
                     <div class="docs-slot-header">
-                        <SlotHeader slot_id={props.slot_id} slot_meta={props.slot_meta} slot_data={props.slot_data} />
+                        <SlotHeader slot_id={props.slot_id} slot_spec={props.slot_spec} />
                         <div class="docs-header-badges">
                             <For each={badges()}>{(badge) => <BadgeTag badge={badge}/>}</For>
                         </div>
@@ -130,9 +134,9 @@ const SlotDropdownItem = (props: {
                         <h4>Description</h4>
                         <ParsedMetaText text={props.slot_meta.description} default="No Description"/>
                     </div>
-                    <Show when={props.slot_data.max_connections}>
+                    <Show when={props.slot_spec.max_connections}>
                         <div class="text-section">
-                            <h4>Max Connections: {props.slot_data.max_connections}</h4>
+                            <h4>Max Connections: {props.slot_spec.max_connections}</h4>
                         </div>
                     </Show>
                 </div>
@@ -143,18 +147,18 @@ const SlotDropdownItem = (props: {
 
 export const NodeSlotSection = (props: {
     data: NodeTypeMeta;
-    constructor?: BaseNodeConstructor;
-    scene_controller: SceneController;
+    spec: NodeTypeSpec;
+    packageManager: PackageManager;
     devMode: boolean;
 }) => {
     const slot_bundle = createMemo(() => {
         const meta = props.data.slot_meta;
         const bundles: Array<[NodeSlotSpec, SlotMeta, string]> = [];
         
-        props.constructor?._slots.forEach((slotData, slotId) => {
-            const slotMeta = meta[slotId];
-            if (slotMeta) bundles.push([slotData, slotMeta, slotId]);
-        });
+        for (const [slot_id, slot_spec] of Object.entries(props.spec.slots)) {
+            const slotMeta = meta[slot_id];
+            if (slotMeta) bundles.push([slot_spec, slotMeta, slot_id]);
+        }
         return bundles;
     });
 
@@ -166,17 +170,15 @@ export const NodeSlotSection = (props: {
             }>
                 <div class="fill keep container">
                     <For each={slot_bundle()}>
-                        {([slotData, slotMeta, slotId]) => {
-                            const slot_type = props.constructor?._slot_types.get(slotData.type);
-                            let data_type = props.scene_controller.node_type_reader.data_types.get(slotData.data_type_id ?? "");
-                            if (slot_type) {
-                                data_type = slot_type.data_type;
-                            }
+                        {([slotSpec, slotMeta, slotId]) => {
+                            const data_type = props.packageManager.registry.getDataTypeSpec(
+                                slotSpec.data_type_id
+                            )
                             return (
                                 <SlotDropdownItem 
                                     datatype={data_type}
                                     slot_id={slotId} 
-                                    slot_data={slotData} 
+                                    slot_spec={slotSpec} 
                                     slot_meta={slotMeta} 
                                     devMode={props.devMode} 
                                 />
@@ -191,32 +193,33 @@ export const NodeSlotSection = (props: {
 
 const ParameterDropdownItem = (props: {
     param_id: string;
-    param_data: NodeDataModel;
+    param_spec: ParameterSpec;
     param_meta: ParameterMeta;
     devMode: boolean;
 }) => {
-    const parameter = createMemo(() => new NodeParameter(props.param_data, props.param_id));
     const badges = createMemo<DropdownBadge[]>(() => {
-        const data = props.param_data;
+        const spec = props.param_spec;
         const list: DropdownBadge[] = [
             {
-                label: data.type,
+                label: spec.type,
                 icon: <ToolIcon class="tag-icon" />
             }
         ];
 
-        if (data.default != undefined) {
-            list.push({ label: `default: ${data.default}` });
+        if (spec.default != undefined) {
+            list.push({ label: `default: ${spec.default}` });
         }
-        if (data.step != undefined) {
-            list.push({ label: `step: ${data.step}` });
-        }
-        if (data.range != undefined) {
-            list.push({ label: `range` });
-        }
-        if (data.extension_filter != undefined) {
-            if (data.extension_filter.length > 0) list.push({ icon: <FilterIcon class="tag-icon"/>, label: "" });
-        }
+
+        // TODO:
+        // if ("step" in spec && spec.step != undefined) {
+        //     list.push({ label: `step: ${spec.step}` });
+        // }
+        // if ("range" in spec.range != undefined) {
+        //     list.push({ label: `range` });
+        // }
+        // if (spec.extension_filter != undefined) {
+        //     if (spec.extension_filter.length > 0) list.push({ icon: <FilterIcon class="tag-icon"/>, label: "" });
+        // }
 
         return list;
     });
@@ -250,7 +253,7 @@ const ParameterDropdownItem = (props: {
                     <div class="text-section">
                         <h4>Widget</h4>
                         <div class="remove-input all">
-                            <NodeFieldSelector parameter={parameter()} hide_label={true} />
+                            <NodeFieldSelector parameterId={props.param_id} parameterSpec={props.param_spec} hide_label={true} />
                         </div>
                     </div>
 
@@ -259,14 +262,15 @@ const ParameterDropdownItem = (props: {
                         <ParsedMetaText text={props.param_meta.description} default="No Description"/>
                     </div>
 
-                    <Show when={props.param_data.default != undefined}>
+                    <Show when={props.param_spec.default != undefined}>
                         <div class="text-section row">
                             <h4>Default Value:</h4>
-                            <span>{formatValue(props.param_data.default)}</span>
+                            <span>{formatValue(props.param_spec.default)}</span>
                         </div>
                     </Show>
 
-                    <Show when={props.param_data.step != undefined}>
+                    {/* TODO: */}
+                    {/* <Show when={props.param_data.step != undefined}>
                         <div class="text-section row">
                             <h4>Step Increment:</h4>
                             <span>{formatValue(props.param_data.step)}</span>
@@ -307,7 +311,7 @@ const ParameterDropdownItem = (props: {
                                 </For>
                             </div>
                         </div>
-                    </Show>
+                    </Show> */}
                 </div>
             }
         />
@@ -316,17 +320,18 @@ const ParameterDropdownItem = (props: {
 
 export const NodeParameterSection = (props: {
     data: NodeTypeMeta;
-    constructor?: BaseNodeConstructor;
+    spec: NodeTypeSpec;
     devMode: boolean;
 }) => {
     const param_bundle = createMemo(() => {
         const meta = props.data.parameter_meta;
-        const bundles: Array<[NodeDataModel, ParameterMeta, string]> = [];
+        const bundles: Array<[ParameterSpec, ParameterMeta, string]> = [];
 
-        props.constructor?._data_model.raw_parameters.forEach((paramData, paramId) => {
+        for (const [paramId, paramSpec] of Object.entries(props.spec.parameters)) {
             const paramMeta = meta[paramId];
-            if (paramMeta) bundles.push([paramData, paramMeta, paramId]);
-        });
+            if (paramMeta) bundles.push([paramSpec, paramMeta, paramId]);
+
+        }
         return bundles;
     });
 
@@ -338,10 +343,10 @@ export const NodeParameterSection = (props: {
             }>
                 <div class="fill keep container">
                     <For each={param_bundle()}>
-                        {([paramData, paramMeta, paramId]) => (
+                        {([paramSpec, paramMeta, paramId]) => (
                             <ParameterDropdownItem 
                                 param_id={paramId} 
-                                param_data={paramData} 
+                                param_spec={paramSpec} 
                                 param_meta={paramMeta} 
                                 devMode={props.devMode} 
                             />

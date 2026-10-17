@@ -1,3 +1,4 @@
+import { DataTypeSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
 import { DefaultDataTypes, BaseDataType, DefaultRenderers } from "./node-data-type";
 
 export interface ScalarGenParams {
@@ -55,21 +56,23 @@ const generateNDArray = (shape: number[], depth: number, base: DefaultDataTypes,
 };
 
 export function generate_datatype_random_value(
-    datatype: BaseDataType,
+    datatype: DataTypeSpec,
     params?: DataTypeGenParams
 ): [string, any] {
     let result: any = null;
-    switch (datatype.renderer) {
+    if (!datatype.base_id) return [datatype.id, null];
+    
+    switch (datatype.default_renderer) {
         case DefaultRenderers.SCALAR: {
             const config = params?.scalar;
-            result = generateScalarValue(datatype.base, config?.value_range);
+            result = generateScalarValue(datatype.base_id, config?.value_range);
             break;
         }
 
         case DefaultRenderers.ARRAY: {
             const config = params?.array;
             const targetShape = config?.shape && config.shape.length > 0 ? config.shape : generateRandomShape();
-            result = generateNDArray(targetShape, 0, datatype.base, config?.value_range);
+            result = generateNDArray(targetShape, 0, datatype.base_id, config?.value_range);
             break;
         }
 
@@ -86,5 +89,5 @@ export function generate_datatype_random_value(
             break;
     }
 
-    return [datatype.type_id, result];
+    return [datatype.id, result];
 }

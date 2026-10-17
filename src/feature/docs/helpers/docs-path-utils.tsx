@@ -1,7 +1,6 @@
 import { DocsPathPrefix, DocsPathSplitter } from "~/feature/docs/docs-protocols";
-import { BaseDataType } from "~/old/wrapper/nodes/data/node-data-type";
-import { GraphNode } from "~/old/wrapper/nodes/graph-node";
-import { NodeSlot } from "~/old/wrapper/nodes/slot/node-slot";
+import { DataTypeSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
+import { NodeSlotSpec, NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 
 
 export const CURRENT_PATH = "{current}";
@@ -39,8 +38,8 @@ export class DocsPathUtils {
     /**
      * Creates a path to a Node's documentation page.
      */
-    public static makeNodePath(root_id: string, node?: GraphNode, type_id?: string): string {
-        const targetId = node ? node.type_id : type_id;
+    public static makeNodePath(root_id: string, node?: NodeTypeSpec, type_id?: string): string {
+        const targetId = node ? node.id : type_id;
         return `${root_id}${DocsPathSplitter}${DocsPathPrefix.NODE}${DocsPathSplitter}${targetId}`;
     }
 
@@ -49,16 +48,11 @@ export class DocsPathUtils {
      */
     public static makeDataTypePath(
         root_id: string, 
-        datatype?: BaseDataType, 
-        slot?: NodeSlot, 
+        datatype?: DataTypeSpec, 
         type_id?: string
     ): string {
         if (datatype) {
-            return `${root_id}${DocsPathSplitter}${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${datatype.type_id}`;
-        }
-
-        if (slot) {
-            return `${root_id}${DocsPathSplitter}${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${slot.data_type.type_id}`;
+            return `${root_id}${DocsPathSplitter}${DocsPathPrefix.DATATYPE}${DocsPathSplitter}${datatype.id}`;
         }
 
         if (type_id) {
@@ -92,7 +86,7 @@ export class DocsPathUtils {
     public static makeAutoPath(root_id: string, docs_prefix: DocsPathPrefix, id: string) {
         switch (docs_prefix) {
             case DocsPathPrefix.NODE: return this.makeNodePath(root_id, undefined, id);
-            case DocsPathPrefix.DATATYPE: return this.makeDataTypePath(root_id, undefined, undefined, id);
+            case DocsPathPrefix.DATATYPE: return this.makeDataTypePath(root_id, undefined, id);
             case DocsPathPrefix.UI: return this.makeUIPath(root_id, id);
             case DocsPathPrefix.HEADER: return root_id;
         }

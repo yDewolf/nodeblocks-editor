@@ -10,7 +10,7 @@ import { UpdateRootDataTheme } from "./feature/ui-themes";
 import { ClientSceneCommandTypes, CommandGroups } from "./protocols/nodeblocks/network/client-command-protocol";
 import { nanoid } from "nanoid";
 import { MetadataProvider, MetaProvider } from "./feature/metadata/metadata-context";
-import { DocsProvider } from "./feature/docs/docs-context";
+import { DocsProvider, DocsUrlSync } from './feature/docs/docs-context';
 
 interface AppContextData {
   appSession: AppSessionManager,
@@ -68,6 +68,7 @@ const TestComponent = () => {
   return (
     <MetadataProvider controller={editor.metadataController}>
       <DocsProvider metadataController={editor.metadataController}>
+        <DocsUrlSync />
         <InputManagerProvider manager={editor.inputManager}>
           <DefinedInputScope context={editor.globalInputContext}>
             <EventManagerProvider manager={editor.eventManager}>

@@ -1,5 +1,5 @@
 import { JSX } from "solid-js/jsx-runtime";
-import { CodeTextElement, YouTubeEmbed } from "~/editor/ui/components/docs/metadata-text";
+import { YouTubeEmbed, CodeTextElement } from "~/feature/metadata/components/metadata-text";
 
 export function extractYouTubeId(url: string): string | null {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;

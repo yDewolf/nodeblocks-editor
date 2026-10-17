@@ -13,6 +13,11 @@ import { SceneCanvasProvider } from '../scene/scene-canvas-context';
 import { SceneProvider } from '../scene/scene-context';
 import { SceneRuntimeProvider } from '../scene/scene-runtime-context';
 import { NotificationProvider } from './contexts/notification-context';
+import { EditorDocsView } from './screens/docs-view';
+import MinimizeIcon from '~/assets/icons/minimize.svg';
+import { createEffect } from 'solid-js';
+import { useDocs } from '../docs/docs-context';
+import { DocsElementIndicator } from './components/selected-docs-indicator';
 
 export const EditorView = () => {
     const editor = useEditor();
@@ -21,23 +26,23 @@ export const EditorView = () => {
     let editor_view_ref: HTMLDivElement | undefined;
     
     // FIXME: Implement a better way of indexing pages on a pageviewer and accessing them
-    // const DocsCallback = () => <DocsView scene_controller={editor.scene_controller}/>;
-    // const docsPage = {
-    //     page_title: "Documentation",
-    //     view_displayer_css: "docs-view",
-    //     icon_element: () => <MinimizeIcon class="small-icon"/>,
-    //     element: DocsCallback
-    // };
+    const DocsCallback = () => <EditorDocsView />;
+    const docsPage = {
+        page_title: "Documentation",
+        view_displayer_css: "docs-view",
+        icon_element: () => <MinimizeIcon class="small-icon"/>,
+        element: DocsCallback
+    };
     
-    // const openDocsPage = () => {
-    //     main_page_viewer.current_page = docsPage;
-    // }
+    const openDocsPage = () => {
+        main_page_viewer.current_page = docsPage;
+    }
     
-    // const isDocsPageVisible = () => main_page_viewer.current_page === docsPage;    
+    const isDocsPageVisible = () => main_page_viewer.current_page === docsPage;    
 
-    // createEffect(() => {
-    //     docs.is_docs_page_opened = isDocsPageVisible();
-    // });
+    createEffect(() => {
+        useDocs().is_docs_page_opened = isDocsPageVisible();
+    });
 
     return (
         <SceneProvider 
@@ -60,7 +65,7 @@ export const EditorView = () => {
                                 onPointerMove={(e) => editor.eventManager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
                                 >
                                 <EditorLeftTabHolder main_page_viewer={main_page_viewer}/>
-                                <EditorMidTab page_viewer={main_page_viewer}/>
+                                <EditorMidTab page_viewer={main_page_viewer} docs_page={docsPage}/>
                                 <EditorRightPanel/>
                             </div>
                             {/* <DocsElementIndicator open_docs_page={openDocsPage} docsPageVisible={isDocsPageVisible} input_manager={editor.input_manager} tool_controller={editor.tool_controller} editor_camera={editor.editor_space.camera} world_space_ref={world_space_ref} editor_view_ref={editor_view_ref}/> */}

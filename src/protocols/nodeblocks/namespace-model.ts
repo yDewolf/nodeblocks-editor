@@ -18,4 +18,8 @@ export class NamespaceUtils {
     public static fqn(model: NamespaceModel): string {
         return `${model.namespace}:${model.id}`
     }
+
+    public static makeFqn(namespace: string, id: string): string {
+        return `${namespace}:${id}`
+    }
 }

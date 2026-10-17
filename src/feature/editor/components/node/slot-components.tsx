@@ -55,18 +55,21 @@ export const SlotComponent = (props: {
 }
 
 export const SlotHeader = (props: {
-    slot_data: NodeSlotSpec,
+    slot_spec: NodeSlotSpec,
     slot_id: string,
     highlightable?: boolean,
 }) => {
     const slot_meta = useNodeMeta()?.slot_meta;
-    const slot_label = slot_meta ? slot_meta[props.slot_id].capitalized_name : props.slot_id;
+    let slot_label = props.slot_id;
+    if (slot_meta && props.slot_id in slot_meta) {
+        slot_label = slot_meta[props.slot_id].capitalized_name;
+    }
     return (
         <div 
             class="node-slot"
             classList={{
-                "input-slot": props.slot_data.is_input,
-                "output-slot": !props.slot_data.is_input,
+                "input-slot": props.slot_spec.is_input,
+                "output-slot": !props.slot_spec.is_input,
             }}
         >
             <div class="slot-dot"></div>

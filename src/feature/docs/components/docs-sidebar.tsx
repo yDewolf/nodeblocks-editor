@@ -43,6 +43,7 @@ export const DocsSidebar = (props: {
                     <For each={loaded_docs()}>
                         {(type_id, idx) => {
                             const data = docs.allDocs[type_id];
+                            console.log(type_id);
                             return (
                                 <DropdownSection 
                                     dropdown_class="list"
