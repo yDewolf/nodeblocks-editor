@@ -44,12 +44,8 @@ export function usePackageMetaContext() {
 }
 
 // Node Meta
-export interface NodeMetaContextValue {
-    node_meta?: NodeTypeMeta
-}
-
-const NodeMetaContext = createContext<NodeMetaContextValue>();
-export function NodeMetaProvider(props: { value: NodeMetaContextValue; children: JSX.Element }) {
+const NodeMetaContext = createContext<NodeTypeMeta | undefined>();
+export function NodeMetaProvider(props: { value?: NodeTypeMeta; children: JSX.Element }) {
     return (
         <NodeMetaContext.Provider value={props.value}>
             {props.children}
@@ -57,21 +53,14 @@ export function NodeMetaProvider(props: { value: NodeMetaContextValue; children:
     );
 }
 
-export function useNodeMetaContext() {
+export function useNodeMeta() {
     const ctx = useContext(NodeMetaContext);
-    if (!ctx) {
-        throw new Error("useNodeMetaContext must be inside a NodeMetaProvider");
-    }
     return ctx;
 }
 
 // Datatype Meta
-export interface DataTypeMetaContextValue {
-    datatype_meta?: DataTypeMeta
-}
-
-const DataTypeMetaContext = createContext<DataTypeMetaContextValue>();
-export function DataTypeMetaProvider(props: { value: DataTypeMetaContextValue; children: JSX.Element }) {
+const DataTypeMetaContext = createContext<DataTypeMeta | undefined>();
+export function DataTypeMetaProvider(props: { value?: DataTypeMeta; children: JSX.Element }) {
     return (
         <DataTypeMetaContext.Provider value={props.value}>
             {props.children}
@@ -81,9 +70,6 @@ export function DataTypeMetaProvider(props: { value: DataTypeMetaContextValue; c
 
 export function useDataTypeMetaContext() {
     const ctx = useContext(DataTypeMetaContext);
-    if (!ctx) {
-        throw new Error("useDataTypeMetaContext must be inside a DataTypeMetaProvider");
-    }
     return ctx;
 }
 
@@ -106,14 +92,14 @@ export function DynamicMetaProvider(props: { payload?: DocPayload; children: JSX
         <Switch fallback={props.children}>
             <Match when={props.payload?.type === "node" && props.payload}>
                 {(payload) => (
-                    <NodeMetaProvider value={{ node_meta: payload().data }}>
+                    <NodeMetaProvider value={payload().data}>
                         {props.children}
                     </NodeMetaProvider>
                 )}
             </Match>
             <Match when={props.payload?.type === "datatype" && props.payload}>
                 {(payload) => (
-                    <DataTypeMetaProvider value={{ datatype_meta: payload().data }}>
+                    <DataTypeMetaProvider value={payload().data}>
                         {props.children}
                     </DataTypeMetaProvider>
                 )}

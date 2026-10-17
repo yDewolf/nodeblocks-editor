@@ -4,6 +4,7 @@ import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { ParameterSpec, OptionParam } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
 import { DefaultDataTypes } from "~/old/wrapper/nodes/data/node-data-type";
 import { debounce } from "~/utils/debounce-utils";
+import { useNodeMeta } from "~/feature/metadata/metadata-context";
 
 const TYPE_CONFIGS: Record<string, { type: string; step?: number; min?: number }> = {
     [DefaultDataTypes.FLOAT]: { type: "number", step: 0.1 },
@@ -18,12 +19,12 @@ const TYPE_CONFIGS: Record<string, { type: string; step?: number; min?: number }
 
 export const NodeFieldSelector = (props: {
     node?: SceneNode;
-    parameterName: string;
+    parameterId: string;
     parameterSpec: ParameterSpec;
     hide_label?: boolean;
 }) => {
     let inputRef!: HTMLInputElement;
-    const field_id = `${props.node?.uid ?? 'global'}_${props.parameterName}`;
+    const field_id = `${props.node?.uid ?? 'global'}_${props.parameterId}`;
     const baseConfig = TYPE_CONFIGS[props.parameterSpec.type] || { type: "text" };
 
     const input_type = baseConfig.type;
@@ -37,7 +38,7 @@ export const NodeFieldSelector = (props: {
 
     const getCurrentValue = () => {
         if (props.node && props.node.parameters) {
-            return props.node.parameters[props.parameterName] ?? props.parameterSpec.default;
+            return props.node.parameters[props.parameterId] ?? props.parameterSpec.default;
         }
         return props.parameterSpec.default;
     };
@@ -59,18 +60,20 @@ export const NodeFieldSelector = (props: {
 
         const currentValue = getCurrentValue();
         if (new_value !== currentValue && props.node) {
-            props.node.parameters[props.parameterName] = new_value;
-            debouncedSync(props.node, props.parameterName, new_value);
+            props.node.parameters[props.parameterId] = new_value;
+            debouncedSync(props.node, props.parameterId, new_value);
         }
 
         if (inputRef) inputRef.value = new_value.toString();
     };
 
+    const param_meta = useNodeMeta()?.parameter_meta;
+    const param_label = param_meta ? param_meta[props.parameterId].capitalized_name : props.parameterId;
     return (
         <div class="field-grid">
             <Show when={!props.hide_label}>
-                <label class="field-label highlightable" title={props.parameterName} for={field_id}>
-                    {props.parameterSpec.label || props.parameterName}
+                <label class="field-label highlightable" title={props.parameterId} for={field_id}>
+                    {param_label}
                 </label>
             </Show>
             <Switch fallback={

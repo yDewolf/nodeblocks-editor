@@ -15,6 +15,7 @@ import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-co
 import { NodeFieldSelector } from "./node-field";
 import { NotificationPopupHolder } from "../notification-badges";
 import { useNotifications } from "../../contexts/notification-context";
+import { NodeMetaProvider, useMetadta as useMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -112,47 +113,49 @@ export const NodeComponentV2 = (props: {
 
     props.default_show_output = props.default_show_output ?? true;
     return (
-        <div
-            class="node"
-            onMouseLeave={(e) => {
-                setIsHovered(false);
-            }}
-            classList={{
-                "expanded": isExpanded(),
-                "hovered": isHovered(),
-                "selected-mode": ref_node.isSelected
-            }}
-            // style={{
-            //     "min-width": `${ref_node.minSize.x}px`,
-            //     "min-height": `${ref_node.minSize.y}px`
-            // }}
-        >
-            <div class="node-contents">
-                <NodeHeader 
-                    node={ref_node} 
-                    isExpanded={isExpanded()} 
-                    setExpanded={setIsExpanded}
-                    setIsHovered={setIsHovered}
-                />
-                <NodeBody 
-                    show_slots={isExpanded() || isHovered()} 
-                    show_sections={isExpanded()} 
-                    node={ref_node}
-                />
-                <Show when={(!isExpanded() && nodeHasOutput(ref_node.uid)) || props.default_show_output && !isExpanded()}>
-                    <NodeOutput node={ref_node}/>
-                </Show>
-            </div>
-            <Show when={!isExpanded() && !isHovered()}>
-                <div class="slot-grid-overlay">
-                    <Show when={USE_ANCHORED_NODES} fallback={
-                        <SlotGrid node={ref_node} slot_label={false} />
-                    }>
-                        <AnchoredSlotGrid node={ref_node} /> 
+        <NodeMetaProvider value={useMetadata().get_node_meta(ref_node.instance.spec.id, ref_node.instance.spec.namespace)}>
+            <div
+                class="node"
+                onMouseLeave={(e) => {
+                    setIsHovered(false);
+                }}
+                classList={{
+                    "expanded": isExpanded(),
+                    "hovered": isHovered(),
+                    "selected-mode": ref_node.isSelected
+                }}
+                // style={{
+                    //     "min-width": `${ref_node.minSize.x}px`,
+                //     "min-height": `${ref_node.minSize.y}px`
+                // }}
+                >
+                <div class="node-contents">
+                    <NodeHeader 
+                        node={ref_node} 
+                        isExpanded={isExpanded()} 
+                        setExpanded={setIsExpanded}
+                        setIsHovered={setIsHovered}
+                    />
+                    <NodeBody 
+                        show_slots={isExpanded() || isHovered()} 
+                        show_sections={isExpanded()} 
+                        node={ref_node}
+                    />
+                    <Show when={(!isExpanded() && nodeHasOutput(ref_node.uid)) || props.default_show_output && !isExpanded()}>
+                        <NodeOutput node={ref_node}/>
                     </Show>
                 </div>
-            </Show>
-        </div>
+                <Show when={!isExpanded() && !isHovered()}>
+                    <div class="slot-grid-overlay">
+                        <Show when={USE_ANCHORED_NODES} fallback={
+                            <SlotGrid node={ref_node} slot_label={false} />
+                        }>
+                            <AnchoredSlotGrid node={ref_node} /> 
+                        </Show>
+                    </div>
+                </Show>
+            </div>
+        </NodeMetaProvider>
     )  
 }
 
@@ -185,8 +188,8 @@ const NodeHeader = (props: {
                 }, InputEvents.HOVER_NODE);
             }}
         >
-            {/* <span>{props.node_meta?.capitalized_name ?? props.node.fqn}</span> */}
-            <span>{props.node.fqn}</span>
+            <span>{useNodeMeta()?.capitalized_name ?? props.node.fqn}</span>
+            {/* <span>{props.node.fqn}</span> */}
             <button 
                 class="icon-button" 
                 onPointerDown={(e) => e.stopPropagation()}
@@ -267,9 +270,9 @@ export const NodeBodySections = (props: {
                 <DropdownSection header="Parameters" content={
                     <div class="field-grid-holder">
                         <For each={Object.entries(props.node.parameterSpecs)}>
-                            {([paramName, paramSpec]) => <NodeFieldSelector
+                            {([paramId, paramSpec]) => <NodeFieldSelector
                                     node={props.node}
-                                    parameterName={paramName}
+                                    parameterId={paramId}
                                     parameterSpec={paramSpec}
                                 />
                             }

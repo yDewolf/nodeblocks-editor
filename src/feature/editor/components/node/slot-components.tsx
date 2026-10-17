@@ -1,4 +1,5 @@
 import { Show } from "solid-js";
+import { useNodeMeta } from "~/feature/metadata/metadata-context";
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { InputEvents } from "~/utils/events/event-handling";
@@ -9,12 +10,10 @@ export const SlotComponent = (props: {
     show_label: boolean,
     highlightable?: boolean,
 }) => {
-    // const node_meta = props.node_meta ? props.node_meta : metadata.get_node_meta(props.slot.parent_node.type_id);
-    // const slot_meta = node_meta != undefined ? node_meta.slot_meta[props.slot.slot_id] : undefined;
-    // const slot_label = slot_meta ? slot_meta.capitalized_name : props.slot.slot_id;
     const eventManager = useEventManager();
-    const slot_label = props.slot.path.slot_id;
-
+    const slot_meta = useNodeMeta()?.slot_meta;
+    const slot_label = slot_meta ? slot_meta[props.slot.slot_id].capitalized_name : props.slot.slot_id;
+    
     return (
         <div
             has-docs={true}
@@ -59,10 +58,9 @@ export const SlotHeader = (props: {
     slot_data: NodeSlotSpec,
     slot_id: string,
     highlightable?: boolean,
-}) => { 
-    // const slot_label = props.slot_meta ? props.slot_meta.capitalized_name : props.slot_id;
-    const slot_label = props.slot_id;
-
+}) => {
+    const slot_meta = useNodeMeta()?.slot_meta;
+    const slot_label = slot_meta ? slot_meta[props.slot_id].capitalized_name : props.slot_id;
     return (
         <div 
             class="node-slot"
