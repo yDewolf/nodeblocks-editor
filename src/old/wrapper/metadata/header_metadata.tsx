@@ -4,11 +4,11 @@ import { DataTypeMeta, NodeTypeMeta } from "./type_metadata"
 
 export interface MetadataVersion {
     meta_version: number,
-    types_version: number
+    package_version: string
 }
 
 export interface MetadataHeader extends MetadataVersion, BaseMetadata {
-    types_id: string,
+    package_id: string,
     last_modified: number,
 
     tags: Record<string, NodeTag>,
@@ -35,9 +35,9 @@ export const parse_header = (json_data: any): MetadataHeader => {
     const header_meta: MetadataHeader = {
         capitalized_name: json_data.capitalized_name ?? json_data.types_id ?? "",
         description: json_data.description ?? "",
-        types_version: json_data.types_version,
+        package_version: json_data.package_version,
         meta_version: json_data.meta_version,
-        types_id: json_data.types_id ?? "",
+        package_id: json_data.package_id ?? "",
         last_modified: json_data.last_modified ?? 0,
         tags: tags_record,
         categories: categories_record

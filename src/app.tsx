@@ -9,6 +9,7 @@ import { EditorView } from "./feature/editor/editor-view";
 import { UpdateRootDataTheme } from "./feature/ui-themes";
 import { ClientSceneCommandTypes, CommandGroups } from "./protocols/nodeblocks/network/client-command-protocol";
 import { nanoid } from "nanoid";
+import { MetadataProvider, MetaProvider } from "./feature/metadata/metadata-context";
 
 interface AppContextData {
   appSession: AppSessionManager,
@@ -64,12 +65,14 @@ const TestComponent = () => {
   }) 
 
   return (
-    <InputManagerProvider manager={editor.inputManager}>
-      <DefinedInputScope context={editor.globalInputContext}>
-        <EventManagerProvider manager={editor.eventManager}>
-          <EditorView />
-        </EventManagerProvider>
-      </DefinedInputScope>
-    </InputManagerProvider>
+    <MetadataProvider controller={editor.metadataController}>
+      <InputManagerProvider manager={editor.inputManager}>
+        <DefinedInputScope context={editor.globalInputContext}>
+          <EventManagerProvider manager={editor.eventManager}>
+            <EditorView />
+          </EventManagerProvider>
+        </DefinedInputScope>
+      </InputManagerProvider>
+    </MetadataProvider>
   )
 }

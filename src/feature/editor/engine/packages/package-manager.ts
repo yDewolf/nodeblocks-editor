@@ -2,13 +2,17 @@ import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { PackageManifest } from "~/protocols/nodeblocks/manifests/package-manifest";
 import { TypeSpecRegistry } from "../type-registry";
 
+type PackageLoadListener = (packages: string[]) => void;
 export class PackageManager {
     public readonly registry: TypeSpecRegistry;
+
+    private _listeners: Set<PackageLoadListener>;
 
     private _loadedPackages: Record<string, PackageManifest> = {};
     private _nodeToPackageMap: Record<string, string> = {}; // node_fqn -> package_id
 
     constructor(registry: TypeSpecRegistry) {
+        this._listeners = new Set();
         this.registry = registry;
     }
 
@@ -16,6 +20,15 @@ export class PackageManager {
         this._loadedPackages = {};
         this._nodeToPackageMap = {};
         this.registry.reset();
+    }
+
+    public subscribePackageLoad(listener: PackageLoadListener): () => void {
+        this._listeners.add(listener);
+        return () => this._listeners.delete(listener);
+    }
+
+    private notifyListeners(loadedPackages: string[]): void {
+        this._listeners.forEach((listener) => listener(loadedPackages));
     }
 
     public loadPackages(packages: PackageManifest[]): void {
@@ -41,6 +54,7 @@ export class PackageManager {
 
             this._loadedPackages[pkg.package_id] = pkg;
         }
+        this.notifyListeners(Object.keys(this._loadedPackages));
     }
 
 

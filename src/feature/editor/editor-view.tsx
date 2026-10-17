@@ -1,5 +1,4 @@
 
-import MinimizeIcon from '~/assets/icons/minimize.svg';
 import { PageViewer } from '~/components/page-controller';
 import { EditorSceneCanvas } from '../scene/components/editor-scene-canvas';
 import { useEditor } from '../scene-editor-context';

@@ -1,25 +1,42 @@
 import { createContext, Match, Switch, useContext } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { DocPayload } from "~/feature/docs/docs-interfaces";
-import { MetadataStoreData } from "~/feature/metadata/metadata_controller";
-import { DataTypeMeta, NodeTypeMeta } from '~/wrapper/metadata/type_metadata';
+import { MetadataController, MetadataStoreData } from "~/feature/metadata/metadata_controller";
+import { NodeTypeMeta, DataTypeMeta } from "~/old/wrapper/metadata/type_metadata";
 
-// Root Meta
-export interface MetaContextValue {
-    metadata?: MetadataStoreData
-}
-
-const MetaContext = createContext<MetaContextValue>();
-export function MetaProvider(props: { value: MetaContextValue; children: JSX.Element }) {
+const MetadataContext = createContext<MetadataController>();
+export function MetadataProvider(props: { controller: MetadataController, children: JSX.Element; }) {
     return (
-        <MetaContext.Provider value={props.value}>
+        <MetadataContext.Provider value={props.controller}>
             {props.children}
-        </MetaContext.Provider>
+        </MetadataContext.Provider>
     );
 }
 
-export function useMetaContext() {
-    const ctx = useContext(MetaContext);
+export function useMetadta() {
+    const context = useContext(MetadataContext);
+    if (!context) {
+        throw new Error("Not inside a '<MetadataProvider/>'");
+    }
+    return context;
+}
+
+// Root Meta
+export interface PackageMetaContextValue {
+    metadata?: MetadataStoreData
+}
+
+const PackageMetaContext = createContext<PackageMetaContextValue>();
+export function MetaProvider(props: { value: PackageMetaContextValue; children: JSX.Element }) {
+    return (
+        <PackageMetaContext.Provider value={props.value}>
+            {props.children}
+        </PackageMetaContext.Provider>
+    );
+}
+
+export function usePackageMetaContext() {
+    const ctx = useContext(PackageMetaContext);
     if (!ctx) {
         throw new Error("useMetaContext must be inside a MetaProvider");
     }
@@ -72,7 +89,7 @@ export function useDataTypeMetaContext() {
 
 
 export function useResolvedMeta() {
-    const rootMeta = useContext(MetaContext);
+    const rootMeta = useContext(PackageMetaContext);
     const nodeMeta = useContext(NodeMetaContext);
     const dataTypeMeta = useContext(DataTypeMetaContext);
 

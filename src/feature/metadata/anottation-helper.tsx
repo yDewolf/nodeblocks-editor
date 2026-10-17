@@ -70,7 +70,7 @@ export class DocAnnotationHelper {
         const nodeMeta = resolvedMeta.nodeMeta?.node_meta;
         const dataTypeMeta = resolvedMeta.dataTypeMeta?.datatype_meta;
 
-        const currentTypesId = rootMeta?.header?.types_id || "";
+        const currentTypesId = rootMeta?.header?.package_id || "";
         const defaultRoot = currentTypesId;
 
         let displayLabel = label;

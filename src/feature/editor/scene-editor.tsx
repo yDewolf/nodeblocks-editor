@@ -18,6 +18,7 @@ import { SelectionTool } from './tools/selection-tool';
 import { CanvasElementController } from '../scene/controllers/canvas-element-controller';
 import { SceneRuntimeController } from '../scene/controllers/scene-runtime-controller';
 import { NotificationController } from './controllers/notification/notification-controller';
+import { MetadataController } from '../metadata/metadata_controller';
 
 export class SceneEditor {
     private _scene: NodeScene;
@@ -35,7 +36,8 @@ export class SceneEditor {
     private _selectionController: SelectionController;
     private _toolController: ToolController;
 
-    private _notificationController: NotificationController
+    private _notificationController: NotificationController;
+    private _metadataController: MetadataController;
 
     constructor(
         private _appSession: AppSessionManager,
@@ -58,6 +60,8 @@ export class SceneEditor {
         this._runtimeController = new SceneRuntimeController(this.sceneConnection, this.elementController);
         this._notificationController = new NotificationController(this.sceneConnection, this.elementController);
 
+        this._metadataController = new MetadataController(this.appSession, this.packageManager);
+
         this._register_handlers();
         this.setup_event_handlers();
         this.setup_keybinds();
@@ -77,6 +81,7 @@ export class SceneEditor {
     get runtimeController() { return this._runtimeController; }
 
     get notificationController() { return this._notificationController; }
+    get metadataController() { return this._metadataController; }
 
     get appSession() { return this._appSession; }
     get packageManager() { return this._packageManager; }
