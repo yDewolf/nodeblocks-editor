@@ -2,7 +2,7 @@ import { createMemo, createSignal, Match, Show, Switch } from "solid-js";
 import { useDocs } from "~/feature/docs/docs-context";
 import { EditorTool } from "~/editor/tools/base-tool";
 import { DocsPath, DocsTags } from "../../docs/components/docs-components";
-import { DocPayload } from "~/feature/docs/docs-interfaces";
+import { DocPayload } from "~/feature/docs/docs-protocols";
 import { SceneController } from "~/wrapper/controllers/scene-controller";
 import CodeIcon from "~/assets/icons/code.svg";
 import { NodeDocsContent } from "../../docs/components/content/node-docs";

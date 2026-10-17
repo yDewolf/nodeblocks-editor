@@ -1,5 +1,5 @@
-import { InterfaceElementMeta } from "~/feature/docs/docs-interfaces";
-import { SceneController } from "~/wrapper/controllers/scene-controller";
+import { InterfaceElementMeta } from "~/feature/docs/docs-protocols";
+import { SceneController } from "~/old/wrapper/controllers/scene-controller";
 
 export const InterfaceDocsContent = (props: {
     path: string | undefined,

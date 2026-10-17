@@ -1,13 +1,14 @@
 import { createContext, useContext, onCleanup, createEffect } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { isServer } from "solid-js/web";
-import { DocsController } from "~/editor/controllers/docs-controller";
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
+import { DocsController } from "./docs-controller";
+import { MetadataController } from "../metadata/metadata_controller";
 
 
 const DocsContext = createContext<DocsController>();
-export function DocsProvider(props: { children: JSX.Element; }) {
-    const controller = new DocsController();
+export function DocsProvider(props: { metadataController: MetadataController, children: JSX.Element; }) {
+    const controller = new DocsController(props.metadataController);
     return (
         <DocsContext.Provider value={controller}>
             {props.children}

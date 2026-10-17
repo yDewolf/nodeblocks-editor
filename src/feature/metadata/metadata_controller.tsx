@@ -1,6 +1,6 @@
 import { createStore, reconcile, SetStoreFunction } from "solid-js/store";
 import { makePersisted } from "@solid-primitives/storage";
-import { DocsPathPrefix } from "../docs/docs-interfaces";
+import { DocsPathPrefix } from "../docs/docs-protocols";
 import { BaseMetadata } from "~/old/wrapper/metadata/base_metadata";
 import { MetadataHeader, MetadataVersion, parse_header } from "~/old/wrapper/metadata/header_metadata";
 import { NodeTypeMeta, DataTypeMeta, parse_node_types, parse_data_types } from "~/old/wrapper/metadata/type_metadata";

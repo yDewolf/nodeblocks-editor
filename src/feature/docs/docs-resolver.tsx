@@ -1,10 +1,9 @@
-import { DocsPathSplitter, metadata } from "~/singletons/metadata";
+import { BaseMetadata } from "~/old/wrapper/metadata/base_metadata";
+import { MetadataHeader } from "~/old/wrapper/metadata/header_metadata";
+import { NodeTypeMeta, DataTypeMeta } from "~/old/wrapper/metadata/type_metadata";
 import { MetadataController, MetadataStoreData } from "../metadata/metadata_controller";
-import { DocPayload, DocsPathPrefix } from "./docs-interfaces";
-import { DataTypeMeta, NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
-import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
-import { MetadataHeader } from "~/wrapper/metadata/header_metadata";
-import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
+import { DocPayload, DocsPathPrefix, DocsPathSplitter } from "./docs-protocols";
+import { DocsPathUtils } from "./helpers/docs-path-utils";
 
 const LOCAL_DATA_ID = "builtin";
 
@@ -12,10 +11,9 @@ const interfaceModules = import.meta.glob("/src/docs/builtin/interface/**/*.json
 const datatypeModules = import.meta.glob("/src/docs/builtin/datatypes/**/*.json");
 
 export class DocsResolver {
-    private _metadata_controller: MetadataController;
-
-    constructor() {
-        this._metadata_controller = metadata;
+    constructor(
+        private readonly metadataController: MetadataController
+    ) {
         this.injectLocalData();
     }
 
@@ -24,9 +22,9 @@ export class DocsResolver {
         const header_meta: MetadataHeader = {
             capitalized_name: "Builtin",
             description: "Metadata for builtin node types and UI elements.",
-            types_id: "builtin",
+            package_id: "builtin",
+            package_version: "0.0.0",
             meta_version: 0,
-            types_version: 0,
             last_modified: 0,
             tags: {},
             categories: {}
@@ -57,18 +55,18 @@ export class DocsResolver {
             data_types: data_types,
             interface: interface_meta
         };
-        this._metadata_controller.insertMetadata(LOCAL_DATA_ID, local_data);
+        this.metadataController.insertMetadata(LOCAL_DATA_ID, local_data);
         return local_data;
     }
 
     public allData() {
-        return this._metadata_controller.get_all();
+        return this.metadataController.get_all();
     }
 
     public async resolve(docs_path: string): Promise<DocPayload> {
         const path_root = DocsPathUtils.extractRootId(docs_path);
         if (docs_path == path_root) {
-            const meta = this._metadata_controller.get_header(path_root);
+            const meta = this.metadataController.get_header(path_root);
 
             if (!meta) throw new Error(`Couldn't find metadata root ${path_root}`);
             return { type: "header", data: meta }
@@ -80,13 +78,13 @@ export class DocsResolver {
         }
 
         if (DocsPathUtils.isType(docs_path, DocsPathPrefix.NODE)) {
-            const meta = this._metadata_controller.get_node_meta(target_id, path_root);
+            const meta = this.metadataController.get_node_meta(target_id, path_root);
             if (!meta) throw new Error(`Couldn't find metadata for node ${target_id}`);
             return { type: "node", data: meta };
         }
 
         if (DocsPathUtils.isType(docs_path, DocsPathPrefix.DATATYPE)) {
-            const meta = this._metadata_controller.get_datatype_meta(target_id, path_root);
+            const meta = this.metadataController.get_datatype_meta(target_id, path_root);
             if (!meta) {
                 const local_path = docs_path.replaceAll(DocsPathSplitter, "/");
                 const full_path = `/src/docs/${local_path}.json`;

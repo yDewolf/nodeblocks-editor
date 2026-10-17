@@ -1,12 +1,14 @@
 import { createSignal, createResource, Resource, createMemo, Accessor } from "solid-js";
-import { docsResolver } from "~/singletons/docs";
 import { isServer } from "solid-js/web";
-import { DocPayload } from "~/feature/docs/docs-interfaces";
-import { MetadataStoreData } from "~/feature/metadata/metadata_controller";
+import { DocPayload } from "~/feature/docs/docs-protocols";
+import { MetadataController, MetadataStoreData } from "~/feature/metadata/metadata_controller";
 import { DocSearchHelper, DocTopic } from "~/feature/docs/helpers/docs-helper";
 import { makePersisted } from "@solid-primitives/storage";
 import { createStore, SetStoreFunction } from "solid-js/store";
 import { DocsPathUtils, DocsRoute } from "~/feature/docs/helpers/docs-path-utils";
+import { DocsResolver } from "./docs-resolver";
+
+// TODO: refatorar isso aqui depois porque tá muito bagunçado
 
 const DOCS_STATE_KEY = "app_docs_state";
 interface DocsState {
@@ -16,6 +18,7 @@ interface DocsState {
 
 
 export class DocsController {
+    private readonly resolver: DocsResolver;
     public readonly state_store: DocsState;
     private setStore: SetStoreFunction<DocsState>;
 
@@ -60,42 +63,36 @@ export class DocsController {
     public docsData: Resource<DocPayload | undefined>;
     public allDocs: Record<string, MetadataStoreData>;
     
-    constructor() {
-        this.allDocs = docsResolver.allData();
-        const [docsStore, setDocsStore] = makePersisted(
+    constructor(
+        private readonly metadataController: MetadataController
+    ) {
+        this.resolver = new DocsResolver(this.metadataController);
+        this.allDocs = this.resolver.allData();
+
+        [this.state_store, this.setStore] = makePersisted(
             createStore<DocsState>({
                 opened_tabs: [],
                 is_docs_page_opened: false,
             }),
             { name: DOCS_STATE_KEY }
         );
-        this.state_store = docsStore;
-        this.setStore = setDocsStore;
         this._doc_topics = createMemo(() => {
             return DocSearchHelper.get_doc_topics(this.allDocs);
         });
 
         // Signals
-        const [hoveredDocElement, setHoveredDocElement] = createSignal<HTMLElement | null>(null);
-        this.hoveredDocElement = hoveredDocElement;
-        this.setHoveredDocElement = setHoveredDocElement;
+        [this.hoveredDocElement, this.setHoveredDocElement] = createSignal<HTMLElement | null>(null);
+        [this.selectedDocElement, this.setSelectedDocElement] = createSignal<HTMLElement | null>(null);
 
-        const [selectedDocElement, setSelectedDocElement] = createSignal<HTMLElement | null>(null);
-        this.selectedDocElement = selectedDocElement;
-        this.setSelectedDocElement = setSelectedDocElement;
-
-        const [_docs_route, _set_docs_route] = createSignal<DocsRoute | undefined>(undefined);
-        this._docs_route = _docs_route;
-        this._set_docs_route = _set_docs_route;
+        [this._docs_route, this._set_docs_route] = createSignal<DocsRoute | undefined>(undefined);
     
-        // Resources and Memos
         const currentPathMemo = createMemo(() => this.route?.path);
         const docsDataResource = createResource(currentPathMemo, async (path) => {
             if (!path || isServer) {
                 return undefined;
             }
             try {
-                const data = await docsResolver.resolve(path);
+                const data = await this.resolver.resolve(path);
                 return data;
             } catch (e) {
                 console.warn(e);

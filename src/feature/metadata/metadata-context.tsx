@@ -1,6 +1,6 @@
 import { createContext, Match, Switch, useContext } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
-import { DocPayload } from "~/feature/docs/docs-interfaces";
+import { DocPayload } from "~/feature/docs/docs-protocols";
 import { MetadataController, MetadataStoreData } from "~/feature/metadata/metadata_controller";
 import { NodeTypeMeta, DataTypeMeta } from "~/old/wrapper/metadata/type_metadata";
 
@@ -13,7 +13,7 @@ export function MetadataProvider(props: { controller: MetadataController, childr
     );
 }
 
-export function useMetadta() {
+export function useMetadata() {
     const context = useContext(MetadataContext);
     if (!context) {
         throw new Error("Not inside a '<MetadataProvider/>'");

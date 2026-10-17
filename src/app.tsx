@@ -10,6 +10,7 @@ import { UpdateRootDataTheme } from "./feature/ui-themes";
 import { ClientSceneCommandTypes, CommandGroups } from "./protocols/nodeblocks/network/client-command-protocol";
 import { nanoid } from "nanoid";
 import { MetadataProvider, MetaProvider } from "./feature/metadata/metadata-context";
+import { DocsProvider } from "./feature/docs/docs-context";
 
 interface AppContextData {
   appSession: AppSessionManager,
@@ -66,13 +67,15 @@ const TestComponent = () => {
 
   return (
     <MetadataProvider controller={editor.metadataController}>
-      <InputManagerProvider manager={editor.inputManager}>
-        <DefinedInputScope context={editor.globalInputContext}>
-          <EventManagerProvider manager={editor.eventManager}>
-            <EditorView />
-          </EventManagerProvider>
-        </DefinedInputScope>
-      </InputManagerProvider>
+      <DocsProvider metadataController={editor.metadataController}>
+        <InputManagerProvider manager={editor.inputManager}>
+          <DefinedInputScope context={editor.globalInputContext}>
+            <EventManagerProvider manager={editor.eventManager}>
+              <EditorView />
+            </EventManagerProvider>
+          </DefinedInputScope>
+        </InputManagerProvider>
+      </DocsProvider>
     </MetadataProvider>
   )
 }

@@ -15,7 +15,7 @@ import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-co
 import { NodeFieldSelector } from "./node-field";
 import { NotificationPopupHolder } from "../notification-badges";
 import { useNotifications } from "../../contexts/notification-context";
-import { NodeMetaProvider, useMetadta as useMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
+import { NodeMetaProvider, useMetadata as useMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;

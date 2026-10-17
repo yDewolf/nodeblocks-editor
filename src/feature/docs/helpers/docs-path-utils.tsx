@@ -1,8 +1,8 @@
-import { DocsPathPrefix } from "~/feature/docs/docs-interfaces";
-import { DocsPathSplitter } from "~/singletons/metadata";
-import { BaseDataType } from "~/wrapper/nodes/data/node-data-type";
-import { GraphNode } from "~/wrapper/nodes/graph-node";
-import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
+import { DocsPathPrefix, DocsPathSplitter } from "~/feature/docs/docs-protocols";
+import { BaseDataType } from "~/old/wrapper/nodes/data/node-data-type";
+import { GraphNode } from "~/old/wrapper/nodes/graph-node";
+import { NodeSlot } from "~/old/wrapper/nodes/slot/node-slot";
+
 
 export const CURRENT_PATH = "{current}";
 export interface DocsRoute {

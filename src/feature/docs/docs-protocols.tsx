@@ -1,8 +1,6 @@
-import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
-import { MetadataHeader } from "~/wrapper/metadata/header_metadata";
-import { DataTypeMeta, NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
-
-// TODO: rename this file to docs-protocols
+import { BaseMetadata } from "~/old/wrapper/metadata/base_metadata";
+import { MetadataHeader } from "~/old/wrapper/metadata/header_metadata";
+import { NodeTypeMeta, DataTypeMeta } from "~/old/wrapper/metadata/type_metadata";
 
 export interface InterfaceElementMeta extends BaseMetadata {
     shortcut?: string;
@@ -15,6 +13,8 @@ export type DocPayload =
     | { type: "interface"; data: InterfaceElementMeta }
     | { type: "header"; data: MetadataHeader }
 ;
+
+export const DocsPathSplitter = ".";
 
 export enum DocsPathPrefix {
     HEADER = "",

@@ -1,13 +1,12 @@
-import { DocPayload, DocsPathPrefix } from "~/feature/docs/docs-interfaces";
+import { DocPayload, DocsPathPrefix, DocsPathSplitter } from "~/feature/docs/docs-protocols";
 import { createMemo, For, Match, Show, Switch } from 'solid-js';
-import { NodeCategory, NodeTag } from "~/wrapper/metadata/node_filters";
-import { NodeTypeMeta } from "~/wrapper/metadata/type_metadata";
-import TagIcon from "~/assets/icons/tag.svg";
-import { DocsPathSplitter } from "~/singletons/metadata";
-import { BaseMetadata } from "~/wrapper/metadata/base_metadata";
 import { DropdownSection } from "../../../components/panels/dropdown";
 import { DocsHref } from "./docs-reference";
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
+import { BaseMetadata } from "~/old/wrapper/metadata/base_metadata";
+import { NodeCategory, NodeTag } from "~/old/wrapper/metadata/node_filters";
+import { NodeTypeMeta } from "~/old/wrapper/metadata/type_metadata";
+import TagIcon from '~/assets/icons/tag.svg';
 
 type PathPart = {
     path: string[],

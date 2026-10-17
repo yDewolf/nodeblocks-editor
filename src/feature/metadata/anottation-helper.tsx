@@ -1,7 +1,7 @@
 import { JSX } from "solid-js";
 import { MetadataHeader } from "~/wrapper/metadata/header_metadata";
 import { NodeTypeMeta, DataTypeMeta } from "~/wrapper/metadata/type_metadata";
-import {  InterfaceElementMeta } from "../docs/docs-interfaces";
+import {  InterfaceElementMeta } from "../docs/docs-protocols";
 import { useResolvedMeta } from "~/feature/metadata/metadata-context";
 import { DocsHref } from "~/editor/ui/components/docs/docs-reference";
 import { CURRENT_PATH, DocsPathUtils, DocsRoute } from "../docs/helpers/docs-path-utils";

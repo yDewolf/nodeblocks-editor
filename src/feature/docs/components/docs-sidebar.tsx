@@ -1,13 +1,13 @@
 import { createEffect, createMemo, For, Match, Switch } from 'solid-js';
 import { useDocs } from "~/feature/docs/docs-context";
-import { DocPayload, DocsPathPrefix } from "~/feature/docs/docs-interfaces";
+import { DocPayload, DocsPathPrefix } from "~/feature/docs/docs-protocols";
 import { MetadataStoreData } from "~/feature/metadata/metadata_controller";
 import { DropdownSection } from "../../../components/panels/dropdown";
-import { MetadataStoreSubContent } from "../../components/docs/docs-components";
 import CloseIcon from '~/assets/icons/close.svg';
 import { DocSearchBar } from './docs-searchbar';
 import { DocsHref } from './docs-reference';
 import { DocsPathUtils } from '~/feature/docs/helpers/docs-path-utils';
+import { MetadataStoreSubContent } from './docs-components';
 
 export const DocsSidebar = (props: {
     docs_data?: DocPayload
