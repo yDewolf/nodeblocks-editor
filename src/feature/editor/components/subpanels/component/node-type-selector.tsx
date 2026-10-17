@@ -97,12 +97,13 @@ export class NodeTypePreview {
     private _selected: () => boolean;
 
     constructor(
-        private readonly spec: NodeTypeSpec
+        private readonly _spec: NodeTypeSpec
     ) {
         [this._selected, this._set_selected] = createSignal(false);
     }
 
-    get nodetype() { return this.spec.fqn; }
+    get nodetype() { return this._spec.fqn; }
+    get spec() { return this._spec; }
     set selected(value: boolean) { this._set_selected(value) }
 
     public View(onPointerDown: (node_preview: NodeTypePreview) => void) {
@@ -119,7 +120,7 @@ export class NodeTypePreview {
                 }}
             >
                 <div class="remove-input">
-                    <NodePreview spec={this.spec}/>
+                    <NodePreview spec={this._spec}/>
                 </div>
             </div>
         );

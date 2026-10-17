@@ -67,7 +67,7 @@ const TestComponent = () => {
 
   return (
     <MetadataProvider controller={editor.metadataController}>
-      <DocsProvider metadataController={editor.metadataController}>
+      <DocsProvider controller={editor.docsController}>
         <DocsUrlSync />
         <InputManagerProvider manager={editor.inputManager}>
           <DefinedInputScope context={editor.globalInputContext}>

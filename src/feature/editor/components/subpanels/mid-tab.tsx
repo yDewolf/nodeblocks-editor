@@ -4,22 +4,11 @@ import { EditorToolbar } from "./component/editor-toolbar";
 import { PageView, PageViewer, StaticViewDisplayer } from '../../../../components/page-controller';
 import { Show } from "solid-js";
 import DocsIcon from "~/assets/icons/book.svg";
-import { useEditor } from "~/feature/scene-editor-context";
-import { DocsTool } from "../../tools/docs-tool";
 
 export const EditorMidTab = (props: {
     page_viewer: PageViewer, 
-    // editor: NodeEditor, 
     docs_page: PageView
 }) => {
-    
-    // FIXME: shouldn't access tool controller for this
-    useEditor().toolController.tools.forEach((tool) => {
-        if (tool instanceof DocsTool) {
-            tool.onSelectDocumentation = () => props.page_viewer.current_page = props.docs_page;
-        }
-    });
-
     return (
         <div class="middle-tab-holder">
             <Show when={!props.page_viewer.current_page} fallback={

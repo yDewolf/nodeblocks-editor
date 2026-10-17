@@ -15,7 +15,7 @@ import { SceneRuntimeProvider } from '../scene/scene-runtime-context';
 import { NotificationProvider } from './contexts/notification-context';
 import { EditorDocsView } from './screens/docs-view';
 import MinimizeIcon from '~/assets/icons/minimize.svg';
-import { createEffect } from 'solid-js';
+import { createEffect, onMount } from 'solid-js';
 import { useDocs } from '../docs/docs-context';
 import { DocsElementIndicator } from './components/selected-docs-indicator';
 
@@ -24,6 +24,7 @@ export const EditorView = () => {
     const main_page_viewer = new PageViewer();
     
     let editor_view_ref: HTMLDivElement | undefined;
+    let world_space_ref: HTMLDivElement | undefined;
     
     // FIXME: Implement a better way of indexing pages on a pageviewer and accessing them
     const DocsCallback = () => <EditorDocsView />;
@@ -40,6 +41,11 @@ export const EditorView = () => {
     
     const isDocsPageVisible = () => main_page_viewer.current_page === docsPage;    
 
+    onMount(() => {
+        if (useDocs().is_docs_page_opened) {
+            openDocsPage();
+        }
+    })
     createEffect(() => {
         useDocs().is_docs_page_opened = isDocsPageVisible();
     });
@@ -59,7 +65,7 @@ export const EditorView = () => {
                             onPointerDown={(e) => {editor.toolController.current_tool?.globalOnPointerDown(e)}}
                             onPointerMove={(e) => editor.toolController.current_tool?.globalOnPointerMove(e)}
                             >
-                            <EditorSceneCanvas></EditorSceneCanvas>
+                            <EditorSceneCanvas world_space_ref={world_space_ref}></EditorSceneCanvas>
                             <div
                                 class="editor-ui" 
                                 onPointerMove={(e) => editor.eventManager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
@@ -68,7 +74,7 @@ export const EditorView = () => {
                                 <EditorMidTab page_viewer={main_page_viewer} docs_page={docsPage}/>
                                 <EditorRightPanel/>
                             </div>
-                            {/* <DocsElementIndicator open_docs_page={openDocsPage} docsPageVisible={isDocsPageVisible} input_manager={editor.input_manager} tool_controller={editor.tool_controller} editor_camera={editor.editor_space.camera} world_space_ref={world_space_ref} editor_view_ref={editor_view_ref}/> */}
+                            <DocsElementIndicator open_docs_page={openDocsPage} docsPageVisible={isDocsPageVisible} world_space_ref={world_space_ref} editor_view_ref={editor_view_ref}/>
                         </div>
                     </SceneCanvasProvider>
                 </NotificationProvider>

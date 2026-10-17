@@ -1,11 +1,10 @@
 import { Component, For, JSXElement } from "solid-js";
 import CursorIcon from "~/assets/icons/cursor.svg";
 import { EditorTool } from "~/feature/editor/tools/base-tool";
+import { DocsTool } from "~/feature/editor/tools/docs-tool";
 import { SelectionTool } from "~/feature/editor/tools/selection-tool";
 // import CommentIcon from "~/assets/icons/comment.svg";
-// import AskDocsIcon from "~/assets/icons/ask-about.svg";
-// import { DocsTool } from "~/editor/tools/docs-tool";
-// import { CommentTool } from "~/editor/tools/comment-tool";
+import AskDocsIcon from "~/assets/icons/ask-about.svg";
 import { useEditor } from "~/feature/scene-editor-context";
 
 interface EditorToolStyle {
@@ -13,7 +12,7 @@ interface EditorToolStyle {
 }
 const TOOL_ICON_MAP = new Map<string, EditorToolStyle>([
     [SelectionTool.name, {icon: CursorIcon}],
-    // [DocsTool.name, {icon: AskDocsIcon}],
+    [DocsTool.name, {icon: AskDocsIcon}],
     // [CommentTool.name, {icon: CommentIcon}]
 ]);
 

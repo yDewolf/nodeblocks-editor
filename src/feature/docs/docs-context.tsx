@@ -3,14 +3,11 @@ import { JSX } from "solid-js/jsx-runtime";
 import { isServer } from "solid-js/web";
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
 import { DocsController } from "./docs-controller";
-import { MetadataController } from "../metadata/metadata_controller";
-
 
 const DocsContext = createContext<DocsController>();
-export function DocsProvider(props: { metadataController: MetadataController, children: JSX.Element; }) {
-    const controller = new DocsController(props.metadataController);
+export function DocsProvider(props: { controller: DocsController, children: JSX.Element; }) {
     return (
-        <DocsContext.Provider value={controller}>
+        <DocsContext.Provider value={props.controller}>
             {props.children}
         </DocsContext.Provider>
     );

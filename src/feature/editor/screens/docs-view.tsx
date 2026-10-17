@@ -11,7 +11,6 @@ import AskDocsIcon from "~/assets/icons/ask-about.svg";
 import { DynamicMetaProvider, MetaProvider } from "~/feature/metadata/metadata-context";
 import { ParsedMetaText } from '../../metadata/components/metadata-text';
 import { DocsSidebar } from "~/feature/docs/components/docs-sidebar";
-import { EditorTool } from "../tools/base-tool";
 import { PackageManager } from '../engine/packages/package-manager';
 import { useEditor } from "~/feature/scene-editor-context";
 

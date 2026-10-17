@@ -19,6 +19,8 @@ import { CanvasElementController } from '../scene/controllers/canvas-element-con
 import { SceneRuntimeController } from '../scene/controllers/scene-runtime-controller';
 import { NotificationController } from './controllers/notification/notification-controller';
 import { MetadataController } from '../metadata/metadata_controller';
+import { DocsTool } from './tools/docs-tool';
+import { DocsController } from '../docs/docs-controller';
 
 export class SceneEditor {
     private _scene: NodeScene;
@@ -38,6 +40,7 @@ export class SceneEditor {
 
     private _notificationController: NotificationController;
     private _metadataController: MetadataController;
+    private _docsController: DocsController;
 
     constructor(
         private _appSession: AppSessionManager,
@@ -61,15 +64,16 @@ export class SceneEditor {
         this._notificationController = new NotificationController(this.sceneConnection, this.elementController);
 
         this._metadataController = new MetadataController(this.appSession, this.packageManager);
+        this._docsController= new DocsController(this.metadataController);
 
         this._register_handlers();
         this.setup_event_handlers();
         this.setup_keybinds();
         
         // this.toolController.add_tool(new CommentTool(this.node_editor));
-        // this.toolController.add_tool(new DocsTool(this.node_editor));
         this._toolController = new ToolController(this.globalInputContext);
         this._toolController.add_tool(new SelectionTool(this.scene, this.actionController, this.selectionController, this._elementController));
+        this.toolController.add_tool(new DocsTool(this.docsController));
         this._toolController.change_tool(0)
     }
 
@@ -82,6 +86,7 @@ export class SceneEditor {
 
     get notificationController() { return this._notificationController; }
     get metadataController() { return this._metadataController; }
+    get docsController() { return this._docsController; }
 
     get appSession() { return this._appSession; }
     get packageManager() { return this._packageManager; }

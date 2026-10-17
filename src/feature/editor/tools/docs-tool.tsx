@@ -1,11 +1,11 @@
-import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { BaseEditorTool } from "./base-tool";
-import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
-import { NodeTypePreview } from "../components/node-type-selector";
-import { NodeEditor } from "../node-editor";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { createSignal } from "solid-js";
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
+import { DocsController } from "~/feature/docs/docs-controller";
+import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
+import { NodeTypePreview } from "../components/subpanels/component/node-type-selector";
+import { SceneNode } from "~/feature/scene/objects/scene-node";
 
 export class DocsTool extends BaseEditorTool {
     protected _selected_docs_path: string | undefined = undefined;
@@ -15,23 +15,19 @@ export class DocsTool extends BaseEditorTool {
     protected _last_pos: () => Vector2 | undefined;
     protected _set_last_pos: (value: Vector2 | undefined) => void;
 
-    constructor(node_editor: NodeEditor) {
-        super(node_editor);
-        const [lastPos, setLastPos] = createSignal<Vector2 | undefined>(undefined);
-        this._last_pos = lastPos;
-
-        this._set_last_pos = setLastPos;
+    constructor(
+        private readonly docsController: DocsController
+    ) {
+        super();
+        [this._last_pos, this._set_last_pos] = createSignal<Vector2 | undefined>(undefined);
     }
 
     get last_selected_pos() { return this._last_pos(); }
 
     protected set selected_docs_path(path: string | undefined) {
-        const docs = this.node_editor.docs_controller;
-        if (!docs) return;
-        
         if (this._selected_docs_path != path) {
             this._selected_docs_path = path;
-            docs.docs_path = this._selected_docs_path;
+            this.docsController.docs_path = this._selected_docs_path;
         }
 
         if (this._selected_docs_path) {
@@ -40,9 +36,6 @@ export class DocsTool extends BaseEditorTool {
     }
     
     globalOnPointerMove = (e: PointerEvent): void => {
-        const docs = this.node_editor.docs_controller;
-        if (!docs) return;
-        
         const currentTarget = e.target as HTMLElement;
         if (!currentTarget) {
             this.clearElement();
@@ -55,22 +48,17 @@ export class DocsTool extends BaseEditorTool {
 
             if (docs_element) {
                 this.lastHoveredElement = docs_element;
-                docs.setHoveredDocElement(docs_element);
+                this.docsController.setHoveredDocElement(docs_element);
             }
         }
     }
 
     public clearElement = (): void => {
-        const docs = this.node_editor.docs_controller;
-        if (!docs) return;
-        
         this.lastHoveredElement = null;
-        docs.setHoveredDocElement(null);
+        this.docsController.setHoveredDocElement(null);
     }
 
     globalOnPointerDown = (e: PointerEvent): void => {
-        const docs = this.node_editor.docs_controller;
-        if (!docs) return;
         // Select UI element docs path
         const clickedElement = e.target as HTMLElement;
         if (!clickedElement) return;
@@ -81,7 +69,7 @@ export class DocsTool extends BaseEditorTool {
         
         let docs_element = clickedElement.closest("[docs-id], [has-docs]") as HTMLElement;
         if (docs_element) {
-            docs.setSelectedDocElement(docs_element as HTMLElement);
+            this.docsController.setSelectedDocElement(docs_element as HTMLElement);
             e.preventDefault();
             e.stopPropagation();
 
@@ -94,20 +82,23 @@ export class DocsTool extends BaseEditorTool {
         }
     }
 
-    onClickOnNodeSlot(slot: NodeSlot): void {
+    onClickOnNodeSlot(slot: SceneNodeSlot): void {
         // Select DataType type id as path
-        this.selected_docs_path = DocsPathUtils.makeDataTypePath(slot.data_type.root_id, undefined, slot)
+        const fqn = slot.instance.spec.data_type_id;
+        const [namespace, id] = fqn.split(":");
+
+        this.selected_docs_path = DocsPathUtils.makeDataTypePath(namespace, undefined, id);
         this._set_last_pos(undefined);
     }
 
     onClickOnNodePreview(node_preview: NodeTypePreview): void {
-        this.selected_docs_path = DocsPathUtils.makeNodePath(node_preview.node_constructor.root_id, undefined, node_preview.node_constructor.type_id)    
+        this.selected_docs_path = DocsPathUtils.makeNodePath(node_preview.spec.namespace, node_preview.spec)    
         this._set_last_pos(undefined);
     }
 
-    onClickOnNode(node: GraphNode): void {
+    onClickOnNode(node: SceneNode): void {
         // Select Node type id as path
-        this.selected_docs_path = DocsPathUtils.makeNodePath(node.root_id, node);
+        this.selected_docs_path = DocsPathUtils.makeNodePath(node.instance.spec.namespace, node.instance.spec);
         this._set_last_pos(undefined);
     }
 }

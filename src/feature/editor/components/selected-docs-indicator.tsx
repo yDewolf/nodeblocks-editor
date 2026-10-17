@@ -1,14 +1,12 @@
 import { createEffect, createSignal, JSX, Show, createMemo, onCleanup } from 'solid-js';
 import { Portal } from 'solid-js/web';
 import { useDocs } from "~/feature/docs/docs-context";
-import { ToolController } from "~/editor/controllers/tool-controller";
-import { EditorCamera } from '~/editor/internal/editor-space';
-import { KeyEventManager } from '~/editor/internal/input_manager/input-manager';
-import { DocsTool } from "~/editor/tools/docs-tool";
 import DocsIcon from '~/assets/icons/book.svg';
 import ExpandIcon from '~/assets/icons/expand.svg';
 import { MetaProvider } from '~/feature/metadata/metadata-context';
 import { ParsedMetaText } from '../../metadata/components/metadata-text';
+import { useEditor } from '~/feature/scene-editor-context';
+import { DocsTool } from '../tools/docs-tool';
 
 // Não sei se fica melhor continuar mostrando o selecionado ou mostrar apenas o hovered
 const KeepSelectedHighlighted = false;
@@ -16,14 +14,13 @@ const KeepSelectedHighlighted = false;
 // TODO: Arrumar quando você seleciona um elemento dentro de um scroll
 // o indicador não acompanha o elemento
 export const DocsElementIndicator = (props: {
-    input_manager: KeyEventManager,
-    tool_controller: ToolController, 
-    editor_camera: EditorCamera, 
     world_space_ref?: HTMLDivElement,
     editor_view_ref?: HTMLDivElement,
     open_docs_page: () => void,
     docsPageVisible: () => boolean
 }) => {
+    const editor = useEditor();
+    const camera = editor.selectionController.space.camera;
     const docs = useDocs();
     let PopupRef: HTMLDivElement | undefined;
     const [style, setStyle] = createSignal<JSX.CSSProperties>({});
@@ -39,11 +36,11 @@ export const DocsElementIndicator = (props: {
         return hovered_element;
     });
 
-    const isToolActive = () => props.tool_controller.current_tool instanceof DocsTool;
+    const isToolActive = () => editor.toolController.current_tool instanceof DocsTool;
     
     const selectedMousePos = () => {
-        if (props.tool_controller.current_tool instanceof DocsTool) {
-            return props.tool_controller.current_tool.last_selected_pos;
+        if (editor.toolController.current_tool instanceof DocsTool) {
+            return editor.toolController.current_tool.last_selected_pos;
         } 
         return undefined;
     };
@@ -67,7 +64,7 @@ export const DocsElementIndicator = (props: {
             const canvasRect = props.world_space_ref.getBoundingClientRect();
             
             if (docs.selectedDocElement() == target_element) {
-                const cameraCenter = props.editor_camera.offset.x + props.editor_camera.size.x / 2;
+                const cameraCenter = camera.offset.x + camera.size.x / 2;
                 const elementCenter = rect.left + rect.width / 2;
                 const rightSide = elementCenter > cameraCenter;
                 setIsToRight(rightSide);
@@ -80,8 +77,8 @@ export const DocsElementIndicator = (props: {
                 setPopupStyle({
                     width: "max-content",
                     position: "absolute",
-                    top: `${(rect.top - canvasRect.top) / props.editor_camera.zoom}px`,
-                    left: `${leftPos / props.editor_camera.zoom}px`,
+                    top: `${(rect.top - canvasRect.top) / camera.zoom}px`,
+                    left: `${leftPos / camera.zoom}px`,
                     transform: rightSide ? "translateX(-100%)" : undefined,
                     "z-index": 11
                 });
@@ -89,10 +86,10 @@ export const DocsElementIndicator = (props: {
         
             setStyle({
                 position: "absolute",
-                top: `${(rect.top - canvasRect.top) / props.editor_camera.zoom}px`,
-                left: `${(rect.left - canvasRect.left) / props.editor_camera.zoom}px`,
-                width: `${rect.width / props.editor_camera.zoom}px`,
-                height: `${(rect.height / props.editor_camera.zoom)}px`,
+                top: `${(rect.top - canvasRect.top) / camera.zoom}px`,
+                left: `${(rect.left - canvasRect.left) / camera.zoom}px`,
+                width: `${rect.width / camera.zoom}px`,
+                height: `${(rect.height / camera.zoom)}px`,
                 opacity: 1,
                 "z-index": 10
             });
