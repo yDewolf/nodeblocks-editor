@@ -16,7 +16,7 @@ import { SelectedNodeType } from "~/feature/editor/components/subpanels/componen
 import { GridView } from "~/feature/editor/components/canvas/grid-view";
 
 export const EditorSceneCanvas = (props: {
-    world_space_ref?: HTMLDivElement | undefined
+    setWorldSpaceRef: (ref: HTMLDivElement | undefined) => void
 }) => {
     const editor = useEditor();
     const scene = useScene();
@@ -83,7 +83,7 @@ export const EditorSceneCanvas = (props: {
                 </div>
                 
                 <div 
-                    ref={(ref) => props.world_space_ref = ref}
+                    ref={(ref) => props.setWorldSpaceRef(ref)}
                     class="world-space"
                     style={{
                         "transform-origin": "0 0",
