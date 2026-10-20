@@ -2,7 +2,7 @@ import { createContext, Match, Switch, useContext } from "solid-js";
 import { JSX } from "solid-js/jsx-runtime";
 import { DocPayload } from "~/feature/docs/docs-protocols";
 import { MetadataController, MetadataStoreData } from "~/feature/metadata/metadata_controller";
-import { NodeTypeMeta, DataTypeMeta } from "~/old/wrapper/metadata/type_metadata";
+import { NodeTypeMeta, DataTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 
 const MetadataContext = createContext<MetadataController>();
 export function MetadataProvider(props: { controller: MetadataController, children: JSX.Element; }) {

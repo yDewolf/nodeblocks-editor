@@ -1,4 +1,4 @@
-import { MetadataHeader } from "~/old/wrapper/metadata/header_metadata";
+import { MetadataHeader } from "~/protocols/nodeblocks/metadata/header_metadata";
 import { useDocs } from "../../docs-context";
 import { createMemo } from "solid-js";
 import { SimpleField, FieldValueDisplayer } from "~/components/input-fields";

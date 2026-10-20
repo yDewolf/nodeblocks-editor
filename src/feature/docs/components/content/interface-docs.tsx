@@ -1,15 +1,10 @@
 import { InterfaceElementMeta } from "~/feature/docs/docs-protocols";
-import { SceneController } from "~/old/wrapper/controllers/scene-controller";
 
 export const InterfaceDocsContent = (props: {
-    path: string | undefined,
-    data?: InterfaceElementMeta,
+    path?: string,
+    data: InterfaceElementMeta,
     devMode: boolean
 }) => {
-    if (!props.data) {
-        return <span>Couldn't load documentation</span>
-    }
-
     return (
         <div class="keep fill container docs-sections">
             {/* Pensar no que colocar aqui */}

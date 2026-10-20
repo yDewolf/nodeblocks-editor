@@ -178,7 +178,7 @@ export const DocsElementIndicator = (props: {
                             </button>
                         </div>
                         {/* TODO: implement a brief description field in metadata */}
-                        <ParsedMetaText class="docs-popup-description" text={docs.docsData.latest?.data.description} default=""/>
+                        <ParsedMetaText class="docs-popup-description" text={(docs.docsData.latest?.data.brief ?? docs.docsData.latest?.data.description)} default=""/>
                     </div>
                 </Portal>
             </Show>

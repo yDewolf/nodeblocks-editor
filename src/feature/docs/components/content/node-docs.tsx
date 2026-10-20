@@ -1,4 +1,4 @@
-import { createMemo, JSXElement, For, Show } from "solid-js";
+import { createMemo, JSXElement, For, Show, createSignal } from "solid-js";
 import { NodeSlotSpec, NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { DropdownSection } from "../../../../components/panels/dropdown";
 import { NodePreview } from "../../../editor/components/node/node-component";
@@ -11,7 +11,7 @@ import FilterIcon from "~/assets/icons/filter.svg";
 import { DocsHref } from "../docs-reference";
 import { ParsedMetaText } from '../../../metadata/components/metadata-text';
 import { DocsPathUtils } from '../../helpers/docs-path-utils';
-import { NodeTypeMeta, ParameterMeta, SlotMeta } from "~/old/wrapper/metadata/type_metadata";
+import { NodeTypeMeta, ParameterMeta, SlotMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import { PackageManager } from "~/feature/editor/engine/packages/package-manager";
 import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
 import { DataTypeSpec, ParameterSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
@@ -20,15 +20,15 @@ import { NodeMetaProvider } from '../../../metadata/metadata-context';
 
 export const NodeDocsContent = (props: {
     path: string | undefined,
-    data?: NodeTypeMeta,
+    data: NodeTypeMeta,
     packageManager: PackageManager,
     devMode: boolean
-}) => {
-    if (!props.data) {
-        return <span>Couldn't load documentation</span>
-    }
-
+}) => { 
+    const [notif, setNotify] = createSignal(0);
+    props.packageManager.subscribePackageLoad(() => setNotify(notif() + 1));
+    
     const spec = createMemo(() => {
+        notif();
         const package_id = DocsPathUtils.extractRootId(props.path ?? "");
         const type_id = DocsPathUtils.extractTargetId(props.path ?? "");
 
@@ -92,7 +92,7 @@ const BadgeTag = (props: { badge: DropdownBadge }) => (
 
 const SlotDropdownItem = (props: {
     slot_id: string,
-    datatype?: DataTypeSpec,
+    datatype: DataTypeSpec,
     slot_spec: NodeSlotSpec,
     slot_meta: SlotMeta,
     devMode: boolean,

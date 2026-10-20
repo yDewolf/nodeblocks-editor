@@ -1,4 +1,4 @@
-import { createMemo, createSignal, Match, Switch } from "solid-js";
+import { createMemo, createSignal, Match, Show, Switch } from "solid-js";
 import { DataTypeValuePack, DataTypeValueSelector } from "~/feature/scene/components/value/datatype-value-view";
 import { FieldValueDisplayer, SimpleField } from "../../../../components/input-fields";
 import RefreshIcon from '~/assets/icons/refresh.svg';
@@ -6,24 +6,26 @@ import { createStore } from "solid-js/store";
 import { DocsHref } from "../docs-reference";
 import { DataTypeMetaProvider } from "~/feature/metadata/metadata-context";
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
-import { DataTypeMeta } from "~/old/wrapper/metadata/type_metadata";
+import { DataTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import { PackageManager } from "~/feature/editor/engine/packages/package-manager";
 import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
 import { DataTypeSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
 import { DataTypeGenParams, generate_datatype_random_value } from "~/old/wrapper/nodes/data/data-type-value-utils";
 import { DefaultRenderers } from "~/old/wrapper/nodes/data/node-data-type";
 
+// TODO: adicionar specs builtin dos tipos padrão
+
 export const DataTypeDocsContent = (props: {
-    path: string | undefined,
-    data?: DataTypeMeta,
+    path?: string,
+    data: DataTypeMeta,
     packageManager: PackageManager,
     devMode: boolean
 }) => {
-    if (!props.data) {
-        return <span>Couldn't load documentation</span>
-    }
-    
+    const [notif, setNotify] = createSignal(0);
+    props.packageManager.subscribePackageLoad(() => setNotify(notif() + 1));
+
     const spec = createMemo(() => {
+        notif();
         const package_id = DocsPathUtils.extractRootId(props.path ?? "");
         const type_id = DocsPathUtils.extractTargetId(props.path ?? "");
 
@@ -33,30 +35,30 @@ export const DataTypeDocsContent = (props: {
         }
         const spec = props.packageManager.registry.getDataTypeSpec(fqn);
         return spec;
-    })
+    });
 
     return (
         <DataTypeMetaProvider value={props.data}>
-            <div class="keep fill container docs-sections">
-                <DataTypeAttributes meta={props.data} spec={spec()}/>
-                <DataTypePreview meta={props.data} spec={spec()}/>
-            </div>
+            <Show when={spec()} fallback={
+                <div class="text-section">
+                    <p>Couldn't find a DataType Object</p>
+                </div>
+            }>
+                {(dataTypeSpec) => 
+                    <div class="keep fill container docs-sections">
+                        <DataTypeAttributes meta={props.data} spec={dataTypeSpec()}/>
+                        <DataTypePreview meta={props.data} spec={dataTypeSpec()}/>
+                    </div>
+                }
+            </Show>
         </DataTypeMetaProvider>
     )
 }
 
 const DataTypeAttributes = (props: {
     meta: DataTypeMeta,
-    spec?: DataTypeSpec
+    spec: DataTypeSpec
 }) => {
-    // TODO: Mexer nisso aqui depois para não ficar repetitivo com os outros subcomponentes
-    if (!props.spec) {
-        return <div class="text-section">
-            <h3>Attributes</h3>
-            <p>Couldn't find a DataType Object</p>
-        </div>
-    }
-
     // TODO: arrumar essa referência do base id
     const base_id = (props.spec ? props.spec.base_id as string : undefined) ?? "unknown";
     return (
@@ -75,16 +77,8 @@ const DataTypeAttributes = (props: {
 
 const DataTypePreview = (props: {
     meta: DataTypeMeta,
-    spec?: DataTypeSpec
+    spec: DataTypeSpec
 }) => {
-    // TODO: Mexer nisso aqui depois para não ficar repetitivo com os outros subcomponentes
-    if (!props.spec) {
-        return <div class="text-section">
-            <h3>Output Preview</h3>
-            <p>Couldn't find a DataType Object</p>
-        </div>
-    }
-    
     const [fetch_signal, refetch] = createSignal(false);
     const [genParams, setGenParams] = createStore<DataTypeGenParams>({});
     const preview_value = createMemo(() => {

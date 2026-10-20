@@ -1,4 +1,4 @@
-import { createEffect, createMemo, For, Match, Switch } from 'solid-js';
+import { createEffect, createMemo, For, Match, Show, Switch } from 'solid-js';
 import { useDocs } from "~/feature/docs/docs-context";
 import { DocPayload, DocsPathPrefix } from "~/feature/docs/docs-protocols";
 import { MetadataStoreData } from "~/feature/metadata/metadata_controller";
@@ -41,16 +41,19 @@ export const DocsSidebar = (props: {
                 <DocSearchBar />
                 <div class="scrollable fill keep container">
                     <For each={loaded_docs()}>
-                        {(type_id, idx) => {
-                            const data = docs.allDocs[type_id];
-                            console.log(type_id);
+                        {(package_id, idx) => {
+                            const data = docs.allDocs[package_id];
                             return (
                                 <DropdownSection 
                                     dropdown_class="list"
-                                    header={type_id}
+                                    header={package_id}
                                     header_class=""
                                     content={
-                                        <MetadataContentIndex data={data} root_id={type_id}/>
+                                        <Show when={data}>
+                                            {(package_docs) => 
+                                                <MetadataContentIndex data={package_docs()} root_id={package_id}/>
+                                            }
+                                        </Show>
                                     }
                                 />
                             )
@@ -98,7 +101,7 @@ export const DocsSidebar = (props: {
 
 export const MetadataContentIndex = (props: {
     root_id: string,
-    data: MetadataStoreData
+    data?: MetadataStoreData
 }) => {
     return <div class="fill container">
         {/* Procedural way of generating these dropdowns */}
@@ -111,8 +114,8 @@ export const MetadataContentIndex = (props: {
         </For> */}
 
         <DocsHref route={{path: props.root_id}}>header</DocsHref>
-        <MetadataStoreSubContent data={props.data.data_types} header="datatypes" docs_prefix={DocsPathPrefix.DATATYPE} root_id={props.root_id}/>
-        <MetadataStoreSubContent data={props.data.node_types} header="nodetypes" docs_prefix={DocsPathPrefix.NODE} root_id={props.root_id}/>
-        <MetadataStoreSubContent data={props.data.interface} header="interface" docs_prefix={DocsPathPrefix.UI} root_id={props.root_id}/>
+        <MetadataStoreSubContent data={props.data?.data_types} header="datatypes" docs_prefix={DocsPathPrefix.DATATYPE} root_id={props.root_id}/>
+        <MetadataStoreSubContent data={props.data?.node_types} header="nodetypes" docs_prefix={DocsPathPrefix.NODE} root_id={props.root_id}/>
+        <MetadataStoreSubContent data={props.data?.interface} header="interface" docs_prefix={DocsPathPrefix.UI} root_id={props.root_id}/>
     </div>
 }

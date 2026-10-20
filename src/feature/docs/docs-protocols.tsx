@@ -1,6 +1,6 @@
-import { BaseMetadata } from "~/old/wrapper/metadata/base_metadata";
-import { MetadataHeader } from "~/old/wrapper/metadata/header_metadata";
-import { NodeTypeMeta, DataTypeMeta } from "~/old/wrapper/metadata/type_metadata";
+import { BaseMetadata } from "~/protocols/nodeblocks/metadata/base_metadata";
+import { MetadataHeader } from "~/protocols/nodeblocks/metadata/header_metadata";
+import { NodeTypeMeta, DataTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 
 export interface InterfaceElementMeta extends BaseMetadata {
     shortcut?: string;

@@ -34,6 +34,7 @@ export const parse_header = (json_data: any): MetadataHeader => {
 
     const header_meta: MetadataHeader = {
         capitalized_name: json_data.capitalized_name ?? json_data.types_id ?? "",
+        brief: json_data.brief ?? "",
         description: json_data.description ?? "",
         package_version: json_data.package_version,
         meta_version: json_data.meta_version,

@@ -1,5 +1,5 @@
 import { ServerNotification } from "~/old/network/websocket/requests/notifications";
-import { Metadata, MetadataVersion } from "~/old/wrapper/metadata/header_metadata";
+import { Metadata, MetadataVersion } from "~/protocols/nodeblocks/metadata/header_metadata";
 import { NodeOutput } from "~/old/wrapper/nodes/graph-node";
 import { PackageManifest } from "../../manifests/package-manifest";
 import { ServerMessages, EditorActionStatus, ServerMessageTypes } from "../server-message-protocol";

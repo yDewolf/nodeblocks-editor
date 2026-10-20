@@ -26,7 +26,7 @@ export const ParsedMetaText = (props: {
         return MarkdownHelper.parse(annotatedElements);
     });
 
-    return <p class={`parsed-meta-text` + props.class ? " " + (props.class) : ""}>{parsedContent()}</p>;
+    return <p class={`parsed-meta-text` + (props.class ? " " + (props.class ?? "") : "")}>{parsedContent()}</p>;
 };
 
 // TODO: melhorar o jeito que isso aqui fica no meio do texto. Talvez funcionar como um popup (?) ou um dropdown

@@ -3,9 +3,9 @@ import { createMemo, For, Match, Show, Switch } from 'solid-js';
 import { DropdownSection } from "../../../components/panels/dropdown";
 import { DocsHref } from "./docs-reference";
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
-import { BaseMetadata } from "~/old/wrapper/metadata/base_metadata";
-import { NodeCategory, NodeTag } from "~/old/wrapper/metadata/node_filters";
-import { NodeTypeMeta } from "~/old/wrapper/metadata/type_metadata";
+import { BaseMetadata } from "~/protocols/nodeblocks/metadata/base_metadata";
+import { NodeCategory, NodeTag } from "~/protocols/nodeblocks/metadata/node_filters";
+import { NodeTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import TagIcon from '~/assets/icons/tag.svg';
 
 type PathPart = {

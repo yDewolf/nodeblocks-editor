@@ -1,17 +1,17 @@
-import { BaseMetadata } from "./base_metadata";
+import { BaseMetadata, EngineSpecMetadata } from "./base_metadata";
 import { NodeCategory, NodeTag } from "./node_filters";
 
-export interface SlotMeta extends BaseMetadata {}
-export interface ParameterMeta extends BaseMetadata {}
+export interface SlotMeta extends EngineSpecMetadata {}
+export interface ParameterMeta extends EngineSpecMetadata {}
 
-export interface NodeTypeMeta extends BaseMetadata {
+export interface NodeTypeMeta extends EngineSpecMetadata {
     category: NodeCategory | string,
     tags: Array<NodeTag | string>,
     parameter_meta: Record<string, ParameterMeta>,
     slot_meta: Record<string, SlotMeta>
 }
 
-export interface DataTypeMeta extends BaseMetadata {
+export interface DataTypeMeta extends EngineSpecMetadata {
     is_builtin?: boolean
 }
 
@@ -40,6 +40,8 @@ export const parse_node_type = (
         const data = param_data as any;
         parameter_meta[id] = {
             capitalized_name: data.capitalized_name ?? id,
+            usages: data.usages ?? [],
+            brief: data.brief ?? "",
             description: data.description ?? ""
         };
     }
@@ -49,6 +51,8 @@ export const parse_node_type = (
         const data = slot_data as any;
         slot_meta[id] = {
             capitalized_name: data.capitalized_name ?? id,
+            usages: data.usages ?? [],
+            brief: data.brief ?? "",
             description: data.description ?? ""
         };
     }
@@ -56,8 +60,10 @@ export const parse_node_type = (
     const node_meta: NodeTypeMeta = {
         capitalized_name: json_data.capitalized_name ?? id,
         description: json_data.description ?? "",
+        brief: json_data.brief ?? "",
         category: json_data.category,
         tags: json_data.tags ?? [],
+        usages: json_data.usages ?? [],
         parameter_meta,
         slot_meta
     };
@@ -88,6 +94,8 @@ export const parse_data_types = (json_data: any): Record<string, DataTypeMeta> =
         const datatype_data = data as any;
         data_types_record[id] = {
             capitalized_name: datatype_data.capitalized_name ?? id,
+            brief: datatype_data.brief ?? "",
+            usages: datatype_data.usages ?? [],
             description: datatype_data.description ?? ""
         };
     }

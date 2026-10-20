@@ -2,8 +2,8 @@ import { JSX } from "solid-js";
 import {  InterfaceElementMeta } from "../docs/docs-protocols";
 import { useResolvedMeta } from "~/feature/metadata/metadata-context";
 import { CURRENT_PATH, DocsPathUtils, DocsRoute } from "../docs/helpers/docs-path-utils";
-import { MetadataHeader } from "~/old/wrapper/metadata/header_metadata";
-import { NodeTypeMeta, DataTypeMeta } from "~/old/wrapper/metadata/type_metadata";
+import { MetadataHeader } from "~/protocols/nodeblocks/metadata/header_metadata";
+import { NodeTypeMeta, DataTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import { DocsHref } from "../docs/components/docs-reference";
 
 export type ResolvedMeta = ReturnType<typeof useResolvedMeta>;

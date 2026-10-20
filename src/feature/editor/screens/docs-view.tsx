@@ -1,7 +1,7 @@
-import { createMemo, createSignal, Match, Show, Switch } from "solid-js";
+import { createMemo, createSignal, For, Match, ParentComponent, Show, Switch } from "solid-js";
 import { useDocs } from "~/feature/docs/docs-context";
 import { DocsPath, DocsTags } from "../../docs/components/docs-components";
-import { DocPayload } from "~/feature/docs/docs-protocols";
+import { DocPayload, InterfaceElementMeta } from "~/feature/docs/docs-protocols";
 import CodeIcon from "~/assets/icons/code.svg";
 import { NodeDocsContent } from "../../docs/components/content/node-docs";
 import { InterfaceDocsContent } from '../../docs/components/content/interface-docs';
@@ -13,6 +13,8 @@ import { ParsedMetaText } from '../../metadata/components/metadata-text';
 import { DocsSidebar } from "~/feature/docs/components/docs-sidebar";
 import { PackageManager } from '../engine/packages/package-manager';
 import { useEditor } from "~/feature/scene-editor-context";
+import { DataTypeMeta, NodeTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
+import { MetadataHeader } from "~/protocols/nodeblocks/metadata/header_metadata";
 
 export const EditorDocsView = () => {
     const docs = useDocs();
@@ -20,11 +22,12 @@ export const EditorDocsView = () => {
         if (!docs.docsData) {
             return;
         }
+
         if (docs.docsData.latest) {
             return docs.docsData.latest;
         }
 
-        return undefined
+        return undefined;
     })
 
     const [devMode, setDevMode] = createSignal(false);
@@ -62,16 +65,16 @@ export const EditorDocsView = () => {
                             <h2>Couldn't find documentation</h2>
                         </Show>
                     }>
-                        <DynamicMetaProvider payload={docs_data()}>
-                            <Show when={docs_data()?.type != "header"}>
-                                <DocsTags docs_data={docs_data()}/>
-                            </Show>
-                            <div class="text-section">
-                                <h2>{(docs_data()?.data.capitalized_name)}</h2>
-                                <ParsedMetaText text={docs_data()?.data.description} default="No Description"/>
-                            </div>
-                            <DocsContentSelector path={docs.docs_path} docs_data={docs_data()} packageManager={useEditor().packageManager} devMode={devMode()}/>
-                        </DynamicMetaProvider>
+                        {(data) => 
+                            <DynamicMetaProvider payload={data()}>
+                                <Show when={data()?.type != "header"}>
+                                    <DocsTags docs_data={data()}/>
+                                </Show>
+                                <DefaultDocsContent docsData={data()}>
+                                    <DocsContentSelector path={docs.docs_path} docs_data={data()} packageManager={useEditor().packageManager} devMode={devMode()}/>
+                                </DefaultDocsContent>
+                            </DynamicMetaProvider>
+                        }
                     </Show>
                     <Show when={devMode()}>
                         <p>
@@ -84,31 +87,57 @@ export const EditorDocsView = () => {
     )
 }
 
+const DefaultDocsContent: ParentComponent<{
+    docsData: DocPayload
+}> = (props) => {
+    const usages: string[] = "usages" in props.docsData.data ? props.docsData.data.usages : [];
+    return <>
+        <div class="text-section">
+            <h2>{(props.docsData?.data.capitalized_name)}</h2>
+            <Show when={props.docsData?.data.brief}>
+                {(brief) => {
+                    <ParsedMetaText text={brief()}/>
+                }}
+            </Show>
+        </div>
+        <div class="text-section">
+            <Show when={props.docsData?.data.brief}>
+                <h2>Description</h2>
+            </Show>
+            <ParsedMetaText text={props.docsData?.data.description} default="No Description"/>
+        </div>
+        {props.children}
+        <Show when={usages.length > 0}>
+            <div class="text-section">
+                <h2>Usages</h2>
+                <For each={usages}>
+                    {(usage) => <ParsedMetaText text={usage}/>}
+                </For>
+            </div>
+        </Show>
+    </>
+}
+
 const DocsContentSelector = (props: {
-    path: string | undefined,
-    docs_data?: DocPayload,
+    path?: string,
+    docs_data: DocPayload,
     packageManager: PackageManager,
     devMode: boolean
 }) => {
-    if (!props.docs_data) return undefined;
-    if (!props.path) return undefined;
-    
-    return (
-        <Switch fallback={
-            <span>No implementation for documentation type {props.docs_data.type}</span>
-        }>
-            <Match when={props.docs_data.type === "header"}>
-                <HeaderDocsContent path={props.path} data={props.docs_data.type === "header" ? props.docs_data.data : undefined} devMode={props.devMode}/>            
-            </Match>
-            <Match when={props.docs_data.type === "node"}>
-                <NodeDocsContent path={props.path} data={props.docs_data.type === "node" ? props.docs_data.data : undefined} packageManager={props.packageManager} devMode={props.devMode}/>            
-            </Match>
-            <Match when={props.docs_data.type === "interface"}>
-                <InterfaceDocsContent path={props.path} data={props.docs_data.type === "interface" ? props.docs_data.data : undefined} devMode={props.devMode}/>            
-            </Match>
-            <Match when={props.docs_data.type === "datatype"}>
-                <DataTypeDocsContent path={props.path} data={props.docs_data.type === "datatype" ? props.docs_data.data : undefined} packageManager={props.packageManager} devMode={props.devMode}/>            
-            </Match>
-        </Switch>
-    )
+    return <Switch fallback={
+        <span>No implementation for documentation type {props.docs_data.type}</span>
+    }>
+        <Match when={props.docs_data.type === "header"}>
+            <HeaderDocsContent path={props.path} data={props.docs_data.data as MetadataHeader} devMode={props.devMode}/>            
+        </Match>
+        <Match when={props.docs_data.type === "node"}>
+            <NodeDocsContent path={props.path} data={props.docs_data.data as NodeTypeMeta} packageManager={props.packageManager} devMode={props.devMode}/>
+        </Match>
+        <Match when={props.docs_data.type === "interface"}>
+            <InterfaceDocsContent path={props.path} data={props.docs_data.data as InterfaceElementMeta} devMode={props.devMode}/>            
+        </Match>
+        <Match when={props.docs_data.type === "datatype"}>
+            <DataTypeDocsContent path={props.path} data={props.docs_data.data as DataTypeMeta} packageManager={props.packageManager} devMode={props.devMode}/>            
+        </Match>
+    </Switch>
 }
