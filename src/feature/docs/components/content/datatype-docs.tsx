@@ -86,7 +86,7 @@ const DataTypePreview = (props: {
         if (!props.spec) return undefined;
         if (!props.spec.base_id) return undefined;
 
-        const value = generate_datatype_random_value(props.spec, genParams);
+        const [type, value] = generate_datatype_random_value(props.spec, genParams);
         const pack: DataTypeValuePack = {
             value: value,
             renderer: props.spec.default_renderer,
