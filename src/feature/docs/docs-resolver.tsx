@@ -5,7 +5,7 @@ import { MetadataController, MetadataStoreData } from "../metadata/metadata_cont
 import { DocPayload, DocsPathPrefix, DocsPathSplitter } from "./docs-protocols";
 import { DocsPathUtils } from "./helpers/docs-path-utils";
 
-const LOCAL_DATA_ID = "builtin";
+export const LOCAL_DOCS_ID = "builtin";
 
 const interfaceModules = import.meta.glob("/src/docs/builtin/interface/**/*.json");
 const datatypeModules = import.meta.glob("/src/docs/builtin/datatypes/**/*.json");
@@ -22,7 +22,7 @@ export class DocsResolver {
         const header_meta: MetadataHeader = {
             capitalized_name: "Builtin",
             description: "Metadata for builtin node types and UI elements.",
-            package_id: "builtin",
+            package_id: LOCAL_DOCS_ID,
             package_version: "0.0.0",
             meta_version: 0,
             last_modified: 0,
@@ -55,7 +55,7 @@ export class DocsResolver {
             data_types: data_types,
             interface: interface_meta
         };
-        this.metadataController.insertMetadata(LOCAL_DATA_ID, local_data);
+        this.metadataController.insertMetadata(LOCAL_DOCS_ID, local_data);
         return local_data;
     }
 

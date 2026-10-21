@@ -8,6 +8,7 @@ import { SettingsView } from "../../screens/settings-view";
 import LeftTabIcon from '~/assets/icons/left-tab.svg';
 import { ClientSceneCommandTypes, CommandGroups } from "~/protocols/nodeblocks/network/client-command-protocol";
 import { nanoid } from "nanoid";
+import { LOCAL_DOCS_ID } from "~/feature/docs/docs-resolver";
 
 
 const LeftTabDropdown = (props: {
@@ -74,7 +75,7 @@ export const EditorLeftTabHolder = (props: {
     }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
     return (
-        <div class="left-tab-holder" docs-id="editor-left-tab" docs-root="builtin">
+        <div class="left-tab-holder" docs-id="editor-left-tab" docs-root={LOCAL_DOCS_ID}>
             <DropdownSection
                 icon={() => <LeftTabIcon class="medium-icon"/>}
                 dropdown_class="left-tab-dropdown"                

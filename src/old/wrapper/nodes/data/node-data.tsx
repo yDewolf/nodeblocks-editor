@@ -1,6 +1,7 @@
 import { NodeDataModel } from "~/wrapper/helpers/node-type-file";
 import { createSignal } from "solid-js";
-import { BaseDataType, DataTypeUtils, DefaultDataTypes } from "./node-data-type";
+import { BaseDataType, DataTypeUtils } from "./node-data-type";
+import { DefaultDataTypes } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
 
 export class NodeParameter {
     type: BaseDataType;

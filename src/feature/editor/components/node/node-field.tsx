@@ -2,7 +2,7 @@ import { For, Match, Show, Switch } from "solid-js";
 import { clamp } from '../../../../utils/parameter-utils';
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { ParameterSpec, OptionParam } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
-import { DefaultDataTypes } from "~/old/wrapper/nodes/data/node-data-type";
+import { DefaultDataTypes } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
 import { debounce } from "~/utils/debounce-utils";
 import { useNodeMeta } from "~/feature/metadata/metadata-context";
 

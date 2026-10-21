@@ -1,4 +1,5 @@
-import { BaseDataType, DataTypeUtils, DefaultRenderers, UNKNOWN_TYPE } from "./node-data-type";
+import { BaseDataType, DataTypeUtils, UNKNOWN_TYPE } from "./node-data-type";
+import { DefaultRenderers } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
 
 export class CustomDataType extends BaseDataType {
     constructor(root_id: string, type_id: string, data_type?: string, renderer?: string, conn_whitelist: string[] = []) {

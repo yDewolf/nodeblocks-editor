@@ -10,10 +10,8 @@ import { DataTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import { PackageManager } from "~/feature/editor/engine/packages/package-manager";
 import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
 import { DataTypeSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
-import { DataTypeGenParams, generate_datatype_random_value } from "~/old/wrapper/nodes/data/data-type-value-utils";
-import { DefaultRenderers } from "~/old/wrapper/nodes/data/node-data-type";
-
-// TODO: adicionar specs builtin dos tipos padrão
+import { DataTypeGenParams, generate_datatype_random_value } from "~/feature/editor/utils/data-type-value-utils";
+import { DefaultRenderers } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
 
 export const DataTypeDocsContent = (props: {
     path?: string,
@@ -66,7 +64,7 @@ const DataTypeAttributes = (props: {
             <h3>Attributes</h3>
             <SimpleField field_name="Base" field_displayer={
                 // TODO: maybe add a better visual for field links
-                () => <DocsHref class="field-link" route={{path: DocsPathUtils.makeDataTypePath("builtin", undefined, base_id)}}><FieldValueDisplayer value_element={() => <input readonly value={props.spec?.base_id} id={props.spec?.id + "-base"}/>}/></DocsHref>
+                () => <DocsHref class="field-link" route={{path: DocsPathUtils.makeDataTypePath("core", undefined, base_id)}}><FieldValueDisplayer value_element={() => <input readonly value={props.spec?.base_id} id={props.spec?.id + "-base"}/>}/></DocsHref>
             } field_id={props.spec?.id + "-base"}/>
             <SimpleField field_name="Renderer" field_displayer={
                 () => <FieldValueDisplayer value_element={() => <input readonly value={props.spec?.default_renderer} id={props.spec?.id + "-renderer"}/>}/>

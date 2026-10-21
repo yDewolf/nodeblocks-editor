@@ -1,7 +1,7 @@
 import { createMemo, createSignal, For } from "solid-js";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-context";
-import { DefaultDataTypes } from "~/old/wrapper/nodes/data/node-data-type";
+import { DefaultDataTypes } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
 import { useScene } from "~/feature/scene/scene-context";
 import { DataTypeValueSelector } from "../../../scene/components/value/datatype-value-view";
 

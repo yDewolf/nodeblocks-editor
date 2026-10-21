@@ -1,5 +1,6 @@
 import { Show, Switch, Match } from "solid-js";
-import { DefaultRenderers, DefaultDataTypes } from "~/old/wrapper/nodes/data/node-data-type";
+import { DefaultRenderers } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
+import { DefaultDataTypes } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
 import { ArrayView } from "./array-view";
 import { ScalarView } from "./scalar-view";
 

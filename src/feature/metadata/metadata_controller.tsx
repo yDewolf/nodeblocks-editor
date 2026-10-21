@@ -2,7 +2,7 @@ import { createStore, reconcile, SetStoreFunction } from "solid-js/store";
 import { makePersisted } from "@solid-primitives/storage";
 import { DocsPathPrefix } from "../docs/docs-protocols";
 import { BaseMetadata } from "~/protocols/nodeblocks/metadata/base_metadata";
-import { MetadataHeader, MetadataVersion, parse_header } from "~/protocols/nodeblocks/metadata/header_metadata";
+import { MetadataHeader, parse_header } from "~/protocols/nodeblocks/metadata/header_metadata";
 import { NodeTypeMeta, DataTypeMeta, parse_node_types, parse_data_types } from "~/protocols/nodeblocks/metadata/type_metadata";
 import { AppSessionManager } from "~/network/app-session-manager";
 import { PackageManager } from "../editor/engine/packages/package-manager";

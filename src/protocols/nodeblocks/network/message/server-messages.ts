@@ -1,8 +1,6 @@
-import { ServerNotification } from "~/old/network/websocket/requests/notifications";
-import { Metadata, MetadataVersion } from "~/protocols/nodeblocks/metadata/header_metadata";
-import { NodeOutput } from "~/old/wrapper/nodes/graph-node";
+import { Metadata } from "~/protocols/nodeblocks/metadata/header_metadata";
 import { PackageManifest } from "../../manifests/package-manifest";
-import { ServerMessages, EditorActionStatus, ServerMessageTypes } from "../server-message-protocol";
+import { ServerMessageTypes } from "../server-message-protocol";
 import { ServerSceneMessages } from "./server/server-scene-messages";
 
 // TODO: refatorar essas mensagens aqui

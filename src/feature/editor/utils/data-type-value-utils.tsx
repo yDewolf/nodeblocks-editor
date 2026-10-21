@@ -1,5 +1,6 @@
 import { DataTypeSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
-import { DefaultDataTypes, BaseDataType, DefaultRenderers } from "./node-data-type";
+import { DefaultRenderers } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
+import { DefaultDataTypes } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
 
 export interface ScalarGenParams {
     value_range?: { min?: number; max?: number };

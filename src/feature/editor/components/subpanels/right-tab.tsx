@@ -7,6 +7,7 @@ import { SceneNode } from "~/feature/scene/objects/scene-node"
 import { useEditor } from "~/feature/scene-editor-context"
 import { useNotifications } from "../../contexts/notification-context"
 import { BaseNotification, SidebarNotifications } from "../notification-badges"
+import { LOCAL_DOCS_ID } from "~/feature/docs/docs-resolver"
 
 const NotificationLog = (props: {node?: SceneNode}) => {
     const notificationController = useNotifications();
@@ -54,7 +55,7 @@ export const EditorRightPanel = () => {
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
     const [selectedTab1, setSelectedTab1] = createSignal<string>(Object.keys(bottom_tabs).at(0) ?? "");
     return (
-        <div class="right-tab-holder" docs-id="editor-right-tab" docs-root="builtin">
+        <div class="right-tab-holder" docs-id="editor-right-tab" docs-root={LOCAL_DOCS_ID}>
             <DropdownSection
                 expanded_states={[expanded, setExpanded]}
                 dropdown_class="right-tab-dropdown"                
