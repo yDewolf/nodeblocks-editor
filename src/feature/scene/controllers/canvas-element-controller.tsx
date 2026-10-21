@@ -156,9 +156,6 @@ export class CanvasElementController {
     public update_slot_position = (slot: SceneNodeSlot) => {
         slot.layoutVersion;
         const parent_node = this._store.nodes[slot.node_id];
-        if (!parent_node) return { x: 0, y: 0 };
-        parent_node.size;
-
         const el = slot.element;
         if (!el) {
             const world_pos = {

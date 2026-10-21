@@ -4,7 +4,6 @@ import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
 import { useNodeMeta } from "~/feature/metadata/metadata-context";
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { NodeSlotSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
-import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
 import { InputEvents } from "~/utils/events/event-handling";
 import { useEventManager } from "~/utils/events/event-provider";
 
