@@ -35,7 +35,11 @@ export type GetSceneDataPayload = CommandResponsePayload & {
     scene_data?: SceneData
 }
 
+export type SaveScenePayload = CommandResponsePayload & {
+    type: ServerCmdResponseTypes.SAVE_SCENE
+}
+
 export type ServerCmdResponsePayload = 
     | GenericCmdPayload | ExecutionStateSyncPayload 
     | AddNodePayload | AddConnPayload
-    | GetSceneDataPayload
+    | GetSceneDataPayload | SaveScenePayload;

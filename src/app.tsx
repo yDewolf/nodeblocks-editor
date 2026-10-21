@@ -71,6 +71,7 @@ const TestComponent = () => {
         <DocsUrlSync />
         <InputManagerProvider manager={editor.inputManager}>
           <DefinedInputScope context={editor.globalInputContext}>
+            {/* TODO adicionar um editor keybind provider */}
             <EventManagerProvider manager={editor.eventManager}>
               <EditorView />
             </EventManagerProvider>

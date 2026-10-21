@@ -2,22 +2,36 @@ import { createSignal, JSXElement } from "solid-js";
 import { PageViewer } from "~/components/page-controller";
 import { useEditor } from "~/feature/scene-editor-context";
 import { NodeTypePreview, NodeTypeSelector } from "./component/node-type-selector";
-import { DropsideItemData, Dropdown, DropsideManager, DropdownItemButton, DropdownSection } from "~/components/panels/dropdown";
+import { DropsideItemData, Dropdown, DropsideManager, DropdownItemButton, DropdownSection, DropdownItemInput } from "~/components/panels/dropdown";
 import { TabSelector } from "~/components/panels/tab-display";
 import { SettingsView } from "../../screens/settings-view";
 import LeftTabIcon from '~/assets/icons/left-tab.svg';
+import { ClientSceneCommandTypes, CommandGroups } from "~/protocols/nodeblocks/network/client-command-protocol";
+import { nanoid } from "nanoid";
 
 
 const LeftTabDropdown = (props: {
     page_viewer: PageViewer
 }) => {
+    const editor = useEditor();
     const [currentItem, setCurrentItem] = createSignal<string | undefined>(undefined);
     const subsections: Map<string, DropsideItemData> = new Map([
         ["file", {
             label: "File",
             content: () => <div class="dropdown-item-grid">
-                <button onclick={() => {}} class="dropdown-button">Save Scene</button>
-                <button onclick={() => {}} class="dropdown-button">Load Scene</button>
+                <button onclick={() => {
+                    editor.sceneConnection.sendCommand({
+                        cmd_uid: nanoid(),
+                        cmd_group: CommandGroups.SCENE,
+                        type: ClientSceneCommandTypes.SAVE_SCENE,
+                    })
+                }} class="dropdown-button">Save Scene</button>
+                <button onclick={() => {
+                    // TODO:
+                }} class="dropdown-button">Load Scene</button>
+                <button onclick={() => {
+                    // TODO:
+                }} class="dropdown-button">Export Scene</button>
             </div>
         }],
     ])
@@ -28,6 +42,14 @@ const LeftTabDropdown = (props: {
             <div
                 class="fill dropdown-item-grid">
                 <DropsideManager dropsides={subsections} currentItem={currentItem} setCurrentItem={setCurrentItem}/>
+                <DropdownItemInput label="Autosave" inputType="checkbox" onChange={(e) => {
+                    editor.sceneConnection.sendCommand({
+                        cmd_uid: nanoid(),
+                        cmd_group: CommandGroups.SCENE, 
+                        type: ClientSceneCommandTypes.SET_SCENE_AUTOSAVE, 
+                        autosave: e.target.checked
+                    })
+                }} onMouseOver={setCurrentItem(undefined)}/>
                 <DropdownItemButton label="Settings" onClick={() => {
                     props.page_viewer.current_page = {
                         page_title: "Settings",

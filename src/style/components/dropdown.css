@@ -76,6 +76,7 @@
 }
 
 .dropdown-item {
+    font-size: 0.85rem;
     width: stretch;
     pointer-events: auto;
 }

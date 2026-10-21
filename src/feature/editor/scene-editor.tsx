@@ -21,6 +21,8 @@ import { NotificationController } from './controllers/notification/notification-
 import { MetadataController } from '../metadata/metadata_controller';
 import { DocsTool } from './tools/docs-tool';
 import { DocsController } from '../docs/docs-controller';
+import { nanoid } from 'nanoid';
+import { ClientSceneCommandTypes, CommandGroups } from '~/protocols/nodeblocks/network/client-command-protocol';
 
 export class SceneEditor {
     private _scene: NodeScene;
@@ -121,8 +123,7 @@ export class SceneEditor {
     // Input Events
 
     private setup_keybinds() {
-        this._globalInputContext.bind(
-            "MainToolAction", 
+        this._globalInputContext.bind("MainToolAction", 
             new KeybindTrigger({mouseButtons: [MouseButton.Left]}),
             {just_activated: (e) => {
                 if (e instanceof PointerEvent) {
@@ -138,8 +139,7 @@ export class SceneEditor {
                 }
             }
         })
-        this._globalInputContext.bind(
-            "SecondaryToolAction",
+        this._globalInputContext.bind("SecondaryToolAction",
             new KeybindTrigger({mouseButtons: [MouseButton.Right]}),
             {}
         )
@@ -158,6 +158,18 @@ export class SceneEditor {
                 }
             }
         })
+
+        this._globalInputContext.bind("Save",
+            new KeybindTrigger({keys: ["KeyS"], modifiers: { ctrl: true }}),
+            {just_activated: (e) => {
+                e.preventDefault();
+                this.sceneConnection.sendCommand({
+                    cmd_uid: nanoid(),
+                    cmd_group: CommandGroups.SCENE,
+                    type: ClientSceneCommandTypes.SAVE_SCENE
+                })
+            }}
+        )
     }
     
     private setup_event_handlers() {

@@ -40,7 +40,8 @@ export enum ServerCmdResponseTypes {
     EXECUTION_STATE_SYNC = "execution_state_sync",
     ADD_NODE = "add_node",
     ADD_CONN = "add_conn",
-    GET_SCENE_DATA = "get_scene_data"
+    GET_SCENE_DATA = "get_scene_data",
+    SAVE_SCENE = "save_scene"
 }
 
 export enum ServerEngineEventTypes {

@@ -40,12 +40,12 @@ export class NotificationFactory {
     public static fromCommandResponse(payload: ServerCmdResponsePayload): Notification | null {
         if (!payload) return null;
 
-        const level = this.resolveCommandLevel(payload.status);
+        const level = this.resolveCommandLevel(payload.type, payload.status);
         const shortMessage = this.resolveCommandShortMessage(payload.type);
         const description = this.resolveCommandDescription(payload);
 
         return {
-            uid: nanoid(),
+            uid: payload.request_id,
             level,
             target: NotificationTarget.UNSPECIFIED,
             message: shortMessage,
@@ -69,7 +69,6 @@ export class NotificationFactory {
                 if (payload.status === NodeExecutionStatus.FAILED) return NotificationLevel.ERROR;
                 if (payload.status === NodeExecutionStatus.SKIPPED) return NotificationLevel.WARNING;
                 return NotificationLevel.DEBUG;
-
             default:
                 return NotificationLevel.INFO;
         }
@@ -106,11 +105,18 @@ export class NotificationFactory {
         }
     }
 
-    private static resolveCommandLevel(status: CmdStatusPack): NotificationLevel {
+    private static resolveCommandLevel(cmdType: ServerCmdResponseTypes, status: CmdStatusPack): NotificationLevel {
         if (status.status == CommandStatus.FAILED) {
             return NotificationLevel.ERROR;
         }
-        return NotificationLevel.DEBUG;
+
+        switch (cmdType) {
+            case ServerCmdResponseTypes.SAVE_SCENE:
+                return NotificationLevel.WARNING
+            
+            default:
+                return NotificationLevel.DEBUG
+        }
     }
 
     private static resolveCommandShortMessage(cmdType: ServerCmdResponseTypes): string {
@@ -125,6 +131,8 @@ export class NotificationFactory {
                 return "Cmd: Fetch Scene";
             case ServerCmdResponseTypes.SCENE_WORKER:
                 return "Cmd: Worker Action";
+            case ServerCmdResponseTypes.SAVE_SCENE:
+                return "Saved Scene"
             default:
                 return `Cmd: ${cmdType || 'Unknown'}`;
         }
@@ -142,6 +150,8 @@ export class NotificationFactory {
                 return `Fetched scene data from server.`;
             case ServerCmdResponseTypes.SCENE_WORKER:
                 return `Processed worker action. (request id: ${payload.request_id})`;
+            case ServerCmdResponseTypes.SAVE_SCENE:
+                return "Saved Scene."
         }
     }
 }

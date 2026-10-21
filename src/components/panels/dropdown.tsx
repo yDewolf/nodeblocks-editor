@@ -1,4 +1,5 @@
-import { createSignal, For, JSXElement, onMount, Show } from "solid-js"
+import { nanoid } from "nanoid";
+import { createSignal, For, JSX, JSXElement, onMount, Show } from "solid-js"
 import { Transition } from "solid-transition-group";
 import ArrowDownIcon from "~/assets/icons/arrow-down.svg";
 
@@ -139,6 +140,21 @@ export const DropdownItemButton = (props: {label: string, onClick: () => void, o
     )
 }
 
+export const DropdownItemInput = (props: {label: string, inputType: string, onChange: JSX.ChangeEventHandlerUnion<HTMLInputElement, Event>, onMouseOver?: () => void}) => {
+    const inputId = nanoid(4);
+    return (
+        <div
+            class="dropdown-item dropdown-button dropdown-label space-between"
+            onMouseOver={() => {props.onMouseOver?.()}}
+        >
+            <Show when={props.label != ""}>
+                <label for={inputId}>{props.label}</label>
+            </Show>
+            <input type={props.inputType} id={inputId} onchange={props.onChange}/>
+        </div>
+    )
+}
+
 export const Dropside = (props: {
     label_element?: JSXElement,
     label?: string,
@@ -179,9 +195,9 @@ export const Dropside = (props: {
         >
             <div class="dropdown-label space-between">
                 <Show when={props.label_element} fallback={
-                    <button class="dropdown-button">
+                    <span class="dropdown-button">
                         {props.label}
-                    </button>
+                    </span>
                 }>
                     {props.label_element}
                 </Show>
