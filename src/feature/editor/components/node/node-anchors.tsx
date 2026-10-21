@@ -1,14 +1,14 @@
 import { createMemo, For } from "solid-js";
-import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { SlotComponent } from "./slot-components";
+import { SceneNode } from "~/feature/scene/objects/scene-node";
 
 export const NodeAnchor = (props: {
     anchor_pos: Vector2, 
-    all_slots: SceneNodeSlot[],
+    node: SceneNode
 }) => {
     const filtered_slots = createMemo(() => {
-        return props.all_slots.filter((slot) => slot.anchor.x == props.anchor_pos.x && slot.anchor.y == props.anchor_pos.y);
+        return props.node.all_slots.filter((slot) => slot.anchor.x == props.anchor_pos.x && slot.anchor.y == props.anchor_pos.y);
     })
     
     return (

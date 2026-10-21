@@ -16,10 +16,8 @@ export const SlotComponent = (props: {
     const eventManager = useEventManager();
     const slot_meta = useNodeMeta()?.meta?.slot_meta;
     const slot_label = slot_meta ? slot_meta[props.slot.slot_id].capitalized_name : props.slot.slot_id;
-    
-    
-    const datatype_fqn = props.slot.instance.data_type_fqn;
-    const [package_id, id] = NamespaceUtils.splitFqn(datatype_fqn);
+    // const datatype_fqn = props.slot.instance.data_type_fqn;
+    // const [package_id, id] = NamespaceUtils.splitFqn(datatype_fqn);
 
     return (
         <div

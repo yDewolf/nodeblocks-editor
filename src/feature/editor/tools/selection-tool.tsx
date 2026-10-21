@@ -137,9 +137,10 @@ export class SelectionTool extends BaseEditorTool {
         )
         if (this.selectionController.moving) {
             this.selectionController.selected_nodes.forEach(node => {
-                node.all_slots.forEach(slot => {
-                    this.elementController.update_slot_anchor(slot);
-                });
+                const conns = this.elementController.get_node_connections(node);
+                conns.forEach((conn) => {
+                    this.elementController.update_anchors_from_conn(conn);
+                })
             });
         }
     }

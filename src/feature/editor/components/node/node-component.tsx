@@ -1,4 +1,4 @@
-import { onCleanup, createMemo, Show, createSignal, For } from "solid-js";
+import { onCleanup, createMemo, Show, createSignal, For, createEffect } from "solid-js";
 import { DropdownIcon, DropdownSection } from "~/components/panels/dropdown";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { useScene } from "~/feature/scene/scene-context";
@@ -17,6 +17,7 @@ import { NotificationPopupHolder } from "../notification-badges";
 import { useNotifications } from "../../contexts/notification-context";
 import { NodeMetaProvider, useMetadata as useMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
 import { DocsPathPrefix } from "~/feature/docs/docs-protocols";
+import { editorSettings } from "../../editor-settings";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -66,7 +67,7 @@ export const NodeComponent = (props: {
                 ref={(el) => handleRef(el)}
                 style={{
                     position: "absolute",
-                    transform: `translate(${props.node.uiPosition.x}px, ${props.node.uiPosition.y}px)`,
+                    transform: `translate(${props.node.position.x}px, ${props.node.position.y}px)`,
                     // "pointer-events": "none"
                 }}
                 classList={{
@@ -112,6 +113,10 @@ export const NodeComponentV2 = (props: {
     const [isExpanded, setIsExpanded] = createSignal(false);
     const [isHovered, setIsHovered] = createSignal(props.default_show_slot_labels ?? false);
 
+    createEffect(() => {
+        setIsHovered(editorSettings.alwaysShowSlotLabels);
+    })
+
     props.default_show_output = props.default_show_output ?? true;
     return (
         <NodeMetaProvider value={useMetadata().get_node_meta(ref_node.instance.spec.id, ref_node.instance.spec.namespace)} package_id={ref_node.instance.spec.namespace} type_id={ref_node.instance.spec.id}>
@@ -123,6 +128,7 @@ export const NodeComponentV2 = (props: {
                 docs-id={ref_node.instance.spec.id}
 
                 onMouseLeave={(e) => {
+                    if (editorSettings.alwaysShowSlotLabels) return;
                     setIsHovered(false);
                 }}
                 classList={{
@@ -256,13 +262,13 @@ const AnchoredSlotGrid = (props: {
 }) => {
     return (
         <div class="anchored-slot-grid">
-            <NodeAnchor anchor_pos={{x: 0, y: -1}} all_slots={props.node.all_slots}/>
+            <NodeAnchor anchor_pos={{x: 0, y: -1}} node={props.node}/>
             <div class="side-anchors">
-                <NodeAnchor anchor_pos={{x: -1, y: 0}} all_slots={props.node.all_slots}/>
+                <NodeAnchor anchor_pos={{x: -1, y: 0}} node={props.node}/>
                 <div></div>
-                <NodeAnchor anchor_pos={{x: 1, y: 0}} all_slots={props.node.all_slots}/>
+                <NodeAnchor anchor_pos={{x: 1, y: 0}} node={props.node}/>
             </div>
-            <NodeAnchor anchor_pos={{x: 0, y: 1}} all_slots={props.node.all_slots}/>
+            <NodeAnchor anchor_pos={{x: 0, y: 1}} node={props.node}/>
         </div>
     )
 }

@@ -149,13 +149,13 @@ export class SelectionController {
     public onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: SceneNode[]) {
         if (this.moving) {
             this.selected_nodes.forEach(node => {
-                node.position = {
-                    x: node.position.x + delta.x / this._space.camera.zoom,
-                    y: node.position.y + delta.y / this._space.camera.zoom
-                }
                 node.uiPosition = {
-                    x: Math.round(node.position.x / this.grid.grid.x) * this.grid.grid.x,
-                    y: Math.round(node.position.y / this.grid.grid.y) * this.grid.grid.y
+                    x: node.uiPosition.x + delta.x / this._space.camera.zoom,
+                    y: node.uiPosition.y + delta.y / this._space.camera.zoom
+                }
+                node.position = {
+                    x: Math.round(node.uiPosition.x / this.grid.grid.x) * this.grid.grid.x,
+                    y: Math.round(node.uiPosition.y / this.grid.grid.y) * this.grid.grid.y
                 }
             });
             let node_datas: Record<string, NodeSceneData> = {};

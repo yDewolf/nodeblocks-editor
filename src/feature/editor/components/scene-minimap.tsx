@@ -16,10 +16,10 @@ export const SceneMinimap = () => {
 
         let is_fitting: boolean = true;
         nodes().forEach(node => {
-            if (node.uiPosition.x < minX) {minX = node.uiPosition.x; is_fitting = false};
-            if (node.uiPosition.y < minY) {minY = node.uiPosition.y; is_fitting = false};
-            if (node.uiPosition.x + node.width > maxX) {maxX = node.uiPosition.x + node.width; is_fitting = false};
-            if (node.uiPosition.y + node.height > maxY) {maxY = node.uiPosition.y + node.height; is_fitting = false};
+            if (node.position.x < minX) {minX = node.position.x; is_fitting = false};
+            if (node.position.y < minY) {minY = node.position.y; is_fitting = false};
+            if (node.position.x + node.width > maxX) {maxX = node.position.x + node.width; is_fitting = false};
+            if (node.position.y + node.height > maxY) {maxY = node.position.y + node.height; is_fitting = false};
         });
         
         setIsFittingEverything(is_fitting);
@@ -48,8 +48,8 @@ export const SceneMinimap = () => {
                     <For each={nodes()}>
                         {(node) => (
                             <rect 
-                                x={node.uiPosition.x} 
-                                y={node.uiPosition.y} 
+                                x={node.position.x} 
+                                y={node.position.y} 
                                 width={node.width} 
                                 height={node.height} 
                                 rx={6}

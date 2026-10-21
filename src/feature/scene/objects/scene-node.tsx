@@ -3,13 +3,15 @@ import { NodeInstance } from "~/feature/editor/engine/graph/node-instance";
 import { Rect, Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeSceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { SceneNodeSlot } from "./scene-slot";
-import { NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols";
 
 export interface NodeUIState {
     // isCurrentStep: boolean; // talvez isso aqui nem deva ficar aqui
     isSelected: boolean;
     size: Vector2;
-    uiPosition: Vector2; // FIXME: talvez isso aqui seja um problema porque a posição do node fica dessincronizada por conta do grid snap
+    
+    // Corresponds to the "real" position of the node before any modifications
+    uiPosition: Vector2; 
+    
     minSize: Vector2;
     // zIndex: number;
 }
@@ -57,6 +59,7 @@ export class SceneNode {
     get uid() { return this._dataStore.uid; }
     get fqn() { return this._dataStore.nodetype_fqn; }
 
+    // Actual node position (that server knows about)
     get position() { return this._dataStore.position; }
     set position(new_pos: Vector2) { this.instance.updateSceneData(undefined, new_pos); }
     
@@ -94,6 +97,7 @@ export class SceneNode {
 
     get rect() { return new Rect(this.position, this.size)}
 
+    // Corresponds to the "real" position of the node before any modifications
     get uiPosition() { return this._uiStore.uiPosition; }
     set uiPosition(pos: Vector2) { this._setUiStore("uiPosition", pos); }
 

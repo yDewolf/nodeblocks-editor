@@ -3,7 +3,7 @@ import { createStore } from "solid-js/store";
 import { isServer } from "solid-js/web";
 
 export type Theme = "light" | "dark" | "dark-contrast" | "auto";
-export const THEMES = ["liht", "dark", "dark-contrast", "auto"];
+export const THEMES = ["light", "dark", "dark-contrast", "auto"];
 
 interface ThemeStore {
     theme: Theme

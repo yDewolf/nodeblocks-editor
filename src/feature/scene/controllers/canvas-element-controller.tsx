@@ -51,7 +51,7 @@ export class CanvasElementController {
         this.unsubscribeScene = scene.subscribe((event: SceneEvent) => {
             if (event.type === "node_added") {
                 const scene_node = new SceneNode(event.node)
-                scene_node.uiPosition = this.grid.roundVector(scene_node.position);
+                scene_node.position = this.grid.roundVector(scene_node.uiPosition);
                 this._setStore("nodes", event.node.uid, scene_node);
             
             } else if (event.type === "node_removed") {
@@ -134,6 +134,15 @@ export class CanvasElementController {
         slot.anchor = { x: 0, y: average_pos.y > 0 ? 1 : -1 };
     }
 
+    public get_node_connections(node: SceneNode): SceneConnection[] {
+        const allConns = Object.values(this._store.conns);
+        return allConns.filter(conn => {
+            return (conn.input_slot.node_id == node.uid
+                || conn.output_slot.node_id == node.uid
+            )  
+        })
+    }
+
     public get_slot_connections(slot: SceneNodeSlot): SceneConnection[] {
         const allConns = Object.values(this._store.conns);
         return allConns.filter(conn => {
@@ -153,16 +162,16 @@ export class CanvasElementController {
         const el = slot.element;
         if (!el) {
             const world_pos = {
-                x: parent_node.uiPosition.x + (slot.isInput == false ? parent_node.size.x : 0),
-                y: parent_node.uiPosition.y + (parent_node.size.y / 2)
+                x: parent_node.position.x + (slot.isInput == false ? parent_node.size.x : 0),
+                y: parent_node.position.y + (parent_node.size.y / 2)
             };
             slot.worldPos = world_pos;
             return world_pos;
         }
 
         const world_pos = {
-            x: parent_node.uiPosition.x + el.offsetLeft + el.offsetWidth / 2,
-            y: parent_node.uiPosition.y + el.offsetTop + el.offsetHeight / 2
+            x: parent_node.position.x + el.offsetLeft + el.offsetWidth / 2,
+            y: parent_node.position.y + el.offsetTop + el.offsetHeight / 2
         }; 
 
         slot.worldPos = world_pos;
