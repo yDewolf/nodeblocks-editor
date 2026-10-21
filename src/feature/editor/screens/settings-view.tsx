@@ -1,5 +1,6 @@
+import { For } from "solid-js"
 import { PageViewer } from "../../../components/page-controller"
-import { getCurrentTheme, setTheme, Theme } from "../../ui-themes"
+import { getCurrentTheme, setTheme, Theme, THEMES } from '../../ui-themes';
 
 // TODO: improve this page
 export const SettingsView = (props: {page_viewer: PageViewer}) => {
@@ -13,9 +14,9 @@ export const SettingsView = (props: {page_viewer: PageViewer}) => {
                         onchange={(e) => {
                             setTheme(e.currentTarget.value as Theme)
                     }}>
-                        <option value="auto">Auto</option>
-                        <option value="light">Light</option>
-                        <option value="dark">Dark</option>
+                        <For each={THEMES}>
+                            {(theme) => <option value={theme}>{theme}</option>}
+                        </For>
                     </select>
                 </div>
             </div>
