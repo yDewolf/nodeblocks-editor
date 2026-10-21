@@ -9,6 +9,7 @@ import LeftTabIcon from '~/assets/icons/left-tab.svg';
 import { ClientSceneCommandTypes, CommandGroups } from "~/protocols/nodeblocks/network/client-command-protocol";
 import { nanoid } from "nanoid";
 import { LOCAL_DOCS_ID } from "~/feature/docs/docs-resolver";
+import { editorSettings, setAutosaveScenes } from "../../editor-settings";
 
 
 const LeftTabDropdown = (props: {
@@ -43,7 +44,8 @@ const LeftTabDropdown = (props: {
             <div
                 class="fill dropdown-item-grid">
                 <DropsideManager dropsides={subsections} currentItem={currentItem} setCurrentItem={setCurrentItem}/>
-                <DropdownItemInput label="Autosave" inputType="checkbox" onChange={(e) => {
+                <DropdownItemInput label="Autosave" inputType="checkbox" checked={editorSettings.autosaveScenes} onChange={(e) => {
+                    setAutosaveScenes(e.target.checked);
                     editor.sceneConnection.sendCommand({
                         cmd_uid: nanoid(),
                         cmd_group: CommandGroups.SCENE, 
@@ -71,7 +73,7 @@ export const EditorLeftTabHolder = (props: {
         "Nodes": () => <NodeTypeSelector onClickOnPreview={
             (node_preview: NodeTypePreview) => editor.toolController.current_tool?.onClickOnNodePreview(node_preview)}
         />,
-        // "Workspace": () => <FileExplorer workspace={session_controller.user_workspace}/>
+        "Workspace": () => <span>This isn't implemented yet</span>// <FileExplorer workspace={session_controller.user_workspace}/>
     }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
     return (

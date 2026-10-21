@@ -140,7 +140,13 @@ export const DropdownItemButton = (props: {label: string, onClick: () => void, o
     )
 }
 
-export const DropdownItemInput = (props: {label: string, inputType: string, onChange: JSX.ChangeEventHandlerUnion<HTMLInputElement, Event>, onMouseOver?: () => void}) => {
+export const DropdownItemInput = (props: {
+    label: string, inputType: string, 
+    onChange: JSX.ChangeEventHandlerUnion<HTMLInputElement, Event>, 
+    onMouseOver?: () => void,
+    value?: any,
+    checked?: boolean
+}) => {
     const inputId = nanoid(4);
     return (
         <div
@@ -150,7 +156,7 @@ export const DropdownItemInput = (props: {label: string, inputType: string, onCh
             <Show when={props.label != ""}>
                 <label for={inputId}>{props.label}</label>
             </Show>
-            <input type={props.inputType} id={inputId} onchange={props.onChange}/>
+            <input type={props.inputType} id={inputId} onchange={props.onChange} checked={props.checked} value={props.value}/>
         </div>
     )
 }

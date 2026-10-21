@@ -18,6 +18,9 @@ import MinimizeIcon from '~/assets/icons/minimize.svg';
 import { createEffect, createSignal, onMount } from 'solid-js';
 import { useDocs } from '../docs/docs-context';
 import { DocsElementIndicator } from './components/selected-docs-indicator';
+import { editorSettings } from './editor-settings';
+import { ClientSceneCommandTypes, CommandGroups } from '~/protocols/nodeblocks/network/client-command-protocol';
+import { nanoid } from 'nanoid';
 
 export const EditorView = () => {
     const editor = useEditor();
@@ -42,6 +45,12 @@ export const EditorView = () => {
     const isDocsPageVisible = () => main_page_viewer.current_page === docsPage;    
 
     onMount(() => {
+        editor.sceneConnection.sendCommand({
+            cmd_uid: nanoid(),
+            cmd_group: CommandGroups.SCENE, 
+            type: ClientSceneCommandTypes.SET_SCENE_AUTOSAVE, 
+            autosave: editorSettings.autosaveScenes
+        })
         if (useDocs().is_docs_page_opened) {
             openDocsPage();
         }
