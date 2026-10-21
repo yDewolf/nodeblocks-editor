@@ -168,16 +168,16 @@ export const DocsElementIndicator = (props: {
                         <div class="fill keep row-container space-between docs-popup-header" style={{"align-items": 'center'}}>
                             <div class="keep fill center-items docs-popup-name-holder">
                                 <DocsIcon class="small-icon"/>
-                                <p>
-                                {docs.docsData.latest?.data.capitalized_name ?? "Not found"}
-                                </p>
+                                <p>{docs.docsData.latest?.data.capitalized_name ?? "Not found"}</p>
                             </div>
                             {/* FIXME: arrumar isso aqui para ele sempre abrir a página relacionada à esse popup */}
                             <button class="icon-button" onclick={() => props.open_docs_page()}>
                                 <ExpandIcon class="small-icon"/>
                             </button>
                         </div>
-                        {/* TODO: implement a brief description field in metadata */}
+                        <Show when={docs.docs_section}>
+                            <p class="docs-popup-section">Section: <b>{docs.docs_section}</b></p>
+                        </Show>
                         <ParsedMetaText class="docs-popup-description" text={(docs.docsData.latest?.data.brief ?? docs.docsData.latest?.data.description)} default=""/>
                     </div>
                 </Portal>

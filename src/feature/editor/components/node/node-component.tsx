@@ -16,6 +16,7 @@ import { NodeFieldSelector } from "./node-field";
 import { NotificationPopupHolder } from "../notification-badges";
 import { useNotifications } from "../../contexts/notification-context";
 import { NodeMetaProvider, useMetadata as useMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
+import { DocsPathPrefix } from "~/feature/docs/docs-protocols";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -113,9 +114,14 @@ export const NodeComponentV2 = (props: {
 
     props.default_show_output = props.default_show_output ?? true;
     return (
-        <NodeMetaProvider value={useMetadata().get_node_meta(ref_node.instance.spec.id, ref_node.instance.spec.namespace)}>
+        <NodeMetaProvider value={useMetadata().get_node_meta(ref_node.instance.spec.id, ref_node.instance.spec.namespace)} package_id={ref_node.instance.spec.namespace} type_id={ref_node.instance.spec.id}>
             <div
                 class="node"
+
+                docs-prefix={DocsPathPrefix.NODE}
+                docs-root={ref_node.instance.spec.namespace}
+                docs-id={ref_node.instance.spec.id}
+
                 onMouseLeave={(e) => {
                     setIsHovered(false);
                 }}
@@ -188,7 +194,7 @@ const NodeHeader = (props: {
                 }, InputEvents.HOVER_NODE);
             }}
         >
-            <span>{useNodeMeta()?.capitalized_name ?? props.node.fqn}</span>
+            <span>{useNodeMeta()?.meta?.capitalized_name ?? props.node.fqn}</span>
             {/* <span>{props.node.fqn}</span> */}
             <button 
                 class="icon-button" 

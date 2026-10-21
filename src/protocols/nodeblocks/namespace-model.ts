@@ -22,4 +22,9 @@ export class NamespaceUtils {
     public static makeFqn(namespace: string, id: string): string {
         return `${namespace}:${id}`
     }
+
+    public static splitFqn(fqn: string): [string, string] {
+        const split = fqn.split(":");
+        return [split[0], split[1]];
+    }
 }

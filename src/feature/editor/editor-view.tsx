@@ -13,7 +13,7 @@ import { SceneCanvasProvider } from '../scene/scene-canvas-context';
 import { SceneProvider } from '../scene/scene-context';
 import { SceneRuntimeProvider } from '../scene/scene-runtime-context';
 import { NotificationProvider } from './contexts/notification-context';
-import { EditorDocsView } from './screens/docs-view';
+import { EditorDocsView } from '../docs/docs-view';
 import MinimizeIcon from '~/assets/icons/minimize.svg';
 import { createEffect, createSignal, onMount } from 'solid-js';
 import { useDocs } from '../docs/docs-context';

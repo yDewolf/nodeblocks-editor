@@ -67,7 +67,7 @@ export const NodeFieldSelector = (props: {
         if (inputRef) inputRef.value = new_value.toString();
     };
 
-    const param_meta = useNodeMeta()?.parameter_meta;
+    const param_meta = useNodeMeta()?.meta?.parameter_meta;
     const param_label = param_meta ? param_meta[props.parameterId].capitalized_name : props.parameterId;
     return (
         <div class="field-grid">

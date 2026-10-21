@@ -44,10 +44,16 @@ export function usePackageMetaContext() {
 }
 
 // Node Meta
-const NodeMetaContext = createContext<NodeTypeMeta | undefined>();
-export function NodeMetaProvider(props: { value?: NodeTypeMeta; children: JSX.Element }) {
+interface NodeTypeMetaContext {
+    meta?: NodeTypeMeta,
+    package_id?: string,
+    type_id?: string
+}
+
+const NodeMetaContext = createContext<NodeTypeMetaContext | undefined>();
+export function NodeMetaProvider(props: { value?: NodeTypeMeta, package_id?: string, type_id?: string; children: JSX.Element }) {
     return (
-        <NodeMetaContext.Provider value={props.value}>
+        <NodeMetaContext.Provider value={{meta: props.value, package_id: props.package_id, type_id: props.type_id}}>
             {props.children}
         </NodeMetaContext.Provider>
     );
@@ -92,6 +98,7 @@ export function DynamicMetaProvider(props: { payload?: DocPayload; children: JSX
         <Switch fallback={props.children}>
             <Match when={props.payload?.type === "node" && props.payload}>
                 {(payload) => (
+                    // TODO: fix this meta provider
                     <NodeMetaProvider value={payload().data}>
                         {props.children}
                     </NodeMetaProvider>

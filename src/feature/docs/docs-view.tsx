@@ -1,17 +1,17 @@
-import { createMemo, createSignal, For, Match, ParentComponent, Show, Switch } from "solid-js";
+import { createMemo, createSignal, For, Match, onMount, ParentComponent, Show, Switch } from "solid-js";
 import { useDocs } from "~/feature/docs/docs-context";
-import { DocsPath, DocsTags } from "../../docs/components/docs-components";
+import { DocsPath, DocsTags } from "./components/docs-components";
 import { DocPayload, InterfaceElementMeta } from "~/feature/docs/docs-protocols";
 import CodeIcon from "~/assets/icons/code.svg";
-import { NodeDocsContent } from "../../docs/components/content/node-docs";
-import { InterfaceDocsContent } from '../../docs/components/content/interface-docs';
-import { DataTypeDocsContent } from "../../docs/components/content/datatype-docs";
-import { HeaderDocsContent } from "../../docs/components/content/header-docs";
+import { NodeDocsContent } from "./components/content/node-docs";
+import { InterfaceDocsContent } from './components/content/interface-docs';
+import { DataTypeDocsContent } from "./components/content/datatype-docs";
+import { HeaderDocsContent } from "./components/content/header-docs";
 import AskDocsIcon from "~/assets/icons/ask-about.svg";
 import { DynamicMetaProvider, MetaProvider } from "~/feature/metadata/metadata-context";
-import { ParsedMetaText } from '../../metadata/components/metadata-text';
+import { ParsedMetaText } from '../metadata/components/metadata-text';
 import { DocsSidebar } from "~/feature/docs/components/docs-sidebar";
-import { PackageManager } from '../engine/packages/package-manager';
+import { PackageManager } from '../editor/engine/packages/package-manager';
 import { useEditor } from "~/feature/scene-editor-context";
 import { DataTypeMeta, NodeTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import { MetadataHeader } from "~/protocols/nodeblocks/metadata/header_metadata";
@@ -31,6 +31,9 @@ export const EditorDocsView = () => {
     })
 
     const [devMode, setDevMode] = createSignal(false);
+    onMount(() => {
+        docs.navigateToSection(docs.route);        
+    })
     return (
         <MetaProvider value={{ metadata: docs.currentRoot}}>
             <div class="docs-view-body">

@@ -6,6 +6,8 @@ import { DocsController } from "~/feature/docs/docs-controller";
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { NodeTypePreview } from "../components/subpanels/component/node-type-selector";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
+import { DocsPathPrefix } from "~/feature/docs/docs-protocols";
+import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
 
 export class DocsTool extends BaseEditorTool {
     protected _selected_docs_path: string | undefined = undefined;
@@ -29,9 +31,11 @@ export class DocsTool extends BaseEditorTool {
             this._selected_docs_path = path;
             this.docsController.docs_path = this._selected_docs_path;
         }
+    }
 
-        if (this._selected_docs_path) {
-            this.onSelectDocumentation?.();
+    protected set selectedDocsSection(section: string | undefined) {
+        if (this.docsController.docs_section != section) {
+            this.docsController.docs_section = section;
         }
     }
     
@@ -73,21 +77,30 @@ export class DocsTool extends BaseEditorTool {
             e.preventDefault();
             e.stopPropagation();
 
+            const prefix = docs_element.getAttribute("docs-prefix") as DocsPathPrefix;
+            
+            const docs_section = docs_element.getAttribute("docs-section");
             const docs_id = docs_element.getAttribute("docs-id");
             const root_id = docs_element.getAttribute("docs-root");
+
             if (docs_id && root_id) {
                 this._set_last_pos({x: e.clientX, y: e.clientY});
-                this.selected_docs_path = DocsPathUtils.makeUIPath(root_id, docs_id);
+                this.selected_docs_path = DocsPathUtils.makeAutoPath(root_id, prefix ?? DocsPathPrefix.UI, docs_id);
+                this.selectedDocsSection = docs_section ?? undefined;                
+                if (this.selected_docs_path) { 
+                    this.onSelectDocumentation?.();
+                }
             }
         }
     }
 
     onClickOnNodeSlot(slot: SceneNodeSlot): void {
         // Select DataType type id as path
+        // TODO: talvez ao invés de redirecionar para o datatype, a gente redireciona para o slot do node
         const fqn = slot.instance.spec.data_type_id;
-        const [namespace, id] = fqn.split(":");
-
+        const [namespace, id] = NamespaceUtils.splitFqn(fqn);
         this.selected_docs_path = DocsPathUtils.makeDataTypePath(namespace, undefined, id);
+
         this._set_last_pos(undefined);
     }
 

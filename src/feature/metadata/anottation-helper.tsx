@@ -67,7 +67,7 @@ export class DocAnnotationHelper {
         super_path = super_path || CURRENT_PATH
         
         const rootMeta = resolvedMeta.rootMeta?.metadata;
-        const nodeMeta = resolvedMeta.nodeMeta;
+        const nodeMeta = resolvedMeta.nodeMeta?.meta;
         const dataTypeMeta = resolvedMeta.dataTypeMeta;
 
         const currentTypesId = rootMeta?.header?.package_id || "";

@@ -122,6 +122,10 @@
   grid-template-columns: auto minmax(0, 1fr);
 }
 
+.docs-popup-section {
+  font-size: 0.8rem;
+}
+
 .docs-popup-description {
   display: -webkit-box;
   -webkit-line-clamp: 3;

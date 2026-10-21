@@ -15,7 +15,7 @@ import { NodeTypeMeta, ParameterMeta, SlotMeta } from "~/protocols/nodeblocks/me
 import { PackageManager } from "~/feature/editor/engine/packages/package-manager";
 import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
 import { DataTypeSpec, ParameterSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
-import { NodeMetaProvider } from '../../../metadata/metadata-context';
+import { NodeMetaProvider, useMetadata } from '../../../metadata/metadata-context';
 
 
 export const NodeDocsContent = (props: {
@@ -97,10 +97,11 @@ const SlotDropdownItem = (props: {
     slot_meta: SlotMeta,
     devMode: boolean,
 }) => {
+    const datatype_meta = useMetadata().get_datatype_meta(props.datatype.id, props.datatype.namespace);
     const badges = createMemo<DropdownBadge[]>(() => {
         const badge_list: DropdownBadge[] = [
             {
-                label: props.slot_spec.data_type_id,
+                label: datatype_meta?.capitalized_name ?? props.slot_spec.data_type_id,
                 href: DocsPathUtils.makeDataTypePath(props.datatype?.namespace ?? "unknown", props.datatype),
                 icon: props.slot_spec.is_input ? <InputIcon class="tag-icon" /> : <OutputIcon class="tag-icon" />
             }

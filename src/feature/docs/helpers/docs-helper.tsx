@@ -39,7 +39,7 @@ export class DocSearchHelper {
                         type: 'datatype',
                         capitalized_name: datatype_meta.capitalized_name || id,
                         description: datatype_meta.description,
-                        path: DocsPathUtils.makeDataTypePath(root_id, undefined, undefined, id)
+                        path: DocsPathUtils.makeDataTypePath(root_id, undefined, id)
                     });
                 });
             }

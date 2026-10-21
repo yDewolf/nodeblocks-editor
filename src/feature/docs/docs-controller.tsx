@@ -59,6 +59,11 @@ export class DocsController {
 
         this.route = {path: path}
     }
+    get docs_section() { return this.route?.section; }
+    set docs_section(section: string | undefined) { 
+        if (!this.route) { return; }
+        this.route = {path: this.route.path, section};
+    }
     
     public docsData: Resource<DocPayload | undefined>;
     public allDocs: Record<string, MetadataStoreData>;
