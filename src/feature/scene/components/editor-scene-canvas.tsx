@@ -1,10 +1,9 @@
 import { For, onCleanup, onMount, ParentComponent, Show } from "solid-js";
 import { useSceneCanvas } from "../scene-canvas-context"
-import { NodeComponent } from "~/feature/editor/components/node/node-component";
 import {} from "~/feature/ui-themes";
 import { useEditor } from "~/feature/scene-editor-context";
 import { EventHandler, InputEvents } from "~/utils/events/event-handling";
-import { ConnectionLines, ConnectionPreview } from "~/feature/editor/components/canvas/connection-lines";
+import { ConnectionLines, ConnectionPreview } from "~/feature/scene/components/connection-lines";
 import { useScene } from "../scene-context";
 import { RemoveConnectionsAction } from "~/feature/editor/actions/conn/remove-conns-action";
 import { InputScope, useInputManager, useKeybind } from "~/utils/keybinds/input-provider";
@@ -13,7 +12,8 @@ import { useEventManager } from "~/utils/events/event-provider";
 import "~/style/containers.css";
 import "~/app.css";
 import { SelectedNodeType } from "~/feature/editor/components/subpanels/component/node-type-selector";
-import { GridView } from "~/feature/editor/components/canvas/grid-view";
+import { GridView } from "~/feature/scene/components/grid-view";
+import { NodeComponent } from "./node/node-component";
 
 export const EditorSceneCanvas = (props: {
     setWorldSpaceRef: (ref: HTMLDivElement | undefined) => void

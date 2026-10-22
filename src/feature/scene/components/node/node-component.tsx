@@ -3,7 +3,6 @@ import { DropdownIcon, DropdownSection } from "~/components/panels/dropdown";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { useScene } from "~/feature/scene/scene-context";
 import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
-import { NodeInstanceFactory } from "../../engine/helpers/node-instance-factory";
 import { NodeAnchor } from "./node-anchors";
 import { NodeOutput } from "./node-output";
 import { SlotComponent } from "./slot-components";
@@ -12,12 +11,13 @@ import { InputEvents } from "~/utils/events/event-handling";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 import { NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols";
 import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-context";
-import { NodeFieldSelector } from "./node-field";
-import { NotificationPopupHolder } from "../notification-badges";
-import { useNotifications } from "../../contexts/notification-context";
+import { DataTypeFieldSelector } from "../value/datatype-field";
 import { NodeMetaProvider, useMetadata as useMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
 import { DocsPathPrefix } from "~/feature/docs/docs-protocols";
-import { editorSettings } from "../../editor-settings";
+import { NotificationPopupHolder } from "~/feature/editor/components/notification-badges";
+import { useNotifications } from "~/feature/editor/contexts/notification-context";
+import { editorSettings } from "~/feature/editor/editor-settings";
+import { NodeInstanceFactory } from "~/feature/editor/engine/helpers/node-instance-factory";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -282,7 +282,7 @@ export const NodeBodySections = (props: {
                 <DropdownSection header="Parameters" content={
                     <div class="field-grid-holder">
                         <For each={Object.entries(props.node.parameterSpecs)}>
-                            {([paramId, paramSpec]) => <NodeFieldSelector
+                            {([paramId, paramSpec]) => <DataTypeFieldSelector
                                     node={props.node}
                                     parameterId={paramId}
                                     parameterSpec={paramSpec}

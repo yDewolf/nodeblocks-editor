@@ -1,7 +1,7 @@
 import { createMemo } from "solid-js";
-import { VectorField } from "../../../../../components/default-fields";
-import { SimpleField, FieldValueDisplayer, FieldSection } from "../../../../../components/input-fields";
-import { NodeBodySections } from "../../node/node-component";
+import { VectorField } from "~/components/default-fields";
+import { SimpleField, FieldValueDisplayer, FieldSection } from "~/components/input-fields";
+import { NodeBodySections } from "~/feature/scene/components/node/node-component";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 
 export const NodeAttributes = (props: {node?: SceneNode}) => {

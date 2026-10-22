@@ -1,5 +1,5 @@
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
-import { SelectionController } from "../canvas/selection-controller";
+import { SelectionController } from "../../scene/canvas/selection-controller";
 import { BaseEditorTool } from "./base-tool";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";

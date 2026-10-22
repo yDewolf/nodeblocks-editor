@@ -1,5 +1,5 @@
-import { CanvasCamera } from "../../canvas/editor-space"
-import { Grid } from "../../canvas/grid"
+import { CanvasCamera } from "../canvas/editor-space"
+import { Grid } from "../canvas/grid"
 
 export const GridView = (props: {camera: CanvasCamera, grid: Grid}) => {
     return (

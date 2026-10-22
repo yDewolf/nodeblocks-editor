@@ -8,7 +8,7 @@ import { NodeParameter } from "~/wrapper/nodes/data/node-data";
 import { GraphNode } from "~/wrapper/nodes/graph-node";
 import { NodeSlot } from "~/wrapper/nodes/slot/node-slot";
 import { DocsElementIndicator } from "../../components/selected-docs-indicator";
-import { ConnectionLines, ConnectionPreview } from "../../components/canvas/connection-lines";
+import { ConnectionLines, ConnectionPreview } from "../../../scene/components/connection-lines";
 import { NodeComponent } from "../../components/node/node-component";
 import { EditorLeftTabHolder } from "../../components/subpanels/left-tab";
 import { EditorMidTab } from "../../components/subpanels/mid-tab";

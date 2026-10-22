@@ -17,7 +17,7 @@ const TYPE_CONFIGS: Record<string, { type: string; step?: number; min?: number }
     [DefaultDataTypes.UNKNOWN]: { type: "text" }
 };
 
-export const NodeFieldSelector = (props: {
+export const DataTypeFieldSelector = (props: {
     node?: SceneNode;
     parameterId: string;
     parameterSpec: ParameterSpec;

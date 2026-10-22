@@ -3,7 +3,7 @@ import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NotificationWithMeta, NotificationLevel, NotificationTarget, isNodeNotify, isSlotNotify, isParamNotify, isConnNotify, NotificationLevelOrder, Notification } from "~/protocols/notification-protocol";
 import { SceneConnectionManager } from "../../network/scene-connection-manager";
 import { CanvasElementController } from "~/feature/scene/controllers/canvas-element-controller";
-import { CanvasSpace } from "../../canvas/editor-space";
+import { CanvasSpace } from "../../../scene/canvas/editor-space";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { ServerMessageTypes } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { NotificationFactory } from "./notification-factory";

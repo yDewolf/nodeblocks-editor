@@ -1,21 +1,21 @@
 import { createMemo, JSXElement, For, Show, createSignal } from "solid-js";
 import { NodeSlotSpec, NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
-import { DropdownSection } from "../../../../components/panels/dropdown";
-import { NodePreview } from "../../../editor/components/node/node-component";
-import { SlotHeader } from "../../../editor/components/node/slot-components";
-import { NodeFieldSelector } from '../../../editor/components/node/node-field';
 import InputIcon from "~/assets/icons/input.svg";
 import OutputIcon from "~/assets/icons/output.svg";
 import ToolIcon from "~/assets/icons/tool.svg";
 import FilterIcon from "~/assets/icons/filter.svg";
 import { DocsHref } from "../docs-reference";
-import { ParsedMetaText } from '../../../metadata/components/metadata-text';
-import { DocsPathUtils } from '../../helpers/docs-path-utils';
 import { NodeTypeMeta, ParameterMeta, SlotMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import { PackageManager } from "~/feature/editor/engine/packages/package-manager";
 import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
 import { DataTypeSpec, ParameterSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
-import { NodeMetaProvider, useMetadata } from '../../../metadata/metadata-context';
+import { DropdownSection } from "~/components/panels/dropdown";
+import { ParsedMetaText } from "~/feature/metadata/components/metadata-text";
+import { NodeMetaProvider, useMetadata } from "~/feature/metadata/metadata-context";
+import { NodePreview } from "~/feature/scene/components/node/node-component";
+import { SlotHeader } from "~/feature/scene/components/node/slot-components";
+import { DocsPathUtils } from "../../helpers/docs-path-utils";
+import { DataTypeFieldSelector } from "~/feature/scene/components/value/datatype-field";
 
 
 export const NodeDocsContent = (props: {
@@ -254,7 +254,7 @@ const ParameterDropdownItem = (props: {
                     <div class="text-section">
                         <h4>Widget</h4>
                         <div class="remove-input all">
-                            <NodeFieldSelector parameterId={props.param_id} parameterSpec={props.param_spec} hide_label={true} />
+                            <DataTypeFieldSelector parameterId={props.param_id} parameterSpec={props.param_spec} hide_label={true} />
                         </div>
                     </div>
 

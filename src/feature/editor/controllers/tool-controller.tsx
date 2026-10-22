@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { SelectionController } from "../canvas/selection-controller";
+import { SelectionController } from "../../scene/canvas/selection-controller";
 import { EditorTool } from "../tools/base-tool";
 import { InputContext } from '../../../utils/keybinds/input-context';
 

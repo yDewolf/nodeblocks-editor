@@ -1,7 +1,7 @@
 import { createContext, useContext, ParentComponent, onMount, onCleanup } from "solid-js";
 import { useScene } from "./scene-context";
 import { SceneNode } from "./objects/scene-node";
-import { CanvasSpace } from '../editor/canvas/editor-space';
+import { CanvasSpace } from './canvas/editor-space';
 import { SceneConnection } from "./objects/scene-connection";
 import { CanvasElementController } from "./controllers/canvas-element-controller";
 

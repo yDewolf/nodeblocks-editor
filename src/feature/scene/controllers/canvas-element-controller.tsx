@@ -3,7 +3,7 @@ import { SceneConnection } from "../objects/scene-connection";
 import { SceneNode } from "../objects/scene-node";
 import { SceneNodeSlot } from "../objects/scene-slot";
 import { NodeScene, SceneEvent } from "~/feature/editor/engine/node_scene";
-import { Grid } from "~/feature/editor/canvas/grid";
+import { Grid } from "~/feature/scene/canvas/grid";
 
 interface CanvasElementStore {
     nodes: Record<string, SceneNode>
