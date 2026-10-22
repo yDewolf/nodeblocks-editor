@@ -9,7 +9,6 @@ import { SlotComponent } from "./slot-components";
 import { useEventManager } from "~/utils/events/event-provider";
 import { InputEvents } from "~/utils/events/event-handling";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
-import { NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols";
 import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-context";
 import { DataTypeFieldSelector } from "../value/datatype-field";
 import { NodeMetaProvider, useMetadata as useMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
@@ -73,7 +72,7 @@ export const NodeComponent = (props: {
                 classList={{
                     "unsynced": actionController.isEntityPending(props.node.uid),
                     // "failed": props.node.has_failed_action,
-                    "current-step": runtime?.getNodeStatus(props.node.uid) == NodeExecutionStatus.SUCCESS,
+                    "current-step": runtime?.isNodeLatestProcessed(props.node.uid),
                     "selected-mode": props.node.isSelected,
                 }}
             >   

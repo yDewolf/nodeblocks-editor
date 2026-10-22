@@ -12,32 +12,64 @@ export class StateController {
     private _runtime_mode: () => SceneWorkerExecutionMode;
     private _set_runtime_mode: (state: SceneWorkerExecutionMode) => void;
 
+    private _target_nodes: () => string[] | undefined;
+    private _set_target_nodes: (state: string[] | undefined) => void;
+
+    private _target_iterations: () => number | undefined;
+    private _set_target_iterations: (state: number | undefined) => void;
+
     public constructor(
         private readonly _client: SceneConnectionManager
     ) {
         [this._runtime_state, this._set_runtime_state] = createSignal(SceneWorkerExecutionState.STOPPED);
-
         [this._runtime_mode, this._set_runtime_mode] = createSignal(SceneWorkerExecutionMode.GRAPH_STEP);
+        [this._target_nodes, this._set_target_nodes] = createSignal<string[] | undefined>(undefined);
+        [this._target_iterations, this._set_target_iterations] = createSignal<number | undefined>(undefined);
+        console.error(_client.isConnected);
         this.setup_handlers();
     }
 
     private setup_handlers() {
         this._client.onCommandResponse(ServerCmdResponseTypes.EXECUTION_STATE_SYNC, (message) => {
-            // console.log(message);
             const runtime_state = message.response_payload.state as SceneWorkerExecutionState;
             const runtime_mode = message.response_payload.mode as SceneWorkerExecutionMode;
-            this._set_runtime_state(runtime_state);
-            this._set_runtime_mode(runtime_mode);
+            
+            if (this.runtime_state != runtime_state) this._set_runtime_state(runtime_state);
+            if (this.runtime_mode != runtime_mode) this._set_runtime_mode(runtime_mode);
+            
+            this._set_target_iterations(message.response_payload.target_iterations);
+            this._set_target_nodes(message.response_payload.target_nodes);
+            
         });
     }
 
-    get runtime_state() {return this._runtime_state();}
-    get runtime_mode() {return this._runtime_mode(); }
+    get runtime_state() { return this._runtime_state();}
+    get runtime_mode() { return this._runtime_mode(); }
 
-    public isRunning() {
+    get target_nodes() { return this._target_nodes(); }
+    get target_iterations() { return this._target_iterations(); }
+
+    public isRunning = () => {
         return this.runtime_state == SceneWorkerExecutionState.RUNNING 
             || this.runtime_state == SceneWorkerExecutionState.RUNNING_CONTINUOUS
 
+    }
+
+    public requestExecutionConfigUpdate(
+        state?: SceneWorkerExecutionState,
+        target_iterations?: number,
+        mode?: SceneWorkerExecutionMode,
+        target_nodes?: string[],
+    ) { 
+        this._client.sendCommand({
+            cmd_uid: nanoid(5),
+            cmd_group: CommandGroups.EXECUTION,
+            type: SceneExecutionCmdTypes.UPDATE_EXECUTION_CONFIG,
+            state,
+            mode,
+            target_iterations,
+            target_nodes
+        })
     }
 
     public requestModeUpdate(new_mode: SceneWorkerExecutionMode) {
@@ -49,16 +81,28 @@ export class StateController {
         });
     }
 
-    public request_play() {
-        // TODO: adapt this to the new protocol
+    public requestPlay() {
         if (this._client) {
             this._client.sendCommand({
                 cmd_group: CommandGroups.EXECUTION,
                 cmd_uid: nanoid(),
                 type: SceneExecutionCmdTypes.SET_EXECUTION_STATE,
-                state: SceneWorkerExecutionState.RUNNING
+                state: SceneWorkerExecutionState.RUNNING,
             })
         }
+    }
+
+    public requestPlayContinuously(targetIterations?: number) {
+        console.trace("test");
+        if (this._client) [
+            this._client.sendCommand({
+                cmd_group: CommandGroups.EXECUTION,
+                cmd_uid: nanoid(),
+                type: SceneExecutionCmdTypes.SET_EXECUTION_STATE,
+                state: SceneWorkerExecutionState.RUNNING_CONTINUOUS,
+                target_iterations: targetIterations
+            })
+        ]
     }
 
     public requestContinue() {

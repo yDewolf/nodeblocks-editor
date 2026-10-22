@@ -26,9 +26,12 @@ export enum ClientSceneCommandTypes {
 }
 
 export enum SceneExecutionCmdTypes {
+    CHECK_EXECUTION_STATE = "check_execution_state",
     SET_EXECUTION_STATE = "set_execution_state",
     SET_EXECUTION_MODE = "set_execution_mode",
-    EXECUTION_SHORTCUT = "execution_shortcut"
+    EXECUTION_SHORTCUT = "execution_shortcut",
+    UPDATE_TARGET_NODES = "update_target_nodes",
+    UPDATE_EXECUTION_CONFIG = "update_execution_config"
 }
 
 export enum ExecutionShortcuts {

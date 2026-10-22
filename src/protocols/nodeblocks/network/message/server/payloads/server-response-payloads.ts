@@ -18,6 +18,8 @@ export type ExecutionStateSyncPayload = CommandResponsePayload & {
     type: ServerCmdResponseTypes.EXECUTION_STATE_SYNC
     state: SceneWorkerExecutionState
     mode: SceneWorkerExecutionMode
+    target_iterations?: number
+    target_nodes?: string[] 
 }
 
 export type AddNodePayload = CommandResponsePayload & {

@@ -11,9 +11,11 @@ import { batch } from "solid-js";
 interface SceneRuntimeContext {
     jobStatus: JobStatus,
     // node uid -> slot id -> output
-    nodeOutputs: Record<string, Record<string, any>>
-    nodeStatuses: Record<string, NodeExecutionStatus>
-    targetedNodes?: string[] // TODO
+    nodeOutputs: Record<string, Record<string, any>>,
+    nodeStatuses: Record<string, NodeExecutionStatus>,
+    targetedNodes?: string[]
+    // This is plural since we might start processing multiple nodes at once
+    latestProcessedNodes?: string[]
 }
 
 interface SceneRuntimeStore {
@@ -63,7 +65,8 @@ export class SceneRuntimeController {
                         jobStatus: msg.event_payload.status,
                         nodeStatuses: nodeStatuses,
                         nodeOutputs: nodeOutputs,
-                        targetedNodes: undefined
+                        targetedNodes: undefined, // TODO:
+                        latestProcessedNodes: undefined
                     });
                     this._setRuntimeStore("latestContext", msg.event_payload.job_id);
     
@@ -91,7 +94,11 @@ export class SceneRuntimeController {
                     "nodeStatuses", msg.event_payload.node_uid,
                     msg.event_payload.status
                 );
-    
+                
+                this._setRuntimeStore(
+                    "contexts", msg.event_payload.job_id,
+                    "latestProcessedNodes", [msg.event_payload.node_uid]
+                )
                 if (msg.event_payload.node_result) {
                     this._setRuntimeStore(
                         "contexts", msg.event_payload.job_id, 
@@ -123,6 +130,15 @@ export class SceneRuntimeController {
     get nodeStatuses() {
         if (!this._runtimeStore.latestContext) { return null; }
         return this._runtimeStore.contexts[this._runtimeStore.latestContext].nodeStatuses; 
+    }
+
+    public isNodeLatestProcessed = (node_uid: string) => {
+        if (!this._runtimeStore.latestContext) { return false; }
+        const context = this._runtimeStore.contexts[this._runtimeStore.latestContext];
+        if (!context) return false;
+        if (!context.latestProcessedNodes) return false;
+
+        return node_uid in context.latestProcessedNodes;
     }
 
     public getNodeStatus = (node_uid: string) => {

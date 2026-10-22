@@ -23,6 +23,7 @@ import { DocsTool } from './tools/docs-tool';
 import { DocsController } from '../docs/docs-controller';
 import { nanoid } from 'nanoid';
 import { ClientSceneCommandTypes, CommandGroups } from '~/protocols/nodeblocks/network/client-command-protocol';
+import { SceneExecutionCmdTypes } from '../../protocols/nodeblocks/network/client-command-protocol';
 
 export class SceneEditor {
     private _scene: NodeScene;
@@ -108,6 +109,22 @@ export class SceneEditor {
 
     public async connectToScene(scene_uid: string) {
         await this._sceneConnection.connect(scene_uid);
+        this.onSceneConnect();
+    }
+
+    protected onSceneConnect() {
+        if (!this._sceneConnection.isConnected) return;
+        
+        this.sceneConnection.sendCommand({
+            cmd_uid: nanoid(5),
+            cmd_group: CommandGroups.SCENE,
+            type: ClientSceneCommandTypes.GET_SCENE_DATA
+        });
+        this.sceneConnection.sendCommand({
+            cmd_uid: nanoid(5),
+            cmd_group: CommandGroups.EXECUTION,
+            type: SceneExecutionCmdTypes.CHECK_EXECUTION_STATE
+        });
     }
 
     // Scene Events

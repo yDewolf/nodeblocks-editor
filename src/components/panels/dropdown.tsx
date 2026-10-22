@@ -82,7 +82,7 @@ export const DropdownSection = (props: {
     )
 }
 
-export const Dropdown = (props: {content: JSXElement, animated?: boolean}) => {
+export const Dropdown = (props: {content: JSXElement, animated?: boolean, class?: string}) => {
     let containerRef: HTMLDivElement | undefined;
     const [expanded, setExpanded] = createSignal(false);
     const handleOnFocusOut = (e: FocusEvent) => {
@@ -95,7 +95,7 @@ export const Dropdown = (props: {content: JSXElement, animated?: boolean}) => {
         <Show when={expanded()}>
             <div
                 onFocusOut={handleOnFocusOut}
-                class="dropdown-wrapper"
+                class={"dropdown-wrapper"}
             >
                 <div class="dropdown-content">
                     {props.content}
@@ -107,7 +107,7 @@ export const Dropdown = (props: {content: JSXElement, animated?: boolean}) => {
         <div 
             ref={containerRef}
             onFocusOut={handleOnFocusOut}
-            class="dropdown" 
+            class={"dropdown" + (props.class ? (" " + props.class) : "")}
             classList={{"expanded": expanded(), "no-animation": !props.animated}}
         >
             <div class="dropdown-header" classList={{"expanded": expanded()}}>

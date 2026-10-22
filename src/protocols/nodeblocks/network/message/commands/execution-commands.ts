@@ -7,6 +7,11 @@ import { BaseClientCommand } from "./base-client-command";
 
 // Execution Commands
 
+export type CheckExecutionStateCmd = BaseClientCommand & {
+    cmd_group: CommandGroups.EXECUTION;
+    type: SceneExecutionCmdTypes.CHECK_EXECUTION_STATE;
+}
+
 export type SetExecutionStateCmd = BaseClientCommand & {
     cmd_group: CommandGroups.EXECUTION;
     type: SceneExecutionCmdTypes.SET_EXECUTION_STATE;
@@ -26,4 +31,24 @@ export type ExecutionShortcutCmd = BaseClientCommand & {
     shortcut: ExecutionShortcuts;
 };
 
-export type ExecutionCommand = SetExecutionStateCmd | SetExecutionModeCmd | ExecutionShortcutCmd;
+export type UpdateTargetNodesCmd = BaseClientCommand & {
+    cmd_group: CommandGroups.EXECUTION;
+    type: SceneExecutionCmdTypes.UPDATE_TARGET_NODES;
+    target_nodes: string[];
+}
+
+export type UpdateExecutionConfigCmd = BaseClientCommand & {
+    cmd_group: CommandGroups.EXECUTION;
+    type: SceneExecutionCmdTypes.UPDATE_EXECUTION_CONFIG;
+    
+    state?: SceneWorkerExecutionState;
+    target_iterations?: number;
+    mode?: SceneWorkerExecutionMode;
+    target_nodes?: string[];
+}
+
+export type ExecutionCommand =
+    | CheckExecutionStateCmd 
+    | SetExecutionStateCmd | SetExecutionModeCmd 
+    | ExecutionShortcutCmd 
+    | UpdateTargetNodesCmd | UpdateExecutionConfigCmd;
