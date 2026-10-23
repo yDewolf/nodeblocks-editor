@@ -26,7 +26,6 @@ export const NodeComponent = (props: {
 }) => {
     const { actionController } = useScene();
     const { canvasSpace } = useSceneCanvas();
-    const runtime = useSceneRuntime();
 
     const isVisible = createMemo(() => {
         return canvasSpace.camera.camera_rect.overlaps(props.node.rect);
@@ -58,7 +57,6 @@ export const NodeComponent = (props: {
         ro.observe(el);
     };
     onCleanup(() => ro?.disconnect());
-
     return (
         <Show when={isVisible()}>
             <div 
@@ -72,8 +70,6 @@ export const NodeComponent = (props: {
                 classList={{
                     "unsynced": actionController.isEntityPending(props.node.uid),
                     // "failed": props.node.has_failed_action,
-                    "current-step": runtime?.isNodeLatestProcessed(props.node.uid),
-                    "selected-mode": props.node.isSelected,
                 }}
             >   
                 <NodeComponentV2 node={props.node}/>
@@ -114,9 +110,10 @@ export const NodeComponentV2 = (props: {
 
     createEffect(() => {
         setIsHovered(editorSettings.alwaysShowSlotLabels);
-    })
-
+    });
+    
     props.default_show_output = props.default_show_output ?? true;
+    const runtime = useSceneRuntime();
     return (
         <NodeMetaProvider value={useMetadata().get_node_meta(ref_node.instance.spec.id, ref_node.instance.spec.namespace)} package_id={ref_node.instance.spec.namespace} type_id={ref_node.instance.spec.id}>
             <div
@@ -133,7 +130,10 @@ export const NodeComponentV2 = (props: {
                 classList={{
                     "expanded": isExpanded(),
                     "hovered": isHovered(),
-                    "selected-mode": ref_node.isSelected
+                    "targeted": runtime?.stateController.isNodeTargeted(ref_node.uid),
+                    "current-step": runtime?.isNodeLatestProcessed(ref_node.uid),
+                    "not-targeted": !runtime?.stateController.isNodeTargeted(ref_node.uid) && runtime?.stateController.hasNodeTargets(),
+                    "selected-mode": ref_node.isSelected,
                 }}
                 // style={{
                     //     "min-width": `${ref_node.minSize.x}px`,

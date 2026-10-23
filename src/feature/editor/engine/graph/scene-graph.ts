@@ -24,14 +24,14 @@ export class SceneGraph {
     // Node Manipulation
 
     public removeNode(nodeId: string): boolean {
-        const node = this._nodes.remove(nodeId);
-        if (!node) {
-            return false;
-        }
-
         const attachedConnections = this._connections.getByNode(nodeId);
         for (const conn of attachedConnections) {
             this.disconnect(conn.uid);
+        }
+        
+        const node = this._nodes.remove(nodeId);
+        if (!node) {
+            return false;
         }
 
         return true;

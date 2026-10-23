@@ -46,6 +46,13 @@ export class InputContext {
         this.bindings.delete(name);
     }
 
+    public getKeybind(name: string) {
+        return this.getAllBindings().get(name);
+    }
+
+    public getFirstKeybindTrigger(name: string) {
+        return this.getKeybind(name)?.triggers.at(0)
+    }
 
     public getAllBindings(): Map<string, KeybindBinding> {
         const merged = new Map<string, KeybindBinding>();

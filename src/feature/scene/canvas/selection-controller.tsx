@@ -2,7 +2,6 @@ import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { CanvasSpace } from "./editor-space";
 import { createSignal } from "solid-js";
 import { debounce } from "~/utils/debounce-utils";
-import { Grid } from "./grid";
 import { SelectionRect } from "../components/selection_rect";
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { ActionController } from "../../editor/actions/action-controller";
@@ -11,26 +10,26 @@ import { NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/com
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeSceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 
-
+// TODO: move this to controllers
 export class SelectionController {
     selection_rect: SelectionRect
 
-    _selected_nodes: () => SceneNode[];
-    _set_selected_nodes: (nodes: SceneNode[]) => void;
+    private _selected_nodes: () => SceneNode[];
+    private _set_selected_nodes: (nodes: SceneNode[]) => void;
     
-    _hovered_node: () => SceneNode | null;
-    _set_hovered_node: (node: SceneNode | null) => void;
+    private _hovered_node: () => SceneNode | null;
+    private _set_hovered_node: (node: SceneNode | null) => void;
     
-    _selected_slot: () => SceneNodeSlot | null;
-    _set_selected_slot: (slot: SceneNodeSlot | null) => void;
+    private _selected_slot: () => SceneNodeSlot | null;
+    private _set_selected_slot: (slot: SceneNodeSlot | null) => void;
 
-    _hovered_slot: () => SceneNodeSlot | null;
-    _set_hovered_slot: (slot: SceneNodeSlot | null) => void;
+    private _hovered_slot: () => SceneNodeSlot | null;
+    private _set_hovered_slot: (slot: SceneNodeSlot | null) => void;
 
     area_selection: boolean = false;
     selecting: boolean = false;
-    _moving: () => boolean;
-    _setMoving: (value: boolean) => void;
+    private _moving: () => boolean;
+    private _setMoving: (value: boolean) => void;
     private debounced_request_update: Function;
     
     protected _selected_node_type: () => string | undefined;
@@ -54,15 +53,6 @@ export class SelectionController {
         }, 100);
 
         this.selection_rect = new SelectionRect();
-        
-        // createRoot(() => {
-        //     // Listen to file updates so it clears selections when file changes
-        //     createEffect(() => {
-        //         this._editor.scene_controller.node_type_reader.keep_track();
-        //         this._editor.scene_controller.node_scene_reader.keep_track();
-        //         this.clear();
-        //     })
-        // });
     }
 
     get space() { return this._space }

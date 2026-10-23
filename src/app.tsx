@@ -11,6 +11,7 @@ import { ClientSceneCommandTypes, CommandGroups } from "./protocols/nodeblocks/n
 import { nanoid } from "nanoid";
 import { MetadataProvider, MetaProvider } from "./feature/metadata/metadata-context";
 import { DocsProvider, DocsUrlSync } from './feature/docs/docs-context';
+import { ContextMenuPortal } from './feature/context-menu/context-menu-component';
 
 interface AppContextData {
   appSession: AppSessionManager,
@@ -39,6 +40,7 @@ export default function App() {
 
   return (
     <main>
+      <ContextMenuPortal />
       <Show 
         when={context()} 
         fallback={<div>Connecting...</div>}

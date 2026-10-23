@@ -64,3 +64,13 @@ export function useKeybind(name: string, triggers: KeybindTrigger[] | KeybindTri
         context.unbind(name);
     });
 }
+
+export function getKeybind(name: string) {
+    const context = useContext(InputContextContainer)
+    if (!context) {
+        console.warn(`getKeybind('${name}') called outside of <InputScope>.`);
+        return;
+    }
+
+    return context.getKeybind(name);
+}

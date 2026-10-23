@@ -7,6 +7,7 @@
 
   --node-color: #f4f6fada;
   --node-selected-color: #e8eefada;
+  --node-current-step-color: #e4ecffda;
   --stroke-color: #D4D4D4;
   
   --group-color: #f9f9f9;
@@ -30,6 +31,7 @@
 
   --node-color: #1a1d25da;
   --node-selected-color: #272c38da;
+  --node-current-step-color: #373f53da;
   --stroke-color: #63708d;
   
   --group-color: #923eff;
@@ -52,6 +54,7 @@
 
   --node-color: #090C14da;
   --node-selected-color: #161c2b;
+  --node-current-step-color: #20293d;
   --stroke-color: #536080;
   
   --group-color: #923eff;

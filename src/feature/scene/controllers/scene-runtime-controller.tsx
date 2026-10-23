@@ -94,7 +94,6 @@ export class SceneRuntimeController {
                     "nodeStatuses", msg.event_payload.node_uid,
                     msg.event_payload.status
                 );
-                
                 this._setRuntimeStore(
                     "contexts", msg.event_payload.job_id,
                     "latestProcessedNodes", [msg.event_payload.node_uid]
@@ -138,7 +137,7 @@ export class SceneRuntimeController {
         if (!context) return false;
         if (!context.latestProcessedNodes) return false;
 
-        return node_uid in context.latestProcessedNodes;
+        return context.latestProcessedNodes.includes(node_uid);
     }
 
     public getNodeStatus = (node_uid: string) => {

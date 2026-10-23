@@ -1,10 +1,11 @@
-import { createEffect, createSignal, onMount, Show } from "solid-js"
+import { createEffect, createSignal, Match, onMount, Show, Switch } from 'solid-js';
 import PauseIcon from "~/assets/icons/pause.svg";
 import RefreshIcon from "~/assets/icons/refresh.svg";
 import PlayIcon from "~/assets/icons/play.svg";
 import { StateController } from "~/feature/editor/controllers/state-controller";
 import { SceneWorkerExecutionMode, SceneWorkerExecutionState } from "~/protocols/nodeblocks/network/scene-worker-protocol";
 import { Dropdown } from "~/components/panels/dropdown";
+import SkipForwardIcon from '~/assets/icons/skip-forward.svg';
 
 // TODO: mostrar a iteração atual e quantas faltam pra acabar
 type RunType = "once" | "forever" | "for";
@@ -19,7 +20,11 @@ export const StatePanel = (props: {state_controller: StateController}) => {
     });
     return (
         <div class="keep row-container">
-            <Show when={props.state_controller.isRunning()} fallback={
+            <Show when={
+                props.state_controller.isRunning() 
+                && 
+                props.state_controller.runtime_state == SceneWorkerExecutionState.RUNNING_CONTINUOUS
+            } fallback={
                 <div class="button-with-dropdown-holder">
                     <button class="icon-button small-icon" onclick={(e) => {
                         const type = runType();
@@ -35,7 +40,16 @@ export const StatePanel = (props: {state_controller: StateController}) => {
                                 break;    
                         }
                     }}>
-                        <PlayIcon/>
+                        <Switch fallback={
+                            <PlayIcon/>
+                        }>
+                            <Match when={
+                                props.state_controller.runtime_mode == SceneWorkerExecutionMode.GRAPH_STEP
+                                && runType() == "once"
+                            }>
+                                <SkipForwardIcon />
+                            </Match>
+                        </Switch>
                     </button>
                     <Dropdown content={
                         <div

@@ -55,19 +55,19 @@ export class CanvasElementController {
                 this._setStore("nodes", event.node.uid, scene_node);
             
             } else if (event.type === "node_removed") {
-                this._setStore("nodes", event.node_id, undefined as any);
-                
                 for (const [connId, conn] of Object.entries(this._store.conns)) {
                     const isConnectedToNode = 
                         conn.input_slot?.node_id === event.node_id ||
                         conn.output_slot?.node_id === event.node_id
-
+                    
                     if (isConnectedToNode) {
                         this._setStore("conns", connId, undefined as any);
+                        this.update_anchors_from_conn(conn);
                     }
-                    this.update_anchors_from_conn(conn);
                 }
 
+                this._setStore("nodes", event.node_id, undefined as any);
+                
             } else if (event.type === "conn_added") {
                 const output_slot = this._store.nodes[event.conn.from_slot.node_id]?.slots[event.conn.from_slot.slot_id];
                 const input_slot = this._store.nodes[event.conn.to_slot.node_id]?.slots[event.conn.to_slot.slot_id];
@@ -93,7 +93,6 @@ export class CanvasElementController {
         }
     }
 
-
     protected onConnRemoved(conn: SceneConnection) {
         this.update_anchors_from_conn(conn);
     }
@@ -111,7 +110,7 @@ export class CanvasElementController {
 
     public update_slot_anchor(slot: SceneNodeSlot) {
         const connections = this.get_slot_connections(slot);
-        if (connections.length === 0) {
+        if (connections.length == 0) {
             slot.anchor = slot.defaultAnchor;
             return;
         }

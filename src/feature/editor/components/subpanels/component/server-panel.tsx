@@ -27,7 +27,7 @@ export const ScenePanel = (props: {state_controller: StateController}) => {
             <div class="keep row-container">
                 <StatePanel state_controller={props.state_controller}/>
                 
-                <Show when={props.state_controller.isRunning()}>
+                {/* <Show when={props.state_controller.isRunning()}>
                     <Switch>
                         <Match when={
                             props.state_controller.runtime_mode == SceneWorkerExecutionMode.GRAPH_STEP
@@ -49,7 +49,7 @@ export const ScenePanel = (props: {state_controller: StateController}) => {
                             </button>
                         </Match>
                     </Switch>
-                </Show>
+                </Show> */}
             </div>
             <div class="control-panel keep row-container">
                 <select value={props.state_controller.runtime_mode} name="" id="" onInput={(e) => {

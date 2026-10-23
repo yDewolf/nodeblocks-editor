@@ -107,6 +107,17 @@
   margin-top: auto;
 }
 
+.node.targeted {
+  border-width: 2px;
+}
+
+.node.not-targeted {
+  opacity: 0.75;
+}
+
+.node.current-step {
+  background-color: var(--node-current-step-color);
+}
 
 .node.selected-mode {
   background-color: var(--node-selected-color);

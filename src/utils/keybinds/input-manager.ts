@@ -1,5 +1,6 @@
 import { InputContext, KeybindBinding } from "./input-context";
 
+// FIXME: talvez isso aqui tenha que se tornar um singleton
 export class InputManager {
     private activeContext: InputContext | null = null;
     private pressedKeybinds: Set<string> = new Set();

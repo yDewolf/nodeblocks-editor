@@ -25,7 +25,6 @@ export class StateController {
         [this._runtime_mode, this._set_runtime_mode] = createSignal(SceneWorkerExecutionMode.GRAPH_STEP);
         [this._target_nodes, this._set_target_nodes] = createSignal<string[] | undefined>(undefined);
         [this._target_iterations, this._set_target_iterations] = createSignal<number | undefined>(undefined);
-        console.error(_client.isConnected);
         this.setup_handlers();
     }
 
@@ -39,7 +38,6 @@ export class StateController {
             
             this._set_target_iterations(message.response_payload.target_iterations);
             this._set_target_nodes(message.response_payload.target_nodes);
-            
         });
     }
 
@@ -79,6 +77,15 @@ export class StateController {
             type: SceneExecutionCmdTypes.SET_EXECUTION_MODE,
             mode: new_mode
         });
+    }
+
+    public requestUpdateTargetNodes(nodes: string[]) {
+        this._client.sendCommand({
+            cmd_group: CommandGroups.EXECUTION,
+            cmd_uid: nanoid(),
+            type: SceneExecutionCmdTypes.UPDATE_TARGET_NODES,
+            target_nodes: nodes
+        })
     }
 
     public requestPlay() {
@@ -136,5 +143,18 @@ export class StateController {
                 shortcut: ExecutionShortcuts.EXECUTION_PAUSE
             })
         }
+    }
+
+
+    public isNodeTargeted = (node_id: string) => {
+        if (this.target_nodes) { 
+            return this.target_nodes.includes(node_id);
+        }
+        return false;
+    }
+
+
+    public hasNodeTargets = () => {
+        return (this.target_nodes ?? []).length > 0;
     }
 }

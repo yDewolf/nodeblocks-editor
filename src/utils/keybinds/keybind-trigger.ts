@@ -3,6 +3,7 @@ export enum MouseButton {
     Middle = 1,
     Right = 2
 }
+const MouseButtonNames = {0: "Left", 1: "Middle", 2: "Right"}
 
 export interface KeyModifiers {
     ctrl?: boolean;
@@ -20,6 +21,31 @@ export interface TriggerConfig {
 
 export class KeybindTrigger {
     constructor(public readonly config: TriggerConfig) {}
+
+    public toStr() {
+        const parts: string[] = [];
+
+        if (this.config.modifiers) {
+            if (this.config.modifiers.ctrl) parts.push("Ctrl");
+            if (this.config.modifiers.alt) parts.push("Alt");
+            if (this.config.modifiers.shift) parts.push("Shift");
+            if (this.config.modifiers.meta) parts.push("Win/Meta");
+        }
+
+        if (this.config.keys && this.config.keys.length > 0) {
+            parts.push(...this.config.keys.map(key => key.toUpperCase()));
+        }
+
+        if (this.config.mouseButtons && this.config.mouseButtons.length > 0) {
+            parts.push(...this.config.mouseButtons.map(button => `${MouseButtonNames[button]} Mouse`));
+        }
+
+        if (this.config.isWheel) {
+            parts.push("Scroll");
+        }
+
+        return parts.join(" + ");
+    }
 
     public matches(event: Event): boolean {
         if (this.config.isWheel && event instanceof WheelEvent && event.deltaY != 0.0) {

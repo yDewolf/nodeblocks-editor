@@ -14,6 +14,8 @@ import "~/app.css";
 import { SelectedNodeType } from "~/feature/editor/components/subpanels/component/node-type-selector";
 import { GridView } from "~/feature/scene/components/grid-view";
 import { NodeComponent } from "./node/node-component";
+import { contextMenuManager } from "~/feature/context-menu/context-menu-controller";
+import { CanvasContextMenuController } from "../controllers/canvas-context-menu-controller";
 
 export const EditorSceneCanvas = (props: {
     setWorldSpaceRef: (ref: HTMLDivElement | undefined) => void
@@ -39,6 +41,16 @@ export const EditorSceneCanvas = (props: {
         }
     });
 
+    const contextMenuController = new CanvasContextMenuController(
+        editor.selectionController,
+        editor.actionController,
+        editor.stateController,
+        editor.inputManager
+    );
+    const handleContextMenu = (e: MouseEvent) => {
+        contextMenuManager.open(e, contextMenuController.contextItems);
+    }
+
     return (
         <InputScope name="SceneCanvas">
             <SceneCanvasKeybindsAndEvents />
@@ -56,7 +68,8 @@ export const EditorSceneCanvas = (props: {
                 }}
 
                 tabindex="0"
-                oncontextmenu={(e) => {e.preventDefault()}}
+                // oncontextmenu={(e) => {e.preventDefault()}}
+                oncontextmenu={handleContextMenu}
                 onKeyDown={(e) => editor.inputManager.onKeyDown(e)}
                 onKeyUp={(e) => editor.inputManager.onKeyUp(e)}
                 onWheel={(e) => {

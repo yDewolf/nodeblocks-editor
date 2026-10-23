@@ -3,6 +3,7 @@ import { NodeInstance } from "~/feature/editor/engine/graph/node-instance";
 import { Rect, Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeSceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { SceneNodeSlot } from "./scene-slot";
+// import { ContextMenuItemManager } from "~/feature/context-menu/context-item-manager";
 
 export interface NodeUIState {
     // isCurrentStep: boolean; // talvez isso aqui nem deva ficar aqui
@@ -28,6 +29,8 @@ export class SceneNode {
     private _input_slots: Array<SceneNodeSlot>;
     private _output_slots: Array<SceneNodeSlot>;
 
+    // private _contextItemManager: ContextMenuItemManager;
+
     constructor(
         public readonly instance: NodeInstance
     ) {
@@ -50,8 +53,12 @@ export class SceneNode {
             uiPosition: instance.scene_data.position,
             minSize: { x: 0, y: 0 }
         });
+
+        // this._contextItemManager = new ContextMenuItemManager();
     }
     
+    // get contextItemManager() { return this._contextItemManager; }
+
     // Scene Data getters/setters
 
     get data() { return this._dataStore; }

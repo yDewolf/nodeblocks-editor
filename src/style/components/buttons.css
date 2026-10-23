@@ -58,6 +58,10 @@
     transform: scale(1.2);
 }
 
+.icon-button:active {
+    transform: scale(1.0);
+}
+
 .icon-button.no-animation:hover {
     transform: inherit;
 }
