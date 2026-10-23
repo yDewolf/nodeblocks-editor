@@ -110,6 +110,9 @@ export class SceneEditor {
 
     public async connectToScene(scene_uid: string) {
         await this._sceneConnection.connect(scene_uid);
+
+        // FIXME: isso aqui tem que ser um event handler do sceneConnection
+        // para funcionar com o handleReconnect
         this.onSceneConnect();
     }
 

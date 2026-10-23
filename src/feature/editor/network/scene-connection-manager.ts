@@ -9,6 +9,7 @@ import { ServerCmdResponse, ServerEngineEvent, ServerSceneMessages, ServerWorker
 import { EngineEventPayload } from "~/protocols/nodeblocks/network/message/server/payloads/engine-event-payloads";
 import { ServerCmdResponsePayload } from "~/protocols/nodeblocks/network/message/server/payloads/server-response-payloads";
 import { createSignal } from "solid-js";
+import { isServer } from "solid-js/web";
 
 type MessageByType<MessageType extends ServerMessages | ServerMessageTypes> = 
     Extract<ServerMessage, {type: MessageType}>;
@@ -31,7 +32,11 @@ export class SceneConnectionManager {
     private _sceneId: string | null = null;
     
     public isConnecting: boolean = false;
-    
+    private reconnectAttempts: number = 0;
+    private maxReconnectAttempts: number = 10;
+    private reconnectTimer: number | null = null;
+    private isIntentionalDisconnect: boolean = false;
+
     private commandQueue: ClientCommand[] = [];
     private messageListeners: Map<ServerMessageTypes, Set<(msg: any) => void>> = new Map();
 
@@ -61,6 +66,8 @@ export class SceneConnectionManager {
             return;
         }
 
+        // Reseta a flag intencional ao iniciar uma conexão nova
+        this.isIntentionalDisconnect = false;
         this.isConnecting = true;
         this._setStatus(WebsocketStatus.CONNECTING);
 
@@ -72,9 +79,23 @@ export class SceneConnectionManager {
             await this.establishWebSocketConnection();
         } catch (error) {
             this.isConnecting = false;
-            this._sceneId = null;
             console.error("[SceneConnection] Failed to connect to scene:", error);
-            throw error;
+            
+            this.handleReconnect();
+            // throw error;
+        }
+    }
+
+    public disconnect(): void {
+        this.isIntentionalDisconnect = true;
+        if (this.reconnectTimer) {
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = null;
+        }
+
+        if (this.socket) {
+            this.socket.close(1000, "User disconnected from scene");
+            this.socket = null;
         }
     }
 
@@ -115,6 +136,12 @@ export class SceneConnectionManager {
             this.socket.onopen = () => {
                 this._setStatus(WebsocketStatus.CONNECTED);
                 this.isConnecting = false;
+                this.reconnectAttempts = 0; // Reseta as tentativas ao conectar com sucesso
+                if (this.reconnectTimer) {
+                    clearTimeout(this.reconnectTimer);
+                    this.reconnectTimer = null;
+                }
+                
                 this.flushCommandQueue();
                 console.log("[SceneConnection] Connected to scene socket");
                 resolve();
@@ -138,11 +165,44 @@ export class SceneConnectionManager {
                 this.socket = null;
                 this.dispatchMessage({type: ServerMessageTypes.CLOSE_SOCKET});
                 console.log("[SceneConnection] Disconnected.");
+
+                if (!this.isIntentionalDisconnect) {
+                    this.handleReconnect();
+                }
             };
         });
     }
 
+    private handleReconnect() {
+        if (isServer) return;
+        console.log(this.isIntentionalDisconnect, this.sceneId);
+        if (this.isIntentionalDisconnect || !this._sceneId) return;
 
+        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+            this._sceneId = null;
+            console.error("[SceneConnection] Maximum reconnection attempts reached. Giving up.");
+            return;
+        }
+
+        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 15000);
+        this.reconnectAttempts++;
+
+        console.log(`[SceneConnection] Reconnecting in ${delay}ms (Attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+        if (this.reconnectTimer) {
+            clearTimeout(this.reconnectTimer);
+        }
+
+        this.reconnectTimer = window.setTimeout(async () => {
+            if (this.isIntentionalDisconnect || !this._sceneId) return;
+            try {
+                await this.connect(this._sceneId);
+            } catch (error) {
+
+            }
+        }, delay);
+    }
+
+    // -- Events and Commands
 
     public sendCommand(command: ClientCommand): void {
         if (this.socket?.readyState === WebSocket.OPEN) {
@@ -251,13 +311,6 @@ export class SceneConnectionManager {
                     listener(message);
                 }
             }
-        }
-    }
-
-    public disconnect(): void {
-        if (this.socket) {
-            this.socket.close(1000, "User disconnected from scene");
-            this.socket = null;
         }
     }
 }

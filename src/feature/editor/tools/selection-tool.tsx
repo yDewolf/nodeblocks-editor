@@ -34,7 +34,7 @@ export class SelectionTool extends BaseEditorTool {
 
     public setupKeybinds(inputContext: InputContext): void {
         inputContext.setHandlers("SecondaryToolAction", {
-            just_activated: (e) => {
+            just_released: (e) => {
                 if (e instanceof PointerEvent) {
                     const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
@@ -53,6 +53,8 @@ export class SelectionTool extends BaseEditorTool {
                     if (!e.shiftKey) {
                         this.selectionController.selected_node_type = undefined;
                     }
+                    e.stopPropagation();
+                    e.preventDefault();                
                 }
             }
         })

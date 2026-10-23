@@ -57,8 +57,9 @@ export default function App() {
 
 const TestComponent = () => {
   const editor = useEditor();
-  const [targetScene, setTargetScene] = createSignal<string | null>(null);
+  // const [targetScene, setTargetScene] = createSignal<string | null>(null);
   onMount(async () => {
+    // FIXME: isso aqui impede o handleReconnect de acontecer
     await editor.connectToScene("test_scene");
     editor.sceneConnection.sendCommand({
       cmd_uid: nanoid(),
