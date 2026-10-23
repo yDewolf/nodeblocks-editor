@@ -14,6 +14,7 @@ import { AddNodesAction } from "../actions/node/add-nodes-action";
 import { NodeScene } from "../engine/node_scene";
 import { RemoveConnectionsAction } from "../actions/conn/remove-conns-action";
 import { AddConnectionsAction } from "../actions/conn/add-conns-action";
+import { InputManager } from "~/utils/keybinds/input-manager";
 
 
 export class SelectionTool extends BaseEditorTool {
@@ -24,7 +25,8 @@ export class SelectionTool extends BaseEditorTool {
         private readonly scene: NodeScene,
         private readonly actionController: ActionController,
         private readonly selectionController: SelectionController,
-        private readonly elementController: CanvasElementController
+        private readonly elementController: CanvasElementController,
+        private readonly inputManager: InputManager
     ) {
         super();
         [this._selected_preview, this._set_selected_preview] = createSignal(null);
@@ -101,7 +103,7 @@ export class SelectionTool extends BaseEditorTool {
     onPointerDown(e: PointerEvent): void {
         const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(e)
         if (e.button == 0) {
-            if (this.selectionController.has_selected) {
+            if (this.selectionController.has_selected && !e.shiftKey) {
                 this.selectionController.clearSelection();
             }
             this.selectionController.unselect_slot();

@@ -45,6 +45,7 @@ export const EditorSceneCanvas = (props: {
         editor.selectionController,
         editor.actionController,
         editor.stateController,
+        editor.sceneConnection,
         editor.inputManager
     );
     const handleContextMenu = (e: MouseEvent) => {

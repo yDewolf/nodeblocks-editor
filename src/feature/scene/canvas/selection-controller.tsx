@@ -9,6 +9,7 @@ import { UpdateNodesAction } from "../../editor/actions/node/update-nodes-action
 import { NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeSceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
+import { InputManager } from "~/utils/keybinds/input-manager";
 
 // TODO: move this to controllers
 export class SelectionController {
@@ -37,7 +38,8 @@ export class SelectionController {
     
     constructor(
         private _space: CanvasSpace,
-        private actionController: ActionController
+        private readonly actionController: ActionController,
+        private readonly inputManager: InputManager
     ) {
         [this._selected_nodes, this._set_selected_nodes] = createSignal<SceneNode[]>([]);
         [this._selected_node_type, this._set_selected_node_type] = createSignal<string | undefined>(undefined);
@@ -104,8 +106,12 @@ export class SelectionController {
     }
 
     public onClickOnNode(node: SceneNode) {
-        if (this.selected_nodes.includes(node)) {
+        if (
+            this.selected_nodes.includes(node)
+            && !this.inputManager.getKeybindState("MultipleMod")
+        ) {
             this.selecting = false;
+            // FIXME: this should only activate if MainToolAction is active
             this.moving = true;
             return;
         }
@@ -113,11 +119,15 @@ export class SelectionController {
         this.area_selection = false;
         this.selecting = true;
         
-        this.selected_nodes.forEach(node => {
-            node.isSelected = false;
-        });
-
-        this._set_selected_nodes([node]);
+        if (this.inputManager.getKeybindState("MultipleMod")) {
+            this._set_selected_nodes([...this.selected_nodes, node])
+        } else {
+            this.selected_nodes.forEach(node => {
+                node.isSelected = false;
+            });
+    
+            this._set_selected_nodes([node]);
+        }
         node.isSelected = true;
     }
 
@@ -176,15 +186,15 @@ export class SelectionController {
             this.selection_rect.size = new_size;
 
             const overlapping_nodes = this.selection_rect.get_overlapping_nodes(all_nodes);
-            let nodes_to_remove = new Array<SceneNode>()
-            this.selected_nodes.forEach(node => {
-                if (overlapping_nodes.includes(node)) { 
-                    return;
-                }
-                node.isSelected = false;
-                nodes_to_remove.push(node);
-            });
-            this.selected_nodes = this.selected_nodes.filter((node) => {!nodes_to_remove.includes(node)})
+            // let nodes_to_remove = new Array<SceneNode>()
+            // this.selected_nodes.forEach(node => {
+            //     if (overlapping_nodes.includes(node)) { 
+            //         return;
+            //     }
+            //     node.isSelected = false;
+            //     // nodes_to_remove.push(node);
+            // });
+            // this.selected_nodes = this.selected_nodes.filter((node) => {!nodes_to_remove.includes(node)})
             overlapping_nodes.forEach(node => {
                 if (this.selected_nodes.includes(node)) {
                     return;

@@ -59,7 +59,8 @@ export class SceneEditor {
         this._actionController = new ActionController(this._scene, this._sceneConnection);    
         this._selectionController = new  SelectionController(
             new CanvasSpace(),
-            this._actionController
+            this._actionController,
+            this._inputManager
         )
         
         this._elementController = new CanvasElementController(this._scene, this.grid);
@@ -75,7 +76,7 @@ export class SceneEditor {
         
         // this.toolController.add_tool(new CommentTool(this.node_editor));
         this._toolController = new ToolController(this.globalInputContext);
-        this._toolController.add_tool(new SelectionTool(this.scene, this.actionController, this.selectionController, this._elementController));
+        this._toolController.add_tool(new SelectionTool(this.scene, this.actionController, this.selectionController, this._elementController, this._inputManager));
         this.toolController.add_tool(new DocsTool(this.docsController));
         this._toolController.change_tool(0)
     }
@@ -140,12 +141,18 @@ export class SceneEditor {
     // Input Events
 
     private setup_keybinds() {
+        this._globalInputContext.bind("MultipleMod",
+            new KeybindTrigger({modifiers: {shift: true}}),
+            {}
+        )
+
         this._globalInputContext.bind("MainToolAction", 
-            new KeybindTrigger({mouseButtons: [MouseButton.Left]}),
+            [new KeybindTrigger({mouseButtons: [MouseButton.Left]}), 
+            // TODO: adicionar opções para os triggers serem válidos independente do modifier
+            new KeybindTrigger({mouseButtons: [MouseButton.Left], modifiers: {shift: true}})],
             {just_activated: (e) => {
                 if (e instanceof PointerEvent) {
                     if (e.target !== e.currentTarget) return;
-    
                     this._toolController.current_tool?.onPointerDown(e);
                 }
             },
