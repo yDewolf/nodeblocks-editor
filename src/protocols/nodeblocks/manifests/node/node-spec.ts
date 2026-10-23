@@ -2,7 +2,7 @@ import { NamespaceModel } from "../../namespace-model";
 import { ParameterSpec } from "./datatype-spec";
 
 export interface NodeSlotSpec {
-    data_type_id: string;
+    datatype_fqn: string;
     
     // tooltip: string;
     required: boolean;

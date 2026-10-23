@@ -9,7 +9,7 @@ export class NodeTypeHelper {
         }
 
         for (const slot of Object.values(spec.slots)) {
-            datatype_fqns.add(slot.data_type_id);
+            datatype_fqns.add(slot.datatype_fqn);
         }
 
         return datatype_fqns;

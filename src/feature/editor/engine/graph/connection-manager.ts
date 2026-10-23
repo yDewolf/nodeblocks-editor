@@ -134,8 +134,8 @@ export class ConnectionManager {
         }
 
         const areCompatible = this._registry.areTypesCompatible(
-            fromSlot.spec.data_type_id,
-            toSlot.spec.data_type_id
+            fromSlot.spec.datatype_fqn,
+            toSlot.spec.datatype_fqn
         );
 
         if (!areCompatible) {
@@ -144,8 +144,8 @@ export class ConnectionManager {
                 fromSlot.slot_id,
                 toSlot.node_id,
                 toSlot.slot_id,
-                fromSlot.spec.data_type_id,
-                toSlot.spec.data_type_id
+                fromSlot.spec.datatype_fqn,
+                toSlot.spec.datatype_fqn
             );
         }
     }

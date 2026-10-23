@@ -57,7 +57,7 @@ export class BaseNodeConstructor {
             return null;
         }
         
-        const slot_data_type = DataTypeUtils._match_default_data_type(slot_data.data_type_id == null ? "" : slot_data.data_type_id) 
+        const slot_data_type = DataTypeUtils._match_default_data_type(slot_data.datatype_fqn == null ? "" : slot_data.datatype_fqn) 
         return new NodeSlot(
             parent_node, 
             slot_type, 

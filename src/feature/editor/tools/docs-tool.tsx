@@ -97,7 +97,7 @@ export class DocsTool extends BaseEditorTool {
     onClickOnNodeSlot(slot: SceneNodeSlot): void {
         // Select DataType type id as path
         // TODO: talvez ao invés de redirecionar para o datatype, a gente redireciona para o slot do node
-        const fqn = slot.instance.spec.data_type_id;
+        const fqn = slot.instance.spec.datatype_fqn;
         const [namespace, id] = NamespaceUtils.splitFqn(fqn);
         this.selected_docs_path = DocsPathUtils.makeDataTypePath(namespace, undefined, id);
 

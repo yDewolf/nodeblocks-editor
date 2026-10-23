@@ -101,7 +101,7 @@ const SlotDropdownItem = (props: {
     const badges = createMemo<DropdownBadge[]>(() => {
         const badge_list: DropdownBadge[] = [
             {
-                label: datatype_meta?.capitalized_name ?? props.slot_spec.data_type_id,
+                label: datatype_meta?.capitalized_name ?? props.slot_spec.datatype_fqn,
                 href: DocsPathUtils.makeDataTypePath(props.datatype?.namespace ?? "unknown", props.datatype),
                 icon: props.slot_spec.is_input ? <InputIcon class="tag-icon" /> : <OutputIcon class="tag-icon" />
             }
@@ -173,7 +173,7 @@ export const NodeSlotSection = (props: {
                     <For each={slot_bundle()}>
                         {([slotSpec, slotMeta, slotId]) => {
                             const data_type = props.packageManager.registry.getDataTypeSpec(
-                                slotSpec.data_type_id
+                                slotSpec.datatype_fqn
                             )
                             return (
                                 <SlotDropdownItem 

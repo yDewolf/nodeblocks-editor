@@ -34,7 +34,7 @@ export class SlotInstance implements SlotPathData {
             || this._connection_count < this.spec.max_connections
     }
     get data_type_fqn() {
-        return this.spec.data_type_id;
+        return this.spec.datatype_fqn;
     }
 
     get connection_count() { return this._connection_count }

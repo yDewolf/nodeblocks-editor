@@ -70,8 +70,8 @@ interface DropdownBadge {
 }
 
 function resolve_slot_type_label(slotData: NodeSlotSpec): string {
-    if (slotData.data_type_id && slotData.data_type_id != "unknown") {
-        return slotData.data_type_id;
+    if (slotData.datatype_fqn && slotData.datatype_fqn != "unknown") {
+        return slotData.datatype_fqn;
     }
 
     return slotData.type?.split(":").at(-1) ?? "unknown";
@@ -168,7 +168,7 @@ export const NodeSlotSection = (props: {
                     <For each={slot_bundle()}>
                         {([slotData, slotMeta, slotId]) => {
                             const slot_type = props.constructor?._slot_types.get(slotData.type);
-                            let data_type = props.scene_controller.node_type_reader.data_types.get(slotData.data_type_id ?? "");
+                            let data_type = props.scene_controller.node_type_reader.data_types.get(slotData.datatype_fqn ?? "");
                             if (slot_type) {
                                 data_type = slot_type.data_type;
                             }
