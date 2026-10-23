@@ -1,9 +1,7 @@
 import { For, Match, Show, Switch } from "solid-js";
 import { clamp } from '../../../../utils/parameter-utils';
-import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { ParameterSpec, OptionParam } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
 import { DefaultDataTypes } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
-import { debounce } from "~/utils/debounce-utils";
 import { useNodeMeta } from "~/feature/metadata/metadata-context";
 
 const TYPE_CONFIGS: Record<string, { type: string; step?: number; min?: number }> = {
@@ -18,13 +16,15 @@ const TYPE_CONFIGS: Record<string, { type: string; step?: number; min?: number }
 };
 
 export const DataTypeFieldSelector = (props: {
-    node?: SceneNode;
     parameterId: string;
     parameterSpec: ParameterSpec;
     hide_label?: boolean;
+    baseFieldId?: string;
+    getCurrentValue?: () => any;
+    onInputValueChanged?: (value: any, raw_value: any) => void;
 }) => {
     let inputRef!: HTMLInputElement;
-    const field_id = `${props.node?.uid ?? 'global'}_${props.parameterId}`;
+    const field_id = `${props.baseFieldId ?? 'global'}_${props.parameterId}`;
     const baseConfig = TYPE_CONFIGS[props.parameterSpec.type] || { type: "text" };
 
     const input_type = baseConfig.type;
@@ -36,14 +36,8 @@ export const DataTypeFieldSelector = (props: {
     const min = ('min' in props.parameterSpec ? props.parameterSpec.min : undefined) ?? baseConfig.min;
     const max = ('max' in props.parameterSpec ? props.parameterSpec.max : undefined);
 
-    const getCurrentValue = () => {
-        if (props.node && props.node.parameters) {
-            return props.node.parameters[props.parameterId] ?? props.parameterSpec.default;
-        }
-        return props.parameterSpec.default;
-    };
+    const getCurrentValue = () => props.getCurrentValue?.() ?? props.parameterSpec.default;
 
-    const debouncedSync = debounce((n: SceneNode, name: string, val: any) => props.node?.setParam(name, val), 250);
     const onInputValueChanged = (raw_value: any) => {
         if (raw_value === "") return;
 
@@ -57,13 +51,8 @@ export const DataTypeFieldSelector = (props: {
         if (input_type === "number" && is_range && min !== undefined && max !== undefined) {
             new_value = clamp(new_value, min, max);
         }
-
-        const currentValue = getCurrentValue();
-        if (new_value !== currentValue && props.node) {
-            props.node.parameters[props.parameterId] = new_value;
-            debouncedSync(props.node, props.parameterId, new_value);
-        }
-
+        
+        props.onInputValueChanged?.(new_value, raw_value);
         if (inputRef) inputRef.value = new_value.toString();
     };
 

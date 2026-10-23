@@ -10,13 +10,13 @@ import { useEventManager } from "~/utils/events/event-provider";
 import { InputEvents } from "~/utils/events/event-handling";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-context";
-import { DataTypeFieldSelector } from "../value/datatype-field";
 import { NodeMetaProvider, ensureMetadata as ensureMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
 import { DocsPathPrefix } from "~/feature/docs/docs-protocols";
 import { NotificationPopupHolder } from "~/feature/editor/components/notification-badges";
 import { useNotifications } from "~/feature/editor/contexts/notification-context";
 import { editorSettings } from "~/feature/editor/editor-settings";
 import { NodeInstanceFactory } from "~/feature/editor/engine/helpers/node-instance-factory";
+import { NodeParamField } from "./node-field";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -283,7 +283,7 @@ export const NodeBodySections = (props: {
                 <DropdownSection header="Parameters" content={
                     <div class="field-grid-holder">
                         <For each={Object.entries(props.node.parameterSpecs)}>
-                            {([paramId, paramSpec]) => <DataTypeFieldSelector
+                            {([paramId, paramSpec]) => <NodeParamField
                                     node={props.node}
                                     parameterId={paramId}
                                     parameterSpec={paramSpec}
