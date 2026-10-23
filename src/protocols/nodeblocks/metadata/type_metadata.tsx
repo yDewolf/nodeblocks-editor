@@ -1,24 +1,32 @@
-import { BaseMetadata, EngineSpecMetadata } from "./base_metadata";
-import { NodeCategory, NodeTag } from "./node_filters";
+import { BaseMetadata, EngineSpecMetadata, RGBColor } from "./base_metadata";
+import { MetaCategory, MetaTag } from "./node_filters";
 
 export interface SlotMeta extends EngineSpecMetadata {}
 export interface ParameterMeta extends EngineSpecMetadata {}
 
 export interface NodeTypeMeta extends EngineSpecMetadata {
-    category: NodeCategory | string,
-    tags: Array<NodeTag | string>,
+    category: MetaCategory | string,
+    tags: Array<MetaTag | string>,
     parameter_meta: Record<string, ParameterMeta>,
     slot_meta: Record<string, SlotMeta>
 }
 
+export interface DataTypeStyle {
+    color?: RGBColor
+    backgroundColor?: RGBColor
+}
+
 export interface DataTypeMeta extends EngineSpecMetadata {
     is_builtin?: boolean
+
+    inStyle?: DataTypeStyle
+    outStyle?: DataTypeStyle
 }
 
 export const parse_node_types = (
     json_data: any, 
-    parsed_tags: Record<string, NodeTag>, 
-    parsed_categories: Record<string, NodeCategory>
+    parsed_tags: Record<string, MetaTag>, 
+    parsed_categories: Record<string, MetaCategory>
 ): Record<string, NodeTypeMeta> => {
     const node_types_record: Record<string, NodeTypeMeta> = {};
     
@@ -32,8 +40,8 @@ export const parse_node_types = (
 export const parse_node_type = (
     id: string, 
     json_data: any, 
-    parsed_tags: Record<string, NodeTag>, 
-    parsed_categories: Record<string, NodeCategory>
+    parsed_tags: Record<string, MetaTag>, 
+    parsed_categories: Record<string, MetaCategory>
 ): NodeTypeMeta => {
     const parameter_meta: Record<string, ParameterMeta> = {};
     for (const [id, param_data] of Object.entries(json_data.parameter_meta || {})) {
@@ -75,7 +83,7 @@ export const parse_node_type = (
         }
     }
     
-    const node_tags: Array<NodeTag> = [];
+    const node_tags: Array<MetaTag> = [];
     node_meta.tags.forEach((tag) => {
         if (typeof tag === "string") {
             const parsed_tag = parsed_tags[tag];
@@ -96,7 +104,9 @@ export const parse_data_types = (json_data: any): Record<string, DataTypeMeta> =
             capitalized_name: datatype_data.capitalized_name ?? id,
             brief: datatype_data.brief ?? "",
             usages: datatype_data.usages ?? [],
-            description: datatype_data.description ?? ""
+            description: datatype_data.description ?? "",
+            inStyle: datatype_data.inStyle,
+            outStyle: datatype_data.outStyle
         };
     }
     

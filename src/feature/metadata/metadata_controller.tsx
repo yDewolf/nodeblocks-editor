@@ -71,7 +71,6 @@ export class MetadataController {
 
     public update_metadata = async (package_id: string) => {
         const target_metadata = this.store[package_id];
-        
         // FIXME: fix how we handle meta version
         // if (
         //     target_metadata &&
@@ -83,7 +82,7 @@ export class MetadataController {
         //     return;
         // }
         
-        console.warn("Couldn't load metadata from cache. Fetching metadata from server");
+        // console.warn("Couldn't load metadata from cache. Fetching metadata from server");
         this.request_metadata(package_id);
     };
 

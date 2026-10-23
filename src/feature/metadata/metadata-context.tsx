@@ -13,11 +13,16 @@ export function MetadataProvider(props: { controller: MetadataController, childr
     );
 }
 
-export function useMetadata() {
+export function ensureMetadata() {
     const context = useContext(MetadataContext);
     if (!context) {
         throw new Error("Not inside a '<MetadataProvider/>'");
     }
+    return context;
+}
+
+export function useMetadata() {
+    const context = useContext(MetadataContext);
     return context;
 }
 

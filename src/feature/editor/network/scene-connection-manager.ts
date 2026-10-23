@@ -44,6 +44,8 @@ export class SceneConnectionManager {
     private workerEventListeners: Map<string, Set<(msg: ServerWorkerEvent) => void>> = new Map();
     private engineEventListeners: Map<string, Set<(msg: ServerEngineEvent) => void>> = new Map();
     
+    private _connectListeners: Set<(sceneConn: SceneConnectionManager) => void> = new Set();
+
     get sceneId() { return this._sceneId; }
 
     constructor(
@@ -56,6 +58,14 @@ export class SceneConnectionManager {
     get status() { return this._status(); }
     get isConnected() { return this._status() == WebsocketStatus.CONNECTED; }
 
+    public onConnect(listener: (sceneConn: SceneConnectionManager) => void) {
+        this._connectListeners.add(listener);
+        return () => this._connectListeners.delete(listener);
+    }
+
+    private notifyConnected() {
+        this._connectListeners.forEach((listener) => listener(this));
+    }
 
     public async connect(sceneId: string): Promise<void> {
         if (!this.appSession.isAuthenticated()) {
@@ -66,7 +76,6 @@ export class SceneConnectionManager {
             return;
         }
 
-        // Reseta a flag intencional ao iniciar uma conexão nova
         this.isIntentionalDisconnect = false;
         this.isConnecting = true;
         this._setStatus(WebsocketStatus.CONNECTING);
@@ -82,8 +91,10 @@ export class SceneConnectionManager {
             console.error("[SceneConnection] Failed to connect to scene:", error);
             
             this.handleReconnect();
+            return;
             // throw error;
         }
+        this.notifyConnected();
     }
 
     public disconnect(): void {
@@ -136,7 +147,7 @@ export class SceneConnectionManager {
             this.socket.onopen = () => {
                 this._setStatus(WebsocketStatus.CONNECTED);
                 this.isConnecting = false;
-                this.reconnectAttempts = 0; // Reseta as tentativas ao conectar com sucesso
+                this.reconnectAttempts = 0;
                 if (this.reconnectTimer) {
                     clearTimeout(this.reconnectTimer);
                     this.reconnectTimer = null;

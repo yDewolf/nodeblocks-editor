@@ -11,7 +11,7 @@ import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
 import { DataTypeSpec, ParameterSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
 import { DropdownSection } from "~/components/panels/dropdown";
 import { ParsedMetaText } from "~/feature/metadata/components/metadata-text";
-import { NodeMetaProvider, useMetadata } from "~/feature/metadata/metadata-context";
+import { NodeMetaProvider, ensureMetadata } from "~/feature/metadata/metadata-context";
 import { NodePreview } from "~/feature/scene/components/node/node-component";
 import { SlotHeader } from "~/feature/scene/components/node/slot-components";
 import { DocsPathUtils } from "../../helpers/docs-path-utils";
@@ -97,7 +97,7 @@ const SlotDropdownItem = (props: {
     slot_meta: SlotMeta,
     devMode: boolean,
 }) => {
-    const datatype_meta = useMetadata().get_datatype_meta(props.datatype.id, props.datatype.namespace);
+    const datatype_meta = ensureMetadata().get_datatype_meta(props.datatype.id, props.datatype.namespace);
     const badges = createMemo<DropdownBadge[]>(() => {
         const badge_list: DropdownBadge[] = [
             {

@@ -11,7 +11,7 @@ import { InputEvents } from "~/utils/events/event-handling";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-context";
 import { DataTypeFieldSelector } from "../value/datatype-field";
-import { NodeMetaProvider, useMetadata as useMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
+import { NodeMetaProvider, ensureMetadata as ensureMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
 import { DocsPathPrefix } from "~/feature/docs/docs-protocols";
 import { NotificationPopupHolder } from "~/feature/editor/components/notification-badges";
 import { useNotifications } from "~/feature/editor/contexts/notification-context";
@@ -109,13 +109,15 @@ export const NodeComponentV2 = (props: {
     const [isHovered, setIsHovered] = createSignal(props.default_show_slot_labels ?? false);
 
     createEffect(() => {
-        setIsHovered(editorSettings.alwaysShowSlotLabels);
+        if (!props.default_show_slot_labels) {
+            setIsHovered(editorSettings.alwaysShowSlotLabels);
+        }
     });
     
     props.default_show_output = props.default_show_output ?? true;
     const runtime = useSceneRuntime();
     return (
-        <NodeMetaProvider value={useMetadata().get_node_meta(ref_node.instance.spec.id, ref_node.instance.spec.namespace)} package_id={ref_node.instance.spec.namespace} type_id={ref_node.instance.spec.id}>
+        <NodeMetaProvider value={ensureMetadata().get_node_meta(ref_node.instance.spec.id, ref_node.instance.spec.namespace)} package_id={ref_node.instance.spec.namespace} type_id={ref_node.instance.spec.id}>
             <div
                 class="node"
 

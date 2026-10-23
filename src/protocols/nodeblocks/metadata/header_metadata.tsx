@@ -1,5 +1,5 @@
 import { BaseMetadata } from "./base_metadata"
-import { NodeCategory, NodeTag, parse_category, parse_tag } from "./node_filters"
+import { MetaCategory, MetaTag, parse_category, parse_tag } from "./node_filters"
 import { DataTypeMeta, NodeTypeMeta } from "./type_metadata"
 
 export interface MetadataVersion {
@@ -11,8 +11,8 @@ export interface MetadataHeader extends MetadataVersion, BaseMetadata {
     package_id: string,
     last_modified: number,
 
-    tags: Record<string, NodeTag>,
-    categories: Record<string, NodeCategory>
+    tags: Record<string, MetaTag>,
+    categories: Record<string, MetaCategory>
 }
 
 export interface Metadata extends MetadataHeader {
@@ -21,8 +21,8 @@ export interface Metadata extends MetadataHeader {
 }
 
 export const parse_header = (json_data: any): MetadataHeader => {
-    const tags_record: Record<string, NodeTag> = {};
-    const categories_record: Record<string, NodeCategory> = {};
+    const tags_record: Record<string, MetaTag> = {};
+    const categories_record: Record<string, MetaCategory> = {};
 
     for (const [id, data] of Object.entries(json_data.tags || {})) {
         tags_record[id] = parse_tag(id, data);
@@ -45,7 +45,7 @@ export const parse_header = (json_data: any): MetadataHeader => {
     };
 
     for (const category of Object.values(header_meta.categories)) {
-        const parsed_tags: Array<NodeTag> = [];
+        const parsed_tags: Array<MetaTag> = [];
         category.default_tags.forEach((tag) => {
             if (typeof tag === "string") {
                 const tag_ref = header_meta.tags[tag];

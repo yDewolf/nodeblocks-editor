@@ -41,7 +41,6 @@ export class ActionController {
         return actionSet ? Boolean(actionSet && actionSet.size > 0) : false;
     }
 
-
     public dispatch<T extends ClientCommand>(action: Action<T>): void {
         action.apply(this.scene);
         if (action.isClientside || !this.sceneClient.isConnected) {

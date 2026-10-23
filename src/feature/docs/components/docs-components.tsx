@@ -4,7 +4,7 @@ import { DropdownSection } from "../../../components/panels/dropdown";
 import { DocsHref } from "./docs-reference";
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
 import { BaseMetadata } from "~/protocols/nodeblocks/metadata/base_metadata";
-import { NodeCategory, NodeTag } from "~/protocols/nodeblocks/metadata/node_filters";
+import { MetaCategory, MetaTag } from "~/protocols/nodeblocks/metadata/node_filters";
 import { NodeTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import TagIcon from '~/assets/icons/tag.svg';
 
@@ -13,13 +13,13 @@ type PathPart = {
     label: string,
 }
 
-function get_categories_recursive(category: NodeCategory | string) {
+function get_categories_recursive(category: MetaCategory | string) {
     if (typeof category === "string") {
         // TODO: grab categories from metadata I guess
         return [];
     }
     
-    let categories: NodeCategory[] = [];
+    let categories: MetaCategory[] = [];
     if (category.super_category) {
         categories = [...get_categories_recursive(category.super_category), ...categories]
     }
@@ -29,7 +29,7 @@ function get_categories_recursive(category: NodeCategory | string) {
 }
 
 function get_node_tags(node: NodeTypeMeta) {
-    let tags: Array<NodeTag | string> = [];
+    let tags: Array<MetaTag | string> = [];
     if (node.category) {
         const categories = get_categories_recursive(node.category);
         categories.forEach((category) => {
@@ -41,7 +41,7 @@ function get_node_tags(node: NodeTypeMeta) {
     return tags
 }
 
-function recursive_category_part(category: NodeCategory | string, current_path: string[], path_parts: PathPart[]) {
+function recursive_category_part(category: MetaCategory | string, current_path: string[], path_parts: PathPart[]) {
     if (!category) {return;}
     if (typeof category === "string") {
         current_path = [...current_path, category];

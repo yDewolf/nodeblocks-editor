@@ -4,7 +4,7 @@ import { FieldValueDisplayer, SimpleField } from "../../../../components/input-f
 import RefreshIcon from '~/assets/icons/refresh.svg';
 import { createStore } from "solid-js/store";
 import { DocsHref } from "../docs-reference";
-import { DataTypeMetaProvider } from "~/feature/metadata/metadata-context";
+import { DataTypeMetaProvider, useDataTypeMetaContext } from "~/feature/metadata/metadata-context";
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
 import { DataTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import { PackageManager } from "~/feature/editor/engine/packages/package-manager";
@@ -12,6 +12,7 @@ import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
 import { DataTypeSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
 import { DataTypeGenParams, generate_datatype_random_value } from "~/feature/editor/utils/data-type-value-utils";
 import { DefaultRenderers } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
+import { ExampleNodeSlotDot, makeSlotStyleFromDataTypeStyle } from '../../../scene/components/node/slot-components';
 
 export const DataTypeDocsContent = (props: {
     path?: string,
@@ -44,6 +45,7 @@ export const DataTypeDocsContent = (props: {
             }>
                 {(dataTypeSpec) => 
                     <div class="keep fill container docs-sections">
+                        <DataTypeStyle meta={props.data}/>
                         <DataTypeAttributes meta={props.data} spec={dataTypeSpec()}/>
                         <DataTypePreview meta={props.data} spec={dataTypeSpec()}/>
                     </div>
@@ -222,3 +224,48 @@ export const GenParamsEditor = (props: {
         </div>
     );
 };
+
+
+const DataTypeStyle = (props: {
+    meta?: DataTypeMeta
+}) => {
+    return (
+        <div class="text-section">
+            <h3>Color Scheme</h3>
+            <table class="datatype-style-table">
+                <thead>
+                    <tr>
+                        <th>Input</th>
+                        <th>Output</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <Show when={props.meta?.inStyle}
+                                fallback={
+                                    "Undefined"
+                                }
+                            >
+                                {(style) => <ExampleNodeSlotDot isInput={true} slotStyle={
+                                    makeSlotStyleFromDataTypeStyle(style())
+                                }/>}
+                            </Show>
+                        </td>
+                        <td>
+                            <Show when={props.meta?.outStyle}
+                                fallback={
+                                    "Undefined"
+                                }
+                            >
+                                {(style) => <ExampleNodeSlotDot isInput={false} slotStyle={
+                                    makeSlotStyleFromDataTypeStyle(style())
+                                }/>}
+                            </Show>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    )
+}

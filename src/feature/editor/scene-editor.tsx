@@ -55,7 +55,8 @@ export class SceneEditor {
 
         this._scene = new NodeScene(_packageManager.registry, new PackageNodeProvider(_packageManager));
         this._sceneConnection = new SceneConnectionManager(_appSession, _packageManager);
-        
+        this._sceneConnection.onConnect(this.onSceneConnect);
+
         this._actionController = new ActionController(this._scene, this._sceneConnection);    
         this._selectionController = new  SelectionController(
             new CanvasSpace(),
@@ -110,21 +111,15 @@ export class SceneEditor {
 
     public async connectToScene(scene_uid: string) {
         await this._sceneConnection.connect(scene_uid);
-
-        // FIXME: isso aqui tem que ser um event handler do sceneConnection
-        // para funcionar com o handleReconnect
-        this.onSceneConnect();
     }
 
-    protected onSceneConnect() {
-        if (!this._sceneConnection.isConnected) return;
-        
-        this.sceneConnection.sendCommand({
+    protected onSceneConnect(connection: SceneConnectionManager) {
+        connection.sendCommand({
             cmd_uid: nanoid(5),
             cmd_group: CommandGroups.SCENE,
             type: ClientSceneCommandTypes.GET_SCENE_DATA
         });
-        this.sceneConnection.sendCommand({
+        connection.sendCommand({
             cmd_uid: nanoid(5),
             cmd_group: CommandGroups.EXECUTION,
             type: SceneExecutionCmdTypes.CHECK_EXECUTION_STATE
