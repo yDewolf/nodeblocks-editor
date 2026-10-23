@@ -127,6 +127,7 @@ export function makeSlotStyleFromDataTypeStyle(targetStyle?: DataTypeStyle) {
     const slotStyle: SlotStyle = {};
     if (targetStyle?.color) {
         slotStyle["--slot-border-color"] = `rgb(${targetStyle.color.r},${targetStyle.color.g},${targetStyle.color.b})`;
+        slotStyle["--slot-background-color"] = `rgb(${targetStyle.color.r * 0.1},${targetStyle.color.g * 0.1},${targetStyle.color.b * 0.1})`;
     }
 
     if (targetStyle?.backgroundColor) {
