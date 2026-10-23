@@ -12,6 +12,7 @@ import { useNotifications } from "../contexts/notification-context";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 import { NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta } from "~/protocols/notification-protocol";
 import { timeSignal } from "~/utils/time-utils";
+import { Theme, THEMES } from '../../ui-themes';
 
 const NotificationIcon = (props: {level: NotificationLevel}) => {
     return (
@@ -119,6 +120,7 @@ export const NotificationCard = (props: {
 
     return (
         <div 
+            data-theme={"light"}
             class="notification-badge animated container padded space-between"
             classList={{
                 "popup": props.is_popup ?? false,
@@ -140,7 +142,7 @@ export const NotificationCard = (props: {
                         <NotificationIcon level={props.notification.level}/>
                     </button>
                     <Show when={!is_compressed()}>
-                        <p>{props.notification.message}</p>
+                        <p class="notification-message">{props.notification.message}</p>
                     </Show>
                     <Show when={props.notification.count > 1}>
                         <span class="stack-counter">
@@ -170,8 +172,8 @@ export const NotificationCard = (props: {
                 </Show>
             </div>
             <Show when={expanded() && !is_compressed()}>
-                <div class="notification-description">
-                    <p>{props.notification.message}</p>
+                <div class="notification-description fill">
+                    <p class="notification-message">{props.notification.message}</p>
                     <p>{props.notification.description}</p>
                 </div>
             </Show>

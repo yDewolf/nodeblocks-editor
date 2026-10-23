@@ -1,5 +1,5 @@
 /* Raw colors (default theme) */
-:root {
+:root, [data-theme="light"] {
   --editor-background-color: #fbffff;
   --grid-color: #a7a8ac75;
   --font-color: #33373f;

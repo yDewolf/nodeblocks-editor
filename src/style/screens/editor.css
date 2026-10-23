@@ -26,8 +26,6 @@
 }
 
 .editor-ui {
-  stroke: var(--font-color);
-  
   z-index: 2;
   inset: 0;
 

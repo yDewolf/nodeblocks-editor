@@ -98,6 +98,9 @@
     color: rgb(51, 51, 54);
 }
 
+.notification-description > .notification-message {
+    font-size: 0.8rem;
+}
 
 .notification-badge.error {
     background-color: red;

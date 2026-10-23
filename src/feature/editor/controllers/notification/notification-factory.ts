@@ -141,17 +141,17 @@ export class NotificationFactory {
     private static resolveCommandDescription(payload: ServerCmdResponsePayload): string {
         switch (payload.type) {
             case ServerCmdResponseTypes.ADD_NODE:
-                return `Added nodes. Total: ${payload.nodes?.length ?? 0}. (request id: ${payload.request_id}) ${payload.status.message}`;
+                return `Added nodes. Total: ${payload.nodes?.length ?? 0}. (request id: ${payload.request_id}) ${payload.status.message ?? ""}`;
             case ServerCmdResponseTypes.ADD_CONN:
-                return `Created connections. Total: ${payload.conns?.length ?? 0}. (request id: ${payload.request_id}) ${payload.status.message}`;
+                return `Created connections. Total: ${payload.conns?.length ?? 0}. (request id: ${payload.request_id}) ${payload.status.message ?? ""}`;
             case ServerCmdResponseTypes.EXECUTION_STATE_SYNC:
-                return `Synced execution state. Mode: [${payload.mode}], State: [${payload.state}]. ${payload.status.message}`;
+                return `Synced execution state. Mode: [${payload.mode}], State: [${payload.state}]. ${payload.status.message ?? ""}`;
             case ServerCmdResponseTypes.GET_SCENE_DATA:
                 return `Fetched scene data from server.`;
             case ServerCmdResponseTypes.SCENE_WORKER:
-                return `Processed worker action. (request id: ${payload.request_id}) ${payload.status.message}`;
+                return `Processed worker action. (request id: ${payload.request_id}) ${payload.status.message ?? ""}`;
             case ServerCmdResponseTypes.SAVE_SCENE:
-                return `Saved Scene. ${payload.status.message}`
+                return `Saved current scene in the server. ${payload.status.message ?? ""}`
         }
     }
 }
