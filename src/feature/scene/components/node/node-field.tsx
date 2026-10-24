@@ -5,6 +5,7 @@ import { debounce } from "~/utils/debounce-utils";
 import { useScene } from "../../scene-context";
 import { UpdateNodesAction } from "~/feature/editor/actions/node/update-nodes-actions";
 import { NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
+import { createMemo } from "solid-js";
 
 export const NodeParamField = (props: {
     node: SceneNode
@@ -14,22 +15,20 @@ export const NodeParamField = (props: {
 }) => {
     const { actionController } = useScene();
 
-    const getCurrentValue = () => {
-        if (props.node && props.node.parameters) {
-            return props.node.parameters[props.parameterId] ?? props.parameterSpec.default;
-        }
-        return props.parameterSpec.default;
-    };
+    const getCurrentValue = createMemo(() => {
+        return props.node.parameters[props.parameterId] ?? props.parameterSpec.default;
+    });
 
     const debouncedSync = debounce((node: SceneNode, name: string, val: any) => {
-        props.node?.setParam(name, val)
         let nodes: NodeSceneRequestData = {};
         nodes[node.uid] = {
             uid: node.uid,
             nodetype_fqn: node.fqn,
             position: node.position,
-            data: node.parameters
+            data: node.instance.scene_data.data
         }
+        nodes[node.uid].data[name] = val;
+
         actionController.dispatch(
             new UpdateNodesAction(nodes)
         );
@@ -37,7 +36,7 @@ export const NodeParamField = (props: {
     const onInputValueChanged = (value: any, raw_value: any) => {
         const currentValue = getCurrentValue();
         if (value !== currentValue && props.node) {
-            props.node.parameters[props.parameterId] = value;
+            props.node.setParam(props.parameterId, value);
             debouncedSync(props.node, props.parameterId, value);
         }
     };

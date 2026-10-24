@@ -34,13 +34,12 @@ export const DataTypeFieldSelector = (props: {
     
     const step = ('step' in props.parameterSpec ? props.parameterSpec.step : undefined) ?? baseConfig.step;
     const min = ('min' in props.parameterSpec ? props.parameterSpec.min : undefined) ?? baseConfig.min;
-    const max = ('max' in props.parameterSpec ? props.parameterSpec.max : undefined);
+    const max = ('max' in props.parameterSpec ? props.parameterSpec.max : undefined) ?? undefined;
 
     const getCurrentValue = () => props.getCurrentValue?.() ?? props.parameterSpec.default;
 
     const onInputValueChanged = (raw_value: any) => {
         if (raw_value === "") return;
-
         let new_value = raw_value;
         if (input_type === "number") {
             const isFloat = props.parameterSpec.type === DefaultDataTypes.FLOAT;
@@ -48,10 +47,14 @@ export const DataTypeFieldSelector = (props: {
             if (isNaN(parsed)) return;
             new_value = parsed;
         }
-        if (input_type === "number" && is_range && min !== undefined && max !== undefined) {
-            new_value = clamp(new_value, min, max);
+
+        if (input_type === "number" && max != undefined) {
+            new_value = Math.min(new_value, max)
         }
-        
+
+        if (input_type === "number" && min != undefined) {
+            new_value = Math.max(new_value, min)
+        }
         props.onInputValueChanged?.(new_value, raw_value);
         if (inputRef) inputRef.value = new_value.toString();
     };
@@ -123,7 +126,7 @@ const OptionField = (props: {
         <select class="field-input"
             id={props.field_id} 
             value={props.value} 
-            onchange={(e) => props.onInputValueChanged(e.currentTarget.value)}
+            oninput={(e) => props.onInputValueChanged(e.currentTarget.value)}
         >
             <option value="" />
             <For each={props.options()}>
@@ -174,8 +177,8 @@ const TextField = (props: {
             type="text"
             ref={props.inputRef}
             id={props.field_id}
-            value={props.value ?? ""}
-            onchange={(e) => { e.preventDefault(); props.onInputValueChanged(e.currentTarget.value); }}
+            value={props.value}
+            oninput={(e) => { e.preventDefault(); props.onInputValueChanged(e.currentTarget.value); }}
             onPointerDown={(e) => e.stopPropagation()}
         />
     );
@@ -197,14 +200,18 @@ const NumberField = (props: {
                 type="number"
                 ref={props.inputRef}
                 id={props.field_id}
-                value={props.value ?? ""}
+                value={props.value}
                 step={props.step}
                 min={props.min}
                 max={props.max}
-                onchange={(e) => { e.preventDefault(); props.onInputValueChanged(e.currentTarget.value); }}
+                oninput={(e) => { e.preventDefault(); props.onInputValueChanged(e.currentTarget.value); }}
                 onPointerDown={(e) => e.stopPropagation()}
             />
-            <Show when={props.is_range}>{props.value}{props.min}{props.max}</Show>
+            <Show when={props.is_range}>
+                <span>
+                    {props.min} {props.value} {props.max}
+                </span>
+            </Show>
         </div>
     );
 };
@@ -220,9 +227,9 @@ const BooleanField = (props: {
         <input class="field-input"
             id={props.field_id}
             type="checkbox"
-            checked={props.value ?? props.defaultValue ?? false}
+            checked={props.value}
             onPointerDown={(e) => e.stopPropagation()}
-            onchange={(e) => props.onInputValueChanged(e.currentTarget.checked)}
+            oninput={(e) => props.onInputValueChanged(e.currentTarget.checked)}
         />
     );
 };

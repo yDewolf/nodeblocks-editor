@@ -89,6 +89,15 @@ export class NodeInstance {
         this._listeners.forEach((listener) => listener(this.scene_data));
     }
 
+    public updateParamValue(
+        paramId: string, value: any
+    ): void {
+        if (paramId in this.spec.parameters) {
+            this.scene_data.data[paramId] = value;
+        }
+        this._listeners.forEach((listener) => listener(this.scene_data));
+    }
+
     // Getters and utils
     get input_slots() { return this._input_slots; }
     get output_slots() { return this._output_slots; }
