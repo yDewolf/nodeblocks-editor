@@ -22,6 +22,18 @@ export class CanvasContextMenuController {
 
     get contextItems() { 
         const items: ContextMenuItem[] = [];
+        items.push({
+            id: "refresh",
+            label: "Refresh",
+            action: () => {
+                this.sceneConnection.sendCommand({
+                    cmd_uid: nanoid(5),
+                    cmd_group: CommandGroups.SCENE,
+                    type: ClientSceneCommandTypes.GET_SCENE_DATA
+                })
+            }
+        });
+
         if (this.selectionController.selected_nodes.length > 0) {
             const nodeCount = this.selectionController.selected_nodes.length;
             const nodeCountString = (nodeCount != 1 ? `(${nodeCount})` : "");
@@ -80,20 +92,8 @@ export class CanvasContextMenuController {
                     action: () => {
                         this.stateController.requestUpdateTargetNodes([])
                     }
-                })
+                });
             }
-
-            items.push({
-                id: "refresh",
-                label: "Refresh",
-                action: () => {
-                    this.sceneConnection.sendCommand({
-                        cmd_uid: nanoid(5),
-                        cmd_group: CommandGroups.SCENE,
-                        type: ClientSceneCommandTypes.GET_SCENE_DATA
-                    })
-                }
-            })
         }
         return items;
     }

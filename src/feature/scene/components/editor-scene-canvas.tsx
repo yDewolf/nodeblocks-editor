@@ -70,6 +70,9 @@ export const EditorSceneCanvas = (props: {
 
                 tabindex="0"
                 // oncontextmenu={(e) => {e.preventDefault()}}
+                
+                // FIXME: impedir que o contextmenu abra se alguma ferramenta
+                // estiver ativada (SecondaryToolAction) 
                 oncontextmenu={handleContextMenu}
                 onKeyDown={(e) => editor.inputManager.onKeyDown(e)}
                 onKeyUp={(e) => editor.inputManager.onKeyUp(e)}

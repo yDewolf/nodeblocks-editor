@@ -54,7 +54,7 @@ export class SelectionTool extends BaseEditorTool {
                         this.selectionController.selected_node_type = undefined;
                     }
                     e.stopPropagation();
-                    e.preventDefault();                
+                    e.preventDefault();
                 }
             }
         })
@@ -124,7 +124,7 @@ export class SelectionTool extends BaseEditorTool {
         if (this.selectedPreview) {
             this.selectedPreview.selected = false;
             this.selectedPreview = null;
-            this.selectionController.selected_node_type = undefined
+            this.selectionController.selected_node_type = undefined;
         }
     }
 

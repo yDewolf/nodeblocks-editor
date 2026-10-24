@@ -162,7 +162,10 @@ export class SceneEditor {
             }
         })
         this._globalInputContext.bind("SecondaryToolAction",
+            [
             new KeybindTrigger({mouseButtons: [MouseButton.Right]}),
+            new KeybindTrigger({mouseButtons: [MouseButton.Right], modifiers: {shift: true}}),
+            ],
             {}
         )
 
