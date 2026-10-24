@@ -76,12 +76,13 @@
 }
 
 .dropdown-item {
+    font-size: 0.85rem;
     width: stretch;
     pointer-events: auto;
 }
 
 .dropdown-label {
-    color: var(--secondary-font-color);
+    /* color: var(--secondary-font-color); */
     border-radius: 4px;
     padding: 2px 4px;
     width: stretch;

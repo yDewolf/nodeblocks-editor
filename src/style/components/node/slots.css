@@ -26,6 +26,9 @@
   border-radius: 50%;
 
   flex-shrink: 0;
+
+  background-color: var(--slot-background-color);
+  border-color: var(--slot-border-color);
 }
 
 .slot-dot.output-slot {
@@ -39,8 +42,8 @@
 
 .input-slot {
   .slot-dot {
-    background-color: var(--dark-input-color);
-    border-color: var(--input-color);
+    --slot-border-color: var(--input-color);
+    --slot-background-color: var(--dark-input-color);
   }
 }
 
@@ -48,19 +51,37 @@
   flex-direction: row-reverse;
   text-align: right;
   .slot-dot {
-    background: var(--dark-output-color);
-    border-color: var(--output-color);
+    --slot-border-color: var(--output-color);
+    --slot-background-color: var(--dark-output-color);
   }
 }
 
 .connected-slot.output-slot, .selected-slot.output-slot {
   .slot-dot {
-    background: var(--output-color);
+    background: var(--slot-border-color);
   }
 }
 
 .connected-slot.input-slot, .selected-slot.input-slot {
   .slot-dot {
-    background: var(--input-color);
+    background: var(--slot-border-color);
   }
+}
+
+
+.node-slot.example {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.node-slot.example > .slot-dot {
+  width: 24px;
+  height: 24px;
+  border-width: 4px;
+}
+
+.node-slot.example > .slot-dot:hover {
+  transform: scale(1.0);
+  cursor: default;
 }

@@ -58,6 +58,10 @@
     transform: scale(1.2);
 }
 
+.icon-button:active {
+    transform: scale(1.0);
+}
+
 .icon-button.no-animation:hover {
     transform: inherit;
 }
@@ -93,6 +97,17 @@
     background-color: var(--overlay-highlight);
     color: var(--font-color);
 }
+
+.button-with-dropdown-holder {
+    display: grid;
+}
+.button-with-dropdown-holder > .dropdown, .button-with-dropdown-holder > button {
+    grid-area: 1 / 1;
+}
+.button-with-dropdown-holder > .dropdown {
+    margin-left: 75%;
+}
+
 
 .dev-mode-button {
     svg {

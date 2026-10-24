@@ -1,51 +1,86 @@
-import "./app.css";
-import "./singletons/docs";
-import { session_controller } from "./singletons/user_session";
-import { createEffect, onMount } from "solid-js";
-import { NodeEditor } from "./editor/node-editor";
-import { UpdateRootDataTheme } from "./editor/ui/ui-themes";
-import { DocsProvider, DocsUrlSync } from "./context/metadata/docs-context";
-import { EditorView } from "./editor/ui/screens/editor-view";
+import { createEffect, createSignal, onMount, Show } from "solid-js";
+import { PackageManager } from "./feature/editor/engine/packages/package-manager";
+import { TypeSpecRegistry } from "./feature/editor/engine/type-registry";
+import { AppSessionManager } from "./network/app-session-manager";
+import { EditorProvider, useEditor } from './feature/scene-editor-context';
+import { DefinedInputScope, InputManagerProvider, InputScope } from './utils/keybinds/input-provider';
+import { EventManagerProvider } from './utils/events/event-provider';
+import { EditorView } from "./feature/editor/editor-view";
+import { UpdateRootDataTheme } from "./feature/ui-themes";
+import { ClientSceneCommandTypes, CommandGroups } from "./protocols/nodeblocks/network/client-command-protocol";
+import { nanoid } from "nanoid";
+import { MetadataProvider, MetaProvider } from "./feature/metadata/metadata-context";
+import { DocsProvider, DocsUrlSync } from './feature/docs/docs-context';
+import { ContextMenuPortal } from './feature/context-menu/context-menu-component';
 
-const node_editor = new NodeEditor();
-
-async function testHandleConnection() {
-  try {
-    const promise = await session_controller.client.connect();
-
-  } catch (error) {
-    // TODO: load previous cached scene with the corresponding node types
-    console.error("Couldn't connect to server:", error);
-    console.log("Loading default types")
-    node_editor.scene_controller.load_scene("data/node_scene.json", "data/node_types.json");
-  }
-}
-
-if (import.meta.hot) {
-  import.meta.hot.dispose(() => {
-    session_controller.client.disconnect();
-  });
+interface AppContextData {
+  appSession: AppSessionManager,
+  packageManager: PackageManager // This shouldn't be here
 }
 
 export default function App() {
-  onMount(() => {
-    const handleUnload = () => session_controller.client.disconnect();
-    window.addEventListener("beforeunload", handleUnload);
-    testHandleConnection();
-    // UpdateRootDataTheme();
+  const [context, setContext] = createSignal<AppContextData | null>(null);
+
+  onMount(async () => {
+    try {
+      const appSession = new AppSessionManager("localhost", 8080);
+      await appSession.login("test_user");
+
+      const registry = new TypeSpecRegistry();
+      const packageManager = new PackageManager(registry);
+      setContext({ appSession, packageManager });
+    } catch (error) {
+      console.error("[App] Failed during initialization:", error);
+    }
   });
 
   createEffect(() => {
       UpdateRootDataTheme();
   });
 
-
   return (
     <main>
-      <DocsProvider>
-        <DocsUrlSync/>
-        <EditorView editor={node_editor}/>
-      </DocsProvider>
+      <ContextMenuPortal />
+      <Show 
+        when={context()} 
+        fallback={<div>Connecting...</div>}
+      >
+        {(context_data) => (
+          <EditorProvider packageManager={context_data().packageManager} appSession={context_data().appSession}>
+            <TestComponent />
+          </EditorProvider>
+        )}
+      </Show>
     </main>
   );
+}
+
+const TestComponent = () => {
+  const editor = useEditor();
+  // const [targetScene, setTargetScene] = createSignal<string | null>(null);
+  onMount(async () => {
+    // FIXME: isso aqui impede o handleReconnect de acontecer
+    await editor.connectToScene("test_scene");
+    editor.sceneConnection.sendCommand({
+      cmd_uid: nanoid(),
+      cmd_group: CommandGroups.SCENE,
+      type: ClientSceneCommandTypes.GET_SCENE_DATA
+    })
+  }) 
+
+  return (
+    <MetadataProvider controller={editor.metadataController}>
+      <DocsProvider controller={editor.docsController}>
+        <DocsUrlSync />
+        <InputManagerProvider manager={editor.inputManager}>
+          <DefinedInputScope context={editor.globalInputContext}>
+            {/* TODO adicionar um editor keybind provider */}
+            <EventManagerProvider manager={editor.eventManager}>
+              <EditorView />
+            </EventManagerProvider>
+          </DefinedInputScope>
+        </InputManagerProvider>
+      </DocsProvider>
+    </MetadataProvider>
+  )
 }

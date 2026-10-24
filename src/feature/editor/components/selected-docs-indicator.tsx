@@ -1,0 +1,187 @@
+import { createEffect, createSignal, JSX, Show, createMemo, onCleanup } from 'solid-js';
+import { Portal } from 'solid-js/web';
+import { useDocs } from "~/feature/docs/docs-context";
+import DocsIcon from '~/assets/icons/book.svg';
+import ExpandIcon from '~/assets/icons/expand.svg';
+import { MetaProvider } from '~/feature/metadata/metadata-context';
+import { ParsedMetaText } from '../../metadata/components/metadata-text';
+import { useEditor } from '~/feature/scene-editor-context';
+import { DocsTool } from '../tools/docs-tool';
+
+// Não sei se fica melhor continuar mostrando o selecionado ou mostrar apenas o hovered
+const KeepSelectedHighlighted = false;
+
+// TODO: Arrumar quando você seleciona um elemento dentro de um scroll
+// o indicador não acompanha o elemento
+export const DocsElementIndicator = (props: {
+    world_space_ref?: HTMLDivElement,
+    editor_view_ref?: HTMLDivElement,
+    open_docs_page: () => void,
+    docsPageVisible: () => boolean
+}) => {
+    const editor = useEditor();
+    const camera = editor.selectionController.space.camera;
+    const docs = useDocs();
+    let PopupRef: HTMLDivElement | undefined;
+    const [style, setStyle] = createSignal<JSX.CSSProperties>({});
+    const [popupStyle, setPopupStyle] = createSignal<JSX.CSSProperties>({});
+    const [isToRight, setIsToRight] = createSignal(false);
+    const [isToTop, setIsToTop] = createSignal(false);
+
+    const target = createMemo(() => {
+        const hovered_element = docs.hoveredDocElement();
+        if (KeepSelectedHighlighted) {
+            return hovered_element != null ? hovered_element : docs.selectedDocElement();
+        }
+        return hovered_element;
+    });
+
+    const isToolActive = () => editor.toolController.current_tool instanceof DocsTool;
+    
+    const selectedMousePos = () => {
+        if (editor.toolController.current_tool instanceof DocsTool) {
+            return editor.toolController.current_tool.last_selected_pos;
+        } 
+        return undefined;
+    };
+
+    const isSelectedInsideGraph = createMemo(() => {
+        const element = docs.selectedDocElement();
+        if (!element || !props.world_space_ref) return false;
+        return props.world_space_ref.contains(element);
+    });
+
+    const isInsideGraph = createMemo(() => {
+        const element = target();
+        if (!element || !props.world_space_ref) return false;
+        return props.world_space_ref.contains(element);
+    });
+
+    const updatePosition = (target_element: HTMLElement) => {
+        const rect = target_element.getBoundingClientRect();
+        const mouse_pos = selectedMousePos();
+        if (isInsideGraph() && props.world_space_ref) {
+            const canvasRect = props.world_space_ref.getBoundingClientRect();
+            
+            if (docs.selectedDocElement() == target_element) {
+                const cameraCenter = camera.offset.x + camera.size.x / 2;
+                const elementCenter = rect.left + rect.width / 2;
+                const rightSide = elementCenter > cameraCenter;
+                setIsToRight(rightSide);
+                setIsToTop(rect.height < (PopupRef?.clientHeight ?? 0))
+
+                const leftPos = rightSide 
+                    ? (rect.left - canvasRect.left) // To the left
+                    : (rect.width + rect.left - canvasRect.left); // To the right
+
+                setPopupStyle({
+                    width: "max-content",
+                    position: "absolute",
+                    top: `${(rect.top - canvasRect.top) / camera.zoom}px`,
+                    left: `${leftPos / camera.zoom}px`,
+                    transform: rightSide ? "translateX(-100%)" : undefined,
+                    "z-index": 11
+                });
+            }
+        
+            setStyle({
+                position: "absolute",
+                top: `${(rect.top - canvasRect.top) / camera.zoom}px`,
+                left: `${(rect.left - canvasRect.left) / camera.zoom}px`,
+                width: `${rect.width / camera.zoom}px`,
+                height: `${(rect.height / camera.zoom)}px`,
+                opacity: 1,
+                "z-index": 10
+            });
+            return;
+        }
+
+        if (docs.selectedDocElement() == target_element) {
+            const rightSide = mouse_pos != undefined ? mouse_pos.x > window.innerWidth / 2 : false;
+            const bottomSide = mouse_pos != undefined ? mouse_pos.y > window.innerHeight / 2 : false;
+            setIsToRight(rightSide);
+            setIsToTop(!bottomSide);
+            
+            const x = mouse_pos != undefined ? mouse_pos.x : (rect.left + rect.width);
+            const y = mouse_pos != undefined ? mouse_pos.y : rect.top;
+            const translateX = rightSide ? "-100%" : "0%";
+            const translateY = bottomSide ? "-100%" : "0%";
+
+            setPopupStyle({
+                position: "fixed",
+                top: `${y}px`,
+                left: `${x}px`,
+                transform: `translate(${translateX}, ${translateY})`,
+                "z-index": 11
+            });
+        }
+
+        setStyle({
+            position: "fixed",
+            top: `${rect.top}px`,
+            left: `${rect.left}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+            opacity: 1,
+            "z-index": 10
+        });
+    };
+
+    createEffect(() => {
+        const target_element = target();
+        if (!target_element) {
+            setStyle({ opacity: 0 });
+            return;
+        }
+
+        updatePosition(target_element);
+        const resizeObserver = new ResizeObserver(() => {
+            updatePosition(target_element);
+        });
+        
+        resizeObserver.observe(target_element);
+        
+        onCleanup(() => {
+            resizeObserver.disconnect();
+        });
+    });
+
+    return (
+        <MetaProvider value={{metadata: docs.currentRoot}}>
+            <Show when={target() != null && isToolActive()}>
+                <Portal mount={isInsideGraph() ? props.world_space_ref : props.editor_view_ref}>
+                    <div 
+                        class="selected-docs-indicator" 
+                        classList={{"in-graph": isInsideGraph()}}
+                        style={style()} 
+                    />
+                </Portal>
+            </Show>
+            <Show when={docs.selectedDocElement() && isToolActive() && !props.docsPageVisible()}>
+                <Portal mount={isSelectedInsideGraph() ? props.world_space_ref : props.editor_view_ref}>
+                    <div
+                        ref={PopupRef}
+                        class="container selected-docs-popup"
+                        classList={{ "right": isToRight(), "top": isToTop() }}
+                        style={popupStyle()} 
+                    >  
+                        <div class="fill keep row-container space-between docs-popup-header" style={{"align-items": 'center'}}>
+                            <div class="keep fill center-items docs-popup-name-holder">
+                                <DocsIcon class="small-icon"/>
+                                <p>{docs.docsData.latest?.data.capitalized_name ?? "Not found"}</p>
+                            </div>
+                            {/* FIXME: arrumar isso aqui para ele sempre abrir a página relacionada à esse popup */}
+                            <button class="icon-button" onclick={() => props.open_docs_page()}>
+                                <ExpandIcon class="small-icon"/>
+                            </button>
+                        </div>
+                        <Show when={docs.docs_section}>
+                            <p class="docs-popup-section">Section: <b>{docs.docs_section}</b></p>
+                        </Show>
+                        <ParsedMetaText class="docs-popup-description" text={(docs.docsData.latest?.data.brief ?? docs.docsData.latest?.data.description)} default=""/>
+                    </div>
+                </Portal>
+            </Show>
+        </MetaProvider>
+    );
+};
