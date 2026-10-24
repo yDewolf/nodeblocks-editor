@@ -11,7 +11,8 @@ export type SceneEvent =
   | { type: "node_added"; node: NodeInstance }
   | { type: "node_removed"; node_id: string }
   | { type: "conn_added"; conn: ConnectionSceneData }
-  | { type: "conn_removed"; conn_id: string };
+  | { type: "conn_removed"; conn_id: string }
+  | { type: "reset_graph"; };
 
 type SceneEventListener = (event: SceneEvent) => void;
 
@@ -93,6 +94,7 @@ export class NodeScene {
         // TODO validate scene
         if (override) {
             this.graph.resetGraph();
+            this._listeners.forEach((listener) => listener({type: "reset_graph"}))
         }
 
         console.log("Loading scene data: ", scene_data);

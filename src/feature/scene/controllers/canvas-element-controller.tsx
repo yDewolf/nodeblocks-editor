@@ -82,6 +82,9 @@ export class CanvasElementController {
                 const conn = this.conns[event.conn_id];
                 this._setStore("conns", event.conn_id, undefined as any);
                 this.onConnRemoved(conn);
+            
+            } else if (event.type === "reset_graph") {
+                this._setStore({nodes: {}, conns: {}});
             }
         });
     }
