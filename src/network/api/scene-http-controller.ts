@@ -54,4 +54,29 @@ export class SceneHTTPController {
             this._setIsLoading(false);
         }
     }
+
+    public async createScene(userId: string, sceneId: string) {
+        try {
+            const response = await fetch(this.appSession.baseHttpUrl + `/api/scene/create/${sceneId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || "Failed to create scene");
+            }
+            
+            this.fetchScenes(userId);
+
+        } catch (error) {
+            console.error("Failed to create scene:", error);
+            throw error;
+        }
+    }
 }

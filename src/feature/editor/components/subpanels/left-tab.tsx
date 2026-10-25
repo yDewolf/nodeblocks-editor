@@ -10,6 +10,7 @@ import { ClientSceneCommandTypes, CommandGroups } from "~/protocols/nodeblocks/n
 import { nanoid } from "nanoid";
 import { LOCAL_DOCS_ID } from "~/feature/docs/docs-resolver";
 import { editorSettings, setAutosaveScenes } from "../../editor-settings";
+import { useNavigate } from "@solidjs/router";
 
 
 const LeftTabDropdown = (props: {
@@ -39,10 +40,15 @@ const LeftTabDropdown = (props: {
     ])
     
     const SettingsCallback = () => <SettingsView page_viewer={props.page_viewer}/>;
+    const navigate = useNavigate();
     return (
         <Dropdown content={
             <div
-                class="fill dropdown-item-grid">
+                class="fill dropdown-item-grid"
+            >
+                <DropdownItemButton label="Return Home" onClick={() => {
+                    navigate("/");
+                }} onMouseOver={setCurrentItem(undefined)}/>
                 <DropsideManager dropsides={subsections} currentItem={currentItem} setCurrentItem={setCurrentItem}/>
                 <DropdownItemInput label="Autosave" inputType="checkbox" checked={editorSettings.autosaveScenes} onChange={(e) => {
                     setAutosaveScenes(e.target.checked);

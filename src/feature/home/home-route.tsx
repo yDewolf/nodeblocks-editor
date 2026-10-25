@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import { SceneHTTPController } from "~/network/api/scene-http-controller";
 import { useAppSession } from "~/network/app-session-provider"
 import { UserSessionData } from "~/network/protocols/user-session";
@@ -36,14 +36,25 @@ export function Home() {
 const SceneGrid = (props: {sessionData: UserSessionData}) => {
     const appSession = useAppSession();
     const sceneController = new SceneHTTPController(appSession);
+    const [targetScene, setTargetScene] = createSignal<string>("");
 
     const navigate = useNavigate();
     const openScene = (id: string) => {
         navigate(`/scene/${id}`);
     };
 
+    onMount(() => {
+        sceneController.fetchScenes(props.sessionData.user_id);
+    })
+
     return (
         <div class="container">
+            <div class="keep row-container fill">
+                <input type="text" oninput={(e) => setTargetScene(e.target.value)}/>
+                <button onclick={() => sceneController.createScene(props.sessionData.user_id, targetScene())}>
+                    Create Scene
+                </button>
+            </div>
             <div class="keep row-container fill">
                 <button class="icon-button" onclick={() => sceneController.fetchScenes(
                     props.sessionData.user_id,
