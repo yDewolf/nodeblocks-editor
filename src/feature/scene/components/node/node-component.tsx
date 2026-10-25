@@ -1,4 +1,4 @@
-import { onCleanup, createMemo, Show, createSignal, For, createEffect } from "solid-js";
+import { onCleanup, createMemo, Show, createSignal, For, createEffect, onMount } from "solid-js";
 import { DropdownIcon, DropdownSection } from "~/components/panels/dropdown";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { useScene } from "~/feature/scene/scene-context";
@@ -24,36 +24,34 @@ const USE_ANCHORED_NODES: boolean = true;
 export const NodeComponent = (props: { 
     node: SceneNode,
 }) => {
+    const [isFirstFrame, setIsFirstFrame] = createSignal(true);
     const { actionController } = useScene();
     const { canvasSpace } = useSceneCanvas();
 
     const isVisible = createMemo(() => {
+        if (isFirstFrame()) { return true; }
         return canvasSpace.camera.camera_rect.overlaps(props.node.rect);
     });
 
     const ro = new ResizeObserver((entries) => {
-        const entry = entries[0];
-        if (entry) {
-            if (!isVisible()) {
-                return;
+        requestAnimationFrame(() => {
+            const entry = entries[0];
+            if (entry) {
+                // if (!isVisible()) {
+                //     return;
+                // }
+                const { width, height } = entry.contentRect;
+                if (props.node.size.x !== width || props.node.size.y !== height) {
+                    props.node.size = { x: width, y: height };
+                }
             }
-
-            props.node.size = {
-                x: entry.contentRect.width, 
-                y: entry.contentRect.height
-            };
-        }
+            if (isFirstFrame()) {
+                setIsFirstFrame(false);
+            }
+        })
     });
 
     const handleRef = (el: HTMLDivElement) => {
-        const rect = el.getBoundingClientRect();
-        props.node.size = {
-            x: rect.width,
-            y: rect.height
-        }
-        
-        // const rounded_size = canvasSpace.grid.roundVector({x: rect.width, y: rect.height});
-        // props.node.minSize = rounded_size;
         ro.observe(el);
     };
     onCleanup(() => ro?.disconnect());
