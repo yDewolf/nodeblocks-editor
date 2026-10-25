@@ -145,17 +145,17 @@ export class SceneEditor {
         )
 
         this._globalInputContext.bind("MainToolAction", 
-            [new KeybindTrigger({mouseButtons: [MouseButton.Left]}), 
-            // TODO: adicionar opções para os triggers serem válidos independente do modifier
-            new KeybindTrigger({mouseButtons: [MouseButton.Left], modifiers: {shift: true}})],
-            {just_activated: (e) => {
-                if (e instanceof PointerEvent) {
-                    if (e.target !== e.currentTarget) return;
+            new KeybindTrigger({mouseButtons: [MouseButton.Left], modifiers: {any: true}}),
+            {handle_just_activated: (event) => {
+                const e = event.nativeEvent;
+                if (e instanceof PointerEvent && !e.defaultPrevented) {
+                    // if (e.target !== e.currentTarget) return;
                     this._toolController.current_tool?.onPointerDown(e);
                 }
             },
-            just_released: (e) => {
-                if (e instanceof PointerEvent) {
+            handle_just_released: (event) => {
+                const e = event.nativeEvent;
+                if (e instanceof PointerEvent && !e.defaultPrevented) {
                     this._toolController.current_tool?.onPointerUp(e);
                     (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
                 }
@@ -164,14 +164,14 @@ export class SceneEditor {
         this._globalInputContext.bind("SecondaryToolAction",
             [
             new KeybindTrigger({mouseButtons: [MouseButton.Right]}),
-            new KeybindTrigger({mouseButtons: [MouseButton.Right], modifiers: {shift: true}}),
+            new KeybindTrigger({mouseButtons: [MouseButton.Right], modifiers: {any: true}}),
             ],
             {}
         )
 
         this._globalInputContext.bind("DeleteNode", 
             new KeybindTrigger({keys: ["Delete"]}),
-            {just_activated: (e) => {
+            {handle_just_activated: (e) => {
                 if (this.selectionController.selected_nodes.length > 0) {
                     let node_ids: string[] = [];
                     for (const node of this.selectionController.selected_nodes) {
@@ -186,8 +186,8 @@ export class SceneEditor {
 
         this._globalInputContext.bind("Save",
             new KeybindTrigger({keys: ["KeyS"], modifiers: { ctrl: true }}),
-            {just_activated: (e) => {
-                e.preventDefault();
+            {handle_just_activated: (e) => {
+                e.nativeEvent.preventDefault();
                 this.sceneConnection.sendCommand({
                     cmd_uid: nanoid(),
                     cmd_group: CommandGroups.SCENE,
@@ -198,26 +198,37 @@ export class SceneEditor {
     }
     
     private setup_event_handlers() {
-        this._eventManager.addEventHandler(
+        this._eventManager.setEventHandler(
             InputEvents.CLICK_ON_NODE,
+            "EditorClickOnNode",
             new EventHandler("onClickOnNode", (data) => {
+                if (data.event instanceof PointerEvent) {
+                    this.inputManager.onPointerDown(data.event, true);
+                }
                 if (data.node != null) {
                     this._toolController.current_tool?.onClickOnNode(data.node);
                 }
+                data.event?.preventDefault();
             })
         );
 
-        this._eventManager.addEventHandler(
+        this._eventManager.setEventHandler(
             InputEvents.CLICK_ON_NODE_SLOT,
+            "EditorClickOnSlot",
             new EventHandler("onClickOnSlot", (data) => {
+                if (data.event instanceof PointerEvent) {
+                    this.inputManager.onPointerDown(data.event, true);
+                }
                 if (data.slot) {
                     this._toolController.current_tool?.onClickOnNodeSlot(data.slot);
                 }
+                data.event?.preventDefault();
             })
         );
 
-        this._eventManager.addEventHandler(
+        this._eventManager.setEventHandler(
             InputEvents.HOVER_NODE,
+            "EditorHoverNode",
             new EventHandler("onHoverNode", (data) => {
                 if (data.node != null) {
                     this._toolController.current_tool?.onHoverNode(data.node);
@@ -225,8 +236,9 @@ export class SceneEditor {
             })
         );
 
-        this._eventManager.addEventHandler(
+        this._eventManager.setEventHandler(
             InputEvents.HOVER_SLOT,
+            "EditorHoverSlot",
             new EventHandler("onHoverSlot", (data) => {
                 if (data.slot) {
                     this._toolController.current_tool?.onHoverSlot(data.slot);
@@ -234,15 +246,17 @@ export class SceneEditor {
             })
         );
 
-        this._eventManager.addEventHandler(
+        this._eventManager.setEventHandler(
             InputEvents.HOVER_BACKGROUND,
+            "EditorHoverBackround",
             new EventHandler("onHoverBackground", (data) => {
                 this._toolController.current_tool?.onHoverBackground();
             })
         );
 
-        this._eventManager.addEventHandler(
+        this._eventManager.setEventHandler(
             InputEvents.POINTER_MOVING,
+            "EditorPointerMoving",
             new EventHandler("onPointerMoving", (data) => {
                 const e = data.event;
                 if (e instanceof PointerEvent) {

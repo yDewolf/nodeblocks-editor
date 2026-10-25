@@ -6,6 +6,7 @@ export enum MouseButton {
 const MouseButtonNames = {0: "Left", 1: "Middle", 2: "Right"}
 
 export interface KeyModifiers {
+    any?: boolean;
     ctrl?: boolean;
     shift?: boolean;
     alt?: boolean;
@@ -20,7 +21,13 @@ export interface TriggerConfig {
 }
 
 export class KeybindTrigger {
-    constructor(public readonly config: TriggerConfig) {}
+    constructor(public readonly config: TriggerConfig) {
+        if (this.config.modifiers == undefined) {
+            this.config.modifiers = {any: false};
+        } else if (this.config.modifiers.any == undefined) {
+            this.config.modifiers.any = false;
+        }
+    }
 
     public toStr() {
         const parts: string[] = [];
@@ -47,22 +54,6 @@ export class KeybindTrigger {
         return parts.join(" + ");
     }
 
-    public matches(event: Event): boolean {
-        if (this.config.isWheel && event instanceof WheelEvent && event.deltaY != 0.0) {
-            return true;
-        }
-
-        if (this.config.keys && event instanceof KeyboardEvent) {
-            return true;
-        }
-
-        if (this.config.mouseButtons && event instanceof PointerEvent) {
-            return true;
-        }
-
-        return false;
-    }
-
     public isSatisfied(
         pressedKeys: Set<string>, 
         pressedMouseButtons: Set<number>, 
@@ -75,11 +66,13 @@ export class KeybindTrigger {
             meta: this.config.modifiers?.meta ?? false,
         };
 
-        if (event instanceof KeyboardEvent || event instanceof MouseEvent || event instanceof WheelEvent) {
-            if (event.ctrlKey !== expectedModifiers.ctrl) return false;
-            if (event.shiftKey !== expectedModifiers.shift) return false;
-            if (event.altKey !== expectedModifiers.alt) return false;
-            if (event.metaKey !== expectedModifiers.meta) return false;
+        if (event instanceof KeyboardEvent || event instanceof PointerEvent || event instanceof WheelEvent) {
+            if (!this.config.modifiers?.any) {
+                if (event.ctrlKey != expectedModifiers.ctrl) return false;
+                if (event.shiftKey != expectedModifiers.shift) return false;
+                if (event.altKey != expectedModifiers.alt) return false;
+                if (event.metaKey != expectedModifiers.meta) return false;
+            }
         }
 
         if (this.config.keys) {
@@ -95,7 +88,7 @@ export class KeybindTrigger {
         if (this.config.isWheel) {
             if (!(event instanceof WheelEvent) || event.deltaY === 0) return false;
         }
-
+        
         return true;
     }
 

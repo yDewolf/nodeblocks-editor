@@ -8,7 +8,6 @@
 .viewport {
   user-select: none;
   z-index: 1;
-  cursor: crosshair;
   color: var(--font-color);
  }
 
@@ -131,4 +130,17 @@
 .middle-tab-overlay {
     z-index: 3;
     width: 100%;
+}
+
+
+.viewport {
+  cursor: crosshair;
+}
+
+.viewport.move-mode {
+  cursor: grab;
+}
+
+.viewport.moving-mode {
+  cursor: grabbing;
 }

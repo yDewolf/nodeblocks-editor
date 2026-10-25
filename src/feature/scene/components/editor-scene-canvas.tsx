@@ -47,7 +47,7 @@ export const EditorSceneCanvas = (props: {
         editor.actionController,
         editor.stateController,
         editor.sceneConnection,
-        editor.inputManager
+        inputManager
     );
 
     return (
@@ -62,8 +62,8 @@ export const EditorSceneCanvas = (props: {
                     width: "100vw"
                 }}
                 classList={{
-                    'move-mode': editor.inputManager.getKeybindState("PanCamera"),
-                    'moving-mode': editor.selectionController.moving
+                    'move-mode': inputManager.getKeybindState("PreparePanCamera"),
+                    'moving-mode': editor.selectionController.moving || inputManager.getKeybindState("PanCamera")
                 }}
 
                 tabindex="0"
@@ -71,19 +71,19 @@ export const EditorSceneCanvas = (props: {
                 
                 // FIXME: impedir que o contextmenu abra se alguma ferramenta
                 // estiver ativada (SecondaryToolAction) 
-                oncontextmenu={(e) => editor.inputManager.onContextMenu(e)}
-                onKeyDown={(e) => editor.inputManager.onKeyDown(e)}
-                onKeyUp={(e) => editor.inputManager.onKeyUp(e)}
+                oncontextmenu={(e) => inputManager.onContextMenu(e)}
+                onKeyDown={(e) => inputManager.onKeyDown(e)}
+                onKeyUp={(e) => inputManager.onKeyUp(e)}
                 onWheel={(e) => {
-                    editor.inputManager.onWheel(e);
+                    inputManager.onWheel(e);
                     e.preventDefault();
                 }}
 
                 onPointerMove={(e) => editor.eventManager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
-                onPointerDown={(e) => editor.inputManager.onPointerDown(e)} 
-                onPointerUp={(e) => editor.inputManager.onPointerUp(e)}
+                onPointerDown={(e) => inputManager.onPointerDown(e)} 
+                onPointerUp={(e) => inputManager.onPointerUp(e)}
 
-                onPointerLeave={(e) => editor.inputManager.onPointerUp(e)}
+                onPointerLeave={(e) => inputManager.onPointerUp(e)}
                 onMouseOver={() => {
                     editor.eventManager.generalizedEventHandler({}, InputEvents.HOVER_BACKGROUND)
                 }}
@@ -153,16 +153,28 @@ export const SceneCanvasKeybindsAndEvents: ParentComponent<{
         e.preventDefault();
         contextMenuManager.open(e, props.contextMenuController.contextItems)
     })
+
     useKeybind(
         "PanCamera", 
         [
+            new KeybindTrigger({ mouseButtons: [MouseButton.Left], keys: ["Space"] }),
             new KeybindTrigger({ mouseButtons: [MouseButton.Middle]}),
-            new KeybindTrigger({ keys: ["Space"] })
         ],
+        {
+            pressed_updateEventState: (e) => {
+                e.blockNextKeybinds();
+            }
+        }
+    )
+
+    useKeybind("PreparePanCamera",
+        new KeybindTrigger({keys: ["Space"]}),
         {}
     )
-    eventManager?.addEventHandler(
+
+    eventManager?.setEventHandler(
         InputEvents.POINTER_MOVING,
+        "PanCameraHandler",
         new EventHandler("handleCameraPan", (data) => {
             const e = data.event;
             if (e instanceof PointerEvent) {
@@ -171,20 +183,21 @@ export const SceneCanvasKeybindsAndEvents: ParentComponent<{
                         x: -e.movementX / scene_canvas.canvasSpace.camera.zoom,
                         y: -e.movementY / scene_canvas.canvasSpace.camera.zoom
                     });
+                    e.stopPropagation();
                     return;
                 }
             }
         })
     )
 
-
     useKeybind(
         "Zoom",
         new KeybindTrigger({ isWheel: true, modifiers: {ctrl: true} }),
-        {just_activated: (e) => {
-            e.preventDefault();
+        {handle_just_activated: (e) => {
+            e.nativeEvent.preventDefault();
         },
-        while_active: (e) => {
+        handle_while_active: (event) => {
+            const e = event.nativeEvent;
             e.preventDefault();
             if (e instanceof WheelEvent) {
                 // TODO: arrumar um jeito de determinar se a pessoa tá usando touchpad ou não
@@ -204,7 +217,8 @@ export const SceneCanvasKeybindsAndEvents: ParentComponent<{
     useKeybind(
         "SideScroll",
         new KeybindTrigger({isWheel: true, modifiers: {shift: true}}),
-        {while_active: (e) => {
+        {handle_while_active: (event) => {
+            const e = event.nativeEvent;
             if (e instanceof WheelEvent) {
                 scene_canvas.canvasSpace.camera.addOffset({
                     x: e.deltaY,
@@ -217,16 +231,17 @@ export const SceneCanvasKeybindsAndEvents: ParentComponent<{
     useKeybind(
         "Scroll",
         new KeybindTrigger({isWheel: true}),
-        {while_active: (e) => {
+        {handle_while_active: (event) => {
+            const e = event.nativeEvent;
             if (e instanceof WheelEvent) {
                 scene_canvas.canvasSpace.camera.addOffset({
                     x: e.deltaX,
                     y: e.deltaY
                 });
             }
-        }, just_activated: 
+        }, handle_just_activated: 
             (e) => {
-                e.preventDefault();
+                e.nativeEvent.preventDefault();
         }}
     )
 

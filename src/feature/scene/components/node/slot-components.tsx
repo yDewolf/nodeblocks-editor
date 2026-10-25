@@ -65,7 +65,8 @@ export const SlotComponent = (props: {
                 onPointerDown={(e) => {
                     // e.stopPropagation();
                     eventManager?.generalizedEventHandler({
-                        slot: props.slot
+                        slot: props.slot,
+                        event: e
                     }, InputEvents.CLICK_ON_NODE_SLOT);
                 }}
                 class="slot-dot"

@@ -106,12 +106,12 @@ export class SelectionController {
     }
 
     public onClickOnNode(node: SceneNode) {
+        console.log(this.selected_nodes);
         if (
             this.selected_nodes.includes(node)
             && !this.inputManager.getKeybindState("MultipleMod")
         ) {
             this.selecting = false;
-            // FIXME: this should only activate if MainToolAction is active
             this.moving = true;
             return;
         }

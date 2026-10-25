@@ -34,7 +34,8 @@ export class SelectionTool extends BaseEditorTool {
 
     public setupKeybinds(inputContext: InputContext): void {
         inputContext.setHandlers("SecondaryToolAction", {
-            just_released: (e) => {
+            handle_just_released: (event) => {
+                const e = event.nativeEvent;
                 if (e instanceof PointerEvent) {
                     const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(e)
                     if (e.target !== e.currentTarget) return;
@@ -54,7 +55,7 @@ export class SelectionTool extends BaseEditorTool {
                         this.selectionController.selected_node_type = undefined;
                     }
                     this.inputManager.blockNextContextMenu();
-                    e.stopPropagation();
+                    event.blockNextKeybinds();
                     e.preventDefault();
                 }
             }
@@ -103,17 +104,17 @@ export class SelectionTool extends BaseEditorTool {
         this.selectionController.clearSelection();
     }
 
+    // FIXME: rename this event to mainToolAction
     onPointerDown(e: PointerEvent): void {
         const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(e)
-        if (e.button == 0) {
-            if (this.selectionController.has_selected && !e.shiftKey) {
-                this.selectionController.clearSelection();
-            }
-            this.selectionController.unselect_slot();
-
-            (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-            this.selectionController.onStartAreaSelection({x: world_pos.x, y: world_pos.y});
+        if (this.selectionController.has_selected && !e.shiftKey) {
+            console.log("Cleared selection")
+            this.selectionController.clearSelection();
         }
+        this.selectionController.unselect_slot();
+        
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+        this.selectionController.onStartAreaSelection({x: world_pos.x, y: world_pos.y});
     }
 
     onPointerUp(e: PointerEvent): void {
@@ -130,8 +131,12 @@ export class SelectionTool extends BaseEditorTool {
     }
 
     onClickOnNode(node: SceneNode): void {
+        if (!this.inputManager.getKeybindState("MainToolAction")) {
+            return;
+        }
+        
         this.selectionController.unselect_slot();
-        this.selectionController.onClickOnNode(node)
+        this.selectionController.onClickOnNode(node);
     }
 
     onMoveCursor(pos: Vector2, delta: Vector2, all_nodes: SceneNode[]): void {

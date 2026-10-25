@@ -17,6 +17,7 @@ import { useNotifications } from "~/feature/editor/contexts/notification-context
 import { editorSettings } from "~/feature/editor/editor-settings";
 import { NodeInstanceFactory } from "~/feature/editor/engine/helpers/node-instance-factory";
 import { NodeParamField } from "./node-field";
+import { useInputManager } from "~/utils/keybinds/input-provider";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -177,16 +178,16 @@ const NodeHeader = (props: {
     setIsHovered: (value: boolean) => void,
 }) => {
     const eventManager = useEventManager();
+    const inputManager = useInputManager();
     return (
         <div
             class="node-header space-between"
-            onPointerDown={(e) => {
-                if (e.button != 0) {
-                    return;
-                }
+            onpointerdown={(e) => {
+                // if (e.button != 0) { return; }
                 (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
                 eventManager?.generalizedEventHandler({
                     node: props.node,
+                    event: e
                 }, InputEvents.CLICK_ON_NODE);
             }}
             onMouseOver={(e) => {
@@ -196,6 +197,7 @@ const NodeHeader = (props: {
                 props.setIsHovered(true);
                 eventManager?.generalizedEventHandler({
                     node: props.node,
+                    event: e
                 }, InputEvents.HOVER_NODE);
             }}
         >
@@ -203,7 +205,7 @@ const NodeHeader = (props: {
             {/* <span>{props.node.fqn}</span> */}
             <button 
                 class="icon-button" 
-                onPointerDown={(e) => e.stopPropagation()}
+                onpointerdown={(e) => e.stopPropagation()}
                 onclick={() => {if (props.isExpanded) {props.setExpanded(false)} else {props.setExpanded(true)}}}
             >
                 <DropdownIcon expanded={props.isExpanded}/>

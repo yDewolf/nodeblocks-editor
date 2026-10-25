@@ -1,11 +1,19 @@
 import { KeybindTrigger } from "./keybind-trigger";
+import { IKeybindEvent } from "./keybind-event";
 
-export type KeybindCallback = (event: Event) => void;
+export type KeybindCallback = (event: IKeybindEvent) => void;
 
 export interface KeybindHandlers {
-    just_activated?: KeybindCallback;
-    while_active?: KeybindCallback;
-    just_released?: KeybindCallback;
+    // These three are called only when handling is enabled
+    // should perform actions
+    handle_just_activated?: KeybindCallback;
+    handle_while_active?: KeybindCallback;
+    handle_just_released?: KeybindCallback;
+
+    // These two are always called when keybind state changes
+    // should update keybind event state (blockNextKeybinds)
+    pressed_updateEventState?: KeybindCallback;
+    released_updateEventState?: KeybindCallback;
 }
 
 export interface KeybindBinding {
@@ -41,11 +49,14 @@ export class InputContext {
     public bind(name: string, triggers: KeybindTrigger | KeybindTrigger[], handlers: KeybindHandlers): this {
         const triggerArray = Array.isArray(triggers) ? triggers : [triggers];
         const maxSpecificity = triggerArray.reduce(
-            (max, triger) => Math.max(max, triger.getSpecificityScore()), 
+            (max, trigger) => Math.max(max, trigger.getSpecificityScore()), 
             0
         );
 
         this.bindings.set(name, { triggers: triggerArray, handlers, maxSpecificity });
+        this.bindings = new Map(Array.from(this.bindings.entries()).sort(([, a], [, b]) => {
+            return b.maxSpecificity - a.maxSpecificity;
+        }));
         return this;
     }
 

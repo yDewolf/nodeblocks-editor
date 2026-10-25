@@ -21,6 +21,7 @@ import { DocsElementIndicator } from './components/selected-docs-indicator';
 import { editorSettings } from './editor-settings';
 import { ClientSceneCommandTypes, CommandGroups } from '~/protocols/nodeblocks/network/client-command-protocol';
 import { nanoid } from 'nanoid';
+import { editorState, setMainCameraPos, setMainCameraZoom } from './editor-state';
 
 export const EditorView = () => {
     const editor = useEditor();
@@ -43,8 +44,12 @@ export const EditorView = () => {
     }
     
     const isDocsPageVisible = () => main_page_viewer.current_page === docsPage;    
-
+    
+    const mainSpace = editor.selectionController.space;
     onMount(() => {
+        mainSpace.camera.updateOffset(editorState.mainCameraPos ?? {x: 0, y: 0});
+        mainSpace.camera.zoom = editorState.mainCameraZoom ?? 1.0;
+        
         editor.sceneConnection.sendCommand({
             cmd_uid: nanoid(),
             cmd_group: CommandGroups.SCENE, 
@@ -55,7 +60,10 @@ export const EditorView = () => {
             openDocsPage();
         }
     })
+
     createEffect(() => {
+        setMainCameraPos(mainSpace.camera.offset);
+        setMainCameraZoom(mainSpace.camera.zoom);
         useDocs().is_docs_page_opened = isDocsPageVisible();
     });
 
@@ -66,7 +74,7 @@ export const EditorView = () => {
           >
             <SceneRuntimeProvider manager={editor.runtimeController}>
                 <NotificationProvider controller={editor.notificationController}>
-                    <SceneCanvasProvider canvasSpace={editor.selectionController.space} elementController={editor.elementController}>
+                    <SceneCanvasProvider canvasSpace={mainSpace} elementController={editor.elementController}>
                         <div 
                             class="editor-view"
                             ref={editor_view_ref}

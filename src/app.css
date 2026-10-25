@@ -12,14 +12,6 @@ body {
   overflow: hidden;
 }
 
-.move-mode {
-  cursor: grab;
-}
-
-.moving-mode {
-  cursor: grabbing;
-}
-
 .remove-input {
   pointer-events: none;
 }
