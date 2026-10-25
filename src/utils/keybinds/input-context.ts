@@ -19,8 +19,15 @@ export class InputContext {
 
     constructor(
         public readonly name: string,
-        public readonly parent?: InputContext
+        public readonly parent?: InputContext,
+        private _contextMenuHandler?: (e: MouseEvent) => void
     ) {}
+
+    get contextHandler() { return this._contextMenuHandler; }
+
+    public setContextHandler(handler: (e: MouseEvent) => void) {
+        this._contextMenuHandler = handler;
+    } 
 
     public setHandlers(keybind_name: string, handlers: KeybindHandlers) {
         const keybind = this.bindings.get(keybind_name);

@@ -8,6 +8,8 @@ export class InputManager {
     private pressedKeys: Set<string> = new Set();
     private pressedMouseButtons: Set<number> = new Set();
 
+    private _blockContextMenuFlag: boolean = false;
+
     public setActiveContext(context: InputContext | null): void {
         this.activeContext = context;
     }
@@ -59,7 +61,30 @@ export class InputManager {
         this.evaluateRelease(event);
     }
 
+    public onContextMenu(event: MouseEvent): void {
+        if (this.consumeContextMenuBlock()) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
 
+        if (!event.defaultPrevented) {
+            this.getActiveContext()?.contextHandler?.(event);
+        }
+    }
+
+
+    public consumeContextMenuBlock(): boolean {
+        if (this._blockContextMenuFlag) {
+            this._blockContextMenuFlag = false;
+            return true;
+        }
+        return false;
+    }
+
+    public blockNextContextMenu() {
+        this._blockContextMenuFlag = true;
+    }
 
     // Evaluators
 

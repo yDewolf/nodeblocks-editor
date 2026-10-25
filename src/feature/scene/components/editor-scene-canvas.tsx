@@ -6,7 +6,7 @@ import { EventHandler, InputEvents } from "~/utils/events/event-handling";
 import { ConnectionLines, ConnectionPreview } from "~/feature/scene/components/connection-lines";
 import { useScene } from "../scene-context";
 import { RemoveConnectionsAction } from "~/feature/editor/actions/conn/remove-conns-action";
-import { InputScope, useInputManager, useKeybind } from "~/utils/keybinds/input-provider";
+import { InputScope, useInputContext, useInputManager, useKeybind } from "~/utils/keybinds/input-provider";
 import { KeybindTrigger, MouseButton } from "~/utils/keybinds/keybind-trigger";
 import { useEventManager } from "~/utils/events/event-provider";
 import "~/style/containers.css";
@@ -14,13 +14,14 @@ import "~/app.css";
 import { SelectedNodeType } from "~/feature/editor/components/subpanels/component/node-type-selector";
 import { GridView } from "~/feature/scene/components/grid-view";
 import { NodeComponent } from "./node/node-component";
-import { contextMenuManager } from "~/feature/context-menu/context-menu-controller";
+import { ContextMenuController, contextMenuManager } from "~/feature/context-menu/context-menu-controller";
 import { CanvasContextMenuController } from "../controllers/canvas-context-menu-controller";
 
 export const EditorSceneCanvas = (props: {
     setWorldSpaceRef: (ref: HTMLDivElement | undefined) => void
 }) => {
     const editor = useEditor();
+    const inputManager = useInputManager();
     const scene = useScene();
     const scene_canvas = useSceneCanvas();
     let viewportRef: HTMLDivElement | undefined;
@@ -48,13 +49,10 @@ export const EditorSceneCanvas = (props: {
         editor.sceneConnection,
         editor.inputManager
     );
-    const handleContextMenu = (e: MouseEvent) => {
-        contextMenuManager.open(e, contextMenuController.contextItems);
-    }
 
     return (
         <InputScope name="SceneCanvas">
-            <SceneCanvasKeybindsAndEvents />
+            <SceneCanvasKeybindsAndEvents contextMenuController={contextMenuController}/>
             <div 
                 ref={viewportRef}
                 class="viewport"
@@ -73,7 +71,7 @@ export const EditorSceneCanvas = (props: {
                 
                 // FIXME: impedir que o contextmenu abra se alguma ferramenta
                 // estiver ativada (SecondaryToolAction) 
-                oncontextmenu={handleContextMenu}
+                oncontextmenu={(e) => editor.inputManager.onContextMenu(e)}
                 onKeyDown={(e) => editor.inputManager.onKeyDown(e)}
                 onKeyUp={(e) => editor.inputManager.onKeyUp(e)}
                 onWheel={(e) => {
@@ -144,11 +142,17 @@ export const EditorSceneCanvas = (props: {
 }
 
 
-export const SceneCanvasKeybindsAndEvents: ParentComponent = () => {
+export const SceneCanvasKeybindsAndEvents: ParentComponent<{
+    contextMenuController: CanvasContextMenuController,
+}> = (props) => {
     const scene_canvas = useSceneCanvas();
     const inputManager = useInputManager();
     const eventManager = useEventManager();
 
+    useInputContext()?.setContextHandler((e) => {
+        e.preventDefault();
+        contextMenuManager.open(e, props.contextMenuController.contextItems)
+    })
     useKeybind(
         "PanCamera", 
         [

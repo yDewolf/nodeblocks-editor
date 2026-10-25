@@ -53,6 +53,7 @@ export class SelectionTool extends BaseEditorTool {
                     if (!e.shiftKey) {
                         this.selectionController.selected_node_type = undefined;
                     }
+                    this.inputManager.blockNextContextMenu();
                     e.stopPropagation();
                     e.preventDefault();
                 }

@@ -52,6 +52,10 @@ export const InputScope: ParentComponent<{ name: string }> = (props) => {
     );
 };
 
+export function useInputContext() {
+    return useContext(InputContextContainer);
+}
+
 export function useKeybind(name: string, triggers: KeybindTrigger[] | KeybindTrigger, handlers: KeybindHandlers) {
     const context = useContext(InputContextContainer);
     if (!context) {
