@@ -114,7 +114,7 @@ export class SceneConnectionManager {
         const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${scene_id}/token`, {
             headers: { "Content-Type": "application/json" },
             method: "POST",
-            body: JSON.stringify({ user_id: this.appSession.sessionData?.user_id })
+            body: JSON.stringify({ user_id: this.appSession.userSession?.user_id })
         });
 
         if (!response.ok) {

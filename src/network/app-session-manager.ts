@@ -1,49 +1,63 @@
-import { createSignal, Setter } from 'solid-js';
 import { UserSessionData } from './protocols/user-session';
+import { createStore, SetStoreFunction } from 'solid-js/store';
+import { makePersisted } from '@solid-primitives/storage';
+import { getUserSession, loginAction, logoutAction } from '~/server/session';
+
+const SESSION_STORAGE_KEY = "app_user_session";
+
+interface SessionStore {
+    user_session?: UserSessionData
+}
 
 export class AppSessionManager {
-    private _sessionData: () => UserSessionData | null;
-    private _setSessionData: Setter<UserSessionData | null>;
+    private _sessionStore: SessionStore;
+    private _setSessionStore: SetStoreFunction<SessionStore>;
 
     // Server urls
     public readonly baseHttpUrl: string;
     public readonly baseWsUrl: string;
 
     constructor(host: string = "localhost", port: number = 8080) {
-        [this._sessionData, this._setSessionData] = createSignal<UserSessionData | null>(null);
+        [this._sessionStore, this._setSessionStore] = createStore<SessionStore>({
+            
+        });
         
         this.baseHttpUrl = `http://${host}:${port}`;
         this.baseWsUrl = `ws://${host}:${port}`;
     }
 
-    get sessionData() { return this._sessionData(); }
+    get userSession() { return this._sessionStore.user_session; }
 
-    public async login(user_id: string, password?: string) {
-        // FIXME: placeholder
-        const response = await fetch(this.baseHttpUrl + "/api/user/login", {
-            headers: { "Content-Type": "application/json" },
-            method: "POST",
-            body: JSON.stringify({
-                "user_id": user_id,
-                "password": password
-            })
-        })
-        if (!response.ok) {
-            throw new Error(`Failed to log as ${user_id}`)
+    private async initSession() {
+        try {
+            const session = await getUserSession();
+            if (session) {
+                this._setSessionStore("user_session", session);
+            }
+        } catch (e) {
+            console.error("Failed to recover session state", e);
         }
-
-        const json_data = await response.json();
-        this._setSessionData({
-            user_id: json_data.user_id,
-            display_name: json_data.display_name
-        });
     }
 
-    public logout(): void {
-        this._setSessionData(null);
+    public async login(user_id: string, password?: string): Promise<void> {
+        try {
+            const session = await loginAction(user_id, password);
+            this._setSessionStore("user_session", session);
+        } catch (error: any) {
+            throw new Error(`Failed to log as ${user_id}: ${error.message || 'Unknown Error'}`);
+        }
+    }
+
+    public async logout(): Promise<void> {
+        try {
+            await logoutAction();
+            this._setSessionStore("user_session", undefined);
+        } catch (error) {
+            console.error("Failed to logout:", error);
+        }
     }
 
     public isAuthenticated(): boolean {
-        return this.sessionData != null;
+        return this.userSession != null;
     }
 }

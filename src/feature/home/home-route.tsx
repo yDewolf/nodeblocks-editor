@@ -11,7 +11,7 @@ export function Home() {
 
     return (
         <div>
-            <Show when={appSession.sessionData} fallback={
+            <Show when={appSession.userSession} fallback={
                 <div>
                     <input type="text" oninput={(e) => {
                         setUserId(e.target.value)
