@@ -1,7 +1,7 @@
 import { UserSessionData } from './protocols/user-session';
 import { createStore, SetStoreFunction } from 'solid-js/store';
-import { makePersisted } from '@solid-primitives/storage';
 import { getUserSession, loginAction, logoutAction } from '~/server/session';
+import { createAsync } from '@solidjs/router';
 
 const SESSION_STORAGE_KEY = "app_user_session";
 
@@ -28,7 +28,7 @@ export class AppSessionManager {
 
     get userSession() { return this._sessionStore.user_session; }
 
-    private async initSession() {
+    public async initSession() {
         try {
             const session = await getUserSession();
             if (session) {

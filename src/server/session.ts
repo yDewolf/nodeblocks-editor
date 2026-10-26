@@ -1,10 +1,13 @@
 "use server";
-import { useSession } from "vinxi/http";
+import { useSession } from "@solidjs/start/http";
 import { UserSessionData } from "~/network/protocols/user-session";
 
 const SERVER_URL = process.env.SERVER_URL ?? "http://localhost:8080"
 
 export async function useAppSession() {
+    if (!process.env.SESSION_SECRET) {
+        console.error("Missing .env SESSION_SECRET");
+    }
     return useSession({
         name: "nodeblocks-app-session",
         password: process.env.SESSION_SECRET,
