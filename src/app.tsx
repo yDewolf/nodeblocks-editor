@@ -1,4 +1,4 @@
-import { Router, Route, createAsync } from "@solidjs/router";
+import { Router, Route } from "@solidjs/router";
 import { Home } from "./feature/home/home-route";
 import SceneEditor from "./feature/editor/scene-editor-route";
 import { AppSessionProvider } from "./network/app-session-provider";
@@ -9,7 +9,6 @@ import { ContextMenuPortal } from "./feature/context-menu/context-menu-component
 
 const app_session = new AppSessionManager();
 export default function App() {
-    createAsync(app_session.initSession);
     createEffect(() => {
       UpdateRootDataTheme();
     });

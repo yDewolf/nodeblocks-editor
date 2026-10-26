@@ -9,25 +9,32 @@ export function Home() {
     const appSession = useAppSession();
     const [userId, setUserId] = createSignal<string>("");
 
+    const [isMounted, setIsMounted] = createSignal(false);
+    onMount(() => {
+        setIsMounted(true);
+    });
+
     return (
         <div>
-            <Show when={appSession.userSession} fallback={
-                <div>
-                    <input type="text" oninput={(e) => {
-                        setUserId(e.target.value)
-                    }} />
-                    <button onclick={() => appSession.login(userId())}>Login</button>
-                </div>
-            }>
-                {(sessionData) => {
-                    const session = sessionData();
-                    return (
-                        <>
-                            Authenticated as {session.user_id}
-                            <SceneGrid sessionData={session}/>
-                        </>
-                    )
-                }}
+            <Show when={isMounted()}>
+                <Show when={appSession.userSession} fallback={
+                    <div>
+                        <input type="text" oninput={(e) => {
+                            setUserId(e.target.value)
+                        }} />
+                        <button onclick={() => appSession.login(userId())}>Login</button>
+                    </div>
+                }>
+                    {(sessionData) => {
+                        const session = sessionData();
+                        return (
+                            <>
+                                Authenticated as {session.user_id}
+                                <SceneGrid sessionData={session}/>
+                            </>
+                        )
+                    }}
+                </Show>
             </Show>
         </div>
     )

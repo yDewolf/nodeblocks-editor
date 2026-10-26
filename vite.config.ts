@@ -4,5 +4,5 @@ import { nitro } from "nitro/vite";
 import solidSvg from 'vite-plugin-solid-svg';
 
 export default defineConfig({
-  plugins: [solidStart(), nitro(), solidSvg()],
+    plugins: [solidStart(), nitro(), solidSvg()],
 });

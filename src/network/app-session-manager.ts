@@ -1,9 +1,6 @@
 import { UserSessionData } from './protocols/user-session';
 import { createStore, SetStoreFunction } from 'solid-js/store';
-import { getUserSession, loginAction, logoutAction } from '~/server/session';
-import { createAsync } from '@solidjs/router';
-
-const SESSION_STORAGE_KEY = "app_user_session";
+import { loginAction, logoutAction } from '~/server/session';
 
 interface SessionStore {
     user_session?: UserSessionData
@@ -27,16 +24,8 @@ export class AppSessionManager {
     }
 
     get userSession() { return this._sessionStore.user_session; }
-
-    public async initSession() {
-        try {
-            const session = await getUserSession();
-            if (session) {
-                this._setSessionStore("user_session", session);
-            }
-        } catch (e) {
-            console.error("Failed to recover session state", e);
-        }
+    public setUserSession(user_session?: UserSessionData | null) {
+        this._setSessionStore("user_session", user_session ?? undefined);
     }
 
     public async login(user_id: string, password?: string): Promise<void> {
