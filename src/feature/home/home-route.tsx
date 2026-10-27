@@ -21,7 +21,7 @@ const HomeView: ParentComponent = (props) => {
     const appSession = useAppSession();
     const routes: HomeRouteConfig[] = [
         {
-            iconElement: () => <FileIcon />,
+            iconElement: () => <FileIcon class="smaller-icon" />,
             label: "Scenes",
             route: "/scenes"
         }
