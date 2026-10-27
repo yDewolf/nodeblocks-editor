@@ -2,7 +2,6 @@ import { JSXElement, ParentComponent } from "solid-js";
 import { useAppSession } from "~/network/app-session-provider"
 import { HomeLeftTab } from "./components/home-left-tab";
 import FileIcon from '~/assets/icons/file.svg';
-import "~/style/screens/home.css";
 
 export const Home: ParentComponent = (props) => {
     return (

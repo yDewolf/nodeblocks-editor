@@ -1,146 +1,148 @@
-@import url("../panels/import.css");
-@import url("../misc/misc.css");
-@import url("../components/notifications.css");
-@import url("../misc/animations/import.css");
-@import url("../screens/settings.css");
-@import url("../screens/docs.css");
-
-.viewport {
-  user-select: none;
-  z-index: 1;
-  color: var(--font-color);
- }
-
-.grid {
-  position: absolute;
-  margin: 0;
-  height: 100%;
-  width: 100%;
-  background-color: var(--editor-background-color);
-  background-image: repeating-linear-gradient(var(--grid-color) 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, var(--grid-color) 0 1px, transparent 1px 100%);
-}
-
-.editor-view {
-  color: var(--font-color);
-}
-
-.editor-ui {
-  z-index: 2;
-  inset: 0;
-
-  pointer-events: none;
-
-  display: grid;
-  grid-template-columns: auto 3fr auto;
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
-  max-height: 100vh;
-}
-
-.left-tab, .right-tab, .middle-tab {
-  width: auto;
-  pointer-events: auto;
-}
-
-
-.right-tab {
-  align-items: end;
-  pointer-events: none;
-
-  * {
+@layer custom {
+  @import url("../panels/import.css");
+  @import url("../misc/misc.css");
+  @import url("../components/notifications.css");
+  @import url("../misc/animations/import.css");
+  @import url("../screens/settings.css");
+  @import url("../screens/docs.css");
+  
+  .viewport {
+    user-select: none;
+    z-index: 1;
+    color: var(--font-color);
+   }
+  
+  .grid {
+    position: absolute;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    background-color: var(--editor-background-color);
+    background-image: repeating-linear-gradient(var(--grid-color) 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, var(--grid-color) 0 1px, transparent 1px 100%);
+  }
+  
+  .editor-view {
+    color: var(--font-color);
+  }
+  
+  .editor-ui {
+    z-index: 2;
+    inset: 0;
+  
+    pointer-events: none;
+  
+    display: grid;
+    grid-template-columns: auto 3fr auto;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+  }
+  
+  .left-tab, .right-tab, .middle-tab {
+    width: auto;
     pointer-events: auto;
   }
-}
-
-.right-tab-split {
-  display: grid;
-  grid-template-rows: minmax(0, 2fr) minmax(0, 1fr);
-}
-
-.right-tab-holder {
-  display: flex;
-  flex-direction: column;
-  justify-content: right;
-}
-
-.left-tab-holder, .right-tab-holder {
-  padding: 10px;
-  gap: 10px;
-  width: 300px;
-  max-height: calc(100vh - 20px);
-}
-
-.left-tab-dropdown, .right-tab-dropdown {
-  grid-template-rows: 48px calc(100% - 48px);
-}
-
-.left-tab-selector, .left-tab-content, .left-tab-header, .right-tab-header, .right-tab-header, .right-tab-content {
-  background-color: var(--overlay-background);
-}
-
-.left-tab-header, .left-tab-content, .right-tab-header, .right-tab-content {
-  pointer-events: auto;
-}
-
-.left-tab-header, .right-tab-header {
-  div {
-    align-items: center;
+  
+  
+  .right-tab {
+    align-items: end;
+    pointer-events: none;
+  
+    * {
+      pointer-events: auto;
+    }
   }
-}
-
-.left-tab-header.expanded, .right-tab-header.expanded {
-  border-bottom: solid 1px transparent;
-}
-
-.left-tab-content > div, .right-tab-content > div {
-  background-color: var(--overlay-background);
-  border: solid 1px var(--stroke-color);
-  border-top: none;
-  padding: 0;
-}
-
-.left-tab-selector, .right-tab-selector {
-  border: solid 1px var(--stroke-color);
-  border-left: none;
-  border-right: none;
-}
-
-
-.middle-tab-holder {
+  
+  .right-tab-split {
     display: grid;
-    padding: 20px 5px;
-    grid-template-rows: minmax(0, 1fr);
-    max-height: calc(100vh - 40px);
-}
-
-
-.middle-tab {
-  pointer-events: none;
-
-  width: 100%;
-  height: 100%;
-  flex-direction: column-reverse;
-}
-
-.middle-tab, .middle-tab-overlay {
-    grid-area: 1 / 1;
-}
-
-.middle-tab-overlay {
-    z-index: 3;
+    grid-template-rows: minmax(0, 2fr) minmax(0, 1fr);
+  }
+  
+  .right-tab-holder {
+    display: flex;
+    flex-direction: column;
+    justify-content: right;
+  }
+  
+  .left-tab-holder, .right-tab-holder {
+    padding: 10px;
+    gap: 10px;
+    width: 300px;
+    max-height: calc(100vh - 20px);
+  }
+  
+  .left-tab-dropdown, .right-tab-dropdown {
+    grid-template-rows: 48px calc(100% - 48px);
+  }
+  
+  .left-tab-selector, .left-tab-content, .left-tab-header, .right-tab-header, .right-tab-header, .right-tab-content {
+    background-color: var(--overlay-background);
+  }
+  
+  .left-tab-header, .left-tab-content, .right-tab-header, .right-tab-content {
+    pointer-events: auto;
+  }
+  
+  .left-tab-header, .right-tab-header {
+    div {
+      align-items: center;
+    }
+  }
+  
+  .left-tab-header.expanded, .right-tab-header.expanded {
+    border-bottom: solid 1px transparent;
+  }
+  
+  .left-tab-content > div, .right-tab-content > div {
+    background-color: var(--overlay-background);
+    border: solid 1px var(--stroke-color);
+    border-top: none;
+    padding: 0;
+  }
+  
+  .left-tab-selector, .right-tab-selector {
+    border: solid 1px var(--stroke-color);
+    border-left: none;
+    border-right: none;
+  }
+  
+  
+  .middle-tab-holder {
+      display: grid;
+      padding: 20px 5px;
+      grid-template-rows: minmax(0, 1fr);
+      max-height: calc(100vh - 40px);
+  }
+  
+  
+  .middle-tab {
+    pointer-events: none;
+  
     width: 100%;
-}
-
-
-.viewport {
-  cursor: crosshair;
-}
-
-.viewport.move-mode {
-  cursor: grab;
-}
-
-.viewport.moving-mode {
-  cursor: grabbing;
+    height: 100%;
+    flex-direction: column-reverse;
+  }
+  
+  .middle-tab, .middle-tab-overlay {
+      grid-area: 1 / 1;
+  }
+  
+  .middle-tab-overlay {
+      z-index: 3;
+      width: 100%;
+  }
+  
+  
+  .viewport {
+    cursor: crosshair;
+  }
+  
+  .viewport.move-mode {
+    cursor: grab;
+  }
+  
+  .viewport.moving-mode {
+    cursor: grabbing;
+  }
 }
