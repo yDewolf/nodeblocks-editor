@@ -9,8 +9,6 @@ import { RemoveConnectionsAction } from "~/feature/editor/actions/conn/remove-co
 import { InputScope, useInputContext, useInputManager, useKeybind } from "~/utils/keybinds/input-provider";
 import { KeybindTrigger, MouseButton } from "~/utils/keybinds/keybind-trigger";
 import { useEventManager } from "~/utils/events/event-provider";
-import "~/style/containers.css";
-import "~/app.css";
 import { SelectedNodeType } from "~/feature/editor/components/subpanels/component/node-type-selector";
 import { GridView } from "~/feature/scene/components/grid-view";
 import { NodeComponent } from "./node/node-component";

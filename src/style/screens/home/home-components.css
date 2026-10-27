@@ -1,0 +1,27 @@
+@layer custom {
+    .user-profile-holder {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .user-profile {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        
+        background-color: var(--font-color);
+        color: var(--overlay-background);
+        
+        font-size: 18px;
+        text-align: center;
+        align-content: center;
+        font-weight: bold;
+        
+        border: none;
+    }
+
+    .user-profile-holder .username {
+        font-size: 0.9rem;
+    }
+}

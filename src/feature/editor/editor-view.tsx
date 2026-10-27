@@ -6,9 +6,6 @@ import { InputEvents } from '~/utils/events/event-handling';
 import { EditorLeftTabHolder } from './components/subpanels/left-tab';
 import { EditorMidTab } from './components/subpanels/mid-tab';
 import { EditorRightPanel } from './components/subpanels/right-tab';
-import {} from "../ui-themes";
-import "~/style/screens/editor.css";
-import "~/app.css";
 import { SceneCanvasProvider } from '../scene/scene-canvas-context';
 import { SceneProvider } from '../scene/scene-context';
 import { SceneRuntimeProvider } from '../scene/scene-runtime-context';
@@ -22,6 +19,7 @@ import { editorSettings } from './editor-settings';
 import { ClientSceneCommandTypes, CommandGroups } from '~/protocols/nodeblocks/network/client-command-protocol';
 import { nanoid } from 'nanoid';
 import { editorState, setMainCameraPos, setMainCameraZoom } from './editor-state';
+import "~/style/screens/editor.css";
 
 export const EditorView = () => {
     const editor = useEditor();
