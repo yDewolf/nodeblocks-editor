@@ -3,6 +3,7 @@ import { HomeRouteConfig } from "../home-route";
 import { useAppSession } from "~/network/app-session-provider";
 import "~/style/screens/home/home.css";
 import { Dropdown } from "~/components/panels/dropdown";
+import { useLocation } from "@solidjs/router";
 
 export const HomeLeftTab = (props: {
     routes: HomeRouteConfig[]
@@ -14,7 +15,8 @@ export const HomeLeftTab = (props: {
     onMount(() => {
         setIsMounted(true);
     });
-    
+
+    const location = useLocation();
     return (
         <Show when={isMounted()}>
             <div class="home-left-tab">
@@ -53,12 +55,21 @@ export const HomeLeftTab = (props: {
                     
                 </div>
                 <For each={props.routes}>
-                    {(route) => <a href={route.route} class="home-left-tab-route keep row-container align-center">
-                        {route.iconElement()}
-                        <span class="home-route-label">
-                            {route.label}
-                        </span>
-                    </a>}
+                    {(route) => {
+                        const isActive = () => location.pathname === route.route;
+                        return (
+                            <a 
+                                href={route.route} 
+                                class="home-left-tab-route keep row-container align-center"
+                                classList={{selected: isActive()}}                    
+                            >
+                                {route.iconElement()}
+                                <span class="home-route-label">
+                                    {route.label}
+                                </span>
+                            </a>
+                        )
+                    }}
                 </For>
             </div>
         </Show>

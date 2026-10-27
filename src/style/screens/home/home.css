@@ -30,6 +30,24 @@
         border-right: 1px solid var(--stroke-color);
     }
 
+    .home-left-tab-route {
+        padding: 0 4px;
+        text-decoration: none;
+        border-radius: 8px;
+    }
+
+    .home-left-tab-route.selected {
+        background-color: var(--dark-overlay-highlight);
+    }
+
+    .home-left-tab-route:hover {
+        background-color: var(--overlay-highlight);
+    }
+
+    .home-left-tab-route .home-route-label {
+        align-content: center;
+    }
+
     .home-content-holder > div {
         width: stretch;
         height: stretch;
