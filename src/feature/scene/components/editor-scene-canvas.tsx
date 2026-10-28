@@ -1,7 +1,6 @@
 import { For, onCleanup, onMount, ParentComponent, Show } from "solid-js";
 import { useSceneCanvas } from "../scene-canvas-context"
 import {} from "~/feature/ui-themes";
-import { useEditor } from "~/feature/scene-editor-context";
 import { EventHandler, InputEvents } from "~/utils/events/event-handling";
 import { ConnectionLines, ConnectionPreview } from "~/feature/scene/components/connection-lines";
 import { useScene } from "../scene-context";
@@ -14,6 +13,7 @@ import { GridView } from "~/feature/scene/components/grid-view";
 import { NodeComponent } from "./node/node-component";
 import { ContextMenuController, contextMenuManager } from "~/feature/context-menu/context-menu-controller";
 import { CanvasContextMenuController } from "../controllers/canvas-context-menu-controller";
+import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
 
 export const EditorSceneCanvas = (props: {
     setWorldSpaceRef: (ref: HTMLDivElement | undefined) => void

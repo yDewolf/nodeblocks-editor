@@ -11,6 +11,7 @@ import {} from "~/feature/ui-themes";
 
 import { Home } from "./feature/home/home-route";
 import { ScenesRoute } from "./feature/home/scenes/scenes-view";
+import { PackageManagerProvider } from './feature/editor/contexts/package-manager-context';
 
 const app_session = new AppSessionManager();
 export default function App() {
@@ -20,16 +21,18 @@ export default function App() {
 
     return (
       <AppSessionProvider appSession={app_session}>
-        <main>
-          <ContextMenuPortal />
-          <Router>
-              <Route path="/" component={Home}>
-                <Route path="" component={() => <Navigate href="/scenes" />} />
-                <Route path="scenes" component={ScenesRoute}/>
-              </Route>
-              <Route path="/scene/:scene_id" component={SceneEditor} />
-          </Router>
-        </main>
+        <PackageManagerProvider>
+          <main>
+            <ContextMenuPortal />
+            <Router>
+                <Route path="/" component={Home}>
+                  <Route path="" component={() => <Navigate href="/scenes" />} />
+                  <Route path="scenes" component={ScenesRoute}/>
+                </Route>
+                <Route path="/scene/:scene_id" component={SceneEditor} />
+            </Router>
+          </main>
+        </PackageManagerProvider>
       </AppSessionProvider>
     );
 }

@@ -1,11 +1,11 @@
+@import url("../panels/import.css");
+@import url("../misc/misc.css");
+@import url("../components/notifications.css");
+@import url("../misc/animations/import.css");
+@import url("../screens/settings.css");
+@import url("../screens/docs.css");
+
 @layer custom {
-  @import url("../panels/import.css");
-  @import url("../misc/misc.css");
-  @import url("../components/notifications.css");
-  @import url("../misc/animations/import.css");
-  @import url("../screens/settings.css");
-  @import url("../screens/docs.css");
-  
   .viewport {
     user-select: none;
     z-index: 1;

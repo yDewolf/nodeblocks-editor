@@ -3,19 +3,21 @@
 @import url("server-panel.css");
 @import url("editor_toolbar.css");
 
-@keyframes keepSpinning {
-    0% {transform: rotate(0deg);}
-    100% {transform: rotate(360deg);}
-}
-
-.auto-loop {
-    animation: keepSpinning 1500ms linear infinite;
-}
-
-.wait-resume {
-    animation: keepSpinning 1500ms linear infinite;
-}
-
-.icon-button.refresh-button:active {
-    animation: keepSpinning 500ms linear 1;
+@layer custom {
+    @keyframes keepSpinning {
+        0% {transform: rotate(0deg);}
+        100% {transform: rotate(360deg);}
+    }
+    
+    .auto-loop {
+        animation: keepSpinning 1500ms linear infinite;
+    }
+    
+    .wait-resume {
+        animation: keepSpinning 1500ms linear infinite;
+    }
+    
+    .icon-button.refresh-button:active {
+        animation: keepSpinning 500ms linear 1;
+    }
 }

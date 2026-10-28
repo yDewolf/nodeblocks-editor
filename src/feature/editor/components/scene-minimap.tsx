@@ -1,5 +1,5 @@
 import { createMemo, createSignal, For } from "solid-js";
-import { useEditor } from "~/feature/scene-editor-context";
+import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
 
 export const SceneMinimap = () => {
     const editor = useEditor();

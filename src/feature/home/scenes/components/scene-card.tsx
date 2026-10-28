@@ -6,10 +6,10 @@ export const SceneCard = (props: {
     listedScene: ListedScene,
 }) => {
     const navigate = useNavigate();
-
     const openScene = (id: string) => {
         navigate(`/scene/${id}`);
     };
+    
     return (
         <div class="scene-card">
             <div class="scene-preview">

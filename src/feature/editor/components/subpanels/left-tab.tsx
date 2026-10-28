@@ -1,6 +1,6 @@
 import { createSignal, JSXElement } from "solid-js";
 import { PageViewer } from "~/components/page-controller";
-import { useEditor } from "~/feature/scene-editor-context";
+import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
 import { NodeTypePreview, NodeTypeSelector } from "./component/node-type-selector";
 import { DropsideItemData, Dropdown, DropsideManager, DropdownItemButton, DropdownSection, DropdownItemInput } from "~/components/panels/dropdown";
 import { TabSelector } from "~/components/panels/tab-display";
