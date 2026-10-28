@@ -3,7 +3,7 @@ import { useSceneCanvas } from "../scene-canvas-context"
 import {} from "~/feature/ui-themes";
 import { EventHandler, InputEvents } from "~/utils/events/event-handling";
 import { ConnectionLines, ConnectionPreview } from "~/feature/scene/components/connection-lines";
-import { useScene } from "../scene-context";
+import { ensureScene } from "../scene-context";
 import { RemoveConnectionsAction } from "~/feature/editor/actions/conn/remove-conns-action";
 import { InputScope, useInputContext, useInputManager, useKeybind } from "~/utils/keybinds/input-provider";
 import { KeybindTrigger, MouseButton } from "~/utils/keybinds/keybind-trigger";
@@ -20,7 +20,7 @@ export const EditorSceneCanvas = (props: {
 }) => {
     const editor = useEditor();
     const inputManager = useInputManager();
-    const scene = useScene();
+    const scene = ensureScene();
     const scene_canvas = useSceneCanvas();
     let viewportRef: HTMLDivElement | undefined;
 

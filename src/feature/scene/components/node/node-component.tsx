@@ -10,7 +10,7 @@ import { useEventManager } from "~/utils/events/event-provider";
 import { InputEvents } from "~/utils/events/event-handling";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 import { nodeHasOutput, useSceneRuntime } from "~/feature/scene/scene-runtime-context";
-import { NodeMetaProvider, ensureMetadata as ensureMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
+import { NodeMetaProvider, ensureMetadata, useMetadata, useNodeMeta } from "~/feature/metadata/metadata-context";
 import { DocsPathPrefix } from "~/feature/docs/docs-protocols";
 import { NotificationPopupHolder } from "~/feature/editor/components/notification-badges";
 import { useNotifications } from "~/feature/editor/contexts/notification-context";
@@ -26,7 +26,7 @@ export const NodeComponent = (props: {
     node: SceneNode,
 }) => {
     const [isFirstFrame, setIsFirstFrame] = createSignal(true);
-    const { actionController } = useScene();
+    const sceneContext = useScene();
     const { canvasSpace } = useSceneCanvas();
 
     const isVisible = createMemo(() => {
@@ -67,15 +67,19 @@ export const NodeComponent = (props: {
                     // "pointer-events": "none"
                 }}
                 classList={{
-                    "unsynced": actionController.isEntityPending(props.node.uid),
+                    "unsynced": sceneContext?.actionController.isEntityPending(props.node.uid),
                     // "failed": props.node.has_failed_action,
                 }}
             >   
                 <NodeComponentV2 node={props.node}/>
-                <NotificationPopupHolder 
-                    notifications={useNotifications().relatedToNode(props.node)}
-                    pos={{x: 0, y: props.node.rect.size.y}}
-                />
+                <Show when={useNotifications()}>
+                    {(notifications) => 
+                        <NotificationPopupHolder 
+                            notifications={notifications().relatedToNode(props.node)}
+                            pos={{x: 0, y: props.node.rect.size.y}}
+                        />
+                    }
+                </Show>
             </div>
         </Show>
     );
@@ -116,7 +120,7 @@ export const NodeComponentV2 = (props: {
     props.default_show_output = props.default_show_output ?? true;
     const runtime = useSceneRuntime();
     return (
-        <NodeMetaProvider value={ensureMetadata().get_node_meta(ref_node.instance.spec.id, ref_node.instance.spec.namespace)} package_id={ref_node.instance.spec.namespace} type_id={ref_node.instance.spec.id}>
+        <NodeMetaProvider value={useMetadata()?.get_node_meta(ref_node.instance.spec.id, ref_node.instance.spec.namespace)} package_id={ref_node.instance.spec.namespace} type_id={ref_node.instance.spec.id}>
             <div
                 class="node"
 

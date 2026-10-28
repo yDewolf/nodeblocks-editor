@@ -8,14 +8,20 @@ import { SceneCard } from "./components/scene-card";
 import "~/style/screens/home/scenes.css";
 import { Dropdown } from '../../../components/panels/dropdown';
 import ArrowRightIcon from '~/assets/icons/arrow-right.svg';
+import { PackageManagerHTTPController } from "~/network/api/package-http-controller";
+import { usePackageManager } from "~/feature/editor/contexts/package-manager-context";
 
 export const ScenesRoute: ParentComponent = (props) => {
     const appSession = useAppSession();
+    const packageManager = usePackageManager();
+
     const sceneController = new SceneHTTPController(appSession);
+    const packageController = new PackageManagerHTTPController(appSession);
 
     const [isMounted, setIsMounted] = createSignal(false);
     onMount(() => {
         setIsMounted(true);
+        packageController.fetchAndLoadManifests(packageManager);
     });
 
     return (
@@ -41,6 +47,10 @@ export const ScenesView = (props: {
     onMount(() => {
         props.sceneController.fetchScenes(props.sessionData.user_id);
     })
+
+    const fetchSceneData = async (sceneId: string) => {
+        return props.sceneController.fetchSceneData(sceneId, props.sessionData.user_id);
+    }
 
     return (
         <div class="container">
@@ -68,9 +78,6 @@ export const ScenesView = (props: {
                 </div>
             </div>
             <div class="keep row-container fill">
-                
-            </div>
-            <div class="keep row-container fill">
                 <button class="icon-button" onclick={() => props.sceneController.fetchScenes(
                     props.sessionData.user_id,
                     // TODO: password
@@ -84,7 +91,7 @@ export const ScenesView = (props: {
             }>
                 <div class="scene-card-grid">
                     <For each={props.sceneController.scenes}>
-                        {(scene) => <SceneCard listedScene={scene}/>}
+                        {(scene) => <SceneCard listedScene={scene} fetchSceneData={fetchSceneData}/>}
                     </For>
                 </div>
             </Show>

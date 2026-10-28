@@ -11,7 +11,7 @@ import { nanoid } from "nanoid";
 import { LOCAL_DOCS_ID } from "~/feature/docs/docs-resolver";
 import { editorSettings, setAutosaveScenes } from "../../editor-settings";
 import { useNavigate } from "@solidjs/router";
-import { useScene } from "~/feature/scene/scene-context";
+import { ensureScene } from "~/feature/scene/scene-context";
 
 
 const LeftTabDropdown = (props: {
@@ -75,7 +75,7 @@ const LeftTabDropdown = (props: {
 export const EditorLeftTabHolder = (props: {
     main_page_viewer: PageViewer,
 }) => {
-    const scene = useScene();
+    const scene = ensureScene();
     const editor = useEditor();
     const tabs: Record<string, () => JSXElement> = {
         "Nodes": () => <NodeTypeSelector onClickOnPreview={

@@ -2,7 +2,7 @@ import { ParameterSpec } from "~/protocols/nodeblocks/manifests/node/datatype-sp
 import { DataTypeFieldSelector } from "../value/datatype-field";
 import { SceneNode } from "../../objects/scene-node";
 import { debounce } from "~/utils/debounce-utils";
-import { useScene } from "../../scene-context";
+import { ensureScene } from "../../scene-context";
 import { UpdateNodesAction } from "~/feature/editor/actions/node/update-nodes-actions";
 import { NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
 import { createMemo } from "solid-js";
@@ -13,7 +13,7 @@ export const NodeParamField = (props: {
     parameterSpec: ParameterSpec;
     hide_label?: boolean;
 }) => {
-    const { actionController } = useScene();
+    const { actionController } = ensureScene();
 
     const getCurrentValue = createMemo(() => {
         return props.node.parameters[props.parameterId] ?? props.parameterSpec.default;

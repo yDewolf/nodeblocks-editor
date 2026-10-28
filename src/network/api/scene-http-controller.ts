@@ -1,5 +1,6 @@
 import { createSignal, Setter } from "solid-js";
 import { AppSessionManager } from "~/network/app-session-manager";
+import { SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 
 export interface ListedScene {
     uid: string;
@@ -39,7 +40,7 @@ export class SceneHTTPController {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.detail || "Erro ao carregar as cenas.");
+                throw new Error(errorData.detail);
             }
 
             const data: ListedScene[] = await response.json();
@@ -52,6 +53,33 @@ export class SceneHTTPController {
 
         } finally {
             this._setIsLoading(false);
+        }
+    }
+
+    public async fetchSceneData(sceneId: string, userId: string, password?: string): Promise<SceneData> {
+        try {
+            const response = await fetch(this.appSession.baseHttpUrl + `/api/scene/${sceneId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    password: password
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail);
+            }
+
+            const data: SceneData = await response.json();
+            return data;
+
+        } catch (error) {
+            console.error("Failed to fetch scene:", error);
+            throw error;
         }
     }
 
@@ -78,5 +106,21 @@ export class SceneHTTPController {
             console.error("Failed to create scene:", error);
             throw error;
         }
+    }
+
+
+    public async fetchSceneToken(scene_id: string): Promise<string> {
+        const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${scene_id}/token`, {
+            headers: { "Content-Type": "application/json" },
+            method: "POST",
+            body: JSON.stringify({ user_id: this.appSession.userSession?.user_id })
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to generate scene connection token");
+        }
+
+        const data = await response.json();
+        return data.token;
     }
 }

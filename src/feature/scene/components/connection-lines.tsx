@@ -2,7 +2,7 @@ import { createMemo } from "solid-js";
 import { SceneConnection } from "~/feature/scene/objects/scene-connection";
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
-import { useScene } from "~/feature/scene/scene-context";
+import { ensureScene, useSceneReadonly } from "~/feature/scene/scene-context";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 
 export function make_simple_curved_path(start: Vector2, end: Vector2, anchor_a: Vector2, anchor_b: Vector2) {
@@ -22,7 +22,7 @@ export function make_simple_curved_path(start: Vector2, end: Vector2, anchor_a: 
 
 
 export const ConnectionPreview = (props: { start_slot: SceneNodeSlot | null, hovered_slot: SceneNodeSlot | null, cursor_pos: Vector2 }) => {
-    const { scene } = useScene();
+    const { scene } = ensureScene();
     const scene_canvas = useSceneCanvas();
 
     const path = createMemo(() => {
@@ -50,8 +50,8 @@ export const ConnectionPreview = (props: { start_slot: SceneNodeSlot | null, hov
     );
 };
 
-export const ConnectionLines = (props: { connection: SceneConnection, onDisconnect: (connection: SceneConnection) => void }) => {
-    const scene = useScene();
+export const ConnectionLines = (props: { connection: SceneConnection, onDisconnect?: (connection: SceneConnection) => void }) => {
+    const scene = useSceneReadonly();
     const scene_canvas = useSceneCanvas();
 
     const pathId = `path-${props.connection.uid}`;
@@ -68,7 +68,7 @@ export const ConnectionLines = (props: { connection: SceneConnection, onDisconne
     const handleContextMenu = (e: MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        props.onDisconnect(props.connection);
+        props.onDisconnect?.(props.connection);
     };
 
     // const is_current_step = createMemo(() => {
