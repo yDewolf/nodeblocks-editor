@@ -34,7 +34,7 @@ export default function SceneEditor() {
                 </div>
             }
         >
-            <EditorProvider packageManager={packageManager} appSession={appSession}>
+            <EditorProvider packageManager={packageManager} appSession={appSession} sceneId={sceneId}>
                 <EditorSetup sceneId={sceneId}/>
             </EditorProvider>
         </Show>

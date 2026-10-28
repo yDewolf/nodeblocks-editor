@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { createSignal, For, JSX, JSXElement, onMount, Show } from "solid-js"
+import { createEffect, createSignal, For, JSX, JSXElement, onMount, ParentComponent, Show } from "solid-js"
 import { Transition } from "solid-transition-group";
 import ArrowDownIcon from "~/assets/icons/arrow-down.svg";
 
@@ -82,23 +82,48 @@ export const DropdownSection = (props: {
     )
 }
 
-export const Dropdown = (props: {content: JSXElement, animated?: boolean, class?: string, icon?: JSXElement}) => {
+export const Dropdown: ParentComponent<{
+    animated?: boolean 
+    class?: string
+    icon?: JSXElement
+    iconClass?: String
+}> = (props) => {
     let containerRef: HTMLDivElement | undefined;
+
     const [expanded, setExpanded] = createSignal(false);
+    const [alignRight, setAlignRight] = createSignal(false);
     const handleOnFocusOut = (e: FocusEvent) => {
         const nextTarget = e.relatedTarget as Node
         if (nextTarget && !containerRef?.contains(nextTarget)) {
             setExpanded(false);
         }
     }
+
+    const handleWrapperRef = (el: HTMLDivElement) => {
+        requestAnimationFrame(() => {
+            if (containerRef && el) {
+                const parentRect = containerRef.getBoundingClientRect();
+                const dropdownWidth = el.offsetWidth;
+
+                if (parentRect.left + dropdownWidth > window.innerWidth) {
+                    setAlignRight(true);
+                    return;
+                } 
+                setAlignRight(false);
+            }
+        });
+    }
+
     const renderContent = () => (
         <Show when={expanded()}>
             <div
+                ref={handleWrapperRef}
                 onFocusOut={handleOnFocusOut}
-                class={"dropdown-wrapper"}
+                class="dropdown-wrapper"
+                classList={{"align-right": alignRight()}}
             >
                 <div class="dropdown-content">
-                    {props.content}
+                    {props.children}
                 </div>
             </div>
         </Show>
@@ -111,7 +136,7 @@ export const Dropdown = (props: {content: JSXElement, animated?: boolean, class?
             classList={{"expanded": expanded(), "no-animation": !props.animated}}
         >
             <div class="dropdown-header" classList={{"expanded": expanded()}}>
-                <button class="icon-button section-dropdown-icon" onclick={() => {
+                <button class={"icon-button section-dropdown-icon" + (props.iconClass ? (" " + props.iconClass) : "")} onclick={() => {
                     if (expanded()) setExpanded(false); else setExpanded(true);
                 }}>
                     {props.icon ?? <DropdownIcon expanded={expanded()}/>}

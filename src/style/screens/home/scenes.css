@@ -36,4 +36,17 @@
         background-color: var(--dark-overlay-highlight);
         border-radius: 0 0 12px 12px;
     }
+
+    .scenes-page-actions {
+        display: flex;
+    }
+
+    .create-scene-action {
+        min-width: 250px;
+        width: fit-content;
+    }
+
+    .create-scene-action .field-grid {
+        width: fit-content;
+    }
 }

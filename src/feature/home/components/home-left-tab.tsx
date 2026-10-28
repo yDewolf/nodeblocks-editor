@@ -26,30 +26,29 @@ export const HomeLeftTab = (props: {
                             icon={<div class="user-profile">
                                 {(appSession.userSession?.user_id ?? "?")[0]}
                             </div>}
-                            content={
-                                <Show when={appSession.userSession} fallback={
-                                    <div class="container">
-                                        {/* TODO: arrumar isso aqui porque tecnicamente depende */}
-                                        {/* de importar o css do editor */}
-                                        <div class="field-grid">
-                                            <label class="field-value-label" for="">Username</label>
-                                            <input class="field-input" type="text" oninput={(e) => {
-                                                setUserId(e.target.value);
-                                            }}/>
-                                        </div>
-                                        <button onclick={() => appSession.login(userId())}>
-                                            Login
-                                        </button>
+                        >
+                            <Show when={appSession.userSession} fallback={
+                                <div class="container">
+                                    {/* TODO: arrumar isso aqui porque tecnicamente depende */}
+                                    {/* de importar o css do editor */}
+                                    <div class="field-grid">
+                                        <label class="field-value-label" for="">Username</label>
+                                        <input class="field-input" type="text" oninput={(e) => {
+                                            setUserId(e.target.value);
+                                        }}/>
                                     </div>
-                                }>
-                                    <div class="container">
-                                        <button onclick={() => appSession.logout()}>
-                                            Logout
-                                        </button>
-                                    </div>
-                                </Show>
-                            }
-                        />
+                                    <button class="text-button" onclick={() => appSession.login(userId())}>
+                                        Login
+                                    </button>
+                                </div>
+                            }>
+                                <div class="container">
+                                    <button class="text-button" onclick={() => appSession.logout()}>
+                                        Logout
+                                    </button>
+                                </div>
+                            </Show>
+                        </Dropdown>
                         <span class="username">{appSession.userSession?.display_name ?? "Unknown"}</span>
                     </div>
                     
