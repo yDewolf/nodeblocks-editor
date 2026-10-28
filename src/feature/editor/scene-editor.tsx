@@ -47,13 +47,14 @@ export class SceneEditor {
 
     constructor(
         private _appSession: AppSessionManager,
-        private _packageManager: PackageManager
+        private _packageManager: PackageManager,
+        private readonly sceneId: string
     ) {
         this._globalInputContext = new InputContext("global");
         this._inputManager = new InputManager();
         this._eventManager = new EventManager();
 
-        this._scene = new NodeScene(_packageManager.registry, new PackageNodeProvider(_packageManager));
+        this._scene = new NodeScene(_packageManager.registry, new PackageNodeProvider(_packageManager), this.sceneId);
         this._sceneConnection = new SceneConnectionManager(_appSession, _packageManager);
         this._sceneConnection.onConnect(this.onSceneConnect);
 

@@ -51,7 +51,7 @@ export const StatePanel = (props: {state_controller: StateController}) => {
                             </Match>
                         </Switch>
                     </button>
-                    <Dropdown content={
+                    <Dropdown>
                         <div
                             class="fill dropdown-item-grid">
                             <div class="keep row-container">
@@ -72,7 +72,7 @@ export const StatePanel = (props: {state_controller: StateController}) => {
                                 </Show>
                             </div>
                         </div>
-                    }/>
+                    </Dropdown>
                 </div>
             }>
                 <button class="icon-button small-icon" onclick={() => props.state_controller.request_stop()}>

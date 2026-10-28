@@ -7,9 +7,10 @@ const EditorContext = createContext<SceneEditor>();
 
 export const EditorProvider: ParentComponent<{
     packageManager: PackageManager,
-    appSession: AppSessionManager
+    appSession: AppSessionManager,
+    sceneId: string
 }> = (props) => {
-  const editor = new SceneEditor(props.appSession, props.packageManager);
+  const editor = new SceneEditor(props.appSession, props.packageManager, props.sceneId);
 
   return (
     <EditorContext.Provider value={editor}>

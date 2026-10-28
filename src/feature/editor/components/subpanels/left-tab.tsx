@@ -11,6 +11,7 @@ import { nanoid } from "nanoid";
 import { LOCAL_DOCS_ID } from "~/feature/docs/docs-resolver";
 import { editorSettings, setAutosaveScenes } from "../../editor-settings";
 import { useNavigate } from "@solidjs/router";
+import { useScene } from "~/feature/scene/scene-context";
 
 
 const LeftTabDropdown = (props: {
@@ -42,7 +43,7 @@ const LeftTabDropdown = (props: {
     const SettingsCallback = () => <SettingsView page_viewer={props.page_viewer}/>;
     const navigate = useNavigate();
     return (
-        <Dropdown content={
+        <Dropdown>
             <div
                 class="fill dropdown-item-grid"
             >
@@ -67,13 +68,14 @@ const LeftTabDropdown = (props: {
                     };
                 }} onMouseOver={setCurrentItem(undefined)}/>
             </div>
-        }/>
+        </Dropdown>
     )
 }
 
 export const EditorLeftTabHolder = (props: {
     main_page_viewer: PageViewer,
 }) => {
+    const scene = useScene();
     const editor = useEditor();
     const tabs: Record<string, () => JSXElement> = {
         "Nodes": () => <NodeTypeSelector onClickOnPreview={
@@ -94,12 +96,12 @@ export const EditorLeftTabHolder = (props: {
                     <div class="keep row-container">
                         <div class="keep row-container" style={{gap: 0}}>
                             <span class="icon-span">
-                                <img src="public/assets/logo/placeholder-logo.png" alt="Nodeblocks" />
+                                <img src="/assets/logo/placeholder-logo.png" alt="Nodeblocks" />
                             </span>
                             <LeftTabDropdown page_viewer={props.main_page_viewer} />
                         </div>
                         <h4>
-                            NodeScene
+                            {scene.scene.scene_id}
                         </h4>
                     </div>)
                 }
