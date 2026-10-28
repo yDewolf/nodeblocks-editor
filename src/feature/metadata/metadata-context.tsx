@@ -21,10 +21,7 @@ export function ensureMetadata() {
     return context;
 }
 
-export function useMetadata() {
-    const context = useContext(MetadataContext);
-    return context;
-}
+export function useMetadata() { return useContext(MetadataContext); }
 
 // Root Meta
 export interface PackageMetaContextValue {

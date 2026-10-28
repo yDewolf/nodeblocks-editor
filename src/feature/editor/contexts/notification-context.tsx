@@ -11,11 +11,4 @@ export const NotificationProvider: ParentComponent<{ controller: NotificationCon
     );
 };
 
-export const useNotifications = () => {
-    const context = useContext(NotificationContext);
-    if (!context) {
-        throw new Error("useNotifications muts be used inside a <NotificationProvider>");
-    }
-  
-    return context;
-};
+export const useNotifications = () => useContext(NotificationContext);

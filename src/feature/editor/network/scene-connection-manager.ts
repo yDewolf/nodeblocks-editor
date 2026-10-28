@@ -2,7 +2,6 @@ import { AppSessionManager } from "~/network/app-session-manager";
 import { ClientCommand } from "~/protocols/nodeblocks/network/message/client-commands";
 import { ServerMessages, ServerMessageTypes, WebsocketStatus } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { PackageManager } from "../engine/packages/package-manager";
-import { PackageManifest } from "~/protocols/nodeblocks/manifests/package-manifest";
 import { ServerMessage } from "~/protocols/nodeblocks/network/message/server-messages";
 import { WorkerEventPayload } from "~/protocols/nodeblocks/network/message/server/payloads/worker-event-payloads";
 import { ServerCmdResponse, ServerEngineEvent, ServerSceneMessages, ServerWorkerEvent } from "~/protocols/nodeblocks/network/message/server/server-scene-messages";
@@ -10,6 +9,8 @@ import { EngineEventPayload } from "~/protocols/nodeblocks/network/message/serve
 import { ServerCmdResponsePayload } from "~/protocols/nodeblocks/network/message/server/payloads/server-response-payloads";
 import { createSignal } from "solid-js";
 import { isServer } from "solid-js/web";
+import { SceneHTTPController } from "~/network/api/scene-http-controller";
+import { PackageManagerHTTPController } from "~/network/api/package-http-controller";
 
 type MessageByType<MessageType extends ServerMessages | ServerMessageTypes> = 
     Extract<ServerMessage, {type: MessageType}>;
@@ -46,6 +47,9 @@ export class SceneConnectionManager {
     
     private _connectListeners: Set<(sceneConn: SceneConnectionManager) => void> = new Set();
 
+    private _sceneHttpController: SceneHTTPController;
+    private _packageHttpController: PackageManagerHTTPController;
+
     get sceneId() { return this._sceneId; }
 
     constructor(
@@ -53,6 +57,8 @@ export class SceneConnectionManager {
         private packageManager: PackageManager
     ) {
         [this._status, this._setStatus] = createSignal(WebsocketStatus.DISCONNECTED);
+        this._sceneHttpController = new SceneHTTPController(appSession);
+        this._packageHttpController = new PackageManagerHTTPController(appSession);
     }
 
     get status() { return this._status(); }
@@ -81,10 +87,10 @@ export class SceneConnectionManager {
         this._setStatus(WebsocketStatus.CONNECTING);
 
         try {
-            this.sceneToken = await this.fetchSceneToken(sceneId);
+            this.sceneToken = await this._sceneHttpController.fetchSceneToken(sceneId);
             this._sceneId = sceneId;
             
-            await this.fetchAndLoadManifests();
+            await this._packageHttpController.fetchAndLoadManifests(this.packageManager);
             await this.establishWebSocketConnection();
         } catch (error) {
             this.isConnecting = false;
@@ -108,33 +114,6 @@ export class SceneConnectionManager {
             this.socket.close(1000, "User disconnected from scene");
             this.socket = null;
         }
-    }
-
-    private async fetchSceneToken(scene_id: string): Promise<string> {
-        const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${scene_id}/token`, {
-            headers: { "Content-Type": "application/json" },
-            method: "POST",
-            body: JSON.stringify({ user_id: this.appSession.userSession?.user_id })
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to generate scene connection token");
-        }
-
-        const data = await response.json();
-        return data.token;
-    }
-
-    private async fetchAndLoadManifests(): Promise<void> {
-        const response = await fetch(`${this.appSession.baseHttpUrl}/api/plugins/manifests`);
-        if (!response.ok) {
-            throw new Error("Failed to fetch package manifests");
-        }
-
-        const json_data = await response.json();
-        const manifests: PackageManifest[] = json_data.loaded_manifests;
-        this.packageManager.loadPackages(manifests);
-        console.log("[SceneConnection] Loaded manifests: ", manifests);
     }
 
     private establishWebSocketConnection(): Promise<void> {

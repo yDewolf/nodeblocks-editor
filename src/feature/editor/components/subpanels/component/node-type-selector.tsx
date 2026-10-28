@@ -1,5 +1,5 @@
 import { createSignal, createMemo, mapArray, Show, For } from "solid-js";
-import { useScene } from "~/feature/scene/scene-context";
+import { ensureScene } from "~/feature/scene/scene-context";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
@@ -9,7 +9,7 @@ import { NodePreview } from "~/feature/scene/components/node/node-component";
 export const NodeTypeSelector = (props: {
     onClickOnPreview: (node_preview: NodeTypePreview) => void
 }) => {
-    const scene = useScene();
+    const scene = ensureScene();
     // const [categoryFilter, setCategoryFilter] = createSignal<string | undefined>(undefined);
     const specs = createMemo(() => {
         // TODO: usar o packageManager e as dependências da cena para

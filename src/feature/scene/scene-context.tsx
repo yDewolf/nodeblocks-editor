@@ -3,10 +3,29 @@ import { createStore } from "solid-js/store";
 import { ActionController } from "../editor/actions/action-controller";
 import { NodeScene } from "../editor/engine/node_scene";
 
-interface SceneContextValue {
+interface ReadonlySceneContextValue {
     scene: NodeScene;
-    actionController: ActionController;
     isPending: (targetId: string) => boolean;
+}
+const ReadonlySceneContext = createContext<ReadonlySceneContextValue>();
+export const ReadonlySceneProvider: ParentComponent<{
+    scene: NodeScene;
+}> = (props) => {
+    const contextValue: ReadonlySceneContextValue = {
+        get scene() { return props.scene; },
+        isPending: (targetId: string) => false,
+    };
+
+    return (
+        <ReadonlySceneContext.Provider value={contextValue}>
+            {props.children}
+        </ReadonlySceneContext.Provider>
+    );
+};
+
+
+interface SceneContextValue extends ReadonlySceneContextValue {
+    actionController: ActionController;
 }
 
 const SceneContext = createContext<SceneContextValue>();
@@ -30,9 +49,18 @@ export const SceneProvider: ParentComponent<{
 
     return (
         <SceneContext.Provider value={contextValue}>
-        {props.children}
+            {props.children}
         </SceneContext.Provider>
     );
 };
 
-export const useScene = () => useContext(SceneContext)!;
+export const ensureScene = () => useContext(SceneContext)!;
+export const useScene = () => useContext(SceneContext);
+
+export const useSceneReadonly = () => {
+    const context = useContext(ReadonlySceneContext);
+    if (!context) {
+        return ensureScene() as ReadonlySceneContextValue;
+    }
+    return context;
+};
