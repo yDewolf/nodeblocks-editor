@@ -12,7 +12,7 @@ import { DynamicMetaProvider, MetaProvider } from "~/feature/metadata/metadata-c
 import { ParsedMetaText } from '../metadata/components/metadata-text';
 import { DocsSidebar } from "~/feature/docs/components/docs-sidebar";
 import { PackageManager } from '../editor/engine/packages/package-manager';
-import { useEditor } from "~/feature/scene-editor-context";
+import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
 import { DataTypeMeta, NodeTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import { MetadataHeader } from "~/protocols/nodeblocks/metadata/header_metadata";
 

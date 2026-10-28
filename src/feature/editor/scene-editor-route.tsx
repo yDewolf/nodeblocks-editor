@@ -1,8 +1,6 @@
 import { useParams } from "@solidjs/router";
-import { onMount, Show } from "solid-js";
-import { PackageManager } from "./engine/packages/package-manager";
-import { TypeSpecRegistry } from "./engine/type-registry";
-import { EditorProvider, useEditor } from "../scene-editor-context";
+import { createSignal, onMount, Show } from "solid-js";
+import { EditorProvider, useEditor } from "./contexts/scene-editor-context";
 import { EventManagerProvider } from "~/utils/events/event-provider";
 import { InputManagerProvider, DefinedInputScope } from "~/utils/keybinds/input-provider";
 import { DocsProvider, DocsUrlSync } from "../docs/docs-context";
@@ -11,16 +9,25 @@ import { EditorView } from "./editor-view";
 import { nanoid } from "nanoid";
 import { CommandGroups, ClientSceneCommandTypes } from "~/protocols/nodeblocks/network/client-command-protocol";
 import { useAppSession } from "~/network/app-session-provider";
+import { usePackageManager } from "./contexts/package-manager-context";
+
+import "~/style/screens/editor.css";
 
 export default function SceneEditor() {
     const appSession = useAppSession();
     const params = useParams<{ scene_id: string }>();
     const sceneId = params.scene_id;
+
+    // FIXME: we might need to reset the package manager
+    const packageManager = usePackageManager();
+    const [isMounted, setIsMounted] = createSignal(false);
+    onMount(() => {
+        setIsMounted(true);
+    });
     
-    const packageManager = new PackageManager(new TypeSpecRegistry());
     return (
         <Show 
-            when={appSession.isAuthenticated()} 
+            when={appSession.isAuthenticated() && isMounted()} 
             fallback={
                 <div>
                     You need to authenticate to open a scene

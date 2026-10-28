@@ -2,7 +2,7 @@ import { StatePanel } from "./state-panel";
 import { createSignal, Match, Show, Switch } from "solid-js";
 import SkipForwardIcon from "~/assets/icons/skip-forward.svg";
 import { StateController } from "~/feature/editor/controllers/state-controller";
-import { useEditor } from "~/feature/scene-editor-context";
+import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
 import { SceneWorkerExecutionMode } from "~/protocols/nodeblocks/network/scene-worker-protocol";
 import { WebsocketStatus } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { Dropdown, Dropside } from '../../../../../components/panels/dropdown';

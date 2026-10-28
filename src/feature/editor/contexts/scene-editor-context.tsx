@@ -1,13 +1,9 @@
 import { createContext, ParentComponent, useContext } from "solid-js";
-import { SceneEditor } from "./editor/scene-editor";
-import { PackageManager } from "./editor/engine/packages/package-manager";
+import { SceneEditor } from "../scene-editor";
+import { PackageManager } from "../engine/packages/package-manager";
 import { AppSessionManager } from "~/network/app-session-manager";
 
-interface EditorContextValue {
-  editor: SceneEditor;
-}
-
-const EditorContext = createContext<EditorContextValue>();
+const EditorContext = createContext<SceneEditor>();
 
 export const EditorProvider: ParentComponent<{
     packageManager: PackageManager,
@@ -16,7 +12,7 @@ export const EditorProvider: ParentComponent<{
   const editor = new SceneEditor(props.appSession, props.packageManager);
 
   return (
-    <EditorContext.Provider value={{ editor }}>
+    <EditorContext.Provider value={editor}>
       {props.children}
     </EditorContext.Provider>
   );
@@ -27,5 +23,5 @@ export const useEditor = () => {
   if (!context) {
     throw new Error("useEditor must be used within an EditorProvider");
   }
-  return context.editor;
+  return context;
 };

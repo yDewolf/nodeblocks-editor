@@ -2,7 +2,7 @@ import { createSignal, createMemo, mapArray, Show, For } from "solid-js";
 import { useScene } from "~/feature/scene/scene-context";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
-import { useEditor } from "~/feature/scene-editor-context";
+import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
 import { NodePreview } from "~/feature/scene/components/node/node-component";
 
 

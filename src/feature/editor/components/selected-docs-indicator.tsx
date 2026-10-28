@@ -5,7 +5,7 @@ import DocsIcon from '~/assets/icons/book.svg';
 import ExpandIcon from '~/assets/icons/expand.svg';
 import { MetaProvider } from '~/feature/metadata/metadata-context';
 import { ParsedMetaText } from '../../metadata/components/metadata-text';
-import { useEditor } from '~/feature/scene-editor-context';
+import { useEditor } from '~/feature/editor/contexts/scene-editor-context';
 import { DocsTool } from '../tools/docs-tool';
 
 // Não sei se fica melhor continuar mostrando o selecionado ou mostrar apenas o hovered

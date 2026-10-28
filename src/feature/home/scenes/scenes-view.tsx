@@ -1,4 +1,3 @@
-import { useNavigate } from "@solidjs/router";
 import { createSignal, onMount, Show, For, ParentComponent } from "solid-js";
 import { SceneHTTPController } from "~/network/api/scene-http-controller";
 import { useAppSession } from "~/network/app-session-provider";
@@ -36,11 +35,6 @@ export const ScenesView = (props: {
     sceneController: SceneHTTPController
 }) => {
     const [targetScene, setTargetScene] = createSignal<string>("");
-
-    const navigate = useNavigate();
-    const openScene = (id: string) => {
-        navigate(`/scene/${id}`);
-    };
 
     onMount(() => {
         props.sceneController.fetchScenes(props.sessionData.user_id);

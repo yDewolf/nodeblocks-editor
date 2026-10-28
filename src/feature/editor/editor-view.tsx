@@ -1,7 +1,7 @@
 
 import { PageViewer } from '~/components/page-controller';
 import { EditorSceneCanvas } from '../scene/components/editor-scene-canvas';
-import { useEditor } from '../scene-editor-context';
+import { useEditor } from './contexts/scene-editor-context';
 import { InputEvents } from '~/utils/events/event-handling';
 import { EditorLeftTabHolder } from './components/subpanels/left-tab';
 import { EditorMidTab } from './components/subpanels/mid-tab';
