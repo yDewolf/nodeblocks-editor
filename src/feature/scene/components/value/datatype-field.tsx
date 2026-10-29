@@ -60,7 +60,7 @@ export const DataTypeFieldSelector = (props: {
     };
 
     const param_meta = useNodeMeta()?.meta?.parameter_meta;
-    const param_label = param_meta ? param_meta[props.parameterId].capitalized_name : props.parameterId;
+    const param_label = param_meta?.[props.parameterId] ? param_meta[props.parameterId].capitalized_name : props.parameterId;
     return (
         <div class="field-grid">
             <Show when={!props.hide_label}>
