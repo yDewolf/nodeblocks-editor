@@ -10,6 +10,8 @@ import { nanoid } from "nanoid";
 import { CommandGroups, ClientSceneCommandTypes } from "~/protocols/nodeblocks/network/client-command-protocol";
 import { useAppSession } from "~/network/app-session-provider";
 import { usePackageManager } from "./contexts/package-manager-context";
+import { SceneArtifactProvider } from "./contexts/artifact-context";
+import { SceneArtifactHTTPController } from "~/network/api/scene-artifact-http-controller";
 
 import "~/style/screens/editor.css";
 
@@ -25,6 +27,7 @@ export default function SceneEditor() {
         setIsMounted(true);
     });
     
+    const artifactController = new SceneArtifactHTTPController(appSession, sceneId);
     return (
         <Show 
             when={appSession.isAuthenticated() && isMounted()} 
@@ -34,9 +37,11 @@ export default function SceneEditor() {
                 </div>
             }
         >
-            <EditorProvider packageManager={packageManager} appSession={appSession} sceneId={sceneId}>
-                <EditorSetup sceneId={sceneId}/>
-            </EditorProvider>
+            <SceneArtifactProvider artifactController={artifactController}>
+                <EditorProvider packageManager={packageManager} appSession={appSession} sceneId={sceneId}>
+                        <EditorSetup sceneId={sceneId}/>
+                </EditorProvider>
+            </SceneArtifactProvider>
         </Show>
     )
 }
@@ -56,14 +61,14 @@ const EditorSetup = (props: {sceneId: string}) => {
         <MetadataProvider controller={editor.metadataController}>
             <DocsProvider controller={editor.docsController}>
                 <DocsUrlSync />
-                <InputManagerProvider manager={editor.inputManager}>
-                    <DefinedInputScope context={editor.globalInputContext}>
-                        {/* TODO adicionar um editor keybind provider */}
-                        <EventManagerProvider manager={editor.eventManager}>
-                            <EditorView />
-                        </EventManagerProvider>
-                    </DefinedInputScope>
-                </InputManagerProvider>
+                    <InputManagerProvider manager={editor.inputManager}>
+                        <DefinedInputScope context={editor.globalInputContext}>
+                            {/* TODO adicionar um editor keybind provider */}
+                            <EventManagerProvider manager={editor.eventManager}>
+                                <EditorView />
+                            </EventManagerProvider>
+                        </DefinedInputScope>
+                    </InputManagerProvider>
             </DocsProvider>
         </MetadataProvider>
     )

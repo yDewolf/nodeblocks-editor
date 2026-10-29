@@ -31,6 +31,7 @@ export const NodeOutput = (props: {node: SceneNode}) => {
         return {
             renderer: datatype.default_renderer,
             base_type: datatype.base_id ?? DefaultDataTypes.UNKNOWN,
+            font_id: props.node.uid,
             value_meta: output_pack?.value_meta,
             value: output_pack.value
         };

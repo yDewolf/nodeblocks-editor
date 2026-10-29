@@ -92,6 +92,7 @@ const DataTypePreview = (props: {
         const pack: DataTypeValuePack = {
             value: value,
             renderer: props.spec.default_renderer,
+            font_id: props.spec.fqn,
             base_type: props.spec.base_id
         }
         return pack;
