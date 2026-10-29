@@ -195,7 +195,7 @@ export const NodeSlotSection = (props: {
 const ParameterDropdownItem = (props: {
     param_id: string;
     param_spec: ParameterSpec;
-    param_meta?: ParameterMeta;
+    param_meta: ParameterMeta;
     devMode: boolean;
 }) => {
     const badges = createMemo<DropdownBadge[]>(() => {

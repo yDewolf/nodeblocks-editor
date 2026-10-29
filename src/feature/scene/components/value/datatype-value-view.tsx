@@ -4,11 +4,13 @@ import { DefaultDataTypes } from "~/protocols/nodeblocks/manifests/node/datatype
 import { ArrayView } from "./array-view";
 import { ScalarView } from "./scalar-view";
 import { MarkdownText } from "~/feature/editor/components/markdown-text";
+import { DataTypeValueMeta } from "~/protocols/nodeblocks/manifests/node/datatype-value-meta";
 
 
 export interface DataTypeValuePack {
     renderer: DefaultRenderers;
     base_type: DefaultDataTypes;
+    value_meta?: DataTypeValueMeta
     value: any;
 }
 

@@ -1,5 +1,6 @@
 import { JobStatus, NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols"
 import { ServerEngineEventTypes } from "../../../server-message-protocol"
+import { SerializedDataTypeValue } from "~/protocols/nodeblocks/manifests/node/datatype-value-meta"
 
 export interface EngineTracker {
     node_id?: string
@@ -19,7 +20,7 @@ export type NodeStatusPayload = BaseEngineEventPayload & {
     type: ServerEngineEventTypes.NODE_STATUS
     node_uid: string
     status: NodeExecutionStatus
-    node_result?: Record<string, any>
+    node_result?: Record<string, SerializedDataTypeValue>
 }
 
 export type JobStatusPayload = BaseEngineEventPayload & {

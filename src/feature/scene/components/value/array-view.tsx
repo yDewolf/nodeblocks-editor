@@ -1,6 +1,7 @@
 import { createEffect, createMemo, createSignal, For, Index, Match, Show, Switch } from "solid-js";
 import { DataTypeValuePack } from "./datatype-value-view";
 import { ScalarView } from "./scalar-view";
+import { DefaultDataTypes } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
 
 // TODO: add a interpreter option on the UI so the user can select
 // how the array should be interpreted
@@ -94,9 +95,10 @@ export const ArrayView = (props: { output_value?: DataTypeValuePack }) => {
     const [target_channel, setTargetChannel] = createSignal(0);
 
     const shape = createMemo(() => {
-        // if ("shape" in props.output_value?.value_meta) {
-        //     return props.output_value?.value_meta.shape;
-        // }
+        if (props.output_value?.value_meta?.type == DefaultDataTypes.ARRAY) {
+            return props.output_value?.value_meta.shape;
+        }
+
         return get_array_shape(props.output_value?.value)
     });
     const dims = () => shape().length;
