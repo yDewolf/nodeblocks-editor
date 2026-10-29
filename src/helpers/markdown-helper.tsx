@@ -21,8 +21,17 @@ export class MarkdownHelper {
         if (typeof item !== "string") {
             return [item];
         }
-        // Inicia a cadeia pelos Embeds/Mídia
-        return this.parseEmbeds(item);
+        return this.parseNewlines(item);
+    }
+
+    private static parseNewlines(text: string): JSX.Element[] {
+        const regex = /\\n/g;
+        return this.splitAndParse(
+            text,
+            regex,
+            (match) => <br />,
+            this.parseEmbeds.bind(this)
+        );
     }
 
     private static parseEmbeds(text: string): JSX.Element[] {
