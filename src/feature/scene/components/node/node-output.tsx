@@ -23,12 +23,16 @@ export const NodeOutput = (props: {node: SceneNode}) => {
 
         const slot = props.node.slots[target];
         const datatype = scene.scene.registry.getDataTypeSpec(slot.instance.data_type_fqn);
-        const value = outputs[target];
-        
+        const output_pack = outputs[target];
+        if (!output_pack) {
+            return undefined;
+        }
+
         return {
             renderer: datatype.default_renderer,
             base_type: datatype.base_id ?? DefaultDataTypes.UNKNOWN,
-            value: value
+            value_meta: output_pack?.value_meta,
+            value: output_pack.value
         };
     });
 

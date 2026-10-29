@@ -5,13 +5,14 @@ import { JobStatus, NodeExecutionStatus } from "~/protocols/nodeblocks/engine/en
 import { ServerEngineEventTypes } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { createStore, SetStoreFunction } from "solid-js/store";
 import { batch } from "solid-js";
+import { SerializedDataTypeValue } from "~/protocols/nodeblocks/manifests/node/datatype-value-meta";
 
 // TODO: get node execution order
 
 interface SceneRuntimeContext {
     jobStatus: JobStatus,
     // node uid -> slot id -> output
-    nodeOutputs: Record<string, Record<string, any>>,
+    nodeOutputs: Record<string, Record<string, SerializedDataTypeValue>>,
     nodeStatuses: Record<string, NodeExecutionStatus>,
     targetedNodes?: string[]
     // This is plural since we might start processing multiple nodes at once
