@@ -3,6 +3,7 @@ import { DefaultRenderers } from "~/protocols/nodeblocks/manifests/node/datatype
 import { DefaultDataTypes } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
 import { ArrayView } from "./array-view";
 import { ScalarView } from "./scalar-view";
+import { MarkdownText } from "~/feature/editor/components/markdown-text";
 
 
 export interface DataTypeValuePack {
@@ -24,7 +25,10 @@ export const DataTypeValueSelector = (props: { value?: DataTypeValuePack; }) => 
                         <ArrayView output_value={props.value} />
                     </Match>
                     <Match when={output().renderer === DefaultRenderers.TEXT}>
-                        <div class="custom-view">JSON: {JSON.stringify(props.value?.value)}</div>
+                        <MarkdownText text={JSON.stringify(props.value?.value)}/>
+                        {/* <div class="custom-view">
+                            JSON: {JSON.stringify(props.value?.value)}
+                        </div> */}
                     </Match>
                     <Match when={output().renderer === DefaultRenderers.NOT_IMPLEMENTED}>
                         <span>Can't render Unknown Type</span>

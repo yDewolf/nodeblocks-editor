@@ -66,7 +66,7 @@ export class NotificationFactory {
                 return NotificationLevel.DEBUG;
 
             case ServerEngineEventTypes.NODE_STATUS:
-                if (payload.status === NodeExecutionStatus.FAILED) return NotificationLevel.ERROR;
+                if (payload.status === NodeExecutionStatus.FAILED) return NotificationLevel.DEBUG; // FIXME: talvez colocar como ERROR apenas quando o node não dá mais nenhum evento de erro
                 if (payload.status === NodeExecutionStatus.SKIPPED) return NotificationLevel.WARNING;
                 return NotificationLevel.DEBUG;
             default:
