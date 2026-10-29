@@ -3,6 +3,7 @@ import { JSX } from "solid-js/jsx-runtime";
 import { isServer } from "solid-js/web";
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
 import { DocsController } from "./docs-controller";
+import { useLocation, useNavigate } from "@solidjs/router";
 
 const DocsContext = createContext<DocsController>();
 export function DocsProvider(props: { controller: DocsController, children: JSX.Element; }) {
@@ -25,30 +26,34 @@ export const DocsUrlSync = () => {
     if (isServer) return;
 
     const docs = useDocs();
-    const handleHashChange = () => {
-        const route = DocsPathUtils.parseHash(window.location.hash);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    createEffect(() => {
+        const hash = location.hash.slice(1);
+        const route = DocsPathUtils.parseHash(hash);
+
         if (route?.path !== docs.route?.path || route?.section !== docs.route?.section) {
             docs.setRoute(route);
         }
-    };
-
-    handleHashChange();
-    window.addEventListener("hashchange", handleHashChange);
-    onCleanup(() => window.removeEventListener("hashchange", handleHashChange));
+    });
 
     createEffect(() => {
         const currentRoute = docs.route;
+        
         if (!currentRoute) {
-            window.location.hash = "";
+            if (location.hash) {
+                navigate(".", { replace: true, scroll: false });
+            }
             return;
         }
 
         const newHash = DocsPathUtils.buildHash(currentRoute);
-        const currentHash = window.location.hash.slice(1);
+        const currentHash = location.hash.slice(1);
 
-        if (newHash !== currentHash) {
-            window.history.pushState(null, "", `#${newHash}`);
-        }
+        // if (newHash !== currentHash) {
+        //     navigate(`#${newHash}`, { replace: false, scroll: false });
+        // }
     });
 
     return null;

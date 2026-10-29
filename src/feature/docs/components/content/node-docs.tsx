@@ -195,7 +195,7 @@ export const NodeSlotSection = (props: {
 const ParameterDropdownItem = (props: {
     param_id: string;
     param_spec: ParameterSpec;
-    param_meta: ParameterMeta;
+    param_meta?: ParameterMeta;
     devMode: boolean;
 }) => {
     const badges = createMemo<DropdownBadge[]>(() => {
@@ -236,7 +236,7 @@ const ParameterDropdownItem = (props: {
                 <div class="fill keep row-container space-between">
                     <div class="docs-slot-header">
                         <span>
-                            {props.param_meta.capitalized_name !== "" 
+                            {props.param_meta?.capitalized_name !== "" 
                                 ? props.param_meta.capitalized_name 
                                 : props.param_id}
                         </span>
