@@ -16,6 +16,7 @@ export enum DefaultRenderers {
     SCALAR = "scalar",
     ARRAY = "array",
     TEXT = "text",
+    FILE = "file",
     NOT_IMPLEMENTED = "not_implemented"
 }
 
