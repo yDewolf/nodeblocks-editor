@@ -39,7 +39,7 @@ export default function SceneEditor() {
         >
             <SceneArtifactProvider artifactController={artifactController}>
                 <EditorProvider packageManager={packageManager} appSession={appSession} sceneId={sceneId}>
-                        <EditorSetup sceneId={sceneId}/>
+                    <EditorSetup sceneId={sceneId}/>
                 </EditorProvider>
             </SceneArtifactProvider>
         </Show>

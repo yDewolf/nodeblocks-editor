@@ -53,23 +53,25 @@ export const HomeLeftTab = (props: {
                     </div>
                     
                 </div>
-                <For each={props.routes}>
-                    {(route) => {
-                        const isActive = () => location.pathname === route.route;
-                        return (
-                            <a 
-                                href={route.route} 
-                                class="home-left-tab-route keep row-container align-center"
-                                classList={{selected: isActive()}}                    
-                            >
-                                {route.iconElement()}
-                                <span class="home-route-label">
-                                    {route.label}
-                                </span>
-                            </a>
-                        )
-                    }}
-                </For>
+                <div class="keep container fill">
+                    <For each={props.routes}>
+                        {(route) => {
+                            const isActive = () => location.pathname === route.route;
+                            return (
+                                <a 
+                                    href={route.route} 
+                                    class="home-left-tab-route keep row-container align-center"
+                                    classList={{selected: isActive()}}                    
+                                >
+                                    {route.iconElement()}
+                                    <span class="home-route-label">
+                                        {route.label}
+                                    </span>
+                                </a>
+                            )
+                        }}
+                    </For>
+                </div>
             </div>
         </Show>
     )
