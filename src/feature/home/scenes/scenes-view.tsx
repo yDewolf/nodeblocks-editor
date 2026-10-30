@@ -10,6 +10,7 @@ import { SceneCard } from "./components/scene-card";
 
 import RefreshIcon from '~/assets/icons/refresh.svg';
 import "~/style/screens/home/scenes.css";
+import { SceneEditModal } from "./components/scene-edit-modal";
 
 export const ScenesRoute: ParentComponent = (props) => {
     const appSession = useAppSession();
@@ -37,6 +38,8 @@ export const ScenesView = (props: {
     sceneController: SceneHTTPController
 }) => {
     const [sceneName, setSceneName] = createSignal<string>("");
+    const [isEditModalOpen, setIsEditModalOpen] = createSignal(false);
+    const [activeSceneId, setActiveSceneId] = createSignal<string | null>(null);
 
     createEffect(() => {
         props.sceneController.fetchScenes(props.sessionData?.user_id);
@@ -44,6 +47,16 @@ export const ScenesView = (props: {
         
     const fetchSceneData = async (sceneId: string) => {
         return props.sceneController.fetchSceneData(sceneId, props.sessionData?.user_id);
+    }
+
+    const editScene = (sceneId: string) => {
+        setActiveSceneId(sceneId);
+        setIsEditModalOpen(true);
+    }
+
+    const closeModal = () => {
+        setIsEditModalOpen(false);
+        setActiveSceneId(null);
     }
 
     return (
@@ -93,9 +106,28 @@ export const ScenesView = (props: {
             }>
                 <div class="scene-card-grid">
                     <For each={props.sceneController.scenes}>
-                        {(scene) => <SceneCard listedScene={scene} fetchSceneData={fetchSceneData}/>}
+                        {(scene) => <SceneCard listedScene={scene} fetchSceneData={fetchSceneData} editScene={editScene}/>}
                     </For>
                 </div>
+            </Show>
+            
+            <Show when={props.sessionData}>
+                {(sessionData) => 
+                    <Show when={activeSceneId()}>
+                        {(sceneId) => {
+                            const listedScene = props.sceneController.sceneIndex[sceneId()];
+                            return (
+                                <SceneEditModal 
+                                    sceneController={props.sceneController}
+                                    sessionData={sessionData()}
+                                    listedScene={listedScene}
+                                    closeModal={closeModal} 
+                                    isModalOpened={isEditModalOpen}
+                                />
+                            )
+                        }}
+                    </Show>
+                }
             </Show>
         </div>
     )

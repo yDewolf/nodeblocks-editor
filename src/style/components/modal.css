@@ -1,0 +1,39 @@
+.modal-overlay {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-overlay-background {
+    z-index: -1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: var(--dark-overlay-highlight);
+    opacity: 0.5;
+}
+
+.modal-content-holder {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 10px;
+
+    min-width: 350px;
+    height: 50vh;
+
+    padding: 24px;
+    background-color: var(--overlay-background);
+    border: 1px solid var(--stroke-color);
+}
+
+.modal-content {
+    overflow-y: scroll;
+}
