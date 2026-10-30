@@ -2,6 +2,7 @@ import { JSXElement, ParentComponent } from "solid-js";
 import { useAppSession } from "~/network/app-session-provider"
 import { HomeLeftTab } from "./components/home-left-tab";
 import FileIcon from '~/assets/icons/file.svg';
+import DocsIcon from '~/assets/icons/book.svg';
 
 export const Home: ParentComponent = (props) => {
     return (
@@ -18,12 +19,16 @@ export interface HomeRouteConfig {
 }
 
 const HomeView: ParentComponent = (props) => {
-    const appSession = useAppSession();
     const routes: HomeRouteConfig[] = [
         {
             iconElement: () => <FileIcon class="smaller-icon" />,
             label: "Scenes",
             route: "/scenes"
+        },
+        {
+            iconElement: () => <DocsIcon class="smaller-icon"/>,
+            label: "Documentation",
+            route: "/docs"
         }
     ]
 

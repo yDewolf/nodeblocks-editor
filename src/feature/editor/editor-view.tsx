@@ -10,7 +10,7 @@ import { SceneCanvasProvider } from '../scene/scene-canvas-context';
 import { SceneProvider } from '../scene/scene-context';
 import { SceneRuntimeProvider } from '../scene/scene-runtime-context';
 import { NotificationProvider } from './contexts/notification-context';
-import { EditorDocsView } from '../docs/docs-view';
+import { DocsView } from '../docs/docs-view';
 import MinimizeIcon from '~/assets/icons/minimize.svg';
 import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import { useDocs } from '../docs/docs-context';
@@ -19,8 +19,8 @@ import { editorSettings } from './editor-settings';
 import { ClientSceneCommandTypes, CommandGroups } from '~/protocols/nodeblocks/network/client-command-protocol';
 import { nanoid } from 'nanoid';
 import { setMainCameraPos, setMainCameraZoom } from './editor-state';
-import "~/style/screens/editor.css";
 import { EditorLoadingOverlay } from './components/subpanels/editor-loading-overlay';
+import "~/style/screens/editor.css";
 
 export const EditorView = () => {
     const editor = useEditor();
@@ -30,7 +30,7 @@ export const EditorView = () => {
     const [world_space_ref, setWorldSpaceRef] = createSignal<HTMLDivElement | undefined>(undefined);
     
     // FIXME: Implement a better way of indexing pages on a pageviewer and accessing them
-    const DocsCallback = () => <EditorDocsView />;
+    const DocsCallback = () => <DocsView />;
     const docsPage = {
         page_title: "Documentation",
         view_displayer_css: "docs-view",

@@ -17,7 +17,6 @@ import { useNotifications } from "~/feature/editor/contexts/notification-context
 import { editorSettings } from "~/feature/editor/editor-settings";
 import { NodeInstanceFactory } from "~/feature/editor/engine/helpers/node-instance-factory";
 import { NodeParamField } from "./node-field";
-import { useInputManager } from "~/utils/keybinds/input-provider";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -182,7 +181,6 @@ const NodeHeader = (props: {
     setIsHovered: (value: boolean) => void,
 }) => {
     const eventManager = useEventManager();
-    const inputManager = useInputManager();
     return (
         <div
             class="node-header space-between"
