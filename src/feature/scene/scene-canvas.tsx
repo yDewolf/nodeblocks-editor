@@ -27,7 +27,7 @@ export const SceneCanvasSetup = (props: {
     return (
         <InputManagerProvider manager={new InputManager()}>
             <ReadonlySceneProvider scene={scene}>
-                <SceneCanvasProvider centeredCamera={props.centerCamera}>
+                <SceneCanvasProvider>
                     <SceneCanvas/>
                 </SceneCanvasProvider>
             </ReadonlySceneProvider>

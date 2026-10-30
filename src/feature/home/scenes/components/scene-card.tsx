@@ -6,6 +6,7 @@ import { createSignal, onMount, Show } from "solid-js";
 import { SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { hasPermission, ScenePermission } from "~/network/protocols/scene-perms";
 import ToolIcon from '~/assets/icons/tool.svg';
+import { ScenePreview, SimplifiedScenePreview } from "~/feature/scene/scene-preview";
 
 export const SceneCard = (props: {
     listedScene: ListedScene,
@@ -28,7 +29,8 @@ export const SceneCard = (props: {
         <div class="scene-card">
             <div class="scene-preview" data-theme="dark">
                 <Show when={sceneData()}>
-                    {(data) => <SceneCanvasSetup sceneData={data()} centerCamera={true}/>}
+                    {(data) => <SimplifiedScenePreview sceneData={data()}/>}
+                    {/* {(data) => <SceneCanvasSetup sceneData={data()} centerCamera={true}/>} */}
                 </Show>
             </div>
             <div class="scene-info">
