@@ -42,7 +42,6 @@ export class DocsController {
     get route() { return this._docs_route(); }
     protected set route(new_route: DocsRoute | undefined) { 
         this._set_docs_route(new_route); 
-
         if (new_route) {
             if (!this.opened_tabs.find((value) => value === new_route.path)) {
                 this.opened_tabs = [...this.opened_tabs, new_route.path];
@@ -56,7 +55,6 @@ export class DocsController {
             this.route = undefined;
             return
         };
-
         this.route = {path: path}
     }
     get docs_section() { return this.route?.section; }
@@ -142,5 +140,10 @@ export class DocsController {
 
     public setRoute(route: DocsRoute | undefined) {
         this.route = route;
+    }
+
+    public async fetchDocByPath(path: string) {
+        const data = await this.resolver.resolve(path);
+        return data;
     }
 }

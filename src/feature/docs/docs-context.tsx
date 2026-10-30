@@ -29,21 +29,35 @@ export const DocsUrlSync = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    let isSyncing = false;
     createEffect(() => {
         const hash = location.hash.slice(1);
-        const route = DocsPathUtils.parseHash(hash);
+        if (isSyncing) return;
 
-        if (route?.path !== docs.route?.path || route?.section !== docs.route?.section) {
+        const route = DocsPathUtils.parseHash(hash);
+        const currentRoute = docs.route;
+
+        if (route?.path !== currentRoute?.path || route?.section !== currentRoute?.section) {
+            isSyncing = true;
             docs.setRoute(route);
+            
+            queueMicrotask(() => {
+                isSyncing = false;
+            });
         }
     });
 
     createEffect(() => {
         const currentRoute = docs.route;
-        
+        if (isSyncing) return;
+
         if (!currentRoute) {
             if (location.hash) {
+                isSyncing = true;
                 navigate(".", { replace: true, scroll: false });
+                queueMicrotask(() => {
+                    isSyncing = false;
+                });
             }
             return;
         }
@@ -51,9 +65,13 @@ export const DocsUrlSync = () => {
         const newHash = DocsPathUtils.buildHash(currentRoute);
         const currentHash = location.hash.slice(1);
 
-        // if (newHash !== currentHash) {
-        //     navigate(`#${newHash}`, { replace: false, scroll: false });
-        // }
+        if (newHash !== currentHash) {
+            isSyncing = true;
+            navigate(`#${newHash}`, { replace: false, scroll: false });
+            queueMicrotask(() => {
+                isSyncing = false;
+            });
+        }
     });
 
     return null;

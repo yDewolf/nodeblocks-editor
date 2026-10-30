@@ -50,11 +50,6 @@ const EditorSetup = (props: {sceneId: string}) => {
     const editor = useEditor();
     onMount(async () => {
         await editor.connectToScene(props.sceneId);
-        editor.sceneConnection.sendCommand({
-            cmd_uid: nanoid(5),
-            cmd_group: CommandGroups.SCENE,
-            type: ClientSceneCommandTypes.GET_SCENE_DATA
-        })
     }) 
 
     return (
