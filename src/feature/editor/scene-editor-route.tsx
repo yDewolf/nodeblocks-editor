@@ -6,8 +6,6 @@ import { InputManagerProvider, DefinedInputScope } from "~/utils/keybinds/input-
 import { DocsProvider, DocsUrlSync } from "../docs/docs-context";
 import { MetadataProvider } from "../metadata/metadata-context";
 import { EditorView } from "./editor-view";
-import { nanoid } from "nanoid";
-import { CommandGroups, ClientSceneCommandTypes } from "~/protocols/nodeblocks/network/client-command-protocol";
 import { useAppSession } from "~/network/app-session-provider";
 import { usePackageManager } from "./contexts/package-manager-context";
 import { SceneArtifactProvider } from "./contexts/artifact-context";

@@ -10,7 +10,14 @@
         overflow-y: scroll;
     }
     
-    .docs-sidebar {
+    /* .docs-left-panel {
+        grid-column: 2;
+    }
+    .docs-content {
+        grid-row: 1;
+    } */
+
+    .docs-sidebar {        
         display: grid;
         height: stretch;
         gap: 4px;
@@ -53,7 +60,6 @@
     }
     
     .docs-left-panel {
-        height: 80vh;
         background-color: var(--dark-overlay-background);
         width: auto;
     }
@@ -168,7 +174,7 @@
         .field-holder {background-color: var(--overlay-highlight);}
     }
     
-    @media (max-width: 1024px) {
+    @media (max-width: 768px) {
         .docs-left-panel {
             height: auto;
         }
