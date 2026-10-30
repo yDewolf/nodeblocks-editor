@@ -80,7 +80,7 @@ export class SceneEditor {
         this._toolController = new ToolController(this.globalInputContext);
         this._toolController.add_tool(new SelectionTool(this.scene, this.actionController, this.selectionController, this._elementController, this._inputManager));
         this.toolController.add_tool(new DocsTool(this.docsController));
-        this._toolController.change_tool(0)
+        this._toolController.change_tool(0);
     }
 
     // Getters
@@ -111,6 +111,7 @@ export class SceneEditor {
     // Methods
 
     public async connectToScene(scene_uid: string) {
+        this.stateController.setIsLoadingScene(true);
         await this._sceneConnection.connect(scene_uid);
     }
 

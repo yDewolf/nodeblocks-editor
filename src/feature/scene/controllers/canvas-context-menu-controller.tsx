@@ -40,7 +40,7 @@ export class CanvasContextMenuController {
             
             let nodeIds: string[] = [];
             this.selectionController.selected_nodes.forEach((node) => nodeIds.push(node.uid));
-            
+            // TODO: mark dependencies as target
             items.push({
                 id: "target",
                 label: "Mark as target" + nodeCountString,
@@ -56,7 +56,7 @@ export class CanvasContextMenuController {
                     this.stateController.requestUpdateTargetNodes(nodeIds)
                 }
             });
-
+            
             let targetedCount = 0;
             nodeIds.forEach((id) => {
                 if (this.stateController.isNodeTargeted(id)) {

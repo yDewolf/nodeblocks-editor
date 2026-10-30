@@ -17,6 +17,9 @@ export class StateController {
 
     private _target_iterations: () => number | undefined;
     private _set_target_iterations: (state: number | undefined) => void;
+    
+    private _is_loading_scene: () => boolean;
+    private _set_is_loading_scene: (value: boolean) => void;
 
     public constructor(
         private readonly _client: SceneConnectionManager
@@ -25,10 +28,14 @@ export class StateController {
         [this._runtime_mode, this._set_runtime_mode] = createSignal(SceneWorkerExecutionMode.GRAPH_STEP);
         [this._target_nodes, this._set_target_nodes] = createSignal<string[] | undefined>(undefined);
         [this._target_iterations, this._set_target_iterations] = createSignal<number | undefined>(undefined);
+        [this._is_loading_scene, this._set_is_loading_scene] = createSignal<boolean>(false);
         this.setup_handlers();
     }
 
     private setup_handlers() {
+        this._client.onCommandResponse(ServerCmdResponseTypes.GET_SCENE_DATA, (msg) => {
+            this.setIsLoadingScene(false);
+        });
         this._client.onCommandResponse(ServerCmdResponseTypes.EXECUTION_STATE_SYNC, (message) => {
             const runtime_state = message.response_payload.state as SceneWorkerExecutionState;
             const runtime_mode = message.response_payload.mode as SceneWorkerExecutionMode;
@@ -41,16 +48,21 @@ export class StateController {
         });
     }
 
+    get isLoadingScene() { return this._is_loading_scene(); }
+
     get runtime_state() { return this._runtime_state();}
     get runtime_mode() { return this._runtime_mode(); }
 
     get target_nodes() { return this._target_nodes(); }
     get target_iterations() { return this._target_iterations(); }
 
+    public setIsLoadingScene(value: boolean) {
+        this._set_is_loading_scene(value);
+    }
+
     public isRunning = () => {
         return this.runtime_state == SceneWorkerExecutionState.RUNNING 
             || this.runtime_state == SceneWorkerExecutionState.RUNNING_CONTINUOUS
-
     }
 
     public requestExecutionConfigUpdate(

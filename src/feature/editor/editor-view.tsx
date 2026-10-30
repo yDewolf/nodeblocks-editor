@@ -12,7 +12,7 @@ import { SceneRuntimeProvider } from '../scene/scene-runtime-context';
 import { NotificationProvider } from './contexts/notification-context';
 import { EditorDocsView } from '../docs/docs-view';
 import MinimizeIcon from '~/assets/icons/minimize.svg';
-import { createEffect, createSignal, onMount } from 'solid-js';
+import { createEffect, createSignal, onMount, Show } from 'solid-js';
 import { useDocs } from '../docs/docs-context';
 import { DocsElementIndicator } from './components/selected-docs-indicator';
 import { editorSettings } from './editor-settings';
@@ -20,6 +20,7 @@ import { ClientSceneCommandTypes, CommandGroups } from '~/protocols/nodeblocks/n
 import { nanoid } from 'nanoid';
 import { editorState, setMainCameraPos, setMainCameraZoom } from './editor-state';
 import "~/style/screens/editor.css";
+import { EditorLoadingOverlay } from './components/subpanels/editor-loading-overlay';
 
 export const EditorView = () => {
     const editor = useEditor();
@@ -81,6 +82,7 @@ export const EditorView = () => {
                             onPointerMove={(e) => editor.toolController.current_tool?.globalOnPointerMove(e)}
                             >
                             <EditorSceneCanvas setWorldSpaceRef={setWorldSpaceRef}></EditorSceneCanvas>
+                            <EditorLoadingOverlay />
                             <div
                                 class="editor-ui" 
                                 onPointerMove={(e) => editor.eventManager.generalizedEventHandler({event: e}, InputEvents.POINTER_MOVING)}
