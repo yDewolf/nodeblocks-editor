@@ -161,8 +161,8 @@ export class CanvasElementController {
         const el = slot.element;
         if (!el) {
             const world_pos = {
-                x: parent_node.position.x + (slot.isInput == false ? parent_node.size.x : 0),
-                y: parent_node.position.y + (parent_node.size.y / 2)
+                x: parent_node.position.x + (parent_node.size.x * ((slot.anchor.x + 1) / 2 )),
+                y: parent_node.position.y + (parent_node.size.y * ((slot.anchor.y + 1) / 2))
             };
             slot.worldPos = world_pos;
             return world_pos;

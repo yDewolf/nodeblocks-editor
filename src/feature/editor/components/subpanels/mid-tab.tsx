@@ -1,5 +1,5 @@
 import { ThemeButton } from "../../../../components/buttons/theme-button";
-import { SceneMinimap } from "../scene-minimap";
+import { SceneMinimap } from "../../../scene/components/scene-minimap";
 import { EditorToolbar } from "./component/editor-toolbar";
 import { PageView, PageViewer, StaticViewDisplayer } from '../../../../components/page-controller';
 import { Show } from "solid-js";

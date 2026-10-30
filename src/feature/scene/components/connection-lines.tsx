@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { createMemo, Show } from "solid-js";
 import { SceneConnection } from "~/feature/scene/objects/scene-connection";
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
@@ -93,10 +93,12 @@ export const ConnectionLines = (props: { connection: SceneConnection, onDisconne
                     ▶
                 </textPath>
             </text>
-            <path class="clickable-path"
-                onContextMenu={handleContextMenu}
-                d={path()}
-            />
+            <Show when={props.onDisconnect}>
+                <path class="clickable-path"
+                    onContextMenu={handleContextMenu}
+                    d={path()}
+                />
+            </Show>
             <path class="connection-path"
                 d={path()}
                 marker-end="url(#arrowhead)"

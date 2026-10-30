@@ -49,7 +49,7 @@ export class SceneNode {
         
         [this._uiStore, this._setUiStore] = createStore<NodeUIState>({
             isSelected: false,
-            size: { x: 100, y: 150 },
+            size: { x: 100, y: 120 },
             uiPosition: instance.scene_data.position,
             minSize: { x: 0, y: 0 }
         });

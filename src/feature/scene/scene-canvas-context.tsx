@@ -11,36 +11,61 @@ interface SceneCanvasContextValue {
     conns: Record<string, SceneConnection>
     canvasSpace: CanvasSpace
     elementController: CanvasElementController
+
+    centerCamera: () => void
 }
 
 export const SceneCanvasContext = createContext<SceneCanvasContextValue>();
 export const SceneCanvasProvider: ParentComponent<{
     canvasSpace?: CanvasSpace,
     elementController?: CanvasElementController,
-    centeredCamera?: boolean
 }> = (props) => {
     const { scene } = useSceneReadonly();
     
     const canvasSpace = props.canvasSpace ?? new CanvasSpace();
     const elementController = props.elementController ?? new CanvasElementController(scene, canvasSpace.grid);
+
+    const centerCamera = () => {
+        const nodes = Object.values(elementController.nodes);
+        if (nodes.length > 0) {
+            let [minX, maxX] = [Infinity, -Infinity];
+            let [minY, maxY] = [Infinity, -Infinity];
+
+            for (const node of nodes) {
+                const pos = node.position;
+                
+                minX = Math.min(minX, pos.x);
+                maxX = Math.max(maxX, pos.x + node.size.x);
+                minY = Math.min(minY, pos.y);
+                maxY = Math.max(maxY, pos.y + node.size.y);
+            }
+
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+            const graphWidth = maxX - minX;
+            const graphHeight = maxY - minY;
+
+            const size = canvasSpace.camera.size;
+            const padding = 20;
+
+            const zoomX = (size.x - padding) / Math.max(graphWidth, 50);
+            const zoomY = (size.y - padding) / Math.max(graphHeight, 50);
+            
+            const newZoom = Math.max(0.1, Math.min(2.0, Math.min(zoomX, zoomY)));
+            canvasSpace.camera.zoom = newZoom;
+            canvasSpace.camera.updateOffset({
+                x: centerX - (size.x / 2) / newZoom,
+                y: centerY - (size.y / 2) / newZoom
+            });
+        }
+    }
     const value: SceneCanvasContextValue = {
         get nodes() { return elementController.nodes; },
         get conns() { return elementController.conns; },
         canvasSpace,
-        elementController
+        elementController,
+        centerCamera
     };
-
-    if (props.centeredCamera) {
-        let totalPos: Vector2 = {x: 0, y: 0}
-        const nodes = Object.values(scene.graph.allNodes)
-        const nodeCount = nodes.length;
-        for (const node of nodes) {
-            totalPos.x += node.scene_data.position.x;
-            totalPos.y += node.scene_data.position.y;
-        }
-        const avgPos: Vector2 = {x: totalPos.x / nodeCount, y: totalPos.y / nodeCount}
-        canvasSpace.camera.updateOffset(avgPos);
-    }
 
     return (
         <SceneCanvasContext.Provider value={value}>

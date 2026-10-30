@@ -19,8 +19,14 @@
     .scene-card .scene-preview {
         width: stretch;
         height: stretch;
-        background-color: var(--overlay-highlight);
         border-radius: 12px 12px 0 0;
+
+        background-color: var(--overlay-background);
+        border: 1px solid var(--stroke-color);
+    }
+
+    .scene-preview .minimap-nodes rect {
+        fill: var(--dark-overlay-highlight);
     }
 
     .scene-card .scene-info {
