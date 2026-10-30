@@ -145,4 +145,21 @@
   .viewport.moving-mode {
     cursor: grabbing;
   }
+
+
+  @media (max-width: 1024px) {
+      .editor-view .docs-left-panel {
+          height: auto;
+      }
+  
+      .editor-view .docs-sidebar {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: minmax(0, 1fr) minmax(0, 48px);
+      }
+  
+      .editor-view .docs-view-body {
+          grid-template-columns: 1fr;
+          grid-template-rows: minmax(0, 150px) minmax(0, 1fr);
+      }
+  }
 }
