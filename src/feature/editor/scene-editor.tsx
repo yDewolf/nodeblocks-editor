@@ -24,6 +24,7 @@ import { DocsController } from '../docs/docs-controller';
 import { nanoid } from 'nanoid';
 import { ClientSceneCommandTypes, CommandGroups } from '~/protocols/nodeblocks/network/client-command-protocol';
 import { SceneExecutionCmdTypes } from '../../protocols/nodeblocks/network/client-command-protocol';
+import { createSceneState, editorState } from './editor-state';
 
 export class SceneEditor {
     private _scene: NodeScene;
@@ -56,7 +57,7 @@ export class SceneEditor {
 
         this._scene = new NodeScene(_packageManager.registry, new PackageNodeProvider(_packageManager), this.sceneId);
         this._sceneConnection = new SceneConnectionManager(_appSession, _packageManager);
-        this._sceneConnection.onConnect(this.onSceneConnect);
+        this._sceneConnection.onConnect(this.onSceneConnect.bind(this));
 
         this._actionController = new ActionController(this._scene, this._sceneConnection);    
         this._selectionController = new  SelectionController(
@@ -126,6 +127,18 @@ export class SceneEditor {
             cmd_group: CommandGroups.EXECUTION,
             type: SceneExecutionCmdTypes.CHECK_EXECUTION_STATE
         });
+
+        const space = this.selectionController.space;
+        if (connection.sceneId) {
+            if (!(connection.sceneId in editorState.scenes)) {
+                createSceneState(connection.sceneId);
+            }
+            space.camera.updateOffset(
+                editorState.scenes[connection.sceneId]?.mainCameraPos
+                ?? {x: 0, y: 0}
+            );
+            space.camera.zoom = editorState.scenes[connection.sceneId]?.mainCameraZoom ?? 1.0;
+        }
     }
 
     // Scene Events
