@@ -25,6 +25,9 @@ export class AppSessionManager {
 
     get userSession() { return this._sessionStore.user_session; }
     public setUserSession(user_session?: UserSessionData | null) {
+        if (!user_session?.user_id) {
+            return;
+        }
         this._setSessionStore("user_session", user_session ?? undefined);
     }
 

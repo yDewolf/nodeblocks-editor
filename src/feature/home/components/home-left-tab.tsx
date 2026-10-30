@@ -27,7 +27,7 @@ export const HomeLeftTab = (props: {
                                 {(appSession.userSession?.user_id ?? "?")[0]}
                             </div>}
                         >
-                            <Show when={appSession.userSession} fallback={
+                            <Show when={appSession.isAuthenticated()} fallback={
                                 <div class="container">
                                     {/* TODO: arrumar isso aqui porque tecnicamente depende */}
                                     {/* de importar o css do editor */}

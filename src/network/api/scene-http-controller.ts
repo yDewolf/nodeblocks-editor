@@ -24,7 +24,7 @@ export class SceneHTTPController {
         [this._isLoading, this._setIsLoading] = createSignal<boolean>(false);
     }
 
-    public async fetchScenes(userId: string, password?: string): Promise<ListedScene[]> {
+    public async fetchScenes(userId?: string, password?: string): Promise<ListedScene[]> {
         this._setIsLoading(true);
         try {
             const response = await fetch(this.appSession.baseHttpUrl + "/api/scenes", {
@@ -56,7 +56,7 @@ export class SceneHTTPController {
         }
     }
 
-    public async fetchSceneData(sceneId: string, userId: string, password?: string): Promise<SceneData> {
+    public async fetchSceneData(sceneId: string, userId?: string, password?: string): Promise<SceneData> {
         try {
             const response = await fetch(this.appSession.baseHttpUrl + `/api/scene/${sceneId}`, {
                 method: "POST",
