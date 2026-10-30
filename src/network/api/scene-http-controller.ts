@@ -94,15 +94,17 @@ export class SceneHTTPController {
         }
     }
 
-    public async createScene(userId: string, sceneId: string) {
+    public async createScene(userId: string, sceneId: string, defaultPerm?: ScenePermission) {
         try {
-            const response = await fetch(this.appSession.baseHttpUrl + `/api/scene/create/${sceneId}`, {
+            const response = await fetch(this.appSession.baseHttpUrl + "/api/scene/create", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     user_id: userId,
+                    scene_id: sceneId,
+                    default_perm: defaultPerm
                 })
             });
 

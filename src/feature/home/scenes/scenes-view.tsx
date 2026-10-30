@@ -11,6 +11,7 @@ import { SceneCard } from "./components/scene-card";
 import RefreshIcon from '~/assets/icons/refresh.svg';
 import "~/style/screens/home/scenes.css";
 import { SceneEditModal } from "./components/scene-edit-modal";
+import { ScenePermissionsMenu } from './components/scene-perms-menu';
 
 export const ScenesRoute: ParentComponent = (props) => {
     const appSession = useAppSession();
@@ -70,24 +71,38 @@ export const ScenesView = (props: {
                         <Show when={props.sessionData} fallback={
                             <span>You must authenticate before creating scenes</span>
                         }>
-                            {(sessionData) => <>
-                                <div class="create-scene-action container">
-                                    <div class="field-grid">
-                                        <label class="field-label" for="scene-name">Scene Name:</label>
-                                        <input class="field-input" type="text" id="scene-name" oninput={(e) => setSceneName(e.target.value)} autocomplete="off"/>
+                            {(sessionData) => {
+                                const [defaultPerm, setDefaultPerm] = createSignal<number>(0);
+                                return <>
+                                    <div class="create-scene-action container">
+                                        <div class="field-grid">
+                                            <label class="field-label" for="scene-name">Scene Id:</label>
+                                            <input class="field-input" type="text" id="scene-name" oninput={(e) => setSceneName(e.target.value)} autocomplete="off"/>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row-container" style={{"justify-content": "right"}}>
-                                    <button 
-                                        class="icon-button" 
-                                        onclick={() => {
-                                            props.sceneController.createScene(sessionData().user_id, sceneName())
-                                        }}
-                                        >
-                                        Criar <ArrowRightIcon class="smaller-icon"/>
-                                    </button>
-                                </div>
-                            </>}
+                                    <div class="text-section">
+                                        <span>Default Permissions</span>
+                                        <ScenePermissionsMenu 
+                                            sessionData={sessionData()}
+                                            initialPerms={0}
+                                            sceneController={props.sceneController}
+
+                                            perms={defaultPerm}
+                                            setPerms={setDefaultPerm}
+                                        />
+                                    </div>
+                                    <div class="row-container" style={{"justify-content": "right"}}>
+                                        <button 
+                                            class="icon-button" 
+                                            onclick={() => {
+                                                props.sceneController.createScene(sessionData().user_id, sceneName(), defaultPerm())
+                                            }}
+                                            >
+                                            Create <ArrowRightIcon class="smaller-icon"/>
+                                        </button>
+                                    </div>
+                                </>
+                            }}
                         </Show>
                     </Dropdown>
                 </div>

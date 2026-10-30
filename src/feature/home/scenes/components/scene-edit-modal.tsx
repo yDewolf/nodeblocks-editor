@@ -1,4 +1,4 @@
-import { createSignal, For, onMount } from "solid-js";
+import { createSignal, For, onMount, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 import { ModalOverlay } from "~/components/modal-overlays"
 import { DropdownSection } from "~/components/panels/dropdown";
@@ -30,10 +30,6 @@ export const SceneEditModal = (props: {
         setAllScenePerms("user_permissions", userId, undefined as any);
     }
 
-    onMount(async () => {
-        setAllScenePerms(await props.sceneController.fetchAllScenePerms(props.listedScene.uid, props.sessionData.user_id));
-    })
-
     const handleSavePermissions = async () => {
         setIsSaving(true);
         if (!allScenePerms) return;
@@ -45,66 +41,73 @@ export const SceneEditModal = (props: {
         setIsSaving(false);
     }
 
+    const [isMounted, setIsMounted] = createSignal<boolean>(false);
+    onMount(async () => {
+        setAllScenePerms(await props.sceneController.fetchAllScenePerms(props.listedScene.uid, props.sessionData.user_id));
+        setIsMounted(true)
+    })
 
     return (
-        <ModalOverlay 
-            title={"Scene Edit"} 
-            closeModal={props.closeModal} 
-            isModalOpened={props.isModalOpened}
-            buttons={[
-                <button 
-                    class="text-button" 
-                    onclick={handleSavePermissions}
-                    disabled={isSaving()}
-                >
-                    {isSaving() ? "Saving..." : "Save Permissions"}
-                </button>
-            ]}
-        >
-            <div class="text-section">
-                <span>Default Permission</span>
-                <ScenePermissionsMenu 
-                    sceneId={props.listedScene.uid}
-                    sessionData={props.sessionData}
-                    initialPerms={allScenePerms?.default_perm ?? 0}
-                    sceneController={props.sceneController}
-
-                    setPermissionStore={setAllScenePerms}
-                    permissionStore={allScenePerms}
-                />
-            </div>
-            <div class="text-section">
-                <span>User Permission</span>
-                <div class="row-container fill">
-                    <input type="text" class="fill" placeholder="user id" value={currentUserId()} oninput={(e) => setCurrentUserId(e.target.value)}/>
-                    <button class="text-button" onclick={() => {
-                        if (currentUserId() == "") { return; }
-                        addUserPerm(currentUserId());
-                    }}>+</button>
-                </div>
-            </div>
-            <For each={Object.keys(allScenePerms?.user_permissions ?? {})}>
-                {(userId) => <DropdownSection
-                    header_content={() => 
-                        <div class="keep row-container space-between">
-                            <button class="icon-button" onclick={() => handleDeleteUserPerms(userId)}>
-                                <CloseIcon class="smaller-icon"/>
-                            </button>
-                            <span class="center-content">{userId}</span>
-                        </div>
-                    }
-                    content={<ScenePermissionsMenu
+        <Show when={isMounted()}>
+            <ModalOverlay 
+                title={"Scene Edit"} 
+                closeModal={props.closeModal} 
+                isModalOpened={props.isModalOpened}
+                buttons={[
+                    <button 
+                        class="text-button" 
+                        onclick={handleSavePermissions}
+                        disabled={isSaving()}
+                    >
+                        {isSaving() ? "Saving..." : "Save Permissions"}
+                    </button>
+                ]}
+            >
+                <div class="text-section">
+                    <span>Default Permission</span>
+                    <ScenePermissionsMenu 
                         sceneId={props.listedScene.uid}
                         sessionData={props.sessionData}
-                        targetUser={userId}
-                        initialPerms={allScenePerms?.user_permissions[userId] ?? 0}
+                        initialPerms={allScenePerms?.default_perm ?? 0}
                         sceneController={props.sceneController}
 
                         setPermissionStore={setAllScenePerms}
                         permissionStore={allScenePerms}
+                    />
+                </div>
+                <div class="text-section">
+                    <span>User Permission</span>
+                    <div class="row-container fill">
+                        <input type="text" class="fill" placeholder="user id" value={currentUserId()} oninput={(e) => setCurrentUserId(e.target.value)}/>
+                        <button class="text-button" onclick={() => {
+                            if (currentUserId() == "") { return; }
+                            addUserPerm(currentUserId());
+                        }}>+</button>
+                    </div>
+                </div>
+                <For each={Object.keys(allScenePerms?.user_permissions ?? {})}>
+                    {(userId) => <DropdownSection
+                        header_content={() => 
+                            <div class="keep row-container space-between">
+                                <button class="icon-button" onclick={() => handleDeleteUserPerms(userId)}>
+                                    <CloseIcon class="smaller-icon"/>
+                                </button>
+                                <span class="center-content">{userId}</span>
+                            </div>
+                        }
+                        content={<ScenePermissionsMenu
+                            sceneId={props.listedScene.uid}
+                            sessionData={props.sessionData}
+                            targetUser={userId}
+                            initialPerms={allScenePerms?.user_permissions[userId] ?? 0}
+                            sceneController={props.sceneController}
+
+                            setPermissionStore={setAllScenePerms}
+                            permissionStore={allScenePerms}
+                        />}
                     />}
-                />}
-            </For>
-        </ModalOverlay>
+                </For>
+            </ModalOverlay>
+        </Show>
     )
 }
