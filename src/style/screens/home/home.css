@@ -10,6 +10,7 @@
         height: 100vh;
         max-height: 100vh;
         
+        background-color: var(--dark-overlay-background);
         color: var(--font-color);
     }
     

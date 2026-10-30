@@ -18,7 +18,7 @@ import { DocsElementIndicator } from './components/selected-docs-indicator';
 import { editorSettings } from './editor-settings';
 import { ClientSceneCommandTypes, CommandGroups } from '~/protocols/nodeblocks/network/client-command-protocol';
 import { nanoid } from 'nanoid';
-import { editorState, setMainCameraPos, setMainCameraZoom } from './editor-state';
+import { setMainCameraPos, setMainCameraZoom } from './editor-state';
 import "~/style/screens/editor.css";
 import { EditorLoadingOverlay } from './components/subpanels/editor-loading-overlay';
 
@@ -46,9 +46,6 @@ export const EditorView = () => {
     
     const mainSpace = editor.selectionController.space;
     onMount(() => {
-        mainSpace.camera.updateOffset(editorState.mainCameraPos ?? {x: 0, y: 0});
-        mainSpace.camera.zoom = editorState.mainCameraZoom ?? 1.0;
-        
         editor.sceneConnection.sendCommand({
             cmd_uid: nanoid(),
             cmd_group: CommandGroups.SCENE, 
@@ -61,8 +58,13 @@ export const EditorView = () => {
     })
 
     createEffect(() => {
-        setMainCameraPos(mainSpace.camera.offset);
-        setMainCameraZoom(mainSpace.camera.zoom);
+        const sceneId = editor.sceneConnection.sceneId;
+        const camOfsset = mainSpace.camera.offset;
+        const camZoom = mainSpace.camera.zoom;
+        if (sceneId) {
+            setMainCameraPos(sceneId, camOfsset);
+            setMainCameraZoom(sceneId, camZoom);
+        }
         useDocs().is_docs_page_opened = isDocsPageVisible();
     });
 

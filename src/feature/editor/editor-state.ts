@@ -7,13 +7,18 @@ interface EditorState {
     mainCameraZoom?: number
 }
 
-const [editorState, _setEditorState] = makePersisted(
-    createStore<EditorState>({
+interface EditorStateStore {
+    scenes: Record<string, EditorState>
+}
 
+const [editorState, _setEditorState] = makePersisted(
+    createStore<EditorStateStore>({
+        scenes: {}
     }),
     {name: "editor-state"}
 );
 
-export const setMainCameraPos = (pos: Vector2) => _setEditorState("mainCameraPos", pos);
-export const setMainCameraZoom = (zoom: number) => _setEditorState("mainCameraZoom", zoom);
+export const createSceneState = (scene_id: string) => _setEditorState("scenes", scene_id, {})
+export const setMainCameraPos = (scene_id: string, pos: Vector2) => _setEditorState("scenes", scene_id, "mainCameraPos", pos);
+export const setMainCameraZoom = (scene_id: string, zoom: number) => _setEditorState("scenes", scene_id, "mainCameraZoom", zoom);
 export { editorState };
