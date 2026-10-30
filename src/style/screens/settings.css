@@ -1,10 +1,12 @@
-.settings-view {
-    width: fit-content;
-    height: fit-content;
-    margin: auto;
- }
-
-.settings-page {
-    min-width: 200px;
-    min-height: 200px;
+@layer custom {
+    .settings-view {
+        width: fit-content;
+        height: fit-content;
+        margin: auto;
+     }
+    
+    .settings-page {
+        min-width: 200px;
+        min-height: 200px;
+    }
 }

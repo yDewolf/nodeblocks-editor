@@ -54,12 +54,30 @@
     height: 32px;
 }
 
-.icon-button:hover {
+.icon-button:hover:not(.text-button) {
     transform: scale(1.2);
+}
+
+.icon-button:active {
+    transform: scale(1.0);
 }
 
 .icon-button.no-animation:hover {
     transform: inherit;
+}
+
+.text-button {
+    border: none;
+    padding: 4px 8px;
+    align-items: center;
+    transform: scale(1.0);
+
+    background-color: var(--dark-overlay-highlight);
+    border-radius: 8px;
+}
+
+.text-button:hover {
+    background-color: var(--overlay-highlight);
 }
 
 .selectable-button {
@@ -93,6 +111,17 @@
     background-color: var(--overlay-highlight);
     color: var(--font-color);
 }
+
+.button-with-dropdown-holder {
+    display: grid;
+}
+.button-with-dropdown-holder > .dropdown, .button-with-dropdown-holder > button {
+    grid-area: 1 / 1;
+}
+.button-with-dropdown-holder > .dropdown {
+    margin-left: 75%;
+}
+
 
 .dev-mode-button {
     svg {

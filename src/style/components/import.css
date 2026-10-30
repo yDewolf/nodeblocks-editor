@@ -2,5 +2,7 @@
 @import url("node/node.css");
 @import url("sections.css");
 @import url("dropdown.css");
+@import url("context_menu.css");
 @import url("attribute_fields.css");
 @import url("minimap.css");
+@import url("modal.css");

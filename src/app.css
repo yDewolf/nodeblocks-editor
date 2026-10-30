@@ -1,29 +1,25 @@
-@import url("style/font.css");
-@import url("style/colors.css");
-@import url("style/containers.css");
-@import url("style/components/import.css");
+@layer reset, custom;
 
-* {
-  margin: 0;
-}
+@import url("style/font.css") layer(reset);
+@import url("style/colors.css") layer(reset);
+@import url("style/components/import.css") layer(reset);
+@import url("style/containers.css") layer(reset);
 
-body {
-  font-family: Gordita, Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  overflow: hidden;
-}
-
-.move-mode {
-  cursor: grab;
-}
-
-.moving-mode {
-  cursor: grabbing;
-}
-
-.remove-input {
-  pointer-events: none;
-}
-
-.remove-input.all * {
-  pointer-events: none !important;
+@layer reset {
+  * {
+    margin: 0;
+  }
+  
+  body {
+    font-family: Gordita, Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    overflow: hidden;
+  }
+  
+  .remove-input {
+    pointer-events: none;
+  }
+  
+  .remove-input.all * {
+    pointer-events: none !important;
+  }
 }

@@ -1,0 +1,36 @@
+import { ThemeButton } from "../../../../components/buttons/theme-button";
+import { SceneMinimap } from "../../../scene/components/scene-minimap";
+import { EditorToolbar } from "./component/editor-toolbar";
+import { PageView, PageViewer, StaticViewDisplayer } from '../../../../components/page-controller';
+import { Show } from "solid-js";
+import DocsIcon from "~/assets/icons/book.svg";
+
+export const EditorMidTab = (props: {
+    page_viewer: PageViewer, 
+    docs_page: PageView
+}) => {
+    return (
+        <div class="middle-tab-holder">
+            <Show when={!props.page_viewer.current_page} fallback={
+                <StaticViewDisplayer page_viewer={props.page_viewer}/>
+            }>
+                <div class="middle-tab-overlay container">
+                    <div class="keep fill row-container space-between">
+                        <div class="theme-button-holder">
+                            <button class="icon-button" onclick={() => {
+                                props.page_viewer.current_page = props.docs_page;
+                            }}>
+                                <DocsIcon class="medium-icon"/>
+                            </button>
+                            <ThemeButton icon_class="medium-icon"/>
+                        </div>
+                        <SceneMinimap/>
+                    </div>
+                    <div class="middle-tab container">
+                        <EditorToolbar/>
+                    </div>
+                </div>
+            </Show>
+        </div>
+    )
+}

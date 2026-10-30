@@ -4,6 +4,10 @@
     align-items: center;
 }
 
+.center-content {
+    align-content: center;
+}
+
 div {
     border-radius: var(--default-border-radius);
 }

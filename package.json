@@ -2,23 +2,26 @@
   "name": "example-bare",
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev",
-    "build": "vinxi build",
-    "start": "vinxi start"
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@solid-primitives/map": "^0.7.3",
     "@solid-primitives/storage": "^4.3.4",
-    "@solidjs/start": "^1.1.0",
+    "@solidjs/router": "^1.0.0",
+    "@solidjs/start": "^2.0.0",
     "nanoid": "^5.1.9",
+    "nitro": "^3.0.260610-beta",
     "solid-js": "^1.9.5",
     "solid-transition-group": "^0.3.0",
-    "vinxi": "^0.5.7"
+    "vite": "^8.3.5"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "devDependencies": {
+    "@types/node": "^26.6.5",
     "vite-plugin-solid-svg": "^0.8.1"
   }
 }

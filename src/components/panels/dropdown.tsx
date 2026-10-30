@@ -1,0 +1,280 @@
+import { nanoid } from "nanoid";
+import { createEffect, createSignal, For, JSX, JSXElement, onMount, ParentComponent, Show } from "solid-js"
+import { Transition } from "solid-transition-group";
+import ArrowDownIcon from "~/assets/icons/arrow-down.svg";
+
+export const DropdownIcon = (props: {expanded: boolean, icon?: () => JSXElement, css_class?: string}) => {
+    return (
+        <Show when={props.icon} fallback={
+            <ArrowDownIcon
+                class={`dropdown-icon ${props.css_class}`}
+                classList={{
+                    "default-icon": !props.icon,
+                    "expanded": props.expanded
+                }}
+            />
+        }>
+            {props.icon?.()}
+        </Show>
+    )
+}
+
+export const DropdownSection = (props: {
+    id?: string,
+    header?: string, 
+    header_class?: string,
+    dropdown_class?: string, 
+    body_class?: string, 
+
+    content: JSXElement, 
+    header_content?: () => JSXElement, 
+    default_expanded?: boolean,
+    icon?: () => JSXElement,
+    icon_class?: string,
+    animated?: boolean,
+    no_button?: boolean,
+    expanded_states?: [() => boolean, (value: boolean) => void]
+}) => {
+    const [expanded, setExpanded] = props.expanded_states ?? createSignal(props?.default_expanded ?? false);
+    const no_button = props.no_button ?? false;
+    const renderContent = () => (
+        <Show when={expanded()}>
+            {props.content}
+        </Show>
+    )
+
+    let containerRef: HTMLDivElement | undefined;
+    onMount(() => {
+        if (!containerRef) return;
+
+        const originalScrollIntoView = containerRef.scrollIntoView.bind(containerRef);
+        containerRef.scrollIntoView = (arg?: boolean | ScrollIntoViewOptions) => {
+            setExpanded(true);
+
+            requestAnimationFrame(() => {
+                originalScrollIntoView(arg ?? { behavior: "smooth", block: "start" });
+            });
+        };
+    });
+    return (
+        <div ref={containerRef} class={`dropdown-section ${props.dropdown_class ?? ""}`} classList={{"expanded": expanded()}} id={props.id}>
+            <div class={`section-header ${props.header_class ?? ""}`} classList={{"expanded": expanded()}}>
+                <Show when={props.header_content} fallback={<span>{props.header}</span>}>
+                    {props.header_content?.()}
+                </Show>
+                <Show when={!no_button}>
+                    <button class="icon-button section-dropdown-icon" onclick={() => {
+                        setExpanded(!expanded());
+                    }}>
+                        <DropdownIcon expanded={expanded()} icon={props.icon} css_class={props.icon_class}/>
+                    </button>
+                </Show>
+            </div>
+            <div class={`section-body ${props.body_class ?? ""}`}>
+            
+            <Show when={props.animated} fallback={renderContent()}>
+                <Transition name="slide-fade">
+                    {renderContent()}
+                </Transition>
+            </Show>
+            </div>
+        </div>
+    )
+}
+
+export const Dropdown: ParentComponent<{
+    animated?: boolean 
+    class?: string
+    icon?: JSXElement
+    iconClass?: String
+}> = (props) => {
+    let containerRef: HTMLDivElement | undefined;
+
+    const [expanded, setExpanded] = createSignal(false);
+    const [alignRight, setAlignRight] = createSignal(false);
+    const handleOnFocusOut = (e: FocusEvent) => {
+        const nextTarget = e.relatedTarget as Node
+        if (nextTarget && !containerRef?.contains(nextTarget)) {
+            setExpanded(false);
+        }
+    }
+
+    const handleWrapperRef = (el: HTMLDivElement) => {
+        requestAnimationFrame(() => {
+            if (containerRef && el) {
+                const parentRect = containerRef.getBoundingClientRect();
+                const dropdownWidth = el.offsetWidth;
+
+                if (parentRect.left + dropdownWidth > window.innerWidth) {
+                    setAlignRight(true);
+                    return;
+                } 
+                setAlignRight(false);
+            }
+        });
+    }
+
+    const renderContent = () => (
+        <Show when={expanded()}>
+            <div
+                ref={handleWrapperRef}
+                onFocusOut={handleOnFocusOut}
+                class="dropdown-wrapper"
+                classList={{"align-right": alignRight()}}
+            >
+                <div class="dropdown-content">
+                    {props.children}
+                </div>
+            </div>
+        </Show>
+    )
+    return (
+        <div 
+            ref={containerRef}
+            onFocusOut={handleOnFocusOut}
+            class={"dropdown" + (props.class ? (" " + props.class) : "")}
+            classList={{"expanded": expanded(), "no-animation": !props.animated}}
+        >
+            <div class="dropdown-header" classList={{"expanded": expanded()}}>
+                <button class={"icon-button section-dropdown-icon" + (props.iconClass ? (" " + props.iconClass) : "")} onclick={() => {
+                    if (expanded()) setExpanded(false); else setExpanded(true);
+                }}>
+                    {props.icon ?? <DropdownIcon expanded={expanded()}/>}
+                </button>
+            </div>
+            <Show when={props.animated} fallback={
+                renderContent()
+            }>
+                <Transition name={"dropdown-slide"} >
+                    {renderContent()}
+                </Transition>
+            </Show>
+        </div>
+    )
+}
+
+export const DropdownItemButton = (props: {label: string, onClick: () => void, onMouseOver?: () => void}) => {
+    return (
+        <button
+            onclick={() => {props.onClick()}}
+            onMouseOver={() => {props.onMouseOver?.()}}
+            class="dropdown-item dropdown-button dropdown-label space-between"
+        >
+            {props.label}
+        </button>
+    )
+}
+
+export const DropdownItemInput = (props: {
+    label: string, inputType: string, 
+    onChange: JSX.ChangeEventHandlerUnion<HTMLInputElement, Event>, 
+    onMouseOver?: () => void,
+    value?: any,
+    checked?: boolean
+}) => {
+    const inputId = nanoid(4);
+    return (
+        <div
+            class="dropdown-item dropdown-button dropdown-label space-between"
+            onMouseOver={() => {props.onMouseOver?.()}}
+        >
+            <Show when={props.label != ""}>
+                <label for={inputId}>{props.label}</label>
+            </Show>
+            <input type={props.inputType} id={inputId} onchange={props.onChange} checked={props.checked} value={props.value}/>
+        </div>
+    )
+}
+
+export const Dropside = (props: {
+    label_element?: JSXElement,
+    label?: string,
+    content: JSXElement,
+    animated?: boolean,
+    visible?: () => boolean,
+    onMouseEnter?: () => void
+}) => {
+    const [localVisible, setLocalVisible] = createSignal(true);
+    const is_visible = props.visible ?? localVisible;
+
+    const renderContent = () => (
+        <Show when={is_visible()}>
+            <div 
+                class="dropside-wrapper"
+                onMouseLeave={() => setLocalVisible(false)}
+            >
+                <div class="dropside-content">
+                    {props.content}
+                </div>
+            </div>
+        </Show>
+    );
+
+    return (
+        <div 
+            class="dropdown-item"
+            classList={{
+                "expanded": is_visible()
+            }}
+            onMouseEnter={() => {
+                if (props.onMouseEnter) {
+                    props.onMouseEnter();
+                    return;
+                }
+                setLocalVisible(true)
+            }}
+        >
+            <div class="dropdown-label space-between">
+                <Show when={props.label_element} fallback={
+                    <span class="dropdown-button">
+                        {props.label}
+                    </span>
+                }>
+                    {props.label_element}
+                </Show>
+                <ArrowDownIcon class="dropside-icon"/>
+            </div>
+            <Show when={props.animated} fallback={renderContent()}>
+                <Transition name="dropside-fade">
+                    {renderContent()}
+                </Transition>
+            </Show>
+        </div>
+    );
+}
+
+export interface DropsideItemData {
+    label_element?: () => JSXElement,
+    label?: string,
+    content: () => JSXElement,
+    animated?: boolean
+}
+
+export const DropsideManager = (props: {
+    dropsides: Map<string, DropsideItemData>,
+    currentItem?: () => string | undefined,
+    setCurrentItem?: (item: string | undefined) => void,
+}) => {
+    const [currentItem, setCurrentItem] = createSignal<string | undefined>(undefined);
+    const current_item = props.currentItem ?? currentItem;
+    const set_current_item = props.setCurrentItem ?? setCurrentItem;
+
+    return (
+        <div class="dropside-manager-container">
+            <For each={Array.from(props.dropsides.entries())}>
+                {([id, data]) => {
+                    return (
+                        <Dropside 
+                            label_element={data.label_element?.()}
+                            label={data.label}
+                            content={data.content()}
+                            animated={data.animated}
+                            visible={() => current_item() === id}
+                            onMouseEnter={() => set_current_item(id)}
+                        />
+                    );
+                }}
+            </For>
+        </div>
+    );
+};

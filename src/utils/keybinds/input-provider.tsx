@@ -1,0 +1,80 @@
+import { createContext, useContext, ParentComponent, createEffect, onCleanup } from "solid-js";
+import { InputContext, KeybindHandlers } from "./input-context";
+import { InputManager } from "./input-manager";
+import { KeybindTrigger } from "./keybind-trigger";
+
+const InputManagerContext = createContext<InputManager>();
+const InputContextContainer = createContext<InputContext>();
+
+export const useInputManager = () => {
+    const manager = useContext(InputManagerContext);
+    if (!manager) throw new Error("useInputManager must be called inside an InputManagerProvider");
+    return manager;
+};
+
+export const useParentInputContext = () => useContext(InputContextContainer);
+
+export const InputManagerProvider: ParentComponent<{ manager: InputManager }> = (props) => {
+    return (
+        <InputManagerContext.Provider value={props.manager}>
+            {props.children}
+        </InputManagerContext.Provider>
+    );
+};
+
+export const DefinedInputScope: ParentComponent<{ context: InputContext }> = (props) => {
+    return (
+        <InputContextContainer.Provider value={props.context}>
+            {props.children}
+        </InputContextContainer.Provider>
+    );
+}
+
+export const InputScope: ParentComponent<{ name: string }> = (props) => {
+    const parentContext = useParentInputContext();
+    const inputManager = useInputManager();
+
+    const currentContext = new InputContext(props.name, parentContext);
+
+    createEffect(() => {
+        inputManager.setActiveContext(currentContext);
+        onCleanup(() => {
+            if (parentContext) {
+                inputManager.setActiveContext(parentContext);
+            }
+        });
+    });
+
+    return (
+        <InputContextContainer.Provider value={currentContext}>
+            {props.children}
+        </InputContextContainer.Provider>
+    );
+};
+
+export function useInputContext() {
+    return useContext(InputContextContainer);
+}
+
+export function useKeybind(name: string, triggers: KeybindTrigger[] | KeybindTrigger, handlers: KeybindHandlers) {
+    const context = useContext(InputContextContainer);
+    if (!context) {
+        console.warn(`useKeybind('${name}') called outside of <InputScope>.`);
+        return;
+    }
+
+    context.bind(name, triggers, handlers);
+    onCleanup(() => {
+        context.unbind(name);
+    });
+}
+
+export function getKeybind(name: string) {
+    const context = useContext(InputContextContainer)
+    if (!context) {
+        console.warn(`getKeybind('${name}') called outside of <InputScope>.`);
+        return;
+    }
+
+    return context.getKeybind(name);
+}

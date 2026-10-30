@@ -1,0 +1,62 @@
+@import url("home-components.css");
+
+@layer custom {
+    .home-view {
+        display: grid;
+        grid-template-columns: minmax(200px, 1fr) 5fr;
+        grid-template-rows: 1fr;
+
+        width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        
+        background-color: var(--dark-overlay-background);
+        color: var(--font-color);
+    }
+    
+    .home-content-holder, .home-left-tab {
+        padding: 12px;
+    }
+
+    .home-left-tab {
+        gap: 24px;
+
+        background-color: var(--overlay-background);
+        display: flex;
+        flex-direction: column;
+
+        width: stretch;
+        height: stretch;
+
+        border-right: 1px solid var(--stroke-color);
+    }
+
+    .home-left-tab-route {
+        padding: 0 4px;
+        text-decoration: none;
+        border-radius: 8px;
+    }
+
+    .home-left-tab-route.selected {
+        background-color: var(--dark-overlay-highlight);
+    }
+
+    .home-left-tab-route:hover {
+        background-color: var(--overlay-highlight);
+    }
+
+    .home-left-tab-route .home-route-label {
+        align-content: center;
+    }
+
+    .home-content-holder > div {
+        width: stretch;
+        height: stretch;
+    }
+    
+    @media (max-width: 1024px) {
+        .home-view {
+            grid-template-columns: minmax(200px, 1fr) 3fr;
+        }
+    }
+}

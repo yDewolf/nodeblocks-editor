@@ -1,51 +1,40 @@
-import "./app.css";
-import "./singletons/docs";
-import { session_controller } from "./singletons/user_session";
-import { createEffect, onMount } from "solid-js";
-import { NodeEditor } from "./editor/node-editor";
-import { UpdateRootDataTheme } from "./editor/ui/ui-themes";
-import { DocsProvider, DocsUrlSync } from "./context/metadata/docs-context";
-import { EditorView } from "./editor/ui/screens/editor-view";
+import "~/app.css";
 
-const node_editor = new NodeEditor();
+import { Router, Route, Navigate } from "@solidjs/router";
+import SceneEditor from "./feature/editor/scene-editor-route";
+import { AppSessionProvider } from "./network/app-session-provider";
+import { AppSessionManager } from "./network/app-session-manager";
+import { createEffect } from "solid-js";
+import { UpdateRootDataTheme } from "./feature/ui-themes";
+import { ContextMenuPortal } from "./feature/context-menu/context-menu-component";
+import {} from "~/feature/ui-themes";
 
-async function testHandleConnection() {
-  try {
-    const promise = await session_controller.client.connect();
+import { Home } from "./feature/home/home-route";
+import { ScenesRoute } from "./feature/home/scenes/scenes-view";
+import { PackageManagerProvider } from './feature/editor/contexts/package-manager-context';
+import DocsRoute from "./feature/docs/docs-route";
 
-  } catch (error) {
-    // TODO: load previous cached scene with the corresponding node types
-    console.error("Couldn't connect to server:", error);
-    console.log("Loading default types")
-    node_editor.scene_controller.load_scene("data/node_scene.json", "data/node_types.json");
-  }
-}
-
-if (import.meta.hot) {
-  import.meta.hot.dispose(() => {
-    session_controller.client.disconnect();
-  });
-}
-
+const app_session = new AppSessionManager();
 export default function App() {
-  onMount(() => {
-    const handleUnload = () => session_controller.client.disconnect();
-    window.addEventListener("beforeunload", handleUnload);
-    testHandleConnection();
-    // UpdateRootDataTheme();
-  });
-
-  createEffect(() => {
+    createEffect(() => {
       UpdateRootDataTheme();
-  });
+    });
 
-
-  return (
-    <main>
-      <DocsProvider>
-        <DocsUrlSync/>
-        <EditorView editor={node_editor}/>
-      </DocsProvider>
-    </main>
-  );
+    return (
+      <AppSessionProvider appSession={app_session}>
+        <PackageManagerProvider>
+          <main>
+            <ContextMenuPortal />
+            <Router>
+                <Route path="/" component={Home}>
+                  <Route path="" component={() => <Navigate href="/scenes" />} />
+                  <Route path="scenes" component={ScenesRoute}/>
+                  <Route path="docs" component={DocsRoute}/>
+                </Route>
+                <Route path="/scene/:scene_id" component={SceneEditor} />
+            </Router>
+          </main>
+        </PackageManagerProvider>
+      </AppSessionProvider>
+    );
 }

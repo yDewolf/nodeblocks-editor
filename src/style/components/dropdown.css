@@ -31,13 +31,26 @@
     row-gap: 5px;
 }
 
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
 .dropdown-wrapper {
     z-index: 10;
     min-width: 180px;
     position: absolute;
     
+    left: 0;
+    top: 100%;
+
     grid-template-rows: 1fr;
     display: grid;
+}
+
+.dropdown-wrapper.align-right {
+    left: auto;
+    right: 0; 
 }
 
 .dropdown-content {
@@ -76,12 +89,13 @@
 }
 
 .dropdown-item {
+    font-size: 0.85rem;
     width: stretch;
     pointer-events: auto;
 }
 
 .dropdown-label {
-    color: var(--secondary-font-color);
+    /* color: var(--secondary-font-color); */
     border-radius: 4px;
     padding: 2px 4px;
     width: stretch;
