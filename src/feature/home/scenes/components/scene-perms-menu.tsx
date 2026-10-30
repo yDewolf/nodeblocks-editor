@@ -1,20 +1,28 @@
-import { Component, createEffect, createSignal, For, Show } from "solid-js";
+import { Component, createEffect, createSignal, For, Setter, Show } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
 import { ListedScenePerms, SceneHTTPController } from "~/network/api/scene-http-controller";
 import { ScenePermission, togglePermission, hasPermission } from "~/network/protocols/scene-perms";
 import { UserSessionData } from "~/network/protocols/user-session";
 
 export const ScenePermissionsMenu: Component<{
-    sceneId: string
+    sceneId?: string
     sessionData: UserSessionData
     targetUser?: string
     initialPerms: number
     sceneController: SceneHTTPController
 
+    perms?: () => number;
+    setPerms?: Setter<number>;
     permissionStore?: ListedScenePerms
     setPermissionStore?: SetStoreFunction<ListedScenePerms | undefined>
+    showSaveButtons?: boolean
 }> = (props) => {
-    const [perms, setPerms] = createSignal<number>(props.initialPerms);
+    if (!props.perms || !props.setPerms) {
+        const [perms, setPerms] = createSignal<number>(props.initialPerms);
+        props.perms = perms;
+        props.setPerms = setPerms;
+    }
+
     const [isSaving, setIsSaving] = createSignal(false);
     
     const permissionList = [
@@ -25,17 +33,19 @@ export const ScenePermissionsMenu: Component<{
     ];
 
     const handleToggle = (flag: ScenePermission) => {
-        setPerms((prev) => togglePermission(prev, flag));
+        props.setPerms?.((prev) => togglePermission(prev, flag));
     };
 
     const applyPreset = (presetValue: number) => {
-        setPerms(presetValue);
+        props.setPerms?.(presetValue);
     };
 
     const handleSave = async () => {
+        if (!props.perms || !props.sceneId) return;
+
         setIsSaving(true);
         try {
-            await props.sceneController.updateScenePerms(props.sceneId, perms(), props.targetUser, props.sessionData.user_id);
+            await props.sceneController.updateScenePerms(props.sceneId, props.perms(), props.targetUser, props.sessionData.user_id);
         
         } catch (error) {
             console.error("Failed to save permissions", error);
@@ -46,7 +56,9 @@ export const ScenePermissionsMenu: Component<{
     };
 
     createEffect(() => {
-        const perm = perms();
+        const perm = props.perms?.();
+        if (perm == undefined) return;
+
         if (props.targetUser) {
             props.setPermissionStore?.("user_permissions", props.targetUser, perm);
         } else {
@@ -60,7 +72,7 @@ export const ScenePermissionsMenu: Component<{
                 <div class="container fill">
                     <For each={permissionList}>
                         {(item) => {
-                            const checked = () => hasPermission(perms(), item.value);
+                            const checked = () => props.perms ? hasPermission(props.perms?.(), item.value) : undefined;
                             return (
                                 <label class="keep row-container">
                                     <input 
@@ -110,7 +122,7 @@ export const ScenePermissionsMenu: Component<{
                 </div>
             </div>
             
-            <Show when={!props.setPermissionStore || !props.permissionStore}>
+            <Show when={props.showSaveButtons}>
                 <button
                     type="button"
                     disabled={isSaving()}
