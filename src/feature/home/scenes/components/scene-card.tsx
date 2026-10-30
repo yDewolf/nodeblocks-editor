@@ -1,13 +1,16 @@
-import { ListedScene, SceneHTTPController } from "~/network/api/scene-http-controller"
+import { ListedScene } from "~/network/api/scene-http-controller"
 import PlayIcon from '~/assets/icons/play.svg';
 import { useNavigate } from "@solidjs/router";
 import { SceneCanvasSetup } from "~/feature/scene/scene-canvas";
 import { createSignal, onMount, Show } from "solid-js";
 import { SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
+import { hasPermission, ScenePermission } from "~/network/protocols/scene-perms";
+import ToolIcon from '~/assets/icons/tool.svg';
 
 export const SceneCard = (props: {
     listedScene: ListedScene,
-    fetchSceneData?: (sceneId: string) => Promise<SceneData | undefined>
+    fetchSceneData?: (sceneId: string) => Promise<SceneData | undefined>,
+    editScene: (sceneId: string) => void;
 }) => {
     const navigate = useNavigate();
     const openScene = (id: string) => {
@@ -34,30 +37,17 @@ export const SceneCard = (props: {
                 <div class="container stretch">
                     <span>{props.listedScene.uid}</span>
                 </div>
-                <button class="icon-button" onclick={() => openScene(props.listedScene.uid)}>
-                    <PlayIcon class="small-icon"/>
-                </button>
+                <div class="scene-actions">
+                    <Show when={hasPermission(props.listedScene.user_perms, ScenePermission.ADMIN)}>
+                        <button class="icon-button" onclick={() => props.editScene(props.listedScene.uid)}>
+                            <ToolIcon class="smaller-icon"/>
+                        </button>
+                    </Show>
+                    <button class="icon-button" onclick={() => openScene(props.listedScene.uid)}>
+                        <PlayIcon class="smaller-icon"/>
+                    </button>
+                </div>
             </div>
         </div>
     )
 }
-
-// {/* <div class="container">
-//     {/* TODO: SCENE CARD */}
-//     <div class="keep row-container">
-//         <span>{scene.uid}</span>
-//         <button onclick={() => openScene(scene.uid)}>
-//             Connect
-//         </button>
-//     </div>
-//     <div class="container">
-//         <span>Scene Dependencies</span>
-//         <ul>
-//             <For each={Object.entries(scene.dependencies)}>
-//                 {([dependency, version]) => <li>
-//                     {dependency}: {version}
-//                 </li>}
-//             </For>
-//         </ul>
-//     </div>
-// </div>} */}

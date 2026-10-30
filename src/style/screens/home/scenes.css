@@ -27,7 +27,7 @@
         align-items: center;
 
         display: grid;
-        grid-template-columns: minmax(0, 32px) auto minmax(0, 32px);
+        grid-template-columns: minmax(0, 32px) auto minmax(0, 64px);
         gap: 10px;
         
         padding: 5px 10px;
@@ -35,6 +35,10 @@
 
         background-color: var(--dark-overlay-highlight);
         border-radius: 0 0 12px 12px;
+    }
+    
+    .scene-card .scene-actions {
+        display: flex;
     }
 
     .scenes-page-actions {
