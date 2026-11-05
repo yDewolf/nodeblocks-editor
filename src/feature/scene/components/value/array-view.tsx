@@ -16,9 +16,9 @@ const ArrayCanvas = (props: { data: any[], shape: number[], target_channel: numb
             return;
         }
 
-        const [b, c, h, w] = props.shape.length === 1 ? [0, 0, 1, props.shape[0]] : 
-                            props.shape.length === 2 ? [0, 0, props.shape[0], props.shape[1]] :
-                            props.shape.length === 3 ? [0, ...props.shape] :
+        const [b, c, h, w] = props.shape.length == 1 ? [0, 0, 1, props.shape[0]] : 
+                            props.shape.length == 2 ? [0, 0, props.shape[0], props.shape[1]] :
+                            props.shape.length == 3 ? [0, ...props.shape] :
                             props.shape
         ;
 
@@ -33,9 +33,7 @@ const ArrayCanvas = (props: { data: any[], shape: number[], target_channel: numb
         else if (c > 4) {
             data = data[props.target_channel];
         }
-        console.log(data);
         const shape = get_array_shape(data)
-        console.log(shape);
 
         for (let i = 0; i < h; i++) {
             for (let j = 0; j < w; j++) {
@@ -43,15 +41,15 @@ const ArrayCanvas = (props: { data: any[], shape: number[], target_channel: numb
                 let r, g, b;
                 let a = 255;
 
-                if (shape.length === 1) { // 1D
+                if (shape.length == 1) { // 1D
                     r = g = b = data[j];
-                } else if (shape.length === 2 || c == 1) { // 2D
+                } else if (shape.length == 2 || c == 1) { // 2D
                     r = g = b = data[i][j];
                 } else if (c >= 3 && c <= 4) { // 3D
                     r = data[0][i][j] || 0;
                     g = data[1][i][j] || 0;
                     b = data[2][i][j] || 0;
-                    if (c === 4) {
+                    if (c == 4) {
                         a = data[3][i][j] || 255;
                     }
                 }
@@ -93,7 +91,6 @@ const get_array_shape = (array: any): number[] => {
 export const ArrayView = (props: { output_value?: DataTypeValuePack }) => {
     if (!props.output_value) return <div>Empty</div>;
     const [target_channel, setTargetChannel] = createSignal(0);
-
     const shape = createMemo(() => {
         if (props.output_value?.value_meta?.type == DefaultDataTypes.ARRAY) {
             return props.output_value?.value_meta.shape;
@@ -133,7 +130,7 @@ export const ArrayView = (props: { output_value?: DataTypeValuePack }) => {
             </div>
             <Switch fallback={
                 <Switch fallback={<div class="text-preview">{JSON.stringify(props.output_value.value).slice(0, 100)}...</div>}>
-                    <Match when={dims() <= 3 || (dims() === 4 && shape().at(0) === 1)}>
+                    <Match when={dims() <= 3 || (dims() == 4 && shape().at(0) == 1)}>
                         <ArrayCanvas data={props.output_value.value} shape={shape()} target_channel={target_channel()}/>
                     </Match>
                     <Match when={dims() > 3}>
