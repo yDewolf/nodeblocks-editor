@@ -2,7 +2,7 @@
     .scene-card-grid {
         box-sizing: border-box;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 250px));
+        grid-template-columns: repeat(auto-fill, minmax(250px, 300px));
         align-items: stretch;
 
         gap: 16px;
@@ -13,7 +13,7 @@
         box-sizing: border-box;
         height: 100%;
         display: grid;
-        grid-template-rows: minmax(120px, 2fr) minmax(60px, 1fr);
+        grid-template-rows: minmax(120px, 200px) minmax(60px, 1fr);
     }
 
     .scene-card .scene-preview {
@@ -65,5 +65,15 @@
         height: 100% !important;
         width: 100% !important;
         overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
+        .scene-card-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 250px));
+        }
+
+        .scene-card {
+            grid-template-rows: minmax(120px, 150px) minmax(60px, 1fr);
+        }
     }
 }
