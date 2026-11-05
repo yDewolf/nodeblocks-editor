@@ -276,6 +276,13 @@ export class SceneConnectionManager {
             }
         }
 
+        if (message.type === ServerMessageTypes.BATCH && message.messages) {
+            for (const msg of message.messages) {
+                console.log(msg, message.messages);
+                this.dispatchMessage(msg);
+            }
+        }
+
         if (message.type === ServerMessageTypes.COMMAND_RESPONSE && message.response_payload) {
             const subListeners = this.commandResponseListeners.get(message.response_payload.type);
             if (subListeners) {
