@@ -18,7 +18,6 @@ export class SceneProtoTranslator {
         try {
             const decodedWrapper = nodeblocks.api.v1.ServerMessageWrapper.decode(buffer);
             const mapped = this.mapWrapperToClientMessage(decodedWrapper);
-            console.log(mapped)
             return mapped;
 
         } catch (error) {
