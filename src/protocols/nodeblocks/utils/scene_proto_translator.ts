@@ -5,7 +5,7 @@ import { WorkerEventTypes } from '../engine/worker-event-types';
 import { DefaultDataTypes } from '../manifests/node/datatype-enums';
 import { SerializedDataTypeValue } from '../manifests/node/datatype-value-meta';
 import { ConnectionSceneData, NodeSceneData, SceneData } from '../manifests/node/node-graph-data';
-import { EngineEventPayload, NodeStatusPayload, JobStatusPayload, FailedProcessPayload, RuntimeErrorPayload } from '../network/message/server/payloads/engine-event-payloads';
+import { EngineEventPayload, NodeStatusPayload, JobStatusPayload, FailedProcessPayload, RuntimeErrorPayload, EngineTracker } from '../network/message/server/payloads/engine-event-payloads';
 import { ServerCmdResponsePayload, GetSceneDataPayload, ExecutionStateSyncPayload, AddNodePayload, AddConnPayload } from '../network/message/server/payloads/server-response-payloads';
 import { WorkerEventPayload } from '../network/message/server/payloads/worker-event-payloads';
 import { ServerSceneMessages } from '../network/message/server/server-scene-messages';
@@ -194,7 +194,13 @@ export class SceneProtoTranslator {
 
     private static mapEngineEvent(protoEvent: nodeblocks.api.v1.EngineEventMessage): EngineEventPayload {
         const jobId = protoEvent.jobId;
-        const tracker = protoEvent.trackerJson ? JSON.parse(protoEvent.trackerJson) : {};
+        const tracker: EngineTracker = {
+            node_id: protoEvent.tracker?.nodeId ?? undefined,
+            slot_id: protoEvent.tracker?.slotId ?? undefined,
+            param_id: protoEvent.tracker?.paramId ?? undefined,
+            conn_id: protoEvent.tracker?.connId ?? undefined,
+            other: protoEvent.tracker?.other ?? undefined,
+        };
         const type = protoEvent.type;
 
         if (type === nodeblocks.api.v1.ProtoEngineEventType.NODE_STATUS || protoEvent.nodeStatus) {
