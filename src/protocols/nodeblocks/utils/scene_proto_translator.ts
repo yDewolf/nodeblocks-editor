@@ -10,6 +10,7 @@ import { ServerCmdResponsePayload, GetSceneDataPayload, ExecutionStateSyncPayloa
 import { WorkerEventPayload } from '../network/message/server/payloads/worker-event-payloads';
 import { ServerSceneMessages } from '../network/message/server/server-scene-messages';
 import { ServerCmdResponseTypes, ServerEngineEventTypes, ServerMessageTypes } from '../network/server-message-protocol';
+import { NDArrayView } from './ndarray_view';
 
 
 export class SceneProtoTranslator {
@@ -254,17 +255,6 @@ export class SceneProtoTranslator {
 
     private static mapSerializedDataTypeValue(protoVal: nodeblocks.protocols.v1.data.SerializedDataTypeValueMessage): SerializedDataTypeValue {
         let actualValue: any = null;
-        if (protoVal.value) {
-            if (protoVal.value.stringValue != undefined) actualValue = protoVal.value.stringValue;
-            else if (protoVal.value.intValue != undefined) actualValue = protoVal.value.intValue;
-            else if (protoVal.value.floatValue != undefined) actualValue = protoVal.value.floatValue;
-            else if (protoVal.value.boolValue != undefined) actualValue = protoVal.value.boolValue;
-            else if (protoVal.value.jsonSerializedValue != undefined) {
-                try { actualValue = JSON.parse(protoVal.value.jsonSerializedValue); }
-                catch { actualValue = protoVal.value.jsonSerializedValue; }
-            }
-        }
-
         let valueMeta: any = undefined;
         if (protoVal.metadata) {
             const meta = protoVal.metadata;
@@ -283,6 +273,27 @@ export class SceneProtoTranslator {
                     type: dataType,
                     is_artifact: meta.fileMetadata.isArtifact
                 };
+            }
+        }
+
+        if (protoVal.value?.ndarrayBytes && valueMeta?.shape) {
+            const uint8Arr: Uint8Array = protoVal.value.ndarrayBytes;
+            const alignedBytes = uint8Arr.slice();
+            const floatArr = new Float32Array(
+                alignedBytes.buffer,
+                alignedBytes.byteOffset,
+                alignedBytes.byteLength / Float32Array.BYTES_PER_ELEMENT
+            );
+            
+            actualValue = new NDArrayView(floatArr, valueMeta.shape);
+        } else if (protoVal.value) {
+            if (protoVal.value.stringValue != undefined) actualValue = protoVal.value.stringValue;
+            else if (protoVal.value.intValue != undefined) actualValue = protoVal.value.intValue;
+            else if (protoVal.value.floatValue != undefined) actualValue = protoVal.value.floatValue;
+            else if (protoVal.value.boolValue != undefined) actualValue = protoVal.value.boolValue;
+            else if (protoVal.value.jsonSerializedValue != undefined) {
+                try { actualValue = JSON.parse(protoVal.value.jsonSerializedValue); }
+                catch { actualValue = protoVal.value.jsonSerializedValue; }
             }
         }
 
