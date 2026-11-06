@@ -98,11 +98,11 @@ export class NodeScene {
         }
 
         console.log("Loading scene data: ", scene_data);
-        for (const node_data of Object.values(scene_data.nodes)) {
+        for (const node_data of Object.values(scene_data?.nodes || [])) {
             this.createNodeFromData(node_data.nodetype_fqn, node_data);
         }
 
-        for (const conn_data of Object.values(scene_data.connections)) {
+        for (const conn_data of Object.values(scene_data?.connections || [])) {
             if (typeof conn_data.from_slot === "string") {
                 const from_path = NodePathUtils.parse_node_path(conn_data.from_slot);
                 if (from_path) conn_data.from_slot = from_path;

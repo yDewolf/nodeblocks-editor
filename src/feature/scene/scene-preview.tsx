@@ -15,7 +15,11 @@ export const SimplifiedScenePreview: Component<{
 }> = (props) => {
     const packageManager = usePackageManager();
     const scene = new NodeScene(packageManager.registry, new PackageNodeProvider(packageManager), props.sceneData.uid);
-    scene.loadFromSceneData(props.sceneData, true);
+    onMount(() => {
+        if (props.sceneData) {
+            scene.loadFromSceneData(props.sceneData, true);
+        }
+    })
 
     return (
         <ReadonlySceneProvider scene={scene}>

@@ -1,8 +1,8 @@
-import { createSignal, Setter } from "solid-js";
+import { batch, createSignal, onCleanup, Setter } from "solid-js";
 import { AppSessionManager } from "~/network/app-session-manager";
 import { SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { ScenePermission } from "../protocols/scene-perms";
-import { createStore, SetStoreFunction } from "solid-js/store";
+import { createStore, reconcile, SetStoreFunction } from "solid-js/store";
 
 export interface ListedScene {
     uid: string;
@@ -16,6 +16,7 @@ export interface ListedScenePerms {
 }
 
 export class SceneHTTPController {
+    // TODO: remove these from here maybe
     private _scenes: Record<string, ListedScene>;
     private _setScenes: SetStoreFunction<Record<string, ListedScene>>;
     
@@ -31,6 +32,16 @@ export class SceneHTTPController {
     ) {
         [this._scenes, this._setScenes] = createStore<Record<string, ListedScene>>({});
         [this._isLoading, this._setIsLoading] = createSignal<boolean>(false);
+        
+        const unsubscribe = this.appSession.listenLogout(() => {
+            this._setScenes(reconcile({}));
+        });
+
+        const unsubscribe1 = this.appSession.listenLogin((session) => {
+            this.fetchScenes(session.user_id);
+        })
+
+        onCleanup(() => {unsubscribe(); unsubscribe1()});
     }
 
     public async fetchScenes(userId?: string, password?: string): Promise<ListedScene[]> {
@@ -53,12 +64,16 @@ export class SceneHTTPController {
             }
 
             const data: ListedScene[] = await response.json();
+            const updatedScenes: Record<string, ListedScene> = {};
             data.forEach((scene) => {
-                this._setScenes(scene.uid, scene);
-            })
+                updatedScenes[scene.uid] = scene;
+            });
+
+            this._setScenes(reconcile(updatedScenes));
             return data;
 
         } catch (error) {
+            this._setScenes(reconcile({}));
             console.error("Failed to fetch scenes:", error);
             throw error;
 
