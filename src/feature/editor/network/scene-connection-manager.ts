@@ -12,6 +12,7 @@ import { isServer } from "solid-js/web";
 import { SceneHTTPController } from "~/network/api/scene-http-controller";
 import { PackageManagerHTTPController } from "~/network/api/package-http-controller";
 import { SceneProtoTranslator } from "~/protocols/nodeblocks/utils/scene_proto_translator";
+import { ForbiddenError, HttpError, UnauthorizedError } from "~/network/api/http_errors";
 
 type MessageByType<MessageType extends ServerMessages | ServerMessageTypes> = 
     Extract<ServerMessage, {type: MessageType}>;
@@ -33,8 +34,9 @@ export class SceneConnectionManager {
     private sceneToken: string | null = null;
     private _sceneId: string | null = null;
     
-    public isConnecting: boolean = false;
-    private reconnectAttempts: number = 0;
+    private _isConnecting: boolean = false;
+    private _reconnectAttempts: () => number;
+    private _setReconnectAttempts: (v: number) => void;
     private maxReconnectAttempts: number = 10;
     private reconnectTimer: number | null = null;
     private isIntentionalDisconnect: boolean = false;
@@ -47,6 +49,7 @@ export class SceneConnectionManager {
     private engineEventListeners: Map<string, Set<(msg: ServerEngineEvent) => void>> = new Map();
     
     private _connectListeners: Set<(sceneConn: SceneConnectionManager) => void> = new Set();
+    private _errorListeners: Set<(error: Error, errorMessage: string) => void> = new Set();
 
     private _sceneHttpController: SceneHTTPController;
     private _packageHttpController: PackageManagerHTTPController;
@@ -58,12 +61,19 @@ export class SceneConnectionManager {
         private packageManager: PackageManager
     ) {
         [this._status, this._setStatus] = createSignal(WebsocketStatus.DISCONNECTED);
+        [this._reconnectAttempts, this._setReconnectAttempts] = createSignal<number>(0);
+
         this._sceneHttpController = new SceneHTTPController(appSession);
         this._packageHttpController = new PackageManagerHTTPController(appSession);
     }
 
     get status() { return this._status(); }
     get isConnected() { return this._status() == WebsocketStatus.CONNECTED; }
+    get isConnecting() { return this._status() == WebsocketStatus.CONNECTING; }
+    
+    get currentAttempt() { return this._reconnectAttempts(); }
+    get maxAttempts() { return this.maxReconnectAttempts; }
+
 
     public onConnect(listener: (sceneConn: SceneConnectionManager) => void) {
         this._connectListeners.add(listener);
@@ -74,17 +84,26 @@ export class SceneConnectionManager {
         this._connectListeners.forEach((listener) => listener(this));
     }
 
+    public onError(listener: (error: Error, errorMessage: string) => void) {
+        this._errorListeners.add(listener);
+        return () => this._errorListeners.delete(listener);
+    }
+
+    private notifyError(error: Error, errorMessage: string) {
+        this._errorListeners.forEach((listener) => listener(error, errorMessage));
+    }
+
     public async connect(sceneId: string): Promise<void> {
         if (!this.appSession.isAuthenticated()) {
             throw new Error("User must be logged to connect to a scene");
         }
 
-        if (this.socket?.readyState === WebSocket.OPEN || this.isConnecting) {
+        if (this.socket?.readyState === WebSocket.OPEN || this._isConnecting) {
             return;
         }
 
         this.isIntentionalDisconnect = false;
-        this.isConnecting = true;
+        this._isConnecting = true;
         this._setStatus(WebsocketStatus.CONNECTING);
 
         try {
@@ -94,12 +113,14 @@ export class SceneConnectionManager {
             await this._packageHttpController.fetchAndLoadManifests(this.packageManager);
             await this.establishWebSocketConnection();
         } catch (error) {
-            this.isConnecting = false;
+            this._isConnecting = false;
             console.error("[SceneConnection] Failed to connect to scene:", error);
-            
+            if (error instanceof HttpError) {
+                this.notifyError(error, error.message);
+            }
+
             this.handleReconnect();
             return;
-            // throw error;
         }
         this.notifyConnected();
     }
@@ -127,8 +148,8 @@ export class SceneConnectionManager {
 
             this.socket.onopen = () => {
                 this._setStatus(WebsocketStatus.CONNECTED);
-                this.isConnecting = false;
-                this.reconnectAttempts = 0;
+                this._isConnecting = false;
+                this._setReconnectAttempts(0);
                 if (this.reconnectTimer) {
                     clearTimeout(this.reconnectTimer);
                     this.reconnectTimer = null;
@@ -141,7 +162,7 @@ export class SceneConnectionManager {
 
             this.socket.onerror = (error) => {
                 this._setStatus(WebsocketStatus.ERROR);
-                this.isConnecting = false;
+                this._isConnecting = false;
                 this.socket = null;
                 reject(error);
             };
@@ -150,7 +171,7 @@ export class SceneConnectionManager {
 
             this.socket.onclose = () => {
                 this._setStatus(WebsocketStatus.DISCONNECTED);
-                this.isConnecting = false;
+                this._isConnecting = false;
                 this.socket = null;
                 this.dispatchMessage({type: ServerMessageTypes.CLOSE_SOCKET});
                 console.log("[SceneConnection] Disconnected.");
@@ -164,19 +185,21 @@ export class SceneConnectionManager {
 
     private handleReconnect() {
         if (isServer) return;
-        console.log(this.isIntentionalDisconnect, this.sceneId);
         if (this.isIntentionalDisconnect || !this._sceneId) return;
 
-        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+        if (this.currentAttempt >= this.maxReconnectAttempts) {
             this._sceneId = null;
             console.error("[SceneConnection] Maximum reconnection attempts reached. Giving up.");
+            this._setStatus(WebsocketStatus.FAILED_TO_RECONNECT);
+            const error = new Error("Failed to reconnect");
+            this.notifyError(error, error.message);
             return;
         }
 
-        const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 15000);
-        this.reconnectAttempts++;
+        const delay = Math.min(1000 * Math.pow(2, this.currentAttempt), 15000);
+        this._setReconnectAttempts(this.currentAttempt + 1);
 
-        console.log(`[SceneConnection] Reconnecting in ${delay}ms (Attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+        console.log(`[SceneConnection] Reconnecting in ${delay}ms (Attempt ${this.currentAttempt}/${this.maxReconnectAttempts})...`);
         if (this.reconnectTimer) {
             clearTimeout(this.reconnectTimer);
         }

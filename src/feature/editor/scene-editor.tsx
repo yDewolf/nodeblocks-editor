@@ -112,11 +112,11 @@ export class SceneEditor {
     // Methods
 
     public async connectToScene(scene_uid: string) {
-        this.stateController.setIsLoadingScene(true);
         await this._sceneConnection.connect(scene_uid);
     }
 
     protected onSceneConnect(connection: SceneConnectionManager) {
+        this.stateController.setIsLoadingScene(true);
         connection.sendCommand({
             cmd_uid: nanoid(5),
             cmd_group: CommandGroups.SCENE,

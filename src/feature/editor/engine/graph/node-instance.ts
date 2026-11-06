@@ -46,7 +46,7 @@ export class SlotInstance implements SlotPathData {
     }
 }
 
-export type NodeDataListener = (data: NodeSceneData) => void;
+export type NodeDataListener = (data: NodeSceneData, forceUpdate: boolean) => void;
 export class NodeInstance {
     private _listeners: Set<NodeDataListener> = new Set();
 
@@ -79,6 +79,7 @@ export class NodeInstance {
     public updateSceneData(
         new_params?: Record<string, any>, 
         position?: Vector2,
+        forceUpdate: boolean = false,
     ): void {
         if (position) { this.scene_data.position = position; }
         if (new_params) {
@@ -86,16 +87,17 @@ export class NodeInstance {
                 this.scene_data.data[key] = value;
             }
         }
-        this._listeners.forEach((listener) => listener(this.scene_data));
+        this._listeners.forEach((listener) => listener(this.scene_data, forceUpdate));
     }
 
     public updateParamValue(
-        paramId: string, value: any
+        paramId: string, value: any,
+        forceUpdate: boolean = false,
     ): void {
         if (paramId in this.spec.parameters) {
             this.scene_data.data[paramId] = value;
         }
-        this._listeners.forEach((listener) => listener(this.scene_data));
+        this._listeners.forEach((listener) => listener(this.scene_data, forceUpdate));
     }
 
     // Getters and utils

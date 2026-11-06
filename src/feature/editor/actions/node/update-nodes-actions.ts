@@ -8,10 +8,14 @@ export class UpdateNodesAction extends Action<NodeGraphCommand> {
 
     constructor(
         private updateData: NodeSceneRequestData,
+        private initialData?: NodeSceneRequestData,
         isClientside: boolean = false
     ) {
         super(isClientside);
         this._targetIds = new Set(Object.keys(updateData));
+        if (initialData) {
+            this._backupData = structuredClone(initialData);
+        }
     }
 
     public toServerMessage(): NodeGraphCommand {
@@ -27,12 +31,18 @@ export class UpdateNodesAction extends Action<NodeGraphCommand> {
     }
 
     public apply(scene: NodeScene): void {
-        this._backupData = {};
+        if (!this.initialData && Object.keys(this._backupData).length === 0) {
+            for (const uid of Object.keys(this.updateData)) {
+                const node = scene.graph.getNode(uid);
+                if (node) {
+                    this._backupData[uid] = structuredClone(node.scene_data);
+                }
+            }
+        }
 
         for (const [uid, newData] of Object.entries(this.updateData)) {
             const node = scene.graph.getNode(uid);
             if (node) {
-                this._backupData[uid] = node.scene_data; // FIXME: talvez isso aqui deva ser copiado
                 node.updateSceneData(newData.data, newData.position);
             }
         }
@@ -42,7 +52,7 @@ export class UpdateNodesAction extends Action<NodeGraphCommand> {
         for (const [uid, previousData] of Object.entries(this._backupData)) {
             const node = scene.graph.getNode(uid);
             if (node) {
-                node.updateSceneData(previousData.data, previousData.position);
+                node.updateSceneData(previousData.data, previousData.position, true);
             }
         }
         this._backupData = {};

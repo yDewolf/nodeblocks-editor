@@ -42,17 +42,20 @@ export class SceneNode {
         this._output_slots = Object.values(this.node_slots).filter((slot) => !slot.isInput);
 
         [this._dataStore, this._setDataStore] = createStore({ ...instance.scene_data });
-
-        this._cleanupDataSub = instance.subscribe((new_data) => {
-            this._setDataStore(new_data);
-        });
-        
         [this._uiStore, this._setUiStore] = createStore<NodeUIState>({
             isSelected: false,
             size: { x: 100, y: 120 },
             uiPosition: instance.scene_data.position,
             minSize: { x: 0, y: 0 }
         });
+
+        this._cleanupDataSub = instance.subscribe((new_data, forceUpdate) => {
+            this._setDataStore(new_data);
+            if (forceUpdate) {
+                this._setUiStore("uiPosition", new_data.position);
+            }
+        });
+        
 
         // this._contextItemManager = new ContextMenuItemManager();
     }

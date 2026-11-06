@@ -72,6 +72,7 @@ export const HomeLeftTab = (props: {
                         }}
                     </For>
                 </div>
+                {/* TODO: add settings button here */}
             </div>
         </Show>
     )

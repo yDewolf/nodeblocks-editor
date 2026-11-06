@@ -6,6 +6,9 @@ interface SessionStore {
     user_session?: UserSessionData
 }
 
+type LoginListener = (session: UserSessionData) => void;
+type LogoutListener = () => void;
+
 export class AppSessionManager {
     private _sessionStore: SessionStore;
     private _setSessionStore: SetStoreFunction<SessionStore>;
@@ -13,6 +16,9 @@ export class AppSessionManager {
     // Server urls
     public readonly baseHttpUrl: string;
     public readonly baseWsUrl: string;
+
+    private _loginListeners: Set<LoginListener> = new Set();
+    private _logoutListeners: Set<() => void> = new Set();
 
     constructor(host: string = "localhost", port: number = 8080) {
         [this._sessionStore, this._setSessionStore] = createStore<SessionStore>({
@@ -38,18 +44,46 @@ export class AppSessionManager {
         } catch (error: any) {
             throw new Error(`Failed to log as ${user_id}: ${error.message || 'Unknown Error'}`);
         }
+
+        if (this.userSession) {
+            this.notifyLogin(this.userSession);
+        }
     }
 
     public async logout(): Promise<void> {
         try {
             await logoutAction();
-            this._setSessionStore("user_session", undefined);
+            this._setSessionStore("user_session", undefined as any);
         } catch (error) {
             console.error("Failed to logout:", error);
+        }
+
+        if (!this.userSession) {
+            this.notifyLogout();
         }
     }
 
     public isAuthenticated(): boolean {
         return this.userSession != null;
+    }
+
+    // -- event subscribers
+
+    public listenLogin(listener: LoginListener): () => void {
+        this._loginListeners.add(listener);
+        return () => this._loginListeners.delete(listener);
+    }
+
+    public listenLogout(listener: LogoutListener): () => void {
+        this._logoutListeners.add(listener);
+        return () => this._logoutListeners.delete(listener);
+    }
+
+    private notifyLogin(session: UserSessionData): void {
+        this._loginListeners.forEach((listener) => listener(session));
+    }
+
+    private notifyLogout(): void {
+        this._logoutListeners.forEach((listener) => listener());
     }
 }
