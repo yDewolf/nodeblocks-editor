@@ -21,4 +21,9 @@ export type ServerEngineEvent = BaseServerMessage & {
     event_payload: EngineEventPayload
 }
 
-export type ServerSceneMessages = ServerEngineEvent | ServerCmdResponse | ServerWorkerEvent;
+export type ServerMessageBatch = BaseServerMessage & {
+    type: ServerMessageTypes.BATCH,
+    messages: ServerSceneMessages[]
+}
+
+export type ServerSceneMessages = ServerEngineEvent | ServerCmdResponse | ServerWorkerEvent | ServerMessageBatch;

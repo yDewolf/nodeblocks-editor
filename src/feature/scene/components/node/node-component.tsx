@@ -280,7 +280,10 @@ export const NodeBodySections = (props: {
     node: SceneNode, 
 }) => {
     return (
-        <div class="node-body-sections container fill">
+        <div 
+            class="node-body-sections container fill"
+            onpointerdown={(e) => e.stopImmediatePropagation()}
+        >
             <Show when={Object.keys(props.node.parameters).length > 0}>
                 <DropdownSection header="Parameters" content={
                     <div class="field-grid-holder">

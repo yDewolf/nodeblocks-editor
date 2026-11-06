@@ -16,7 +16,8 @@ export enum ServerMessageTypes {
     CLOSE_SOCKET = "close_socket",
     GRAPH_EVENT = "graph_event",
     SCENE_EVENT = "scene_event",
-    COMMAND_RESPONSE = "cmd_response"
+    COMMAND_RESPONSE = "cmd_response",
+    BATCH = "batch",
 }
 
 export enum WebsocketStatus {

@@ -11,6 +11,7 @@ import { createSignal } from "solid-js";
 import { isServer } from "solid-js/web";
 import { SceneHTTPController } from "~/network/api/scene-http-controller";
 import { PackageManagerHTTPController } from "~/network/api/package-http-controller";
+import { SceneProtoTranslator } from "~/protocols/nodeblocks/utils/scene_proto_translator";
 import { ForbiddenError, HttpError, UnauthorizedError } from "~/network/api/http_errors";
 
 type MessageByType<MessageType extends ServerMessages | ServerMessageTypes> = 
@@ -141,6 +142,7 @@ export class SceneConnectionManager {
         return new Promise((resolve, reject) => {
             const websocketUrl = new URL(`${this.appSession.baseWsUrl}/ws/scene`);
             websocketUrl.searchParams.append("token", this.sceneToken!);
+            websocketUrl.searchParams.append("protoc", "");
 
             this.socket = new WebSocket(websocketUrl.toString());
 
@@ -165,10 +167,7 @@ export class SceneConnectionManager {
                 reject(error);
             };
 
-            this.socket.onmessage = (event) => {
-                const message = JSON.parse(event.data);
-                this.dispatchMessage(message);
-            };
+            this.socket.onmessage = this._handleWebsocketMessage.bind(this);
 
             this.socket.onclose = () => {
                 this._setStatus(WebsocketStatus.DISCONNECTED);
@@ -291,11 +290,34 @@ export class SceneConnectionManager {
         };
     }
 
+
+    private async _handleWebsocketMessage(event: MessageEvent) {
+        let message: any;
+        if (event.data instanceof ArrayBuffer || event.data instanceof Blob) {
+            const buffer = event.data instanceof Blob 
+                ? new Uint8Array(await event.data.arrayBuffer()) 
+                : new Uint8Array(event.data);
+
+            message = SceneProtoTranslator.decodeServerMessage(buffer);
+        } else {
+            message = JSON.parse(event.data);
+        }
+
+        if (!message) return;
+        this.dispatchMessage(message);
+    }
+
     private dispatchMessage(message: ServerMessage): void {
         const typeListeners = this.messageListeners.get(message.type);
         if (typeListeners) {
             for (const listener of typeListeners) {
                 listener(message);
+            }
+        }
+
+        if (message.type === ServerMessageTypes.BATCH && message.messages) {
+            for (const msg of message.messages) {
+                this.dispatchMessage(msg);
             }
         }
 
