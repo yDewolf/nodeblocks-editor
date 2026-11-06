@@ -2,8 +2,8 @@
   "name": "example-bare",
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
+    "dev": "npm run build:protos && vite dev",
+    "build": "npm run build:protos && vite build",
     "preview": "vite preview",
     
     "build:protos": "pbjs -t static-module -w es6 -p src/protocols/nodeblocks/protos -o src/protocols/nodeblocks/generated/proto.js src/protocols/nodeblocks/protos/**/*.proto && pbts -o src/protocols/nodeblocks/generated/proto.d.ts src/protocols/nodeblocks/generated/proto.js"
