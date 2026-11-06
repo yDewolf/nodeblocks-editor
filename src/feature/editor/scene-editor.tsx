@@ -112,7 +112,6 @@ export class SceneEditor {
     // Methods
 
     public async connectToScene(scene_uid: string) {
-        this.stateController.setIsLoadingScene(true);
         await this._sceneConnection.connect(scene_uid);
     }
 

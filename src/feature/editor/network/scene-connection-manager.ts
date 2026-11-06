@@ -53,9 +53,6 @@ export class SceneConnectionManager {
     private _sceneHttpController: SceneHTTPController;
     private _packageHttpController: PackageManagerHTTPController;
 
-    private _sceneHttpController: SceneHTTPController;
-    private _packageHttpController: PackageManagerHTTPController;
-
     get sceneId() { return this._sceneId; }
 
     constructor(
