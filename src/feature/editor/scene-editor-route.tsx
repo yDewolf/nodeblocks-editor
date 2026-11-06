@@ -54,14 +54,14 @@ const EditorSetup = (props: {sceneId: string}) => {
         <MetadataProvider controller={editor.metadataController}>
             <DocsProvider controller={editor.docsController}>
                 <DocsUrlSync />
-                <InputManagerProvider manager={editor.inputManager}>
-                    <DefinedInputScope context={editor.globalInputContext}>
-                        {/* TODO adicionar um editor keybind provider */}
-                        <EventManagerProvider manager={editor.eventManager}>
-                            <EditorView />
-                        </EventManagerProvider>
-                    </DefinedInputScope>
-                </InputManagerProvider>
+                    <InputManagerProvider manager={editor.inputManager}>
+                        <DefinedInputScope context={editor.globalInputContext}>
+                            {/* TODO adicionar um editor keybind provider */}
+                            <EventManagerProvider manager={editor.eventManager}>
+                                <EditorView />
+                            </EventManagerProvider>
+                        </DefinedInputScope>
+                    </InputManagerProvider>
             </DocsProvider>
         </MetadataProvider>
     )
