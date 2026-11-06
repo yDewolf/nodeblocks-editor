@@ -33,6 +33,8 @@ export class SelectionController {
     private _setMoving: (value: boolean) => void;
     private debounced_request_update: Function;
     
+    private _dragInitialData: NodeSceneRequestData = {};
+
     protected _selected_node_type: () => string | undefined;
     protected _set_selected_node_type: (type: string | undefined) => void;
     
@@ -50,8 +52,8 @@ export class SelectionController {
         [this._hovered_slot, this._set_hovered_slot] = createSignal(null);
 
         [this._moving, this._setMoving] = createSignal(false);
-        this.debounced_request_update = debounce((nodes: NodeSceneRequestData) => {
-            this.actionController.dispatch(new UpdateNodesAction(nodes));
+        this.debounced_request_update = debounce((nodes: NodeSceneRequestData, initialData: NodeSceneRequestData) => {
+            this.actionController.dispatch(new UpdateNodesAction(nodes, initialData));
         }, 100);
 
         this.selection_rect = new SelectionRect();
@@ -113,6 +115,12 @@ export class SelectionController {
         ) {
             this.selecting = false;
             this.moving = true;
+
+            this._dragInitialData = {};
+            this.selected_nodes.forEach(node => {
+                this._dragInitialData[node.uid] = structuredClone(node.instance.scene_data);
+            });
+
             return;
         }
 
@@ -137,6 +145,7 @@ export class SelectionController {
         }
 
         this.selecting = false;
+        this.moving = false;
     }
 
     public clearSelection() { 
@@ -162,7 +171,7 @@ export class SelectionController {
             this.selected_nodes.forEach((node) => {
                 node_datas[node.uid] = node.data;
             });
-            this.debounced_request_update(node_datas);
+            this.debounced_request_update(node_datas, this._dragInitialData);
         }
 
         if (Math.abs(delta.x) < 1 && Math.abs(delta.y) < 1) {
