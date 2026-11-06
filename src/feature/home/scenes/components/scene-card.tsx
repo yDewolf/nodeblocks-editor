@@ -1,12 +1,11 @@
 import { ListedScene } from "~/network/api/scene-http-controller"
 import PlayIcon from '~/assets/icons/play.svg';
 import { useNavigate } from "@solidjs/router";
-import { SceneCanvasSetup } from "~/feature/scene/scene-canvas";
-import { createSignal, onMount, Show } from "solid-js";
+import { createEffect, createSignal, onMount, Show } from "solid-js";
 import { SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { hasPermission, ScenePermission } from "~/network/protocols/scene-perms";
 import ToolIcon from '~/assets/icons/tool.svg';
-import { ScenePreview, SimplifiedScenePreview } from "~/feature/scene/scene-preview";
+import { SimplifiedScenePreview } from "~/feature/scene/scene-preview";
 
 export const SceneCard = (props: {
     listedScene: ListedScene,
@@ -19,9 +18,20 @@ export const SceneCard = (props: {
     };
     
     const [sceneData, setSceneData] = createSignal<SceneData | undefined>(undefined);
-    onMount(async () => {
-        if (props.fetchSceneData) {
-            setSceneData(await props.fetchSceneData(props.listedScene.uid));
+    createEffect(async () => {
+        const sceneId = props.listedScene.uid;
+        setSceneData(undefined);
+
+        if (props.fetchSceneData && sceneId) {
+            try {
+                const scene_data = await props.fetchSceneData(sceneId);
+                if (scene_data) {
+                    setSceneData(scene_data);
+                }
+            } catch (error) {
+                // Trata o erro 401/Unauthorized de forma silenciosa para não quebrar a UI
+                console.warn(`Acesso negado ou erro ao carregar a preview da cena: ${sceneId}`);
+            }
         }
     });
 

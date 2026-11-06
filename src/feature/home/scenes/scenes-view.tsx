@@ -41,11 +41,7 @@ export const ScenesView = (props: {
     const [sceneName, setSceneName] = createSignal<string>("");
     const [isEditModalOpen, setIsEditModalOpen] = createSignal(false);
     const [activeSceneId, setActiveSceneId] = createSignal<string | null>(null);
-
-    createEffect(() => {
-        props.sceneController.fetchScenes(props.sessionData?.user_id);
-    });
-        
+    
     const fetchSceneData = async (sceneId: string) => {
         return props.sceneController.fetchSceneData(sceneId, props.sessionData?.user_id);
     }
@@ -59,6 +55,12 @@ export const ScenesView = (props: {
         setIsEditModalOpen(false);
         setActiveSceneId(null);
     }
+
+    onMount(() => {
+        if (props.sessionData) {
+            props.sceneController.fetchScenes(props.sessionData?.user_id);
+        }
+    });
 
     return (
         <div class="container">
@@ -108,26 +110,31 @@ export const ScenesView = (props: {
                 </div>
             </div>
             <div class="keep row-container fill">
-                <button class="icon-button" onclick={() => props.sceneController.fetchScenes(
-                    props.sessionData?.user_id,
-                    // TODO: password
-                )}>
+                <button class="icon-button" onclick={() => {
+                    if (!props.sessionData) return;
+
+                    props.sceneController.fetchScenes(
+                        props.sessionData?.user_id,
+                        // TODO: password
+                    )
+                }}>
                     <RefreshIcon class="smaller-icon"/>
                 </button>
                 <span class="center-content">Found {props.sceneController.scenes.length} scenes</span>
             </div>
-            <Show when={!props.sceneController.isLoading} fallback={
-                <span>Loading Scenes...</span>
+            <Show when={props.sessionData} fallback={
+                <span>You must log in to view scenes</span>
             }>
-                <div class="scene-card-grid">
-                    <For each={props.sceneController.scenes}>
-                        {(scene) => <SceneCard listedScene={scene} fetchSceneData={fetchSceneData} editScene={editScene}/>}
-                    </For>
-                </div>
-            </Show>
-            
-            <Show when={props.sessionData}>
-                {(sessionData) => 
+                {(sessionData) => <>
+                    <Show when={!props.sceneController.isLoading} fallback={
+                        <span>Loading Scenes...</span>
+                    }>
+                        <div class="scene-card-grid">
+                            <For each={props.sceneController.scenes}>
+                                {(scene) => <SceneCard listedScene={scene} fetchSceneData={fetchSceneData} editScene={editScene}/>}
+                            </For>
+                        </div>
+                    </Show>
                     <Show when={activeSceneId()}>
                         {(sceneId) => {
                             const listedScene = props.sceneController.sceneIndex[sceneId()];
@@ -142,7 +149,7 @@ export const ScenesView = (props: {
                             )
                         }}
                     </Show>
-                }
+                </>}
             </Show>
         </div>
     )

@@ -35,6 +35,10 @@
         position: absolute;
     }
 
+    .loading-overlay.no-access {
+        z-index: 2;
+    }
+
     .loading-overlay-background {
         z-index: -1;
         position: absolute;

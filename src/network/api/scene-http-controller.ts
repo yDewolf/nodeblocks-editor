@@ -1,8 +1,9 @@
-import { createSignal, Setter } from "solid-js";
+import { batch, createSignal, onCleanup, Setter } from "solid-js";
 import { AppSessionManager } from "~/network/app-session-manager";
 import { SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { ScenePermission } from "../protocols/scene-perms";
-import { createStore, SetStoreFunction } from "solid-js/store";
+import { createStore, reconcile, SetStoreFunction } from "solid-js/store";
+import { ForbiddenError, HttpError, UnauthorizedError } from "./http_errors";
 
 export interface ListedScene {
     uid: string;
@@ -16,6 +17,7 @@ export interface ListedScenePerms {
 }
 
 export class SceneHTTPController {
+    // TODO: remove these from here maybe
     private _scenes: Record<string, ListedScene>;
     private _setScenes: SetStoreFunction<Record<string, ListedScene>>;
     
@@ -31,6 +33,16 @@ export class SceneHTTPController {
     ) {
         [this._scenes, this._setScenes] = createStore<Record<string, ListedScene>>({});
         [this._isLoading, this._setIsLoading] = createSignal<boolean>(false);
+        
+        const unsubscribe = this.appSession.listenLogout(() => {
+            this._setScenes(reconcile({}));
+        });
+
+        const unsubscribe1 = this.appSession.listenLogin((session) => {
+            this.fetchScenes(session.user_id);
+        })
+
+        onCleanup(() => {unsubscribe(); unsubscribe1()});
     }
 
     public async fetchScenes(userId?: string, password?: string): Promise<ListedScene[]> {
@@ -53,12 +65,16 @@ export class SceneHTTPController {
             }
 
             const data: ListedScene[] = await response.json();
+            const updatedScenes: Record<string, ListedScene> = {};
             data.forEach((scene) => {
-                this._setScenes(scene.uid, scene);
-            })
+                updatedScenes[scene.uid] = scene;
+            });
+
+            this._setScenes(reconcile(updatedScenes));
             return data;
 
         } catch (error) {
+            this._setScenes(reconcile({}));
             console.error("Failed to fetch scenes:", error);
             throw error;
 
@@ -123,18 +139,34 @@ export class SceneHTTPController {
 
 
     public async fetchSceneToken(scene_id: string): Promise<string> {
-        const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${scene_id}/token`, {
-            headers: { "Content-Type": "application/json" },
-            method: "POST",
-            body: JSON.stringify({ user_id: this.appSession.userSession?.user_id })
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to generate scene connection token");
+        try {
+            const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${scene_id}/token`, {
+                headers: { "Content-Type": "application/json" },
+                method: "POST",
+                body: JSON.stringify({ user_id: this.appSession.userSession?.user_id })
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.detail || errorData.message || response.statusText;
+    
+                if (response.status == 401) {
+                    throw new UnauthorizedError(errorMessage);
+                } else if (response.status == 403) {
+                    throw new ForbiddenError(errorMessage);
+                }
+    
+                throw new HttpError(response.status, "Failed to generate scene connection token");
+            }
+            const data = await response.json();
+            return data.token;
+        
+        } catch (error) {
+            if (error instanceof HttpError) {
+                throw error;
+            }
+            throw new Error("Failed to get scene token")
         }
-
-        const data = await response.json();
-        return data.token;
     }
 
 
