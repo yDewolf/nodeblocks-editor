@@ -23,7 +23,8 @@ export enum WebsocketStatus {
     ERROR = -1,
     CONNECTING = 2,
     CONNECTED = 1,
-    DISCONNECTED = 0
+    DISCONNECTED = 0,
+    FAILED_TO_RECONNECT = -2
 }
 
 export enum EditorActionStatus {

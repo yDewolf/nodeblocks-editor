@@ -56,6 +56,12 @@ export const ScenesView = (props: {
         setActiveSceneId(null);
     }
 
+    onMount(() => {
+        if (props.sessionData) {
+            props.sceneController.fetchScenes(props.sessionData?.user_id);
+        }
+    });
+
     return (
         <div class="container">
             <div class="keep row-container fill space-between">
@@ -104,15 +110,21 @@ export const ScenesView = (props: {
                 </div>
             </div>
             <div class="keep row-container fill">
-                <button class="icon-button" onclick={() => props.sceneController.fetchScenes(
-                    props.sessionData?.user_id,
-                    // TODO: password
-                )}>
+                <button class="icon-button" onclick={() => {
+                    if (!props.sessionData) return;
+
+                    props.sceneController.fetchScenes(
+                        props.sessionData?.user_id,
+                        // TODO: password
+                    )
+                }}>
                     <RefreshIcon class="smaller-icon"/>
                 </button>
                 <span class="center-content">Found {props.sceneController.scenes.length} scenes</span>
             </div>
-            <Show when={props.sessionData}>
+            <Show when={props.sessionData} fallback={
+                <span>You must log in to view scenes</span>
+            }>
                 {(sessionData) => <>
                     <Show when={!props.sceneController.isLoading} fallback={
                         <span>Loading Scenes...</span>

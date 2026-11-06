@@ -3,6 +3,7 @@ import { AppSessionManager } from "~/network/app-session-manager";
 import { SceneData } from "~/protocols/nodeblocks/manifests/node/node-graph-data";
 import { ScenePermission } from "../protocols/scene-perms";
 import { createStore, reconcile, SetStoreFunction } from "solid-js/store";
+import { ForbiddenError, HttpError, UnauthorizedError } from "./http_errors";
 
 export interface ListedScene {
     uid: string;
@@ -138,18 +139,34 @@ export class SceneHTTPController {
 
 
     public async fetchSceneToken(scene_id: string): Promise<string> {
-        const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${scene_id}/token`, {
-            headers: { "Content-Type": "application/json" },
-            method: "POST",
-            body: JSON.stringify({ user_id: this.appSession.userSession?.user_id })
-        });
-
-        if (!response.ok) {
-            throw new Error("Failed to generate scene connection token");
+        try {
+            const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${scene_id}/token`, {
+                headers: { "Content-Type": "application/json" },
+                method: "POST",
+                body: JSON.stringify({ user_id: this.appSession.userSession?.user_id })
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.detail || errorData.message || response.statusText;
+    
+                if (response.status == 401) {
+                    throw new UnauthorizedError(errorMessage);
+                } else if (response.status == 403) {
+                    throw new ForbiddenError(errorMessage);
+                }
+    
+                throw new HttpError(response.status, "Failed to generate scene connection token");
+            }
+            const data = await response.json();
+            return data.token;
+        
+        } catch (error) {
+            if (error instanceof HttpError) {
+                throw error;
+            }
+            throw new Error("Failed to get scene token")
         }
-
-        const data = await response.json();
-        return data.token;
     }
 
 
