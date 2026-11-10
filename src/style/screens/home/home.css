@@ -31,6 +31,10 @@
         border-right: 1px solid var(--stroke-color);
     }
 
+    .home-left-tab-routes {
+        height: stretch;
+    }
+
     .home-left-tab-route {
         padding: 0 4px;
         text-decoration: none;

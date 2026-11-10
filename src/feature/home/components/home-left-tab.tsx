@@ -4,6 +4,7 @@ import { useAppSession } from "~/network/app-session-provider";
 import "~/style/screens/home/home.css";
 import { Dropdown } from "~/components/panels/dropdown";
 import { useLocation } from "@solidjs/router";
+import SettingsIcon from "~/assets/icons/settings.svg";
 
 export const HomeLeftTab = (props: {
     routes: HomeRouteConfig[]
@@ -53,7 +54,7 @@ export const HomeLeftTab = (props: {
                     </div>
                     
                 </div>
-                <div class="keep container fill">
+                <div class="home-left-tab-routes keep container fill">
                     <For each={props.routes}>
                         {(route) => {
                             const isActive = () => location.pathname === route.route;
@@ -72,6 +73,16 @@ export const HomeLeftTab = (props: {
                         }}
                     </For>
                 </div>
+                <a 
+                    href="/settings"
+                    class="home-left-tab-route keep row-container align-center"
+                    classList={{selected: location.pathname == "/settings"}}
+                >
+                    <SettingsIcon class="smaller-icon"/>
+                    <span class="home-route-label">
+                        Settings
+                    </span>
+                </a>
                 {/* TODO: add settings button here */}
             </div>
         </Show>

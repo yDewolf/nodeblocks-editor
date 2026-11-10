@@ -1,5 +1,5 @@
 @layer custom {
-    .settings-view {
+    .editor-settings-view {
         width: fit-content;
         height: fit-content;
         margin: auto;
@@ -8,5 +8,10 @@
     .settings-page {
         min-width: 200px;
         min-height: 200px;
+    }
+
+
+    .settings-view-content {
+        margin-top: 20px;
     }
 }

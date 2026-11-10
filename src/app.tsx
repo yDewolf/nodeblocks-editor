@@ -13,8 +13,10 @@ import { Home } from "./feature/home/home-route";
 import { ScenesRoute } from "./feature/home/scenes/scenes-view";
 import { PackageManagerProvider } from './feature/editor/contexts/package-manager-context';
 import DocsRoute from "./feature/docs/docs-route";
+import { SettingsRoute } from "./feature/home/settings/settings-route";
+import { appSettings } from "./feature/app-settings";
 
-const app_session = new AppSessionManager();
+const app_session = new AppSessionManager(appSettings.serverHost, appSettings.serverPort);
 export default function App() {
     createEffect(() => {
       UpdateRootDataTheme();
@@ -30,6 +32,7 @@ export default function App() {
                   <Route path="" component={() => <Navigate href="/scenes" />} />
                   <Route path="scenes" component={ScenesRoute}/>
                   <Route path="docs" component={DocsRoute}/>
+                  <Route path="settings" component={SettingsRoute}/>
                 </Route>
                 <Route path="/scene/:scene_id" component={SceneEditor} />
             </Router>

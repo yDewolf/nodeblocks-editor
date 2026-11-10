@@ -11,6 +11,9 @@ pub fn run() {
       }
       Ok(())
     })
+    .on_page_load(|window, _| {
+      window.eval("window.isTauriEnvironment = true;").unwrap();
+    })
     .run(tauri::generate_context!())
     .expect("error while building tauri application");
 }

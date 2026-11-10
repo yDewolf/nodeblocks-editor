@@ -4,7 +4,7 @@ import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
 import { NodeTypePreview, NodeTypeSelector } from "./component/node-type-selector";
 import { DropsideItemData, Dropdown, DropsideManager, DropdownItemButton, DropdownSection, DropdownItemInput } from "~/components/panels/dropdown";
 import { TabSelector } from "~/components/panels/tab-display";
-import { SettingsView } from "../../screens/settings-view";
+import { EditorSettingsView } from "../../screens/settings-view";
 import LeftTabIcon from '~/assets/icons/left-tab.svg';
 import { ClientSceneCommandTypes, CommandGroups } from "~/protocols/nodeblocks/network/client-command-protocol";
 import { nanoid } from "nanoid";
@@ -40,7 +40,7 @@ const LeftTabDropdown = (props: {
         }],
     ])
     
-    const SettingsCallback = () => <SettingsView page_viewer={props.page_viewer}/>;
+    const SettingsCallback = () => <EditorSettingsView page_viewer={props.page_viewer}/>;
     const navigate = useNavigate();
     return (
         <Dropdown>
@@ -63,7 +63,7 @@ const LeftTabDropdown = (props: {
                 <DropdownItemButton label="Settings" onClick={() => {
                     props.page_viewer.current_page = {
                         page_title: "Settings",
-                        view_displayer_css: "settings-view",
+                        view_displayer_css: "editor-settings-view",
                         element: SettingsCallback
                     };
                 }} onMouseOver={setCurrentItem(undefined)}/>
