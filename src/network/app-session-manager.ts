@@ -1,6 +1,7 @@
+import { loginAction, logoutAction } from '~/server/user-session';
 import { UserSessionData } from './protocols/user-session';
 import { createStore, SetStoreFunction } from 'solid-js/store';
-import { loginAction, logoutAction } from '~/server/session';
+import { setServerUrlAction } from '~/server/connected-server';
 
 interface SessionStore {
     user_session?: UserSessionData
@@ -8,26 +9,39 @@ interface SessionStore {
 
 type LoginListener = (session: UserSessionData) => void;
 type LogoutListener = () => void;
+type ServerListener = () => void;
 
 export class AppSessionManager {
     private _sessionStore: SessionStore;
     private _setSessionStore: SetStoreFunction<SessionStore>;
 
     // Server urls
-    public readonly baseHttpUrl: string;
-    public readonly baseWsUrl: string;
+    private _host: string;
+    private _port: number;
+
+    private _baseHttpUrl: string;
+    private _baseWsUrl: string;
 
     private _loginListeners: Set<LoginListener> = new Set();
-    private _logoutListeners: Set<() => void> = new Set();
+    private _logoutListeners: Set<LogoutListener> = new Set();
+    private _serverListeners: Set<ServerListener> = new Set();
 
     constructor(host: string = "localhost", port: number = 8080) {
         [this._sessionStore, this._setSessionStore] = createStore<SessionStore>({
             
         });
-        
-        this.baseHttpUrl = `http://${host}:${port}`;
-        this.baseWsUrl = `ws://${host}:${port}`;
+        this._port = port;
+        this._host = host;
+
+        this._baseHttpUrl = `http://${host}:${port}`;
+        this._baseWsUrl = `ws://${host}:${port}`;
     }
+
+    get baseHttpUrl() { return this._baseHttpUrl; }
+    get baseWsUrl() { return this._baseWsUrl; }
+
+    get port() { return this._port; }
+    get host() { return this._host; }
 
     get userSession() { return this._sessionStore.user_session; }
     public setUserSession(user_session?: UserSessionData | null) {
@@ -35,6 +49,21 @@ export class AppSessionManager {
             return;
         }
         this._setSessionStore("user_session", user_session ?? undefined);
+    }
+
+    public async tryConnectToServer(serverHost: string, serverPort: number) {
+        try {
+            const serverUrl = `http://${serverHost}:${serverPort}`;
+            console.log("[AppSession] trying to connect to: ", serverUrl);
+            await setServerUrlAction(serverUrl);
+            
+            this.changeServer(serverHost, serverPort);
+            if (this.userSession) {
+                await this.login(this.userSession?.user_id);
+            }
+        } catch (err) {
+            console.error("Failed to connect to server: ", err);
+        }
     }
 
     public async login(user_id: string, password?: string): Promise<void> {
@@ -79,11 +108,33 @@ export class AppSessionManager {
         return () => this._logoutListeners.delete(listener);
     }
 
+    public listenServerChange(listener: ServerListener): () => void {
+        this._serverListeners.add(listener);
+        return () => this._serverListeners.delete(listener);
+    }
+
     private notifyLogin(session: UserSessionData): void {
         this._loginListeners.forEach((listener) => listener(session));
     }
 
     private notifyLogout(): void {
         this._logoutListeners.forEach((listener) => listener());
+    }
+
+    private notifyServerChanged(): void {
+        this._serverListeners.forEach((listener) => listener());
+    }
+
+    // -- other
+
+    private changeServer(host: string, port: number) {
+        this._port = port;
+        this._host = host;
+
+        
+        this._baseHttpUrl = `http://${host}:${port}`;
+        this._baseWsUrl = `ws://${host}:${port}`;
+        console.log("[AppSession] changed server url to: ", this.baseHttpUrl);
+        this.notifyServerChanged();
     }
 }

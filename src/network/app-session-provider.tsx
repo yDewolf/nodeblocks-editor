@@ -1,7 +1,7 @@
 import { createContext, ParentComponent, useContext } from "solid-js";
 import { AppSessionManager } from "./app-session-manager";
 import { createAsync } from "@solidjs/router";
-import { getUserSession } from "~/server/session";
+import { getUserSession } from "./protocols/user-session";
 
 
 const AppSessionContext = createContext<AppSessionManager>();

@@ -1,23 +1,32 @@
 import "~/app.css";
+import {} from "~/feature/ui-themes";
 
 import { Router, Route, Navigate } from "@solidjs/router";
 import SceneEditor from "./feature/editor/scene-editor-route";
 import { AppSessionProvider } from "./network/app-session-provider";
 import { AppSessionManager } from "./network/app-session-manager";
-import { createEffect } from "solid-js";
+import { createEffect, onMount } from "solid-js";
 import { UpdateRootDataTheme } from "./feature/ui-themes";
 import { ContextMenuPortal } from "./feature/context-menu/context-menu-component";
-import {} from "~/feature/ui-themes";
-
 import { Home } from "./feature/home/home-route";
 import { ScenesRoute } from "./feature/home/scenes/scenes-view";
 import { PackageManagerProvider } from './feature/editor/contexts/package-manager-context';
 import DocsRoute from "./feature/docs/docs-route";
 import { SettingsRoute } from "./feature/home/settings/settings-route";
-import { appSettings } from "./feature/app-settings";
+import { getActiveServerUrl } from "./server/connected-server";
 
-const app_session = new AppSessionManager(appSettings.serverHost, appSettings.serverPort);
+const app_session = new AppSessionManager();
 export default function App() {
+    onMount(async () => {
+      const activeServerUrl = await getActiveServerUrl();
+      console.log(activeServerUrl);
+      const parsedUrl = new URL(activeServerUrl);
+  
+      const serverHost = parsedUrl.hostname;
+      const serverPort = Number.parseInt(parsedUrl.port) || (parsedUrl.protocol === "https:" ? 443 : 80);
+      app_session.tryConnectToServer(serverHost, serverPort);
+    });
+
     createEffect(() => {
       UpdateRootDataTheme();
     });
