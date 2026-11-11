@@ -113,7 +113,7 @@ export const LocalServerSetupContent = (props: {
             {error()}
           </pre>
           <Show when={!error().includes("already running")}>
-            <button onclick={handleInstall}>Try again</button>
+            <button class="text-button" onclick={handleInstall}>Try again</button>
           </Show>
         </Match>
       </Switch>

@@ -172,7 +172,7 @@ fn get_state_file_path(app: &tauri::AppHandle) -> PathBuf {
     return app_dir.join("install_state.json");
 }
 
-fn get_local_server_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+pub fn get_local_server_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     let app_dir = app.path().app_local_data_dir().map_err(|e| e.to_string())?;
     Ok(app_dir.join("local_server"))
 }

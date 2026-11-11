@@ -5,6 +5,7 @@ import "~/style/screens/setup/setup.css";
 import { appSettings, setSetupComplete } from "../app-settings";
 import { useAppSession } from "~/network/app-session-provider";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 
 type WizardSteps = "start" | "local" | "remote";
 
@@ -21,15 +22,44 @@ export const SetupWizard: ParentComponent<{
     
     const [isLocalServerInstalled, setLocalServerInstalled] = createSignal<boolean>(false);
 
+    const [logs, setLogs] = createSignal<string[]>([]);
+
+    const [isLocalRunning, setLocalRunning] = createSignal(false);
     if (window.isTauriEnvironment) {
         onMount(async () => {
             const is_installed = await invoke<boolean>("check_server_installed");
             setLocalServerInstalled(is_installed);
+            const is_running = await invoke<boolean>("is_local_server_running");
+            setLocalRunning(is_running);
+        });
+
+        onMount(async () => {
+            const unlisten = await listen<string>("server-log", (event) => {
+                setLogs((prev) => [...prev, event.payload]);
+            });
+
+            onCleanup(() => {
+                unlisten();
+            });
         });
     }
 
-    const handleStartLocalServer = () => {
-
+    // TODO: fazer um controller para o servidor local que armazena logs e etc
+    const [serverStarting, setServerStarting] = createSignal(false);
+    const handleStartLocalServer = async () => {
+        setServerStarting(true);
+        try {
+            await invoke("start_local_server");
+            setLocalRunning(true);
+            // FIXME: trocar isso aqui por porta dinâmica
+            setTimeout(() => {
+                appSession.tryConnectToServer("127.0.0.1", 8080);
+            }, 1500);
+        } catch (err: any) {
+            console.error("Failed to start local server:", err);
+        } finally {
+            setServerStarting(false);
+        }
     };
 
     return (
@@ -56,8 +86,10 @@ export const SetupWizard: ParentComponent<{
                                             </button>
 
                                         }>
-                                            <button class="text-button" onClick={handleStartLocalServer}>
-                                                Start local server
+                                            <button class="text-button" onClick={handleStartLocalServer}
+                                                disabled={serverStarting()}
+                                            >
+                                                {serverStarting() ? "Starting..." : "Start local server"}
                                             </button>
                                         </Show>
                                         <button class="text-button" onClick={() => setStep("remote")}>
@@ -89,7 +121,6 @@ export const SetupWizard: ParentComponent<{
                             </Match>
                         </Switch>
                     </div>
-                    
                     <div class="setup-actions">
                         <button class="text-button" onclick={() => {
                             setSetupComplete(true);
@@ -97,6 +128,12 @@ export const SetupWizard: ParentComponent<{
                             Finish Setup
                         </button>
                     </div>
+                    <Show when={isLocalRunning()}>
+                        <details>
+                            <summary>Server Output</summary>
+                            <pre>{logs().join("\n")}</pre>
+                        </details>
+                    </Show>
                 </div>
             </div>
         </Show>
