@@ -1,5 +1,5 @@
 mod env;
-
+mod utils;
 use env::environment;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

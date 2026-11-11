@@ -1,15 +1,20 @@
-use serde::{Serialize, Deserialize};
-use tauri_plugin_shell::ShellExt;
-use std::collections::HashMap;
-use std::fs;
+use std::collections::{HashMap, VecDeque};
+use std::fs::{self, OpenOptions};
+use std::io::Write;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
-use tauri::{Emitter, Manager, State};
+ 
+use serde::{Deserialize, Serialize};
+use tauri::{Manager, State};
+use tauri_plugin_shell::process::{Command, CommandEvent};
+use tauri_plugin_shell::ShellExt;
+
+use crate::utils::progress_event::emit_progress;
 
 const PYTHON_VERSION: &str = "3.14";
 const NODEBLOCKS_WHEEL_URL: &str =
     "https://github.com/yDewolf/nodeblocks-server/releases/download/v0.2.0-beta/nodeblocks-0.2.0-py3-none-any.whl";
-
+const PROGRESS_EVENT: &str = "env-setup-progress";
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -79,6 +84,8 @@ pub async fn check_server_installed(app: tauri::AppHandle) -> Result<bool, Strin
 
 pub async fn install_local_server(app: tauri::AppHandle) -> Result<String, String> {
     let server_dir = get_local_server_dir(&app)?;
+    let log_path = server_dir.join("logs");
+    let _ = fs::create_dir(&log_path);
 
     let mut state = load_state(&app);
     let venv_path = server_dir.join(".venv");
@@ -87,10 +94,10 @@ pub async fn install_local_server(app: tauri::AppHandle) -> Result<String, Strin
     );
 
     if state.step == InstallStep::NotStarted {
-        emit_progress(&app, "venv", 10, "Setting up environment");
-        let _ = run_uv_sidecar(
+        let _ =run_uv_sidecar(
             &app,
-            &server_dir,
+            "venv", 10,
+            &server_dir, &log_path,
             vec![
                 "venv".into(), 
                 venv_path.to_string_lossy().to_string(), 
@@ -98,18 +105,17 @@ pub async fn install_local_server(app: tauri::AppHandle) -> Result<String, Strin
                 PYTHON_VERSION.into()
             ],
         )
-        .await
-        .map_err(|err| format!("Failed at instalation step 1: {}", err))?;
+        .await;
 
         state.step = InstallStep::VenvCreated;
         save_state(&app, &state)?;
     }
 
     if state.step == InstallStep::VenvCreated {
-        emit_progress(&app, "nodeblocks", 60, "Installing nodeblocks server");
         let _ = run_uv_sidecar(
             &app,
-            &server_dir,
+            "nodeblocks", 50,
+            &server_dir, &log_path,
             vec![
                 "pip".into(), "install".into(),
                 "--python".into(), 
@@ -117,14 +123,12 @@ pub async fn install_local_server(app: tauri::AppHandle) -> Result<String, Strin
                 NODEBLOCKS_WHEEL_URL.into()
             ],
         )
-        .await
-        .map_err(|err| format!("Failed at installation step 2: {}", err))?;
+        .await;
 
         state.step = InstallStep::Completed;
         save_state(&app, &state)?;
     }
 
-    emit_progress(&app, "verify", 95, "Veryfing installation");
     let verify = app
         .shell()
         .command(python_in_venv)
@@ -132,9 +136,9 @@ pub async fn install_local_server(app: tauri::AppHandle) -> Result<String, Strin
             "-c".to_string(),
             format!("import nodeblocks"),
         ]);
-    let _ = verify.output().await.map_err(|e| format!("Failed to verify installation {}", e))?;
+    let _ = run_step(&app, &log_path, "verify", 95, verify);
 
-    emit_progress(&app, "finished", 100, "Finished installing");
+    emit_progress(&app, PROGRESS_EVENT, "finished", 100, "Finished installing");
     Ok("Finished installation".into())
 }
 
@@ -177,53 +181,87 @@ fn get_local_server_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
 
 async fn run_uv_sidecar(
     app: &tauri::AppHandle,
+    step: &str,
+    percent: u8,
     server_dir: &PathBuf,
+    log_path: &PathBuf,
     args: Vec<String>,
-) -> Result<String, String> {
+) -> Result<(), String> {
     let python_install_dir = server_dir.join(".python_versions");
     let cache_dir = server_dir.join(".uv_cache");
     let envs: HashMap<String, String> = HashMap::from([
         ("UV_PYTHON_INSTALL_DIR".to_string(), python_install_dir.to_string_lossy().to_string()),
-        ("UV_CACHE_DIR".to_string(), cache_dir.to_string_lossy().to_string())
+        ("UV_CACHE_DIR".to_string(), cache_dir.to_string_lossy().to_string()),
+        ("UV_NO_PROGRESS".to_string(), "1".to_string()),
+        ("UV_NO_CONFIG".to_string(), "1".to_string()),
+        ("NO_COLOR".to_string(), "1".to_string()),
+        ("UV_HTTP_TIMEOUT".to_string(), "300".to_string()),
     ]);
 
-    let output = app
+    let uv_command = app
         .shell()
         .sidecar("uv")
         .map_err(|e| format!("Failed to load uv sidecar: {}", e))?
         .args(args)
-        .envs(envs)
-        .output()
-        .await
-        .map_err(|e| format!("Failed to execute uv command: {}", e))?;
+        .envs(envs);
 
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(stderr.to_string());
-    }
-
-    Ok(String::from_utf8_lossy(&output.stdout).to_string())
+    run_step(app, log_path, step, percent, uv_command).await
 }
 
-
-
-// -- events
-const PROGRESS_EVENT: &str = "env-setup-progress";
-
-#[derive(Clone, Serialize)]
-struct Progress {
-    step: String,
+async fn run_step(
+    app: &tauri::AppHandle,
+    log_path: &PathBuf,
+    step: &str,
     percent: u8,
-    message: String,
-}
+    command: Command,
+) -> Result<(), String> {
+    const TAIL_LINES: usize = 40;
+    let (mut rx, _child) = command
+        .spawn()
+        .map_err(|e| format!("could not start {step} step: {e}"))?;
+ 
+    let mut log = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(log_path)
+        .ok();
 
-fn emit_progress(app: &tauri::AppHandle, step: &str, percent: u8, message: &str) {
-    let _ = app.emit(
-        PROGRESS_EVENT,
-        Progress {
-            step: step.to_string(),
-            percent,
-            message: message.to_string(),
-        },
-    );
+    let mut tail: VecDeque<String> = VecDeque::with_capacity(TAIL_LINES);
+    let mut exit_code: Option<i32> = None;
+ 
+    while let Some(event) = rx.recv().await {
+        match event {
+            CommandEvent::Stdout(bytes) | CommandEvent::Stderr(bytes) => {
+                let line = String::from_utf8_lossy(&bytes).trim().to_string();
+                if line.is_empty() {
+                    continue;
+                }
+                if let Some(file) = log.as_mut() {
+                    let _ = writeln!(file, "[{step}] {line}");
+                }
+                emit_progress(app, PROGRESS_EVENT, step, percent, &line);
+ 
+                if tail.len() == TAIL_LINES {
+                    tail.pop_front();
+                }
+                tail.push_back(line);
+            }
+            CommandEvent::Error(e) => return Err(format!("step '{step}' failed: {e}")),
+            CommandEvent::Terminated(payload) => {
+                exit_code = payload.code;
+                break;
+            }
+            _ => {}
+        }
+    }
+ 
+    if exit_code == Some(0) {
+        return Ok(());
+    }
+ 
+    let output = tail.into_iter().collect::<Vec<_>>().join("\n");
+    Err(format!(
+        "step '{step}' failed (exit code {exit_code:?}):\n{output}\n\nFull log: {}",
+        log_path.display()
+    ))
 }
