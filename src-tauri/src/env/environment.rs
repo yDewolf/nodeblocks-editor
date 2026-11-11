@@ -4,11 +4,13 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
-use tauri::{Manager, State};
+use tauri::{Emitter, Manager, State};
 
 const PYTHON_VERSION: &str = "3.14";
 const NODEBLOCKS_WHEEL_URL: &str =
     "https://github.com/yDewolf/nodeblocks-server/releases/download/v0.2.0-beta/nodeblocks-0.2.0-py3-none-any.whl";
+
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 enum InstallStep {
@@ -85,6 +87,7 @@ pub async fn install_local_server(app: tauri::AppHandle) -> Result<String, Strin
     );
 
     if state.step == InstallStep::NotStarted {
+        emit_progress(&app, "venv", 10, "Setting up environment");
         let _ = run_uv_sidecar(
             &app,
             &server_dir,
@@ -103,6 +106,7 @@ pub async fn install_local_server(app: tauri::AppHandle) -> Result<String, Strin
     }
 
     if state.step == InstallStep::VenvCreated {
+        emit_progress(&app, "nodeblocks", 60, "Installing nodeblocks server");
         let _ = run_uv_sidecar(
             &app,
             &server_dir,
@@ -120,6 +124,17 @@ pub async fn install_local_server(app: tauri::AppHandle) -> Result<String, Strin
         save_state(&app, &state)?;
     }
 
+    emit_progress(&app, "verify", 95, "Veryfing installation");
+    let verify = app
+        .shell()
+        .command(python_in_venv)
+        .args(vec![
+            "-c".to_string(),
+            format!("import nodeblocks"),
+        ]);
+    let _ = verify.output().await.map_err(|e| format!("Failed to verify installation {}", e))?;
+
+    emit_progress(&app, "finished", 100, "Finished installing");
     Ok("Finished installation".into())
 }
 
@@ -158,7 +173,6 @@ fn get_local_server_dir(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     Ok(app_dir.join("local_server"))
 }
 
-
 // -- uv utils
 
 async fn run_uv_sidecar(
@@ -176,12 +190,12 @@ async fn run_uv_sidecar(
     let output = app
         .shell()
         .sidecar("uv")
-        .map_err(|e| format!("Falha ao carregar o sidecar uv: {}", e))?
+        .map_err(|e| format!("Failed to load uv sidecar: {}", e))?
         .args(args)
         .envs(envs)
         .output()
         .await
-        .map_err(|e| format!("Erro na execução do comando uv: {}", e))?;
+        .map_err(|e| format!("Failed to execute uv command: {}", e))?;
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
@@ -189,4 +203,27 @@ async fn run_uv_sidecar(
     }
 
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
+}
+
+
+
+// -- events
+const PROGRESS_EVENT: &str = "env-setup-progress";
+
+#[derive(Clone, Serialize)]
+struct Progress {
+    step: String,
+    percent: u8,
+    message: String,
+}
+
+fn emit_progress(app: &tauri::AppHandle, step: &str, percent: u8, message: &str) {
+    let _ = app.emit(
+        PROGRESS_EVENT,
+        Progress {
+            step: step.to_string(),
+            percent,
+            message: message.to_string(),
+        },
+    );
 }
