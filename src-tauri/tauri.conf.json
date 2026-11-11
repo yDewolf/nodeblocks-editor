@@ -6,8 +6,8 @@
   "build": {
     "frontendDist": "../../src/",
     "devUrl": "http://localhost:3000",
-    "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "beforeDevCommand": "node scripts/fetch-uv.mjs && npm run dev",
+    "beforeBuildCommand": "node scripts/fetch-uv.mjs && npm run build"
   },
   "app": {
     "windows": [
@@ -35,6 +35,9 @@
     ],
     "android": {
       "debugApplicationIdSuffix": ".debug"
-    }
+    },
+    "externalBin": [
+      "binaries/uv"
+    ]
   }
 }

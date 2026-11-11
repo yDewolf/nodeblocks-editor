@@ -14,39 +14,43 @@ import { PackageManagerProvider } from './feature/editor/contexts/package-manage
 import DocsRoute from "./feature/docs/docs-route";
 import { SettingsRoute } from "./feature/home/settings/settings-route";
 import { getActiveServerUrl } from "./server/connected-server";
+import SetupScreen from "./feature/setup/setup-screen";
 
 const app_session = new AppSessionManager();
 export default function App() {
-    onMount(async () => {
-      const activeServerUrl = await getActiveServerUrl();
-      console.log(activeServerUrl);
-      const parsedUrl = new URL(activeServerUrl);
+  return (
+    <SetupScreen onReady={() => {}}/>
+  )
+    // onMount(async () => {
+    //   const activeServerUrl = await getActiveServerUrl();
+    //   console.log(activeServerUrl);
+    //   const parsedUrl = new URL(activeServerUrl);
   
-      const serverHost = parsedUrl.hostname;
-      const serverPort = Number.parseInt(parsedUrl.port) || (parsedUrl.protocol === "https:" ? 443 : 80);
-      app_session.tryConnectToServer(serverHost, serverPort);
-    });
+    //   const serverHost = parsedUrl.hostname;
+    //   const serverPort = Number.parseInt(parsedUrl.port) || (parsedUrl.protocol === "https:" ? 443 : 80);
+    //   app_session.tryConnectToServer(serverHost, serverPort);
+    // });
 
-    createEffect(() => {
-      UpdateRootDataTheme();
-    });
+    // createEffect(() => {
+    //   UpdateRootDataTheme();
+    // });
 
-    return (
-      <AppSessionProvider appSession={app_session}>
-        <PackageManagerProvider>
-          <main>
-            <ContextMenuPortal />
-            <Router>
-                <Route path="/" component={Home}>
-                  <Route path="" component={() => <Navigate href="/scenes" />} />
-                  <Route path="scenes" component={ScenesRoute}/>
-                  <Route path="docs" component={DocsRoute}/>
-                  <Route path="settings" component={SettingsRoute}/>
-                </Route>
-                <Route path="/scene/:scene_id" component={SceneEditor} />
-            </Router>
-          </main>
-        </PackageManagerProvider>
-      </AppSessionProvider>
-    );
+    // return (
+    //   <AppSessionProvider appSession={app_session}>
+    //     <PackageManagerProvider>
+    //       <main>
+    //         <ContextMenuPortal />
+    //         <Router>
+    //             <Route path="/" component={Home}>
+    //               <Route path="" component={() => <Navigate href="/scenes" />} />
+    //               <Route path="scenes" component={ScenesRoute}/>
+    //               <Route path="docs" component={DocsRoute}/>
+    //               <Route path="settings" component={SettingsRoute}/>
+    //             </Route>
+    //             <Route path="/scene/:scene_id" component={SceneEditor} />
+    //         </Router>
+    //       </main>
+    //     </PackageManagerProvider>
+    //   </AppSessionProvider>
+    // );
 }
