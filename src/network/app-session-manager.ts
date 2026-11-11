@@ -2,6 +2,7 @@ import { loginAction, logoutAction } from '~/server/user-session';
 import { UserSessionData } from './protocols/user-session';
 import { createStore, SetStoreFunction } from 'solid-js/store';
 import { setServerUrlAction } from '~/server/connected-server';
+import { createSignal, Setter } from 'solid-js';
 
 interface SessionStore {
     user_session?: UserSessionData
@@ -26,10 +27,15 @@ export class AppSessionManager {
     private _logoutListeners: Set<LogoutListener> = new Set();
     private _serverListeners: Set<ServerListener> = new Set();
 
+    private _isConnectedToServer: () => boolean;
+    private _setIsConnectedToServer: Setter<boolean>;
+
     constructor(host: string = "localhost", port: number = 8080) {
         [this._sessionStore, this._setSessionStore] = createStore<SessionStore>({
             
         });
+        [this._isConnectedToServer, this._setIsConnectedToServer] = createSignal<boolean>(false);
+
         this._port = port;
         this._host = host;
 
@@ -44,6 +50,8 @@ export class AppSessionManager {
     get host() { return this._host; }
 
     get userSession() { return this._sessionStore.user_session; }
+    get isConnectedToServer() { return this._isConnectedToServer(); }
+
     public setUserSession(user_session?: UserSessionData | null) {
         if (!user_session?.user_id) {
             return;
@@ -55,8 +63,12 @@ export class AppSessionManager {
         try {
             const serverUrl = `http://${serverHost}:${serverPort}`;
             console.log("[AppSession] trying to connect to: ", serverUrl);
-            await setServerUrlAction(serverUrl);
+            const success = await setServerUrlAction(serverUrl);
+            if (!success) {
+                throw Error();
+            }
             
+            this._setIsConnectedToServer(true);
             this.changeServer(serverHost, serverPort);
             if (this.userSession) {
                 await this.login(this.userSession?.user_id);

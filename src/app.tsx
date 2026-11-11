@@ -14,21 +14,28 @@ import { PackageManagerProvider } from './feature/editor/contexts/package-manage
 import DocsRoute from "./feature/docs/docs-route";
 import { SettingsRoute } from "./feature/home/settings/settings-route";
 import { getActiveServerUrl } from "./server/connected-server";
-import { FirstTimeSetupRoute, SetupRoute } from "./feature/setup/setup-route";
+import { SetupScreen } from "./feature/setup/setup-route";
+
+declare global {
+  interface Window {
+    isTauriEnvironment?: boolean;
+  }
+}
 
 const app_session = new AppSessionManager();
 export default function App() {
-  // return (
-  //   <SetupScreenContent onReady={() => {}}/>
-  // )
-  onMount(async () => {
+  const connectToServer = async () => {
     const activeServerUrl = await getActiveServerUrl();
-    console.log(activeServerUrl);
     const parsedUrl = new URL(activeServerUrl);
 
     const serverHost = parsedUrl.hostname;
     const serverPort = Number.parseInt(parsedUrl.port) || (parsedUrl.protocol === "https:" ? 443 : 80);
+    
     app_session.tryConnectToServer(serverHost, serverPort);
+  };
+
+  onMount(async () => {
+    await connectToServer();
   });
 
   createEffect(() => {
@@ -37,21 +44,22 @@ export default function App() {
 
   return (
     <AppSessionProvider appSession={app_session}>
-      <PackageManagerProvider>
-        <main>
-          <ContextMenuPortal />
-          <Router>
-              <Route path="/" component={Home}>
-                <Route path="" component={() => <Navigate href="/scenes" />}/>
-                <Route path="scenes" component={ScenesRoute}/>
-                <Route path="docs" component={DocsRoute}/>
-                <Route path="settings" component={SettingsRoute}/>
-                <Route path="setup" component={SetupRoute} />
-              </Route>
-              <Route path="/scene/:scene_id" component={SceneEditor} />
-          </Router>
-        </main>
-      </PackageManagerProvider>
+      <SetupScreen>
+        <PackageManagerProvider>
+          <main>
+            <ContextMenuPortal />
+            <Router>
+                <Route path="/" component={Home}>
+                  <Route path="" component={() => <Navigate href="/scenes" />}/>
+                  <Route path="scenes" component={ScenesRoute}/>
+                  <Route path="docs" component={DocsRoute}/>
+                  <Route path="settings" component={SettingsRoute}/>
+                </Route>
+                <Route path="/scene/:scene_id" component={SceneEditor} />
+            </Router>
+          </main>
+        </PackageManagerProvider>
+      </SetupScreen>
     </AppSessionProvider>
   );
 }

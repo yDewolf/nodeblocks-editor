@@ -66,6 +66,10 @@
     transform: inherit;
 }
 
+button.go-back {
+    margin-bottom: 20px;
+}
+
 .text-button {
     border: none;
     padding: 4px 8px;
@@ -78,6 +82,10 @@
 
 .text-button:hover {
     background-color: var(--overlay-highlight);
+}
+
+.text-button:disabled {
+    background-color: var(--disabled-button-background);
 }
 
 .selectable-button {

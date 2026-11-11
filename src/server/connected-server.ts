@@ -14,10 +14,17 @@ export async function getActiveServerUrl(): Promise<string> {
     return data?.server_url || DEFAULT_SERVER_URL;
 }
 
-export async function setServerUrlAction(newUrl: string): Promise<void> {
+export async function setServerUrlAction(newUrl: string): Promise<boolean> {
+    try {
+        await fetch(newUrl);
+    } catch {
+        console.error("Failed to establish a connection with server", newUrl);
+        return false;
+    }
     const session = await useAppSession();
     await session.update({
         ...session.data,
         server_url: newUrl,
     });
+    return true;
 }

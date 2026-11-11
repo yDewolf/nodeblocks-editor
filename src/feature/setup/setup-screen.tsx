@@ -36,7 +36,6 @@ export const LocalServerSetupContent = (props: {
       await invoke("ensure_environment");
       setPhase("installed");
       props.onReady();
-    
     } catch (e) {
       setError(String(e));
       setPhase("error");

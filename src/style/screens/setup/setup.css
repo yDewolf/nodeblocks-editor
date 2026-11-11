@@ -7,4 +7,27 @@
         background-color: var(--dark-overlay-background);
         color: var(--font-color);
     }
+
+    .setup-title {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .setup-wizard-content {
+        height: 50%;
+        width: 50%;
+        margin: auto;
+    }
+    
+    .setup-options {
+        margin-top: 30px;
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    .setup-actions {
+        margin-top: auto;
+        display: flex;
+        justify-content: right;
+    }       
 }
