@@ -1,3 +1,8 @@
+import en from "./en";
+
 export default {
-    test: ""
-}
+    routes: {
+        scenes: "Cenas",
+        docs: "Documentação",
+    }
+} satisfies typeof en;

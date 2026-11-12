@@ -1,3 +1,6 @@
 export default {
-    test: ""
+    routes: {
+        scenes: "Scenes",
+        docs: "Documentation",
+    }
 }

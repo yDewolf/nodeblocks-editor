@@ -1,13 +1,12 @@
-import { createContext, useContext, createSignal, createMemo, ParentComponent } from "solid-js";
+import { createContext, useContext, createMemo, ParentComponent } from "solid-js";
 import { translator, flatten, Translator, BaseRecordDict } from "@solid-primitives/i18n";
-import { appSettings, defaultSystemLanguage, getShortSystemLanguage, setLocale } from "~/feature/app-settings";
-import { localeDicts, Locale } from "./i18n-locale";
-import { isServer } from "solid-js/web";
+import { appSettings, defaultSystemLanguage, setLocale } from "~/feature/app-settings";
+import { localeDicts, Locale, TranslationKey } from "./i18n-locale";
 
 type I18nContextType = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  t: Translator<BaseRecordDict, string>;
+  t: (path: TranslationKey, vars?: Record<string, string | number>) => string;
 };
 
 const I18nContext = createContext<I18nContextType>();
@@ -18,8 +17,7 @@ export const I18nProvider: ParentComponent = (props) => {
         setLocale(defaultLocale);
     }
     const localeDict = localeDicts[appSettings.locale || defaultLocale];
-    console.log(localeDict);
-    const dict = createMemo(() => flatten(localeDicts));
+    const dict = createMemo(() => flatten(localeDict));
     const translate = translator(dict);
 
     return (
