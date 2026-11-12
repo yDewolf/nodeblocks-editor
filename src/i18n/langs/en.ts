@@ -119,6 +119,47 @@ export default {
             position: "Position",
         }
     },
+    notifications: {
+        engine: {
+            shortMessage: {
+                runtimeError: "Runtime Error",
+                failedProcess: "Process Failure",
+                jobStatus: (status: string) => `Process ${status}`,
+                nodeStatus: (status: string) => `Node Status: ${status}`,
+                default: "Engine Event",
+            },
+            description: {
+                runtimeErrorFallback: "Failed to process a node...",
+                failedProcessFallback: "Failed to process scene...",
+                jobStatus: (status: string) => `Scene process status changed to: '${status}'.`,
+                nodeStatus: (status: string) => `Node execution status changed to: '${status}'.`,
+            },
+        },
+        command: {
+            shortMessage: {
+                addNode: "Cmd: Add Node",
+                addConn: "Cmd: Add Connection",
+                executionStateSync: "Cmd: Sync State",
+                getSceneData: "Cmd: Fetch Scene",
+                sceneWorker: "Cmd: Worker Action",
+                saveScene: "Saved Scene",
+                default: (cmdType?: string) => `Cmd: ${cmdType || "Unknown"}`,
+            },
+            description: {
+                addNode: (total: number, requestId: string, statusMessage?: string) =>
+                    `Added nodes. Total: ${total}. (request id: ${requestId}) ${statusMessage ?? ""}`.trim(),
+                addConn: (total: number, requestId: string, statusMessage?: string) =>
+                    `Created connections. Total: ${total}. (request id: ${requestId}) ${statusMessage ?? ""}`.trim(),
+                executionStateSync: (mode: string, state: string, statusMessage?: string) =>
+                    `Synced execution state. Mode: [${mode}], State: [${state}]. ${statusMessage ?? ""}`.trim(),
+                getSceneData: "Fetched scene data from server.",
+                sceneWorker: (requestId: string, statusMessage?: string) =>
+                    `Processed worker action. (request id: ${requestId}) ${statusMessage ?? ""}`.trim(),
+                saveScene: (statusMessage?: string) =>
+                    `Saved current scene in the server. ${statusMessage ?? ""}`.trim(),
+            },
+        },
+    },
     datatype: {
         shape: "Shape",
         channel: "Channel",

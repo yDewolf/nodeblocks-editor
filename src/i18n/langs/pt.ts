@@ -122,6 +122,47 @@ export default {
             position: "Posição",
         }
     },
+    notifications: {
+        engine: {
+            shortMessage: {
+                runtimeError: "Erro de execução",
+                failedProcess: "Falha no processo",
+                jobStatus: (status: string) => `Processo ${status}`,
+                nodeStatus: (status: string) => `Status do Node: ${status}`,
+                default: "Evento da Engine",
+            },
+            description: {
+                runtimeErrorFallback: "Falha ao processar um node...",
+                failedProcessFallback: "Falha ao processar a cena...",
+                jobStatus: (status: string) => `O status de processamento da cena mudou para: '${status}'.`,
+                nodeStatus: (status: string) => `O status de execução do node mudou para: '${status}'.`,
+            },
+        },
+        command: {
+            shortMessage: {
+                addNode: "Cmd: Add Node",
+                addConn: "Cmd: Add Conexão",
+                executionStateSync: "Cmd: Sincronizar estado",
+                getSceneData: "Cmd: Fetch Scene",
+                sceneWorker: "Cmd: Worker Action",
+                saveScene: "A cena foi salva",
+                default: (cmdType?: string) => `Cmd: ${cmdType || "Desconhecido"}`,
+            },
+            description: {
+                addNode: (total: number, requestId: string, statusMessage?: string) =>
+                    `Os nodes foram adicionados. Total: ${total}. (request id: ${requestId}) ${statusMessage ?? ""}`.trim(),
+                addConn: (total: number, requestId: string, statusMessage?: string) =>
+                    `As conexões foram criadas. Total: ${total}. (request id: ${requestId}) ${statusMessage ?? ""}`.trim(),
+                executionStateSync: (mode: string, state: string, statusMessage?: string) =>
+                    `O estado de execução foi sincronizado. Mode: [${mode}], State: [${state}]. ${statusMessage ?? ""}`.trim(),
+                getSceneData: "Os dados da cena foram sincronizados",
+                sceneWorker: (requestId: string, statusMessage?: string) =>
+                    `Ação do worker foi processada. (request id: ${requestId}) ${statusMessage ?? ""}`.trim(),
+                saveScene: (statusMessage?: string) =>
+                    `A cena foi salva no servidor. ${statusMessage ?? ""}`.trim(),
+            },
+        },
+    },
     datatype: {
         shape: "Forma",
         channel: "Canal",
