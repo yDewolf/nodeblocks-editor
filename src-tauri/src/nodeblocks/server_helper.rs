@@ -42,6 +42,7 @@ pub async fn start_local_server(app: tauri::AppHandle, state: tauri::State<'_, S
         .arg("--extraction")
         .arg(&extraction_dir)
         .env("PLUGIN_LIBS_FOLDER", &plugin_libs_dir)
+        .env("INCLUDE_REMOTE_ACCESS_ROUTES", "True")
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()

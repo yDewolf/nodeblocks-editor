@@ -1,5 +1,4 @@
 import "~/app.css";
-import {} from "~/feature/ui-themes";
 
 import { Router, Route, Navigate } from "@solidjs/router";
 import SceneEditor from "./feature/editor/scene-editor-route";

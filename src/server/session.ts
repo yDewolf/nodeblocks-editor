@@ -1,12 +1,20 @@
-"use server";
-import { useSession } from "@solidjs/start/http";
+import { makePersisted } from "@solid-primitives/storage";
+import { createStore } from "solid-js/store";
+import { UserSessionData } from "~/network/protocols/user-session";
 
-export async function useAppSession() {
-    if (!process.env.SESSION_SECRET) {
-        console.error("Missing .env SESSION_SECRET");
-    }
-    return useSession({
-        name: "nodeblocks-app-session",
-        password: process.env.SESSION_SECRET,
-    });
+interface AppSession {
+    userSession?: UserSessionData,
+    serverUrl?: string
 }
+
+const [appSession, _setAppSession] = makePersisted(
+    createStore<AppSession>({
+        serverUrl: "http://localhost:8080"
+    }), 
+    {name: "app-session"}
+);
+
+export const getUserSession = () => {
+    return appSession.userSession
+}
+export {appSession, _setAppSession};

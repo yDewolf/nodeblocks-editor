@@ -1,8 +1,6 @@
-"use server";
-
 import { UserSessionData } from "~/network/protocols/user-session";
 import { getActiveServerUrl } from "./connected-server";
-import { useAppSession } from "./session";
+import { _setAppSession } from "./session";
 
 export async function loginAction(user_id: string, password?: string): Promise<UserSessionData> {
     const serverUrl = await getActiveServerUrl();
@@ -18,21 +16,12 @@ export async function loginAction(user_id: string, password?: string): Promise<U
 
     const json_data = await response.json();
     
-    const session = await useAppSession();
-    await session.update({
-        ...session.data,
-        user_id: json_data.user_id,
-        display_name: json_data.display_name
-    });
+    const userSession = json_data as UserSessionData;
+    _setAppSession("userSession", userSession);
 
-    return session.data as UserSessionData;
+    return userSession;
 }
 
 export async function logoutAction(): Promise<void> {
-    const session = await useAppSession();
-    await session.update({
-        ...session.data,
-        user_id: undefined,
-        display_name: undefined
-    })
+    _setAppSession("userSession", undefined);
 }

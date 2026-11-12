@@ -1,6 +1,5 @@
 import { For, onCleanup, onMount, ParentComponent, Show } from "solid-js";
 import { useSceneCanvas } from "../scene-canvas-context"
-import {} from "~/feature/ui-themes";
 import { EventHandler, InputEvents } from "~/utils/events/event-handling";
 import { ConnectionLines, ConnectionPreview } from "~/feature/scene/components/connection-lines";
 import { ensureScene } from "../scene-context";
