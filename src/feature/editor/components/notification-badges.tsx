@@ -12,7 +12,8 @@ import { useNotifications } from "../contexts/notification-context";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 import { NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta } from "~/protocols/notification-protocol";
 import { timeSignal } from "~/utils/time-utils";
-import { Theme, THEMES } from '../../ui-themes';
+import { THEMES } from "~/feature/app-settings";
+import { Theme } from "~/feature/app-settings";
 
 const NotificationIcon = (props: {level: NotificationLevel}) => {
     return (

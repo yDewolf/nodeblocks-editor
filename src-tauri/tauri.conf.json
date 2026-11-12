@@ -2,9 +2,9 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "nodeblocks-editor",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.github.ydewolf.nodeblocks",
   "build": {
-    "frontendDist": "../../src/",
+    "frontendDist": "src/",
     "devUrl": "http://localhost:3000",
     "beforeDevCommand": "node scripts/fetch-uv.mjs && npm run dev",
     "beforeBuildCommand": "node scripts/fetch-uv.mjs && npm run build"

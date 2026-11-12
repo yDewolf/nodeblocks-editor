@@ -131,7 +131,7 @@ export const SetupWizard: ParentComponent<{
                     <Show when={isLocalRunning()}>
                         <details>
                             <summary>Server Output</summary>
-                            <pre>{logs().join("\n")}</pre>
+                            <pre class="container scrollable">{logs().join("\n")}</pre>
                         </details>
                     </Show>
                 </div>

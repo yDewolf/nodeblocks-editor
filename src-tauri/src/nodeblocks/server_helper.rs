@@ -65,7 +65,7 @@ pub async fn start_local_server(app: tauri::AppHandle, state: tauri::State<'_, S
             let reader = BufReader::new(stderr);
             for line in reader.lines() {
                 if let Ok(content) = line {
-                    let _ = app_handle.emit("server-log", format!("[ERR] {}", content));
+                    let _ = app_handle.emit("server-log", content);
                 }
             }
         });

@@ -1,6 +1,9 @@
 import { For } from "solid-js"
 import { PageViewer } from "../../../components/page-controller"
-import { getCurrentTheme, setTheme, Theme, THEMES } from '../../ui-themes';
+import { setTheme } from "~/feature/app-settings";
+import { getCurrentTheme } from "~/feature/app-settings";
+import { THEMES } from "~/feature/app-settings";
+import { Theme } from "~/feature/app-settings";
 import { editorSettings, setAlwaysShowSlotLabels } from "../editor-settings";
 
 // TODO: improve this page

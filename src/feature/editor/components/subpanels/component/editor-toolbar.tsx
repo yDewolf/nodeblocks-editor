@@ -6,7 +6,7 @@ import { SelectionTool } from "~/feature/editor/tools/selection-tool";
 // import CommentIcon from "~/assets/icons/comment.svg";
 import AskDocsIcon from "~/assets/icons/ask-about.svg";
 import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
-import { getCurrentTheme } from "~/feature/ui-themes";
+import { getCurrentTheme } from "~/feature/app-settings";
 
 interface EditorToolStyle {
     icon: Component,

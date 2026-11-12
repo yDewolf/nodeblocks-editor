@@ -79,7 +79,7 @@ export const LocalServerSetupContent = (props: {
             This needs an internet connection and might take a few minutes.
           </p>
           <p>
-            <button onclick={handleInstall}>Install</button>
+            <button class="text-button"  onclick={handleInstall}>Install</button>
           </p>
         </Match>
         <Match when={phase() == "installing"}>

@@ -6,7 +6,7 @@ import SceneEditor from "./feature/editor/scene-editor-route";
 import { AppSessionProvider } from "./network/app-session-provider";
 import { AppSessionManager } from "./network/app-session-manager";
 import { createEffect, onMount } from "solid-js";
-import { UpdateRootDataTheme } from "./feature/ui-themes";
+import { UpdateRootDataTheme } from "./feature/app-settings";
 import { ContextMenuPortal } from "./feature/context-menu/context-menu-component";
 import { Home } from "./feature/home/home-route";
 import { ScenesRoute } from "./feature/home/scenes/scenes-view";
