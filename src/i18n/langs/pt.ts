@@ -95,6 +95,7 @@ export default {
             title: "Configurações",
             generalTitle: "Configurações Gerais",
             editorTitle: "Configurações do Editor",
+            openSetupWizard: "Abrir utilitário de instalação",
             remoteHost: {
                 hostLabel: "Host do servidor",
                 portLabel: "Porta do servidor",
@@ -110,6 +111,31 @@ export default {
                 theme: "Tema",
                 lang: "Idioma",
                 alwaysShowSlotLabels: "Sempre mostrar nome dos slots"
+            },
+            setupWizard: {
+                finishSetup: "Finalizar configuração",
+                serverOutput: "Saída do servidor",
+                messages: {
+                    alreadyConnected: (http: string) => `você já está conectado em: ${http}`
+                },
+                start: {
+                    title: "Como você gostaria de rodar o Nodeblocks?",
+                    description: "Você pode instalar o servidor e rodá-lo localmente ou se conectar a um servidor remoto.",
+                    installLocally: "Instalar servidor local",
+                    connectToRemote: "Conectar a um servidor remoto"
+                },
+                install: {
+                    title: "Instalação do Nodeblocks",
+                    setupInfo: "Para rodar o servidor do nodeblocks localmente, esse utilitário instalará o a biblioteca nodeblocks e suas dependências",
+                    setupInfo1: "Essa ação precisa de internet e pode levar alguns minutos.",
+                    install: "Instalar",
+                    messages: {
+                        alreadyInstalled: "Nodeblocks já está instalado.",
+                        installedSuccessfully: "Nodeblocks foi instalado com sucesso.",
+                        checkingInstallation: "Checando instalação...",
+                        installFailed: "A instalação falhou.",
+                    }
+                }
             }
         }
     },
@@ -182,6 +208,8 @@ export default {
     },
     actions: {
         loadImage: "carregar imagem",
+        goBack: "Voltar",
+        tryAgain: "Tentar novamente",
     },
     messages: {
         mustBeAuthenticated: (action: string) => `Você deve se autenticar para ${action}`,
@@ -224,5 +252,7 @@ export default {
         widget: "Widget",
         defaultValue: "Valor padrão",
         tags: "Tags",
+        details: "Detalhes",
+        note: "OBS"
     }
 } satisfies typeof en;

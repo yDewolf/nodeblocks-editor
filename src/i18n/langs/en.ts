@@ -93,6 +93,7 @@ export default {
             title: "Settings",
             generalTitle: "General Settings",
             editorTitle: "Editor Settings",
+            openSetupWizard: "Open Setup Wizard",
             remoteHost: {
                 hostLabel: "Server Host",
                 portLabel: "Server Port",
@@ -107,6 +108,31 @@ export default {
                 theme: "Theme",
                 lang: "Language",
                 alwaysShowSlotLabels: "Always Show Slot Labels"
+            },
+            setupWizard: {
+                finishSetup: "Finish Setup",
+                serverOutput: "Server Output",
+                messages: {
+                    alreadyConnected: (http: string) => `you are already connected to: ${http}`
+                },
+                start: {
+                    title: "How would you like to run nodeblocks?",
+                    description: "You can install the server and run it locally or connect to a remote server.",
+                    installLocally: "Install server locally",
+                    connectToRemote: "Connect to a remote server"
+                },
+                install: {
+                    title: "Nodeblocks Setup",
+                    setupInfo: "To run nodeblocks server locally, this installer will download its runtime",
+                    setupInfo1: "This needs an internet connection and might take a few minutes.",
+                    install: "Install",
+                    messages: {
+                        alreadyInstalled: "Nodeblocks is already installed.",
+                        installedSuccessfully: "Nodeblocks was installed successfully.",
+                        checkingInstallation: "Checking installation...",
+                        installFailed: "The installation failed.",
+                    }
+                }
             }
         }
     },
@@ -179,6 +205,8 @@ export default {
     },
     actions: {
         loadImage: "load image",
+        goBack: "Go back",
+        tryAgain: "Try again",
     },
     messages: {
         mustBeAuthenticated: (action: string) => `You must be authenticated to ${action}`,
@@ -221,5 +249,7 @@ export default {
         widget: "Widget",
         defaultValue: "Default Value",
         tags: "Tags",
+        details: "Details",
+        note: "Note",
     }
 }

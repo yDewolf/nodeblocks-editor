@@ -6,12 +6,14 @@ import { appSettings, setSetupComplete } from "../app-settings";
 import { useAppSession } from "~/network/app-session-provider";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { useI18n } from "~/i18n/i18n-context";
 
 type WizardSteps = "start" | "local" | "remote";
 
 export const SetupWizard: ParentComponent<{
 
 }> = (props) => {
+    const {t} = useI18n();
     const appSession = useAppSession();
     const [step, setStep] = createSignal<WizardSteps>("start");
     
@@ -71,18 +73,18 @@ export const SetupWizard: ParentComponent<{
                         <Switch>
                             <Match when={step() == "start" }>
                                 <div>
-                                    <h3>How would you like to run nodeblocks?</h3>
+                                    <h3>{t("pages.settings.setupWizard.start.title")}</h3>
                                     <p>
-                                        You can install the server and run it locally or connect to a remote server.
+                                        {t("pages.settings.setupWizard.start.description")}
                                     </p>
                                     <Show when={appSession.isConnectedToServer}>
-                                        <p><b>Note:</b> you are already connected to: {appSession.baseHttpUrl}</p>
+                                        <p><b>{t("words.note")}</b> {t("pages.settings.setupWizard.messages.alreadyConnected", appSession.baseHttpUrl)}</p>
                                     </Show>
                                     
                                     <div class="setup-options">
                                         <Show when={isLocalServerInstalled()} fallback={
                                             <button class="text-button" onClick={() => setStep("local")}>
-                                                Install server locally
+                                                {t("pages.settings.setupWizard.start.installLocally")}
                                             </button>
 
                                         }>
@@ -93,7 +95,7 @@ export const SetupWizard: ParentComponent<{
                                             </button>
                                         </Show>
                                         <button class="text-button" onClick={() => setStep("remote")}>
-                                            Connect to a remote server
+                                            {t("pages.settings.setupWizard.start.connectToRemote")}
                                         </button>
                                     </div>
                                 </div>
@@ -101,7 +103,7 @@ export const SetupWizard: ParentComponent<{
                             <Match when={step() === "local"}>
                                 <div>
                                     <button class="text-button" onClick={() => setStep("start")}>
-                                        Go back
+                                        {t("actions.goBack")}
                                     </button>
                                     <LocalServerSetupContent 
                                         isFirstInstall={false}
@@ -114,7 +116,7 @@ export const SetupWizard: ParentComponent<{
                             <Match when={step() === "remote"}>
                                 <div>
                                     <button class="text-button go-back" onClick={() => setStep("start")}>
-                                        Go back
+                                        {t("actions.goBack")}
                                     </button>
                                     <RemoteServerConfigForm />
                                 </div>
@@ -125,12 +127,12 @@ export const SetupWizard: ParentComponent<{
                         <button class="text-button" onclick={() => {
                             setSetupComplete(true);
                         }} disabled={!appSession.isConnectedToServer}>
-                            Finish Setup
+                            {t("pages.settings.setupWizard.finishSetup")}
                         </button>
                     </div>
                     <Show when={isLocalRunning()}>
                         <details>
-                            <summary>Server Output</summary>
+                            <summary>{t("pages.settings.setupWizard.serverOutput")}</summary>
                             <pre class="container scrollable">{logs().join("\n")}</pre>
                         </details>
                     </Show>

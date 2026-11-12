@@ -30,7 +30,7 @@ export const SettingsRoute: ParentComponent = (props) => {
                         <button class="text-button" onclick={() => {
                             setSetupComplete(false);
                         }}>
-                            Open Setup Wizard
+                            {t("pages.settings.openSetupWizard")}
                         </button>
                     </Show>
                     {props.children}
