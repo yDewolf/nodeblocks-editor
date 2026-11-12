@@ -6,10 +6,12 @@ import { StateController } from "~/feature/editor/controllers/state-controller";
 import { SceneWorkerExecutionMode, SceneWorkerExecutionState } from "~/protocols/nodeblocks/network/scene-worker-protocol";
 import { Dropdown } from "~/components/panels/dropdown";
 import SkipForwardIcon from '~/assets/icons/skip-forward.svg';
+import { useI18n } from '~/i18n/i18n-context';
 
 // TODO: mostrar a iteração atual e quantas faltam pra acabar
 type RunType = "once" | "forever" | "for";
 export const StatePanel = (props: {state_controller: StateController}) => {
+    const {t} = useI18n();
     const [runType, setRunType] = createSignal<RunType>();
     const [iterations, setIterations] = createSignal<number | undefined>(props.state_controller.target_iterations);
     onMount(() => {
@@ -55,12 +57,12 @@ export const StatePanel = (props: {state_controller: StateController}) => {
                         <div
                             class="fill dropdown-item-grid">
                             <div class="keep row-container">
-                                Run <select value={runType()} onchange={(e) => {
+                                {t("pages.editor.run")} <select value={runType()} onchange={(e) => {
                                     setRunType(e.target.value as RunType)
                                 }}>
-                                    <option value="once">once</option>
-                                    <option value="forever">forever</option>
-                                    <option value="for">for</option>
+                                    <option value="once">{t("pages.editor.runtimeStates.once")}</option>
+                                    <option value="forever">{t("pages.editor.runtimeStates.forever")}</option>
+                                    <option value="for">{t("pages.editor.runtimeStates.for")}</option>
                                 </select> <Show when={runType() == "for"}>
                                     <input 
                                         value={iterations()}
@@ -68,7 +70,7 @@ export const StatePanel = (props: {state_controller: StateController}) => {
                                         style={{width: "42px"}}
                                         onchange={(e) => setIterations(Number.parseInt(e.target.value))}
                                     />
-                                    iterations
+                                    {t("pages.editor.iterations")}
                                 </Show>
                             </div>
                         </div>

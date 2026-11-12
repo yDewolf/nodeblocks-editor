@@ -12,6 +12,7 @@ import RefreshIcon from '~/assets/icons/refresh.svg';
 import "~/style/screens/home/scenes.css";
 import { SceneEditModal } from "./components/scene-edit-modal";
 import { ScenePermissionsMenu } from './components/scene-perms-menu';
+import { useI18n } from "~/i18n/i18n-context";
 
 export const ScenesRoute: ParentComponent = (props) => {
     const appSession = useAppSession();
@@ -38,6 +39,7 @@ export const ScenesView = (props: {
     sessionData?: UserSessionData,
     sceneController: SceneHTTPController
 }) => {
+    const { t } = useI18n();
     const [sceneName, setSceneName] = createSignal<string>("");
     const [isEditModalOpen, setIsEditModalOpen] = createSignal(false);
     const [activeSceneId, setActiveSceneId] = createSignal<string | null>(null);
@@ -65,25 +67,25 @@ export const ScenesView = (props: {
     return (
         <div class="container">
             <div class="keep row-container fill space-between">
-                <span><strong>Scenes</strong></span>
+                <span><strong>{t("pages.scenes.title")}</strong></span>
                 <div class="scenes-page-actions">
                     <Dropdown icon={
-                        <span>New Scene</span>
+                        <span>{t("pages.scenes.newScene")}</span>
                     } iconClass="text-button">
                         <Show when={props.sessionData} fallback={
-                            <span>You must authenticate before creating scenes</span>
+                            <span>{t("messages.mustBeAuthenticated", t("pages.scenes.actions.createScene"))}</span>
                         }>
                             {(sessionData) => {
                                 const [defaultPerm, setDefaultPerm] = createSignal<number>(0);
                                 return <>
                                     <div class="create-scene-action container">
                                         <div class="field-grid">
-                                            <label class="field-label" for="scene-name">Scene Id:</label>
+                                            <label class="field-label" for="scene-name">{t("pages.scenes.labels.sceneId")}</label>
                                             <input class="field-input" type="text" id="scene-name" oninput={(e) => setSceneName(e.target.value)} autocomplete="off"/>
                                         </div>
                                     </div>
                                     <div class="text-section">
-                                        <span>Default Permissions</span>
+                                        <span>{t("pages.scenes.defaultPermissions")}</span>
                                         <ScenePermissionsMenu 
                                             sessionData={sessionData()}
                                             initialPerms={0}
@@ -99,8 +101,8 @@ export const ScenesView = (props: {
                                             onclick={() => {
                                                 props.sceneController.createScene(sessionData().user_id, sceneName(), defaultPerm())
                                             }}
-                                            >
-                                            Create <ArrowRightIcon class="smaller-icon"/>
+                                        >
+                                            {t("words.create")} <ArrowRightIcon class="smaller-icon"/>
                                         </button>
                                     </div>
                                 </>
@@ -120,14 +122,14 @@ export const ScenesView = (props: {
                 }}>
                     <RefreshIcon class="smaller-icon"/>
                 </button>
-                <span class="center-content">Found {props.sceneController.scenes.length} scenes</span>
+                <span class="center-content">{t("pages.scenes.foundScenes", props.sceneController.scenes.length)}</span>
             </div>
             <Show when={props.sessionData} fallback={
-                <span>You must log in to view scenes</span>
+                <span>{t("messages.mustBeAuthenticated", t("pages.scenes.actions.viewScenes"))}</span>
             }>
                 {(sessionData) => <>
                     <Show when={!props.sceneController.isLoading} fallback={
-                        <span>Loading Scenes...</span>
+                        <span>{t("messages.loading", t("words.scenes"))}</span>
                     }>
                         <div class="scene-card-grid">
                             <For each={props.sceneController.scenes}>

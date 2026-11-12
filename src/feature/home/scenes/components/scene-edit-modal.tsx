@@ -6,6 +6,7 @@ import { ListedScene, ListedScenePerms, SceneHTTPController } from "~/network/ap
 import { UserSessionData } from "~/network/protocols/user-session";
 import { ScenePermissionsMenu } from "./scene-perms-menu";
 import CloseIcon from '~/assets/icons/close.svg';
+import { useI18n } from "~/i18n/i18n-context";
 
 export const SceneEditModal = (props: {
     listedScene: ListedScene
@@ -14,6 +15,7 @@ export const SceneEditModal = (props: {
     closeModal: () => void
     isModalOpened: () => boolean
 }) => {
+    const { t } = useI18n();
     const [allScenePerms, setAllScenePerms] = createStore<ListedScenePerms | undefined>(undefined);
     const [currentUserId, setCurrentUserId] = createSignal<string>("");
     const [isSaving, setIsSaving] = createSignal(false);
@@ -59,12 +61,12 @@ export const SceneEditModal = (props: {
                         onclick={handleSavePermissions}
                         disabled={isSaving()}
                     >
-                        {isSaving() ? "Saving..." : "Save Permissions"}
+                        {isSaving() ? t("words.saving") +  "..." : t("pages.scenes.savePerms")}
                     </button>
                 ]}
             >
                 <div class="text-section">
-                    <span>Default Permission</span>
+                    <span>{t("pages.scenes.defaultPermissions")}</span>
                     <ScenePermissionsMenu 
                         sceneId={props.listedScene.uid}
                         sessionData={props.sessionData}
@@ -76,7 +78,7 @@ export const SceneEditModal = (props: {
                     />
                 </div>
                 <div class="text-section">
-                    <span>User Permission</span>
+                    <span>{t("pages.scenes.userPerms")}</span>
                     <div class="row-container fill">
                         <input type="text" class="fill" placeholder="user id" value={currentUserId()} oninput={(e) => setCurrentUserId(e.target.value)}/>
                         <button class="text-button" onclick={() => {

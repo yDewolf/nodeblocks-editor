@@ -7,6 +7,7 @@ import { BaseMetadata } from "~/protocols/nodeblocks/metadata/base_metadata";
 import { MetaCategory, MetaTag } from "~/protocols/nodeblocks/metadata/node_filters";
 import { NodeTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import TagIcon from '~/assets/icons/tag.svg';
+import { useI18n } from "~/i18n/i18n-context";
 
 type PathPart = {
     path: string[],
@@ -129,6 +130,7 @@ export const DocsPath = (props: {current_path?: string, docs_data?: DocPayload})
 }
 
 export const DocsTags = (props: {docs_data?: DocPayload, section_title?: string}) => {
+    const {t} = useI18n();
     const data_tags = createMemo(() => {
         const data = props.docs_data;
         if (!data) return [];
@@ -147,7 +149,7 @@ export const DocsTags = (props: {docs_data?: DocPayload, section_title?: string}
     return (
         <Show when={data_tags().length > 0}>
             <div class="text-section">
-                <h3>{props.section_title ?? "Tags"}</h3>
+                <h3>{props.section_title ?? t("words.tags")}</h3>
                 <div class="tag-holder row-container keep fill">
                     <For each={data_tags()}>
                         {(tag, idx) => {

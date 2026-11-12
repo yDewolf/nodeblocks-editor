@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid";
+import { TranslationFunc } from "~/i18n/i18n-locale";
 import { JobStatus, NodeExecutionStatus } from "~/protocols/nodeblocks/engine/engine-status-protocols";
 import { CmdStatusPack, CommandStatus } from "~/protocols/nodeblocks/engine/server-ipc-event-protocol";
 import { EngineEventPayload, EngineTracker } from "~/protocols/nodeblocks/network/message/server/payloads/engine-event-payloads";
@@ -7,7 +8,7 @@ import { ServerEngineEventTypes, ServerCmdResponseTypes } from "~/protocols/node
 import { Notification, NotificationLevel, NotificationTarget, resolveNotificationTarget } from "~/protocols/notification-protocol";
 
 export class NotificationFactory {
-    public static fromEngineEvent(payload: EngineEventPayload): Notification | null {
+    public static fromEngineEvent(payload: EngineEventPayload, t?: TranslationFunc): Notification | null {
         if (!payload) return null;
 
         const rawTracker = payload.tracker || {};
@@ -20,8 +21,8 @@ export class NotificationFactory {
 
         const target = resolveNotificationTarget(tracker);
         const level = this.resolveEngineLevel(payload);
-        const shortMessage = this.resolveEngineShortMessage(payload);
-        const description = this.resolveEngineDescription(payload);
+        const shortMessage = this.resolveEngineShortMessage(payload, t);
+        const description = this.resolveEngineDescription(payload, t);
 
         return {
             uid: nanoid(),
@@ -37,12 +38,12 @@ export class NotificationFactory {
         };
     }
 
-    public static fromCommandResponse(payload: ServerCmdResponsePayload): Notification | null {
+    public static fromCommandResponse(payload: ServerCmdResponsePayload, t?: TranslationFunc): Notification | null {
         if (!payload) return null;
 
         const level = this.resolveCommandLevel(payload.type, payload.status);
-        const shortMessage = this.resolveCommandShortMessage(payload.type);
-        const description = this.resolveCommandDescription(payload);
+        const shortMessage = this.resolveCommandShortMessage(payload.type, t);
+        const description = this.resolveCommandDescription(payload, t);
 
         return {
             uid: payload.request_id,
@@ -66,7 +67,7 @@ export class NotificationFactory {
                 return NotificationLevel.DEBUG;
 
             case ServerEngineEventTypes.NODE_STATUS:
-                if (payload.status === NodeExecutionStatus.FAILED) return NotificationLevel.DEBUG; // FIXME: talvez colocar como ERROR apenas quando o node não dá mais nenhum evento de erro
+                if (payload.status === NodeExecutionStatus.FAILED) return NotificationLevel.DEBUG;
                 if (payload.status === NodeExecutionStatus.SKIPPED) return NotificationLevel.WARNING;
                 return NotificationLevel.DEBUG;
             default:
@@ -74,34 +75,36 @@ export class NotificationFactory {
         }
     }
 
-    private static resolveEngineShortMessage(payload: EngineEventPayload): string {
+    private static resolveEngineShortMessage(payload: EngineEventPayload, t?: any): string {
         switch (payload.type) {
             case ServerEngineEventTypes.RUNTIME_ERROR:
-                return "Runtime Error";
+                return t ? t("notifications.engine.shortMessage.runtimeError") : "Runtime Error";
             case ServerEngineEventTypes.FAILED_PROCESS:
-                return "Process Failure";
+                return t ? t("notifications.engine.shortMessage.failedProcess") : "Process Failure";
             case ServerEngineEventTypes.JOB_STATUS:
-                return `Process ${payload.status}`;
+                return t ? t("notifications.engine.shortMessage.jobStatus", payload.status) : `Process ${payload.status}`;
             case ServerEngineEventTypes.NODE_STATUS:
-                return `Node Status: ${payload.status}`;
+                return t ? t("notifications.engine.shortMessage.nodeStatus", payload.status) : `Node Status: ${payload.status}`;
             default:
-                return "Engine Event";
+                return t ? t("notifications.engine.shortMessage.default") : "Engine Event";
         }
     }
 
-    private static resolveEngineDescription(payload: EngineEventPayload): string {
+    private static resolveEngineDescription(payload: EngineEventPayload, t?: any): string {
         switch (payload.type) {
             case ServerEngineEventTypes.RUNTIME_ERROR:
-                return payload.message || "Failed to process a node...";
+                return payload.message || (t ? t("notifications.engine.description.runtimeErrorFallback") : "Failed to process a node...");
                 
             case ServerEngineEventTypes.FAILED_PROCESS:
-                return payload.error || "Failed to process scene...";
+                return payload.error || (t ? t("notifications.engine.description.failedProcessFallback") : "Failed to process scene...");
                 
             case ServerEngineEventTypes.JOB_STATUS:
-                return `Scene process status changed to: '${payload.status}'.`;
+                return t ? t("notifications.engine.description.jobStatus", payload.status) : `Scene process status changed to: '${payload.status}'.`;
                 
             case ServerEngineEventTypes.NODE_STATUS:
-                return `Node execution status changed to: '${payload.status}'.`;
+                return t ? t("notifications.engine.description.nodeStatus", payload.status) : `Node execution status changed to: '${payload.status}'.`;
+            default:
+                return "";
         }
     }
 
@@ -112,46 +115,58 @@ export class NotificationFactory {
 
         switch (cmdType) {
             case ServerCmdResponseTypes.SAVE_SCENE:
-                return NotificationLevel.WARNING
-            
+                return NotificationLevel.WARNING;
             default:
-                return NotificationLevel.DEBUG
+                return NotificationLevel.DEBUG;
         }
     }
 
-    private static resolveCommandShortMessage(cmdType: ServerCmdResponseTypes): string {
+    private static resolveCommandShortMessage(cmdType: ServerCmdResponseTypes, t?: any): string {
         switch (cmdType) {
             case ServerCmdResponseTypes.ADD_NODE:
-                return "Cmd: Add Node";
+                return t ? t("notifications.command.shortMessage.addNode") : "Cmd: Add Node";
             case ServerCmdResponseTypes.ADD_CONN:
-                return "Cmd: Add Connection";
+                return t ? t("notifications.command.shortMessage.addConn") : "Cmd: Add Connection";
             case ServerCmdResponseTypes.EXECUTION_STATE_SYNC:
-                return "Cmd: Sync State";
+                return t ? t("notifications.command.shortMessage.executionStateSync") : "Cmd: Sync State";
             case ServerCmdResponseTypes.GET_SCENE_DATA:
-                return "Cmd: Fetch Scene";
+                return t ? t("notifications.command.shortMessage.getSceneData") : "Cmd: Fetch Scene";
             case ServerCmdResponseTypes.SCENE_WORKER:
-                return "Cmd: Worker Action";
+                return t ? t("notifications.command.shortMessage.sceneWorker") : "Cmd: Worker Action";
             case ServerCmdResponseTypes.SAVE_SCENE:
-                return "Saved Scene"
+                return t ? t("notifications.command.shortMessage.saveScene") : "Saved Scene";
             default:
-                return `Cmd: ${cmdType || 'Unknown'}`;
+                return t ? t("notifications.command.shortMessage.default", cmdType) : `Cmd: ${cmdType || 'Unknown'}`;
         }
     }
 
-    private static resolveCommandDescription(payload: ServerCmdResponsePayload): string {
+    private static resolveCommandDescription(payload: ServerCmdResponsePayload, t?: any): string {
+        const statusMsg = payload.status?.message ?? "";
         switch (payload.type) {
             case ServerCmdResponseTypes.ADD_NODE:
-                return `Added nodes. Total: ${payload.nodes?.length ?? 0}. (request id: ${payload.request_id}) ${payload.status.message ?? ""}`;
+                return t 
+                    ? t("notifications.command.description.addNode", payload.nodes?.length ?? 0, payload.request_id, statusMsg)
+                    : `Added nodes. Total: ${payload.nodes?.length ?? 0}. (request id: ${payload.request_id}) ${statusMsg}`.trim();
             case ServerCmdResponseTypes.ADD_CONN:
-                return `Created connections. Total: ${payload.conns?.length ?? 0}. (request id: ${payload.request_id}) ${payload.status.message ?? ""}`;
+                return t 
+                    ? t("notifications.command.description.addConn", payload.conns?.length ?? 0, payload.request_id, statusMsg)
+                    : `Created connections. Total: ${payload.conns?.length ?? 0}. (request id: ${payload.request_id}) ${statusMsg}`.trim();
             case ServerCmdResponseTypes.EXECUTION_STATE_SYNC:
-                return `Synced execution state. Mode: [${payload.mode}], State: [${payload.state}]. ${payload.status.message ?? ""}`;
+                return t 
+                    ? t("notifications.command.description.executionStateSync", payload.mode, payload.state, statusMsg)
+                    : `Synced execution state. Mode: [${payload.mode}], State: [${payload.state}]. ${statusMsg}`.trim();
             case ServerCmdResponseTypes.GET_SCENE_DATA:
-                return `Fetched scene data from server.`;
+                return t ? t("notifications.command.description.getSceneData") : "Fetched scene data from server.";
             case ServerCmdResponseTypes.SCENE_WORKER:
-                return `Processed worker action. (request id: ${payload.request_id}) ${payload.status.message ?? ""}`;
+                return t 
+                    ? t("notifications.command.description.sceneWorker", payload.request_id, statusMsg)
+                    : `Processed worker action. (request id: ${payload.request_id}) ${statusMsg}`.trim();
             case ServerCmdResponseTypes.SAVE_SCENE:
-                return `Saved current scene in the server. ${payload.status.message ?? ""}`
+                return t 
+                    ? t("notifications.command.description.saveScene", statusMsg)
+                    : `Saved current scene in the server. ${statusMsg}`.trim();
+            default:
+                return "";
         }
     }
 }

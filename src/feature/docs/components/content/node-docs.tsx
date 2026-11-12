@@ -16,6 +16,7 @@ import { NodePreview } from "~/feature/scene/components/node/node-component";
 import { SlotHeader } from "~/feature/scene/components/node/slot-components";
 import { DocsPathUtils } from "../../helpers/docs-path-utils";
 import { DataTypeFieldSelector } from "~/feature/scene/components/value/datatype-field";
+import { useI18n } from "~/i18n/i18n-context";
 
 
 export const NodeDocsContent = (props: {
@@ -24,6 +25,7 @@ export const NodeDocsContent = (props: {
     packageManager: PackageManager,
     devMode: boolean
 }) => { 
+    const {t} = useI18n();
     const [notif, setNotify] = createSignal(0);
     props.packageManager.subscribePackageLoad(() => setNotify(notif() + 1));
     
@@ -45,13 +47,13 @@ export const NodeDocsContent = (props: {
         if (nodespec) {
             return <NodePreview spec={nodespec}/>
         }
-        return <span>Couldn't parse Node Preview</span>
+        return <span>{t("messages.errorWhile", t("pages.docs.parseNodePreview"))}</span>
     });
 
     return (
         <div class="keep fill container docs-sections">
             <div class="text-section">
-                <h3>Preview</h3>
+                <h3>{t("words.preview")}</h3>
                 <div class="remove-input all">
                     {preview()}            
                 </div>
@@ -152,6 +154,7 @@ export const NodeSlotSection = (props: {
     packageManager: PackageManager;
     devMode: boolean;
 }) => {
+    const {t} = useI18n();
     const slot_bundle = createMemo(() => {
         const meta = props.data.slot_meta;
         const bundles: Array<[NodeSlotSpec, SlotMeta, string]> = [];
@@ -165,9 +168,9 @@ export const NodeSlotSection = (props: {
 
     return (
         <div class="text-section">
-            <h3>Slots</h3>
+            <h3>{t("pages.docs.sections.slots")}</h3>
             <Show when={slot_bundle().length > 0} fallback={
-                <span>This node has no Slots</span>
+                <span>{t("pages.docs.messages.nodeHasNoSlots")}</span>
             }>
                 <div class="fill keep container">
                     <For each={slot_bundle()}>
@@ -198,6 +201,7 @@ const ParameterDropdownItem = (props: {
     param_meta: ParameterMeta;
     devMode: boolean;
 }) => {
+    const {t} = useI18n();
     const badges = createMemo<DropdownBadge[]>(() => {
         const spec = props.param_spec;
         const list: DropdownBadge[] = [
@@ -252,20 +256,20 @@ const ParameterDropdownItem = (props: {
             content={
                 <div>
                     <div class="text-section">
-                        <h4>Widget</h4>
+                        <h4>{t("words.widget")}</h4>
                         <div class="remove-input all">
                             <DataTypeFieldSelector parameterId={props.param_id} parameterSpec={props.param_spec} hide_label={true} />
                         </div>
                     </div>
 
                     <div class="text-section">
-                        <h4>Description</h4>
+                        <h4>{t("words.description")}</h4>
                         <ParsedMetaText text={props.param_meta.description} default="No Description"/>
                     </div>
 
                     <Show when={props.param_spec.default != undefined}>
                         <div class="text-section row">
-                            <h4>Default Value:</h4>
+                            <h4>{t("words.defaultValue")}</h4>
                             <span>{formatValue(props.param_spec.default)}</span>
                         </div>
                     </Show>
@@ -324,6 +328,7 @@ export const NodeParameterSection = (props: {
     spec: NodeTypeSpec;
     devMode: boolean;
 }) => {
+    const {t} = useI18n();
     const param_bundle = createMemo(() => {
         const meta = props.data.parameter_meta;
         const bundles: Array<[ParameterSpec, ParameterMeta, string]> = [];
@@ -338,9 +343,9 @@ export const NodeParameterSection = (props: {
 
     return (
         <div class="text-section">
-            <h3>Parameters</h3>
+            <h3>{t("node.parameters")}</h3>
             <Show when={param_bundle().length > 0} fallback={
-                <span>This node has no parameters</span>
+                <span>{t("pages.docs.messages.nodeHasNoParam")}</span>
             }>
                 <div class="fill keep container">
                     <For each={param_bundle()}>

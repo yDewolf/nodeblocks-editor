@@ -1,6 +1,7 @@
 import { createSignal, Match, onCleanup, onMount, Show, Switch } from "solid-js";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
+import { useI18n } from "~/i18n/i18n-context";
 
 type Phase = "checking" | "idle" | "installing" | "installed" |  "error";
 
@@ -16,6 +17,7 @@ export const LocalServerSetupContent = (props: {
   onReady: () => void, 
   isFirstInstall?: boolean 
 }) => {
+  const {t} = useI18n();
   const [phase, setPhase] = createSignal<Phase>("checking");
   const [log, setLog] = createSignal<string[]>([]);
   const [error, setError] = createSignal("");
@@ -71,15 +73,15 @@ export const LocalServerSetupContent = (props: {
 
   return (
     <div class="text-section">
-      <h2>Nodeblocks Setup</h2>
+      <h3>{t("pages.settings.setupWizard.install.title")}</h3>
       <Switch>
         <Match when={phase() == "idle"}>
           <p>
-            To run nodeblocks server locally, this installer will download its runtime (Python and <a href="https://github.com/yDewolf/nodeblocks-server">Nodeblocks Server</a>).
-            This needs an internet connection and might take a few minutes.
+            {t("pages.settings.setupWizard.install.setupInfo")} (Python, <a href="https://github.com/yDewolf/nodeblocks-server">Nodeblocks Server</a>).
+            {t("pages.settings.setupWizard.install.setupInfo1")}
           </p>
           <p>
-            <button class="text-button"  onclick={handleInstall}>Install</button>
+            <button class="text-button"  onclick={handleInstall}>{t("pages.settings.setupWizard.install.install")}</button>
           </p>
         </Match>
         <Match when={phase() == "installing"}>
@@ -89,31 +91,31 @@ export const LocalServerSetupContent = (props: {
           <progress class="fill" max="100" value={progress().percent} />
           <p>{progress().message}</p>
           <details>
-            <summary>Details</summary>
+            <summary>{t("words.details")}</summary>
             <pre>{log().join("\n")}</pre>
           </details>
         </Match>
         <Match when={phase() == "installed"}>
           <Show when={props.isFirstInstall} fallback={
             <p>
-              Nodeblocks is already installed.
+              {t("pages.settings.setupWizard.install.messages.alreadyInstalled")}
             </p>
           }>
             <p>
-              Nodeblocks was installed successfully.
+              {t("pages.settings.setupWizard.install.messages.installedSuccessfully")}
             </p>
           </Show>
         </Match>
         <Match when={phase() == "checking"}>
-          <p>Checking installation...</p>
+          <p>{t("pages.settings.setupWizard.install.messages.checkingInstallation")}</p>
         </Match>
         <Match when={phase() == "error"}>
-          <p style={{ color: "crimson" }}>The installation failed.</p>
+          <p style={{ color: "crimson" }}>{t("pages.settings.setupWizard.install.messages.installFailed")}</p>
           <pre>
             {error()}
           </pre>
           <Show when={!error().includes("already running")}>
-            <button class="text-button" onclick={handleInstall}>Try again</button>
+            <button class="text-button" onclick={handleInstall}>{t("actions.tryAgain")}</button>
           </Show>
         </Match>
       </Switch>

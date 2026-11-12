@@ -2,10 +2,13 @@ import { createSignal, createMemo, For, Show } from "solid-js";
 import { useDocs } from "~/feature/docs/docs-context";
 import { DocSearchHelper } from "~/feature/docs/helpers/docs-helper";
 import { DocsHref } from "./docs-reference";
+import { useI18n } from "~/i18n/i18n-context";
 
 export const DocSearchBar = (props: {
 
 }) => {
+    const { t } = useI18n();
+
     let containerRef: HTMLDivElement | undefined;
     const [query, setQuery] = createSignal("");
     const [isFocused, setIsFocused] = createSignal(false);
@@ -35,7 +38,7 @@ export const DocSearchBar = (props: {
                     "dropdown-visible": query().trim().length > 0
                 }}
                 type="text"
-                placeholder="Search for topics"
+                placeholder={t("pages.docs.messages.searchForTopics")}
                 value={query()}
                 onInput={(e) => setQuery(e.currentTarget.value)}
             />
@@ -47,7 +50,7 @@ export const DocSearchBar = (props: {
                     }}
                 >
                     <For each={searchResults()} fallback={
-                        <div>No topic found</div>
+                        <div>{t("pages.docs.messages.noTopicFound")}</div>
                     }>
                         {(topic) => (
                             <DocsHref route={{path: topic.path}} onclick={() => setQuery("")}>

@@ -13,6 +13,7 @@ import { DataTypeSpec } from "~/protocols/nodeblocks/manifests/node/datatype-spe
 import { DataTypeGenParams, generate_datatype_random_value } from "~/feature/editor/utils/data-type-value-utils";
 import { DefaultRenderers } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
 import { ExampleNodeSlotDot, makeSlotStyleFromDataTypeStyle } from '../../../scene/components/node/slot-components';
+import { useI18n } from "~/i18n/i18n-context";
 
 export const DataTypeDocsContent = (props: {
     path?: string,
@@ -20,6 +21,7 @@ export const DataTypeDocsContent = (props: {
     packageManager: PackageManager,
     devMode: boolean
 }) => {
+    const { t } = useI18n();
     const [notif, setNotify] = createSignal(0);
     props.packageManager.subscribePackageLoad(() => setNotify(notif() + 1));
 
@@ -40,7 +42,7 @@ export const DataTypeDocsContent = (props: {
         <DataTypeMetaProvider value={props.data}>
             <Show when={spec()} fallback={
                 <div class="text-section">
-                    <p>Couldn't find a DataType Object</p>
+                    <p>{t("messages.couldntFind", t("pages.docs.datatypeObject"))}</p>
                 </div>
             }>
                 {(dataTypeSpec) => 
@@ -59,16 +61,17 @@ const DataTypeAttributes = (props: {
     meta: DataTypeMeta,
     spec: DataTypeSpec
 }) => {
+    const { t } = useI18n();
     // TODO: arrumar essa referência do base id
     const base_id = (props.spec ? props.spec.base_id as string : undefined) ?? "unknown";
     return (
         <div class="text-section">
-            <h3>Attributes</h3>
-            <SimpleField field_name="Base" field_displayer={
+            <h3>{t("words.attributes")}</h3>
+            <SimpleField field_name={t("words.baseType")} field_displayer={
                 // TODO: maybe add a better visual for field links
                 () => <DocsHref class="field-link" route={{path: DocsPathUtils.makeDataTypePath("core", undefined, base_id)}}><FieldValueDisplayer value_element={() => <input readonly value={props.spec?.base_id} id={props.spec?.id + "-base"}/>}/></DocsHref>
             } field_id={props.spec?.id + "-base"}/>
-            <SimpleField field_name="Renderer" field_displayer={
+            <SimpleField field_name={t("words.renderer")} field_displayer={
                 () => <FieldValueDisplayer value_element={() => <input readonly value={props.spec?.default_renderer} id={props.spec?.id + "-renderer"}/>}/>
             } field_id={props.spec?.id + "-renderer"}/>
         </div>
@@ -79,6 +82,7 @@ const DataTypePreview = (props: {
     meta: DataTypeMeta,
     spec: DataTypeSpec
 }) => {
+    const { t } = useI18n();
     const [fetch_signal, refetch] = createSignal(false);
     const [genParams, setGenParams] = createStore<DataTypeGenParams>({});
     const preview_value = createMemo(() => {
@@ -101,7 +105,7 @@ const DataTypePreview = (props: {
     return (
         <div class="text-section">
             <div class="row-container">
-                <h3>Output Preview</h3>
+                <h3>{t("pages.docs.sections.outputPreview")}</h3>
                 <button class="icon-button" onclick={() => refetch(true)}>
                     <RefreshIcon class="dropdown-icon"/>
                 </button>
@@ -124,16 +128,17 @@ export const GenParamsEditor = (props: {
     params: DataTypeGenParams;
     setParams: (updater: (prev: DataTypeGenParams) => DataTypeGenParams) => void;
 }) => {
+    const { t } = useI18n();
     const id = ""
     return (
         <div class="fill container">
             <Switch fallback={
-                <span>No parameters available for this renderer</span>
+                <span>{t("pages.docs.messages.noParametersForRenderer")}</span>
             }>
                 <Match when={props.renderer === DefaultRenderers.SCALAR}>
                     <div class="fill container">
                         <div class="field-holder">
-                            <SimpleField field_name="Min" field_displayer={
+                            <SimpleField field_name={t("words.min")} field_displayer={
                                 () => <FieldValueDisplayer value_element={() => <input 
                                     class="fill"
                                     type="number" 
@@ -146,7 +151,7 @@ export const GenParamsEditor = (props: {
                             } field_id={id + "-min"}/>
                         </div>
                         <div class="field-holder">
-                            <SimpleField field_name="Max" field_displayer={
+                            <SimpleField field_name={t("words.max")} field_displayer={
                                 () => <FieldValueDisplayer value_element={() => <input 
                                     class="fill"
                                     type="number" 
@@ -164,7 +169,7 @@ export const GenParamsEditor = (props: {
                     <div class="row-container fill">
                         <div class="fill container">
                             <div class="field-holder">
-                                <SimpleField field_name="Shape" field_displayer={
+                                <SimpleField field_name={t("datatype.shape")} field_displayer={
                                     () => <FieldValueDisplayer value_element={() => <input 
                                         type="text"
                                         placeholder="example: 10,10,3"
@@ -182,7 +187,7 @@ export const GenParamsEditor = (props: {
                         </div>
                         <div class="keep row-container">
                             <div class="field-holder">
-                                <SimpleField field_name="Min" field_displayer={
+                                <SimpleField field_name={t("words.min")} field_displayer={
                                     () => <FieldValueDisplayer value_element={() => <input 
                                         type="number"
                                         oninput={(e) => props.setParams(p => ({
@@ -193,7 +198,7 @@ export const GenParamsEditor = (props: {
                                 } field_id={id + "min"}/>
                             </div>
                             <div class="field-holder">
-                                <SimpleField field_name="Max" field_displayer={
+                                <SimpleField field_name={t("words.max")} field_displayer={
                                     () => <FieldValueDisplayer value_element={() => <input 
                                         type="number"
                                         oninput={(e) => props.setParams(p => ({
@@ -209,7 +214,7 @@ export const GenParamsEditor = (props: {
 
                 <Match when={props.renderer === DefaultRenderers.TEXT}>
                     <div class="field-holder">
-                        <SimpleField field_name="SampleText" field_displayer={
+                        <SimpleField field_name={t("words.sample")} field_displayer={
                             () => <FieldValueDisplayer value_element={() => <input 
                                 class="fill"
                                 type="text"
@@ -230,14 +235,15 @@ export const GenParamsEditor = (props: {
 const DataTypeStyle = (props: {
     meta?: DataTypeMeta
 }) => {
+    const { t } = useI18n();
     return (
         <div class="text-section">
-            <h3>Color Scheme</h3>
+            <h3>{t("pages.docs.sections.colorScheme")}</h3>
             <table class="datatype-style-table">
                 <thead>
                     <tr>
-                        <th>Input</th>
-                        <th>Output</th>
+                        <th>{t("words.input")}</th>
+                        <th>{t("words.output")}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -245,7 +251,7 @@ const DataTypeStyle = (props: {
                         <td>
                             <Show when={props.meta?.inStyle}
                                 fallback={
-                                    "Undefined"
+                                    t("words.undefined")
                                 }
                             >
                                 {(style) => <ExampleNodeSlotDot isInput={true} slotStyle={
@@ -256,7 +262,7 @@ const DataTypeStyle = (props: {
                         <td>
                             <Show when={props.meta?.outStyle}
                                 fallback={
-                                    "Undefined"
+                                    t("words.undefined")
                                 }
                             >
                                 {(style) => <ExampleNodeSlotDot isInput={false} slotStyle={
