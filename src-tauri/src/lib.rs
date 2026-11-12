@@ -2,13 +2,9 @@ mod env;
 mod utils;
 mod nodeblocks;
 
-use std::{println, sync::Mutex};
-
 use env::environment;
 use nodeblocks::server_helper;
 use tauri::Manager;
-
-use crate::nodeblocks::server_helper::ServerProcessState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -25,7 +21,7 @@ pub fn run() {
     })
     .plugin(tauri_plugin_shell::init())
     .manage(environment::SetupGuard::default())
-    .manage(ServerProcessState(Mutex::new(None)))
+    .manage(server_helper::ServerProcessState::default())
       .invoke_handler(tauri::generate_handler![
         environment::check_server_installed,
         environment::ensure_environment,

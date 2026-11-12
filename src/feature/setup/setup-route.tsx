@@ -23,7 +23,7 @@ export const SetupWizard: ParentComponent<{
     });
     
     const handleStartLocalServer = async () => {
-        localServerController.startServer();
+        await localServerController.startServer();
         appSession.tryConnectToServer("127.0.0.1", 8080);
     };
 
