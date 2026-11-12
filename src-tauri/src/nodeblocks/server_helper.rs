@@ -32,9 +32,9 @@ pub async fn start_local_server(app: tauri::AppHandle, state: tauri::State<'_, S
     if !nodeblocks_bin.exists() {
         return Err(format!("Couldn't find nodeblocks executable {:?}", nodeblocks_bin));
     }
-
-    let mut child = Command::new(&nodeblocks_bin)
-        .arg("run:server")
+    
+    let mut cmd = Command::new(&nodeblocks_bin);
+    cmd.arg("run:server")
         .arg("--plugins")
         .arg(&plugins_dir)
         .arg("--scenes")
@@ -44,7 +44,16 @@ pub async fn start_local_server(app: tauri::AppHandle, state: tauri::State<'_, S
         .env("PLUGIN_LIBS_FOLDER", &plugin_libs_dir)
         .env("INCLUDE_REMOTE_ACCESS_ROUTES", "True")
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
+        .stderr(Stdio::piped());
+
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+
+    let mut child = cmd
         .spawn()
         .map_err(|e| format!("Failed to start local server: {}", e))?;
 
@@ -86,8 +95,16 @@ pub fn stop_local_server(state: tauri::State<'_, ServerProcessState>) -> Result<
     let mut guard = state.0.lock().unwrap();
     
     if let Some(mut child) = guard.take() {
-        child.kill().map_err(|e| format!("Failed to finish server: {}", e))?;
-        child.wait().map_err(|e| format!("Error while waiting for server finish: {}", e))?;
+        #[cfg(target_os = "windows")]
+        {
+            let id = child.id();
+            let _ = std::process::Command::new("taskkill")
+                .args(["/F", "/T", "/PID", &id.to_string()])
+                .status();
+        }
+
+        let _ = child.kill().map_err(|e| format!("Failed to finish server: {}", e))?;
+        let _ = child.wait().map_err(|e| format!("Error while waiting for server finish: {}", e))?;
         Ok("Server Finished Successfully.".into())
     } else {
         Ok("No local server was running.".into())

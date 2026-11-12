@@ -41,13 +41,7 @@ pub fn run() {
     .expect("error while building tauri application")
     .run(|app_handle, event| {
       if let tauri::RunEvent::Exit = event {
-        let state = app_handle.state::<ServerProcessState>();
-        let mut guard = state.0.lock().unwrap();
-        if let Some(mut child) = guard.take() {
-          println!("Killing nodeblocks server process");
-          let _ = child.kill();
-          let _ = child.wait();
-        }
+        let _ = server_helper::stop_local_server(app_handle.state());
       }
     });
 }
