@@ -4,7 +4,7 @@ import { solidStart } from "@solidjs/start/config";
 import solidSvg from 'vite-plugin-solid-svg';
 
 export default defineConfig({
-    plugins: [solidStart(), solidSvg()],
+    plugins: [solidStart({ ssr: false }), solidSvg()],
     clearScreen: false,
     server: {
         port: 3000,

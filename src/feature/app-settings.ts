@@ -23,15 +23,20 @@ const getSystemLanguage = (): string => {
   return navigator.language || (navigator as any).userLanguage || "en";
 };
 
-const getShortSystemLanguage = (): string => {
+export const getShortSystemLanguage = (): string => {
   const fullLang = getSystemLanguage();
   return fullLang.split("-")[0];
 };
 
+export const defaultSystemLanguage = (): Locale => {
+    const key = getShortSystemLanguage();
+    return (new Map(Object.entries(localeDicts)).has(key) ? key : "en") as Locale
+}
+
 const [appSettings, _setAppSettings] = makePersisted(
     createStore<AppSettings>({
         isSetupComplete: false,
-        locale: new Map(Object.entries(localeDicts)).get(getShortSystemLanguage()) as Locale || "en",
+        locale: defaultSystemLanguage(),
         theme: getSystemTheme(),
     }), 
     {name: "app-settings"}
