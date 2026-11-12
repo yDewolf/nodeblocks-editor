@@ -74,10 +74,9 @@
     color: var(--selection-color);
   }
   
-  .current-step {
-    background-color: var(--selection-color);
+  .connection-group.current-step > text {
+    fill: var(--selection-color);
   }
-  
   
   .selected-docs-indicator {
     z-index: 100;

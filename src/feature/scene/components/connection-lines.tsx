@@ -4,6 +4,7 @@ import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 import { ensureScene, useSceneReadonly } from "~/feature/scene/scene-context";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
+import { useSceneRuntime } from "../scene-runtime-context";
 
 export function make_simple_curved_path(start: Vector2, end: Vector2, anchor_a: Vector2, anchor_b: Vector2) {
     const intensity = 50;
@@ -53,6 +54,7 @@ export const ConnectionPreview = (props: { start_slot: SceneNodeSlot | null, hov
 export const ConnectionLines = (props: { connection: SceneConnection, onDisconnect?: (connection: SceneConnection) => void }) => {
     const scene = useSceneReadonly();
     const scene_canvas = useSceneCanvas();
+    const runtime = useSceneRuntime();
 
     const pathId = `path-${props.connection.uid}`;
     const path = createMemo(() => {
@@ -71,17 +73,12 @@ export const ConnectionLines = (props: { connection: SceneConnection, onDisconne
         props.onDisconnect?.(props.connection);
     };
 
-    // const is_current_step = createMemo(() => {
-    //     const parent_node = scene_canvas.nodes[props.connection.input_slot.node_id];
-    //     return parent_node.isCurrentStep;
-    // });
-
     return (
         <g 
             class={"connection-group"} 
             classList={{
                 "unsynced": scene.isPending(props.connection.uid),
-                // "current-step": is_current_step()
+                "current-step": runtime?.isNodeLatestProcessed(props.connection.input_slot.node_id)
             }}
         >
             <text class="connection-arrow-text" dy="3.5"> 
