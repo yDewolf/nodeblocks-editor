@@ -51,6 +51,17 @@ export default {
             saveScene: "Salvar Cena",
             loadScene: "Carregar Cena",
             exportScene: "Exportar Cena",
+            run: "Executar",
+            iterations: "iterações",
+            runtimeStates: {
+                once: "uma vez",
+                forever: "para sempre",
+                for: "durante"
+            },
+            runtimeModes: {
+                step: "Próximo Passo",
+                graph: "Grafo inteiro",
+            }
         },
         scenes: {
             title: "Cenas",

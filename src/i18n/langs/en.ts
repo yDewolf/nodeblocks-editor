@@ -49,6 +49,17 @@ export default {
             saveScene: "Save Scene",
             loadScene: "Load Scene",
             exportScene: "Export Scene",
+            run: "Run",
+            iterations: "iterações",
+            runtimeStates: {
+                once: "Once",
+                forever: "Forever",
+                for: "For"
+            },
+            runtimeModes: {
+                step: "Step",
+                graph: "Full Graph",
+            }
         },
         scenes: {
             title: "Scenes",
