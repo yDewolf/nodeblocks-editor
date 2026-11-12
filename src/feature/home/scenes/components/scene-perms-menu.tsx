@@ -1,5 +1,6 @@
 import { Component, createEffect, createSignal, For, Setter, Show } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
+import { useI18n } from "~/i18n/i18n-context";
 import { ListedScenePerms, SceneHTTPController } from "~/network/api/scene-http-controller";
 import { ScenePermission, togglePermission, hasPermission } from "~/network/protocols/scene-perms";
 import { UserSessionData } from "~/network/protocols/user-session";
@@ -17,6 +18,7 @@ export const ScenePermissionsMenu: Component<{
     setPermissionStore?: SetStoreFunction<ListedScenePerms | undefined>
     showSaveButtons?: boolean
 }> = (props) => {
+    const { t } = useI18n();
     if (!props.perms || !props.setPerms) {
         const [perms, setPerms] = createSignal<number>(props.initialPerms);
         props.perms = perms;
@@ -26,10 +28,10 @@ export const ScenePermissionsMenu: Component<{
     const [isSaving, setIsSaving] = createSignal(false);
     
     const permissionList = [
-        { label: "Read", value: ScenePermission.READ },
-        { label: "Execute", value: ScenePermission.EXECUTE },
-        { label: "Edit", value: ScenePermission.EDIT },
-        { label: "Admin", value: ScenePermission.ADMIN },
+        { label: t("pages.scenes.perms.read"), value: ScenePermission.READ },
+        { label: t("pages.scenes.perms.execute"), value: ScenePermission.EXECUTE },
+        { label: t("pages.scenes.perms.edit"), value: ScenePermission.EDIT },
+        { label: t("pages.scenes.perms.admin"), value: ScenePermission.ADMIN },
     ];
 
     const handleToggle = (flag: ScenePermission) => {
@@ -89,35 +91,35 @@ export const ScenePermissionsMenu: Component<{
             </div>
             <hr />
             <div class="text-section">
-                <span>Default Profiles</span>
+                <span>{t("pages.scenes.defaultProfiles")}</span>
                 <div class="keep fill row-container space-between">
                     <button 
                         class="text-button"
                         type="button"
                         onClick={() => applyPreset(ScenePermission.VIEWER)}
                     >
-                        Viewer
+                        {t("pages.scenes.profiles.viewer")}
                     </button>
                     <button 
                         class="text-button"
                         type="button"
                         onClick={() => applyPreset(ScenePermission.OPERATOR)}
                     >
-                        Operator
+                        {t("pages.scenes.profiles.operator")}
                     </button>
                     <button 
                         class="text-button"
                         type="button"
                         onClick={() => applyPreset(ScenePermission.EDITOR)}
                     >
-                        Editor
+                        {t("pages.scenes.profiles.editor")}
                     </button>
                     <button 
                         class="text-button"
                         type="button"
                         onClick={() => applyPreset(ScenePermission.ALL)}
                     >
-                        All (Admin)
+                        {t("pages.scenes.profiles.all")}
                     </button>
                 </div>
             </div>
@@ -129,7 +131,7 @@ export const ScenePermissionsMenu: Component<{
                     class="text-button"
                     onClick={handleSave}
                 >
-                    {isSaving() ? "Saving..." : "Save Permissions"}
+                    {isSaving() ? t("words.saving") +  "..." : t("pages.scenes.savePerms")}
                 </button>
             </Show>
         </div>
