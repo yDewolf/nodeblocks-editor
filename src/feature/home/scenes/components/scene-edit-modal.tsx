@@ -61,7 +61,7 @@ export const SceneEditModal = (props: {
                         onclick={handleSavePermissions}
                         disabled={isSaving()}
                     >
-                        {isSaving() ? "Saving..." : "Save Permissions"}
+                        {isSaving() ? t("words.saving") +  "..." : t("pages.scenes.savePerms")}
                     </button>
                 ]}
             >

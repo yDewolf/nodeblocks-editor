@@ -16,6 +16,12 @@ export default {
         docs: "Documentação",
     },
     pages: {
+        editor: {
+            returnHome: "Voltar ao início",
+            saveScene: "Salvar Cena",
+            loadScene: "Carregar Cena",
+            exportScene: "Exportar Cena",
+        },
         scenes: {
             title: "Cenas",
             newScene: "Nova Cena",
@@ -66,6 +72,25 @@ export default {
             }
         }
     },
+    node: {
+        parameters: "Parâmetros",
+        output: "Saída",
+        attributes: {
+            nodeFqn: "Tipo",
+            uid: "UID",
+            position: "Posição",
+        }
+    },
+    datatype: {
+        shape: "Forma",
+        channel: "Canal",
+        message: {
+            cantRender: (type: string) => `Não é possível renderizar o tipo ${type}`,
+            rendererNotImplemented: "Renderizador não implementado",
+            noValue: "Nenhum Valor",
+            highDimTensor: (size: number) => `Tensor com muitas dimensões. Tamanho: ${size} elementos`
+        }
+    },
     components: {
         login: {
             username: "Nome de usuário",
@@ -73,15 +98,27 @@ export default {
             logout: "Sair"
         }
     },
+    actions: {
+        loadImage: "carregar imagem",
+    },
     messages: {
         mustBeAuthenticated: (action: string) => `Você deve se autenticar para ${action}`,
-        loading: (what?: string) => ``
+        loading: (what?: string) => `Carregando ${what}...`,
+        isntImplementedYet: (what?: string) => `${what ?? "Isso"} ainda não foi implementado`,
+        errorWhile: (action: string) => `Erro ao ${action}`
     },
     words: {
         unknown: "Desconhecido",
         settings: "Configurações",
+        notifications: "Notificações",
+        notificationHistory: "Histórico de Notificações",
+        autosave: "Salvamento Automático",
+        file: "Arquivo",
+        close: "Fechar",
         create: "Criar",
         scenes: "Cenas",
-        saving: "Salvando"
+        saving: "Salvando",
+        empty: "Vazio",
+        artifact: "Artefato"
     }
 } satisfies typeof en;

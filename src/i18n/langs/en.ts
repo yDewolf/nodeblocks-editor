@@ -14,6 +14,12 @@ export default {
         docs: "Documentation",
     },
     pages: {
+        editor: {
+            returnHome: "Return Home",
+            saveScene: "Save Scene",
+            loadScene: "Load Scene",
+            exportScene: "Export Scene",
+        },
         scenes: {
             title: "Scenes",
             newScene: "New Scene",
@@ -63,6 +69,25 @@ export default {
             }
         }
     },
+    node: {
+        parameters: "Parameters",
+        output: "Output",
+        attributes: {
+            nodeFqn: "Type",
+            uid: "UID",
+            position: "Position",
+        }
+    },
+    datatype: {
+        shape: "Shape",
+        channel: "Channel",
+        message: {
+            cantRender: (type: string) => `Can't render ${type} type`,
+            rendererNotImplemented: "Renderer not implemented",
+            noValue: "No Value",
+            highDimTensor: (size: number) => `High-dimensional tensor. Size: ${size} elements`
+        }
+    },
     components: {
         login: {
             username: "Username",
@@ -70,15 +95,27 @@ export default {
             logout: "Logout"
         }
     },
+    actions: {
+        loadImage: "load image",
+    },
     messages: {
         mustBeAuthenticated: (action: string) => `You must be authenticated to ${action}`,
-        loading: (what?: string) => `Loading ${what}...`
+        loading: (what?: string) => `Loading ${what}...`,
+        isntImplementedYet: (what?: string) => `${what ?? "this"} isn't implemented yet`,
+        errorWhile: (action: string) => `Failed to ${action}`
     },
     words: {
         unknown: "Unknown",
-        settings: "Configurações",
+        settings: "Settings",
+        notifications: "Notifications",
+        notificationHistory: "Notification History",
+        autosave: "Autosave",
+        file: "File",
         create: "Create",
+        close: "Close",
         scenes: "Scenes",
-        saving: "Saving"
+        saving: "Saving",
+        empty: "Empty",
+        artifact: "Artifact"
     }
 }

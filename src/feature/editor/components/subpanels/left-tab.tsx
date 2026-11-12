@@ -12,16 +12,18 @@ import { LOCAL_DOCS_ID } from "~/feature/docs/docs-resolver";
 import { editorSettings, setAutosaveScenes } from "../../editor-settings";
 import { useNavigate } from "@solidjs/router";
 import { ensureScene } from "~/feature/scene/scene-context";
+import { useI18n } from "~/i18n/i18n-context";
 
 
 const LeftTabDropdown = (props: {
     page_viewer: PageViewer
 }) => {
+    const { t } = useI18n();
     const editor = useEditor();
     const [currentItem, setCurrentItem] = createSignal<string | undefined>(undefined);
     const subsections: Map<string, DropsideItemData> = new Map([
         ["file", {
-            label: "File",
+            label: t("words.file"),
             content: () => <div class="dropdown-item-grid">
                 <button onclick={() => {
                     editor.sceneConnection.sendCommand({
@@ -29,13 +31,13 @@ const LeftTabDropdown = (props: {
                         cmd_group: CommandGroups.SCENE,
                         type: ClientSceneCommandTypes.SAVE_SCENE,
                     })
-                }} class="dropdown-button">Save Scene</button>
+                }} class="dropdown-button">{t("pages.editor.saveScene")}</button>
                 <button onclick={() => {
                     // TODO:
-                }} class="dropdown-button">Load Scene</button>
+                }} class="dropdown-button">{t("pages.editor.loadScene")}</button>
                 <button onclick={() => {
                     // TODO:
-                }} class="dropdown-button">Export Scene</button>
+                }} class="dropdown-button">{t("pages.editor.exportScene")}</button>
             </div>
         }],
     ])
@@ -47,11 +49,11 @@ const LeftTabDropdown = (props: {
             <div
                 class="fill dropdown-item-grid"
             >
-                <DropdownItemButton label="Return Home" onClick={() => {
+                <DropdownItemButton label={t("pages.editor.returnHome")} onClick={() => {
                     navigate("/");
                 }} onMouseOver={setCurrentItem(undefined)}/>
                 <DropsideManager dropsides={subsections} currentItem={currentItem} setCurrentItem={setCurrentItem}/>
-                <DropdownItemInput label="Autosave" inputType="checkbox" checked={editorSettings.autosaveScenes} onChange={(e) => {
+                <DropdownItemInput label={t("words.autosave")} inputType="checkbox" checked={editorSettings.autosaveScenes} onChange={(e) => {
                     setAutosaveScenes(e.target.checked);
                     editor.sceneConnection.sendCommand({
                         cmd_uid: nanoid(),
@@ -60,9 +62,9 @@ const LeftTabDropdown = (props: {
                         autosave: e.target.checked
                     })
                 }} onMouseOver={setCurrentItem(undefined)}/>
-                <DropdownItemButton label="Settings" onClick={() => {
+                <DropdownItemButton label={t("words.settings")} onClick={() => {
                     props.page_viewer.current_page = {
-                        page_title: "Settings",
+                        page_title: t("words.settings"),
                         view_displayer_css: "editor-settings-view",
                         element: SettingsCallback
                     };
@@ -75,13 +77,14 @@ const LeftTabDropdown = (props: {
 export const EditorLeftTabHolder = (props: {
     main_page_viewer: PageViewer,
 }) => {
+    const { t } = useI18n();
     const scene = ensureScene();
     const editor = useEditor();
     const tabs: Record<string, () => JSXElement> = {
         "Nodes": () => <NodeTypeSelector onClickOnPreview={
             (node_preview: NodeTypePreview) => editor.toolController.current_tool?.onClickOnNodePreview(node_preview)}
         />,
-        "Workspace": () => <span>This isn't implemented yet</span>// <FileExplorer workspace={session_controller.user_workspace}/>
+        "Workspace": () => <span>{t("messages.isntImplementedYet", "Workspace")}</span>// <FileExplorer workspace={session_controller.user_workspace}/>
     }
     const [selectedTab, setSelectedTab] = createSignal<string>(Object.keys(tabs).at(0) ?? "");
     return (
