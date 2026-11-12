@@ -65,7 +65,6 @@ pub async fn ensure_environment(app: tauri::AppHandle, guard: State<'_, SetupGua
     Ok(())
 }
 
-
 #[tauri::command]
 pub async fn check_server_installed(app: tauri::AppHandle) -> Result<bool, String> {
     let state = load_state(&app);
@@ -78,6 +77,49 @@ pub async fn check_server_installed(app: tauri::AppHandle) -> Result<bool, Strin
     }
     
     Ok(false)
+}
+
+#[tauri::command]
+pub async fn get_local_server_version(app: tauri::AppHandle) -> Result<String, String> {
+    let server_dir = get_local_server_dir(&app)?;
+    let venv_path = server_dir.join(".venv");
+    let python_in_venv = venv_path.join(
+        if cfg!(target_os = "windows") { "Scripts/python.exe" } else { "bin/python" }
+    );
+
+    if !python_in_venv.exists() {
+        return Err("Venv not found".to_string());
+    }
+
+    let output = app
+        .shell()
+        .sidecar("uv")
+        .map_err(|e| format!("Failed to load uv sidecar: {}", e))?
+        .args(vec![
+            "pip".to_string(),
+            "show".to_string(),
+            "nodeblocks".to_string(),
+            "--python".to_string(),
+            python_in_venv.to_string_lossy().to_string(),
+        ])
+        .envs(uv_env(&server_dir))
+        .output()
+        .await
+        .map_err(|e| format!("Failed to run uv command: {}", e))?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("Failed to check package: {}", stderr));
+    }
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    for line in stdout.lines() {
+        if line.starts_with("Version:") {
+            return Ok(line.replace("Version:", "").trim().to_string());
+        }
+    }
+
+    Err("Couldn't find server version in uv".to_string())
 }
 
 pub async fn install_local_server(app: tauri::AppHandle, wheel_url: String) -> Result<String, String> {
@@ -185,16 +227,7 @@ async fn run_uv_sidecar(
     log_path: &PathBuf,
     args: Vec<String>,
 ) -> Result<(), String> {
-    let python_install_dir = server_dir.join(".python_versions");
-    let cache_dir = server_dir.join(".uv_cache");
-    let envs: HashMap<String, String> = HashMap::from([
-        ("UV_PYTHON_INSTALL_DIR".to_string(), python_install_dir.to_string_lossy().to_string()),
-        ("UV_CACHE_DIR".to_string(), cache_dir.to_string_lossy().to_string()),
-        ("UV_NO_PROGRESS".to_string(), "1".to_string()),
-        ("UV_NO_CONFIG".to_string(), "1".to_string()),
-        ("NO_COLOR".to_string(), "1".to_string()),
-        ("UV_HTTP_TIMEOUT".to_string(), "300".to_string()),
-    ]);
+    let envs: HashMap<String, String> = uv_env(server_dir);
 
     let uv_command = app
         .shell()
@@ -262,4 +295,19 @@ async fn run_step(
         "step '{step}' failed (exit code {exit_code:?}):\n{output}\n\nFull log: {}",
         log_path.display()
     ))
+}
+
+// -- env utils
+
+fn uv_env(server_dir: &PathBuf) -> HashMap<String, String> {
+    let python_install_dir = server_dir.join(".python_versions");
+    let cache_dir = server_dir.join(".uv_cache");
+    return HashMap::from([
+        ("UV_PYTHON_INSTALL_DIR".to_string(), python_install_dir.to_string_lossy().to_string()),
+        ("UV_CACHE_DIR".to_string(), cache_dir.to_string_lossy().to_string()),
+        ("UV_NO_PROGRESS".to_string(), "1".to_string()),
+        ("UV_NO_CONFIG".to_string(), "1".to_string()),
+        ("NO_COLOR".to_string(), "1".to_string()),
+        ("UV_HTTP_TIMEOUT".to_string(), "300".to_string()),
+    ]);
 }

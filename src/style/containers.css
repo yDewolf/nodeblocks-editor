@@ -142,6 +142,8 @@ svg.smaller-icon {
 pre {
     padding: 4px;
     overflow: auto;
+
+    max-width: 500px;
     max-height: 200px;
     
     border: 1px solid var(--stroke-color);

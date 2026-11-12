@@ -113,6 +113,7 @@ export default {
                 alwaysShowSlotLabels: "Sempre mostrar nome dos slots"
             },
             setupWizard: {
+                title: "Configuração do Nodeblocks",
                 finishSetup: "Finalizar configuração",
                 serverOutput: "Saída do servidor",
                 messages: {
@@ -122,7 +123,9 @@ export default {
                     title: "Como você gostaria de rodar o Nodeblocks?",
                     description: "Você pode instalar o servidor e rodá-lo localmente ou se conectar a um servidor remoto.",
                     installLocally: "Instalar servidor local",
-                    connectToRemote: "Conectar a um servidor remoto"
+                    connectToRemote: "Conectar a um servidor remoto",
+                    startLocal: "Iniciar servidor local",
+                    startingLocal: "Iniciando..."
                 },
                 install: {
                     title: "Instalação do Nodeblocks",

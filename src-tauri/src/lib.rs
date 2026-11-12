@@ -29,6 +29,7 @@ pub fn run() {
       .invoke_handler(tauri::generate_handler![
         environment::check_server_installed,
         environment::ensure_environment,
+        environment::get_local_server_version,
         server_helper::start_local_server,
         server_helper::stop_local_server,
         server_helper::is_local_server_running,

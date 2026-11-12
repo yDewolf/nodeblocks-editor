@@ -4,6 +4,7 @@ import "~/style/screens/settings.css";
 import { RemoteServerConfigForm } from '../../setup/remote-server-setup';
 import { setSetupComplete } from "~/feature/app-settings";
 import { useI18n } from "~/i18n/i18n-context";
+import { LocalServerLogs } from "~/feature/local-server/local-server-components";
 
 export const SettingsRoute: ParentComponent = (props) => {
     const { t } = useI18n();
@@ -32,6 +33,7 @@ export const SettingsRoute: ParentComponent = (props) => {
                         }}>
                             {t("pages.settings.openSetupWizard")}
                         </button>
+                        <LocalServerLogs/>
                     </Show>
                     {props.children}
                 </div>

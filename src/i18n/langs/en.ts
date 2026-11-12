@@ -110,6 +110,7 @@ export default {
                 alwaysShowSlotLabels: "Always Show Slot Labels"
             },
             setupWizard: {
+                title: "Nodeblocks Setup",
                 finishSetup: "Finish Setup",
                 serverOutput: "Server Output",
                 messages: {
@@ -119,10 +120,12 @@ export default {
                     title: "How would you like to run nodeblocks?",
                     description: "You can install the server and run it locally or connect to a remote server.",
                     installLocally: "Install server locally",
-                    connectToRemote: "Connect to a remote server"
+                    connectToRemote: "Connect to a remote server",
+                    startLocal: "Start local server",
+                    startingLocal: "Starting..."
                 },
                 install: {
-                    title: "Nodeblocks Setup",
+                    title: "Nodeblocks Install",
                     setupInfo: "To run nodeblocks server locally, this installer will download its runtime",
                     setupInfo1: "This needs an internet connection and might take a few minutes.",
                     install: "Install",
