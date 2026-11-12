@@ -5,6 +5,8 @@ import { getCurrentTheme } from "~/feature/app-settings";
 import { THEMES } from "~/feature/app-settings";
 import { Theme } from "~/feature/app-settings";
 import { editorSettings, setAlwaysShowSlotLabels } from "../editor-settings";
+import { useI18n } from "~/i18n/i18n-context";
+import { Locale, localeDicts } from "~/i18n/i18n-locale";
 
 // TODO: improve this page
 export const EditorSettingsView = (props: {page_viewer: PageViewer}) => {
@@ -22,22 +24,35 @@ export const EditorSettingsView = (props: {page_viewer: PageViewer}) => {
 }
 
 export const EditorSettingsContent = () => {
+    const { t, locale, setLocale } = useI18n();
     return (
         <div class="field-grid-holder">
             <div class="field-grid">
-                <label class="field-label" for="settings-theme">Theme</label>
+                <label class="field-label" for="settings-theme">{t("pages.settings.editor.theme")}</label>
                 <select id="settings-theme" 
                     value={getCurrentTheme()} 
                     onchange={(e) => {
                         setTheme(e.currentTarget.value as Theme)
                 }}>
                     <For each={THEMES}>
-                        {(theme) => <option value={theme}>{theme}</option>}
+                        {(theme) => <option value={theme}>{t(`themes.${theme as Theme}`)}</option>}
                     </For>
                 </select>
             </div>
             <div class="field-grid">
-                <label for="settings-alwaysShowSlotLabel" class="field-label">Always Show Slot Labels</label>
+                <label class="field-label" for="settings-lang">{t("pages.settings.editor.lang")}</label>
+                <select id="settings-lang" 
+                    value={locale} 
+                    onchange={(e) => {
+                        setLocale(e.target.value as Locale);
+                }}>
+                    <For each={Object.keys(localeDicts)}>
+                        {(locale) => <option value={locale}>{t(`locale.${locale as Locale}`)}</option>}
+                    </For>
+                </select>
+            </div>
+            <div class="field-grid">
+                <label for="settings-alwaysShowSlotLabel" class="field-label">{t("pages.settings.editor.alwaysShowSlotLabels")}</label>
                 <input type="checkbox" id="settings-alwaysShowSlotLabel" 
                     checked={editorSettings.alwaysShowSlotLabels}
                     onchange={(e) => setAlwaysShowSlotLabels(e.target.checked)}

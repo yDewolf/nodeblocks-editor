@@ -1,4 +1,14 @@
 export default {
+    locale: {
+        en: "English",
+        pt: "Portuguese (BR)"
+    },
+    themes: {
+        dark: "Dark",
+        light: "Light",
+        "dark-contrast": "Dark Constrast",
+        auto: "Auto"
+    },
     routes: {
         scenes: "Scenes",
         docs: "Documentation",
@@ -17,6 +27,11 @@ export default {
 
                 connecting: "Connecting...",
                 connect: "Connect to a server"
+            },
+            editor: {
+                theme: "Theme",
+                lang: "Language",
+                alwaysShowSlotLabels: "Always Show Slot Labels"
             }
         }
     }

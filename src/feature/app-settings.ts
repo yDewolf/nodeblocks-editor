@@ -42,9 +42,9 @@ const [appSettings, _setAppSettings] = makePersisted(
     {name: "app-settings"}
 );
 
+export { appSettings }
 export const setLocale = (l: Locale) => _setAppSettings("locale", l);
 export const setSetupComplete = (v: boolean) => _setAppSettings("isSetupComplete", v);
-export { appSettings }
 
 export const getCurrentTheme = () => appSettings.theme;
 

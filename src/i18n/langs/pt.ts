@@ -1,6 +1,16 @@
 import en from "./en";
 
 export default {
+    locale: {
+        en: "Inglês",
+        pt: "Português Brasil"
+    },
+    themes: {
+        dark: "Escuro",
+        light: "Claro",
+        "dark-contrast": "Escuro com Constraste",
+        auto: "Automático"
+    },
     routes: {
         scenes: "Cenas",
         docs: "Documentação",
@@ -20,6 +30,11 @@ export default {
 
                 connecting: "Conectando...",
                 connect: "Conectar com o servidor"
+            },
+            editor: {
+                theme: "Tema",
+                lang: "Idioma",
+                alwaysShowSlotLabels: "Sempre mostrar nome dos slots"
             }
         }
     }
