@@ -115,7 +115,6 @@ export default {
             setupWizard: {
                 title: "Configuração do Nodeblocks",
                 finishSetup: "Finalizar configuração",
-                serverOutput: "Saída do servidor",
                 messages: {
                     alreadyConnected: (http: string) => `você já está conectado em: ${http}`
                 },
@@ -203,6 +202,17 @@ export default {
         }
     },
     components: {
+        localServerPanel: {
+            title: "Painel do Servidor Local",
+            serverOutput: "Saída do servidor",
+            serverVersion: "Versão instalada",
+            serverStatus: "Status do Servidor",
+            serverStatusRunning: "Rodando",
+            serverStatusStarting: "Iniciando",
+            serverStatusStopped: "Parado",
+            stopServer: "Parar servidor",
+            connectToLocalServer: "Conectar ao servidor local"
+        },
         login: {
             username: "Nome de usuário",
             login: "Entrar",

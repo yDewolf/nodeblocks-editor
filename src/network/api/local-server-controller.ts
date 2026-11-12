@@ -58,6 +58,10 @@ export class LocalServerController {
         }
     }
 
+    public clearLogs() {
+        this._setState("logs", []);
+    }
+
     public async checkIsInstalled() {
         if (!window.isTauriEnvironment) return;
         try {
@@ -84,10 +88,14 @@ export class LocalServerController {
         this._setState("isStarting", true);
         try {
             await invoke("start_local_server");
+            this.clearLogs();
             this._setState("isRunning", true);
+            this.checkStatus();
+        
         } catch (err) {
             console.error("Failed to start local server:", err);
             throw err;
+        
         } finally {
             this._setState("isStarting", false);
         }
@@ -98,6 +106,7 @@ export class LocalServerController {
         try {
             await invoke("stop_local_server");
             this._setState("isRunning", false);
+            this.checkStatus(); 
         } catch (err) {
             console.error("Failed to stop local server:", err);
             throw err;

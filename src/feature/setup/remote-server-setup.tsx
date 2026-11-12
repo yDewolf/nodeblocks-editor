@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, onCleanup } from "solid-js";
 import { useI18n } from "~/i18n/i18n-context";
 import { useAppSession } from "~/network/app-session-provider";
 
@@ -7,6 +7,7 @@ export const RemoteServerConfigForm = () => {
     const appSession = useAppSession();
     const [serverHost, setServerHost] = createSignal<string>(appSession.host);
     const [serverPort, setServerPort] = createSignal<number>(appSession.port);
+    const [url, setUrl] = createSignal<string>(appSession.baseHttpUrl);
     const [connecting, setConnecting] = createSignal<boolean>(false);
     const handleConnectToServer = (e: Event) => {
         setConnecting(true);
@@ -15,6 +16,14 @@ export const RemoteServerConfigForm = () => {
         });
         e.preventDefault();
     }
+
+    const unsubscribe = appSession.listenServerChange(() => {
+        setServerHost(appSession.host);
+        setServerPort(appSession.port);
+        setUrl(appSession.baseHttpUrl);
+    });
+
+    onCleanup(() => unsubscribe);
     
     return (
         <form class="container fill" onsubmit={handleConnectToServer}>
@@ -32,15 +41,17 @@ export const RemoteServerConfigForm = () => {
                     oninput={(e) => setServerPort(Number.parseInt(e.target.value))}
                     />
             </div>
-            <span>{t("pages.settings.remoteHost.status", 
-                (appSession.isConnectedToServer ? t("pages.settings.remoteHost.serverStatusAlive") : t("pages.settings.remoteHost.serverStatusDisconnected")), 
-                appSession.baseHttpUrl
-            )}</span>
-            <button type="submit" class="text-button"
-                disabled={connecting()}
-                >
-                {connecting() ? t("pages.settings.remoteHost.connecting") : t("pages.settings.remoteHost.connect")}
-            </button>
+            <div class="row-container fill space-between">
+                <span>{t("pages.settings.remoteHost.status", 
+                    (appSession.isConnectedToServer ? t("pages.settings.remoteHost.serverStatusAlive") : t("pages.settings.remoteHost.serverStatusDisconnected")), 
+                    url()
+                )}</span>
+                <button type="submit" class="text-button"
+                    disabled={connecting()}
+                    >
+                    {connecting() ? t("pages.settings.remoteHost.connecting") : t("pages.settings.remoteHost.connect")}
+                </button>
+            </div>
         </form>
     )
 }

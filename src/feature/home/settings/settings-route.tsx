@@ -4,7 +4,7 @@ import "~/style/screens/settings.css";
 import { RemoteServerConfigForm } from '../../setup/remote-server-setup';
 import { setSetupComplete } from "~/feature/app-settings";
 import { useI18n } from "~/i18n/i18n-context";
-import { LocalServerLogs } from "~/feature/local-server/local-server-components";
+import { LocalServerPanel } from "~/feature/local-server/local-server-components";
 
 export const SettingsRoute: ParentComponent = (props) => {
     const { t } = useI18n();
@@ -21,11 +21,12 @@ export const SettingsRoute: ParentComponent = (props) => {
                         <h3>{t("pages.settings.generalTitle")}</h3>
                         <RemoteServerConfigForm />
                     </div>
+                    <hr style={{margin: "20px 0"}}/>
                     <div class="text-section">
                         <h3>{t("pages.settings.editorTitle")}</h3>
                         <EditorSettingsContent/>
                     </div>
-
+                    <hr style={{margin: "20px 0"}}/>
                     {/* placeholder */}
                     <Show when={window.isTauriEnvironment}>
                         <button class="text-button" onclick={() => {
@@ -33,7 +34,8 @@ export const SettingsRoute: ParentComponent = (props) => {
                         }}>
                             {t("pages.settings.openSetupWizard")}
                         </button>
-                        <LocalServerLogs/>
+                        <hr style={{margin: "20px 0"}}/>
+                        <LocalServerPanel/>
                     </Show>
                     {props.children}
                 </div>

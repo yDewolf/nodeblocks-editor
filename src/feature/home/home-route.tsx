@@ -36,7 +36,7 @@ const HomeView: ParentComponent = (props) => {
     return (
         <div class="home-view">
             <HomeLeftTab routes={routes} />
-            <div class="home-content-holder fill">
+            <div class="home-content-holder container scrollable fill">
                 {props.children}
             </div>
         </div>
