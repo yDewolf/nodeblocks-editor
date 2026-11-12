@@ -5,10 +5,12 @@ import "~/style/screens/home/home.css";
 import { Dropdown } from "~/components/panels/dropdown";
 import { useLocation } from "@solidjs/router";
 import SettingsIcon from "~/assets/icons/settings.svg";
+import { useI18n } from "~/i18n/i18n-context";
 
 export const HomeLeftTab = (props: {
     routes: HomeRouteConfig[]
 }) => {
+    const { t } = useI18n();
     const appSession = useAppSession();
     const [userId, setUserId] = createSignal<string>("");
 
@@ -33,24 +35,24 @@ export const HomeLeftTab = (props: {
                                     {/* TODO: arrumar isso aqui porque tecnicamente depende */}
                                     {/* de importar o css do editor */}
                                     <div class="field-grid">
-                                        <label class="field-value-label" for="">Username</label>
+                                        <label class="field-value-label" for="">{t("components.login.username")}</label>
                                         <input class="field-input" type="text" oninput={(e) => {
                                             setUserId(e.target.value);
                                         }}/>
                                     </div>
                                     <button class="text-button" onclick={() => appSession.login(userId())}>
-                                        Login
+                                        {t("components.login.login")}
                                     </button>
                                 </div>
                             }>
                                 <div class="container">
                                     <button class="text-button" onclick={() => appSession.logout()}>
-                                        Logout
+                                        {t("components.login.logout")}
                                     </button>
                                 </div>
                             </Show>
                         </Dropdown>
-                        <span class="username">{appSession.userSession?.display_name ?? "Unknown"}</span>
+                        <span class="username">{appSession.userSession?.display_name ?? t("words.unknown")}</span>
                     </div>
                     
                 </div>
@@ -80,7 +82,7 @@ export const HomeLeftTab = (props: {
                 >
                     <SettingsIcon class="smaller-icon"/>
                     <span class="home-route-label">
-                        Settings
+                        {t("words.settings")}
                     </span>
                 </a>
                 {/* TODO: add settings button here */}

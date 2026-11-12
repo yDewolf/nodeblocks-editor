@@ -34,5 +34,16 @@ export default {
                 alwaysShowSlotLabels: "Always Show Slot Labels"
             }
         }
+    },
+    components: {
+        login: {
+            username: "Username",
+            login: "Login",
+            logout: "Logout"
+        }
+    },
+    words: {
+        unknown: "Unknown",
+        settings: "Configurações",
     }
 }

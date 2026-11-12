@@ -37,5 +37,16 @@ export default {
                 alwaysShowSlotLabels: "Sempre mostrar nome dos slots"
             }
         }
+    },
+    components: {
+        login: {
+            username: "Nome de usuário",
+            login: "Entrar",
+            logout: "Sair"
+        }
+    },
+    words: {
+        unknown: "Desconhecido",
+        settings: "Configurações",
     }
 } satisfies typeof en;
