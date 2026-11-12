@@ -8,6 +8,7 @@
     "build:protos": "pbjs -t static-module -w es6 -p src/protocols/nodeblocks/protos -o src/protocols/nodeblocks/generated/proto.js src/protocols/nodeblocks/protos/**/*.proto && pbts -o src/protocols/nodeblocks/generated/proto.d.ts src/protocols/nodeblocks/generated/proto.js"
   },
   "dependencies": {
+    "@solid-primitives/i18n": "^2.2.1",
     "@solid-primitives/map": "^0.7.3",
     "@solid-primitives/storage": "^4.3.4",
     "@solidjs/router": "^1.0.0",

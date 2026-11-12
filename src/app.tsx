@@ -14,6 +14,7 @@ import DocsRoute from "./feature/docs/docs-route";
 import { SettingsRoute } from "./feature/home/settings/settings-route";
 import { getActiveServerUrl } from "./server/connected-server";
 import { SetupScreen } from "./feature/setup/setup-route";
+import { I18nProvider } from "./i18n/i18n-context";
 
 declare global {
   interface Window {
@@ -42,23 +43,25 @@ export default function App() {
   });
 
   return (
-    <AppSessionProvider appSession={app_session}>
-      <SetupScreen>
-        <PackageManagerProvider>
-          <main>
-            <ContextMenuPortal />
-            <Router>
-                <Route path="/" component={Home}>
-                  <Route path="" component={() => <Navigate href="/scenes" />}/>
-                  <Route path="scenes" component={ScenesRoute}/>
-                  <Route path="docs" component={DocsRoute}/>
-                  <Route path="settings" component={SettingsRoute}/>
-                </Route>
-                <Route path="/scene/:scene_id" component={SceneEditor} />
-            </Router>
-          </main>
-        </PackageManagerProvider>
-      </SetupScreen>
-    </AppSessionProvider>
+    <I18nProvider>
+      <AppSessionProvider appSession={app_session}>
+        <SetupScreen>
+          <PackageManagerProvider>
+            <main>
+              <ContextMenuPortal />
+              <Router>
+                  <Route path="/" component={Home}>
+                    <Route path="" component={() => <Navigate href="/scenes" />}/>
+                    <Route path="scenes" component={ScenesRoute}/>
+                    <Route path="docs" component={DocsRoute}/>
+                    <Route path="settings" component={SettingsRoute}/>
+                  </Route>
+                  <Route path="/scene/:scene_id" component={SceneEditor} />
+              </Router>
+            </main>
+          </PackageManagerProvider>
+        </SetupScreen>
+      </AppSessionProvider>
+    </I18nProvider>
   );
 }
