@@ -28,7 +28,7 @@ const HomeView: ParentComponent = (props) => {
         },
         {
             iconElement: () => <DocsIcon class="smaller-icon"/>,
-            label: t("routes.scenes"),
+            label: t("routes.docs"),
             route: "/docs"
         }
     ]
