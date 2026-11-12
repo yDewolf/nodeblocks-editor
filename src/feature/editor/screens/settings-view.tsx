@@ -1,6 +1,6 @@
 import { For } from "solid-js"
 import { PageViewer } from "../../../components/page-controller"
-import { setTheme } from "~/feature/app-settings";
+import { appSettings, setTheme } from "~/feature/app-settings";
 import { getCurrentTheme } from "~/feature/app-settings";
 import { THEMES } from "~/feature/app-settings";
 import { Theme } from "~/feature/app-settings";
@@ -24,7 +24,7 @@ export const EditorSettingsView = (props: {page_viewer: PageViewer}) => {
 }
 
 export const EditorSettingsContent = () => {
-    const { t, locale, setLocale } = useI18n();
+    const { t, setLocale } = useI18n();
     return (
         <div class="field-grid-holder">
             <div class="field-grid">
@@ -42,7 +42,7 @@ export const EditorSettingsContent = () => {
             <div class="field-grid">
                 <label class="field-label" for="settings-lang">{t("pages.settings.editor.lang")}</label>
                 <select id="settings-lang" 
-                    value={locale} 
+                    value={appSettings.locale} 
                     onchange={(e) => {
                         setLocale(e.target.value as Locale);
                 }}>

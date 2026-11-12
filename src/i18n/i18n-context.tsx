@@ -4,7 +4,6 @@ import { appSettings, defaultSystemLanguage, setLocale } from "~/feature/app-set
 import { localeDicts, Locale, TranslationFunc } from "./i18n-locale";
 
 type I18nContextType = {
-  locale: Locale;
   setLocale: (locale: Locale) => void;
   t: TranslationFunc
 };
@@ -26,7 +25,7 @@ export const I18nProvider: ParentComponent = (props) => {
     const translate = translator(dict);
 
     return (
-        <I18nContext.Provider value={{ locale: appSettings.locale, setLocale: handleSetLocale, t: translate as any}}>
+        <I18nContext.Provider value={{ setLocale: handleSetLocale, t: translate as any}}>
             {props.children}
         </I18nContext.Provider>
     );
