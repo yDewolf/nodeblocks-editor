@@ -14,6 +14,36 @@ export default {
         docs: "Documentation",
     },
     pages: {
+        docs: {
+            datatypeObject: "DataType Object",
+            docsType: "documentation type",
+            loadDocs: "load documentation",
+            parseNodePreview: "parse node preview",
+            messages: {
+                previousTabsShowUp: "Previous opened tabs show up here.",
+                noTopicFound: "No topic found",
+                noParametersForRenderer: "No parameters available for this renderer",
+                nodeHasNoSlots: "This node has no slots",
+                nodeHasNoParam: "This node has no parameters",
+                searchForTopics: "Search for topics",
+            },
+            howToDocs: {
+                title: "You can view documentation about datatypes, nodetypes and interface elements by:",
+                usingTool: "selecting an element with the docs tool",
+                usingIndex: "using the documentation index (left tab in this view)",
+                usingUrl: "inserting #docs=<path.to.documentation> in your browser's url"
+            },
+            labels: {
+                meta_version: "Metadata Version",
+                last_modified: "Last Modified",
+            },
+            sections: {
+                colorScheme: "Color Scheme",
+                allTags: "All Tags",
+                outputPreview: "Output Preview",
+                slots: "Slots",
+            }
+        },
         editor: {
             returnHome: "Return Home",
             saveScene: "Save Scene",
@@ -102,10 +132,16 @@ export default {
         mustBeAuthenticated: (action: string) => `You must be authenticated to ${action}`,
         loading: (what?: string) => `Loading ${what}...`,
         isntImplementedYet: (what?: string) => `${what ?? "this"} isn't implemented yet`,
-        errorWhile: (action: string) => `Failed to ${action}`
+        noImplementationFor: (something: string) => `No implementation for ${something}`,
+        errorWhile: (action: string) => `Failed to ${action}`,
+        noSomethingSelected: (something: string, fem?: boolean) => `No ${something} selected`,
+        couldntFind: (something: string) => `Couldn't find ${something}`
     },
     words: {
         unknown: "Unknown",
+        documentation: "Documentação",
+        description: "Description",
+        usages: "Usages",
         settings: "Settings",
         notifications: "Notifications",
         notificationHistory: "Notification History",
@@ -116,6 +152,22 @@ export default {
         scenes: "Scenes",
         saving: "Saving",
         empty: "Empty",
-        artifact: "Artifact"
+        artifact: "Artifact",
+        id: "Id",
+        version: "Version",
+        index: "Index",
+        attributes: "Attributes",
+        renderer: "Renderer",
+        baseType: "BaseType",
+        input: "Input",
+        output: "Output",
+        undefined: "Undefined",
+        min: "Min",
+        max: "Max",
+        sample: "Sample",
+        preview: "Preview",
+        widget: "Widget",
+        defaultValue: "Default Value",
+        tags: "Tags",
     }
 }

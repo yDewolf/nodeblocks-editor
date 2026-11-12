@@ -15,8 +15,10 @@ import { PackageManager } from '../editor/engine/packages/package-manager';
 import { DataTypeMeta, NodeTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import { MetadataHeader } from "~/protocols/nodeblocks/metadata/header_metadata";
 import { usePackageManager } from "../editor/contexts/package-manager-context";
+import { useI18n } from "~/i18n/i18n-context";
 
 export const DocsView = () => {
+    const { t } = useI18n();
     const docs = useDocs();
     const docs_data = createMemo(() => {
         if (!docs.docsData) {
@@ -50,22 +52,22 @@ export const DocsView = () => {
                     <Show when={docs_data()} fallback={
                         <Show when={docs.docs_path} fallback={
                             <div class="text-section">
-                                <h2>No documentation selected</h2>
-                                <p>You can view documentation about datatypes, nodetypes and interface elements by:</p>
+                                <h2>{t("messages.noSomethingSelected", t("words.documentation"), true)}</h2>
+                                <p>{t("pages.docs.howToDocs.title")}</p>
                                 <ul>
                                     <li class="row-container center-items">
-                                        selecting an element with the docs tool (<AskDocsIcon class="small-icon"/>)
+                                        {t("pages.docs.howToDocs.usingTool")} (<AskDocsIcon class="small-icon"/>)
                                     </li>
                                     <li class="row-container center-items">
-                                        using the documentation index (left tab in this view)
+                                        {t("pages.docs.howToDocs.usingIndex")}
                                     </li>
                                     <li class="row-container center-items">
-                                        inserting #docs={"<path.to.documentation>"} in your browser's url
+                                        {t("pages.docs.howToDocs.usingUrl")}
                                     </li>
                                 </ul>
                             </div>
                         }>
-                            <h2>Couldn't find documentation</h2>
+                            <h2>{t("messages.couldntFind", t("words.documentation"))}</h2>
                         </Show>
                     }>
                         {(data) => 
@@ -93,6 +95,7 @@ export const DocsView = () => {
 const DefaultDocsContent: ParentComponent<{
     docsData: DocPayload
 }> = (props) => {
+    const { t } = useI18n();
     const usages: string[] = "usages" in props.docsData.data ? props.docsData.data.usages : [];
     return <>
         <div class="text-section">
@@ -105,14 +108,14 @@ const DefaultDocsContent: ParentComponent<{
         </div>
         <div class="text-section">
             <Show when={props.docsData?.data.brief}>
-                <h2>Description</h2>
+                <h2>{t("words.description")}</h2>
             </Show>
             <ParsedMetaText text={props.docsData?.data.description} default="No Description"/>
         </div>
         {props.children}
         <Show when={usages.length > 0}>
             <div class="text-section">
-                <h2>Usages</h2>
+                <h2>{t("words.usages")}</h2>
                 <For each={usages}>
                     {(usage) => <ParsedMetaText text={usage}/>}
                 </For>
@@ -127,8 +130,9 @@ const DocsContentSelector = (props: {
     packageManager: PackageManager,
     devMode: boolean
 }) => {
+    const { t } = useI18n();
     return <Switch fallback={
-        <span>No implementation for documentation type {props.docs_data.type}</span>
+        <span>{t("messages.noImplementationFor", t("pages.docs.docsType"))} {props.docs_data.type}</span>
     }>
         <Match when={props.docs_data.type === "header"}>
             <HeaderDocsContent path={props.path} data={props.docs_data.data as MetadataHeader} devMode={props.devMode}/>            
