@@ -12,8 +12,6 @@ use tauri_plugin_shell::ShellExt;
 use crate::utils::progress_event::emit_progress;
 
 const PYTHON_VERSION: &str = "3.14";
-const NODEBLOCKS_WHEEL_URL: &str =
-    "https://github.com/yDewolf/nodeblocks-server/releases/download/v0.2.0-beta/nodeblocks-0.2.0-py3-none-any.whl";
 const PROGRESS_EVENT: &str = "env-setup-progress";
 
 
@@ -58,12 +56,12 @@ impl Drop for SetupRun<'_> {
 }
 
 #[tauri::command]
-pub async fn ensure_environment(app: tauri::AppHandle, guard: State<'_, SetupGuard>) -> Result<(), String> {
+pub async fn ensure_environment(app: tauri::AppHandle, guard: State<'_, SetupGuard>, wheel_url: String) -> Result<(), String> {
     let _running = guard.try_acquire()?;
     let server_dir = get_local_server_dir(&app)?;
     fs::create_dir_all(&server_dir).map_err(|e| e.to_string())?;
     
-    let _ = install_local_server(app).await;
+    let _ = install_local_server(app, wheel_url).await;
     Ok(())
 }
 
@@ -82,9 +80,9 @@ pub async fn check_server_installed(app: tauri::AppHandle) -> Result<bool, Strin
     Ok(false)
 }
 
-pub async fn install_local_server(app: tauri::AppHandle) -> Result<String, String> {
+pub async fn install_local_server(app: tauri::AppHandle, wheel_url: String) -> Result<String, String> {
     let server_dir = get_local_server_dir(&app)?;
-    let log_path = server_dir.join("logs");
+    let log_path = server_dir.join("setup.log");
     let _ = fs::create_dir(&log_path);
 
     let mut state = load_state(&app);
@@ -94,7 +92,7 @@ pub async fn install_local_server(app: tauri::AppHandle) -> Result<String, Strin
     );
 
     if state.step == InstallStep::NotStarted {
-        let _ =run_uv_sidecar(
+        let _ = run_uv_sidecar(
             &app,
             "venv", 10,
             &server_dir, &log_path,
@@ -120,7 +118,7 @@ pub async fn install_local_server(app: tauri::AppHandle) -> Result<String, Strin
                 "pip".into(), "install".into(),
                 "--python".into(), 
                 python_in_venv.to_string_lossy().to_string(), 
-                NODEBLOCKS_WHEEL_URL.into()
+                wheel_url.into()
             ],
         )
         .await;

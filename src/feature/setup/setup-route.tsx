@@ -106,7 +106,6 @@ export const SetupWizard: ParentComponent<{
                                         {t("actions.goBack")}
                                     </button>
                                     <LocalServerSetupContent 
-                                        isFirstInstall={false}
                                         onReady={() => {
                                             setLocalServerInstalled(true);
                                         }} 
@@ -133,7 +132,7 @@ export const SetupWizard: ParentComponent<{
                     <Show when={isLocalRunning()}>
                         <details>
                             <summary>{t("pages.settings.setupWizard.serverOutput")}</summary>
-                            <pre class="container scrollable">{logs().join("\n")}</pre>
+                            <pre>{logs().join("\n")}</pre>
                         </details>
                     </Show>
                 </div>

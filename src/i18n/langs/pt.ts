@@ -253,6 +253,7 @@ export default {
         defaultValue: "Valor padrão",
         tags: "Tags",
         details: "Detalhes",
-        note: "OBS"
+        note: "OBS",
+        serverRelease: "Server Release",
     }
 } satisfies typeof en;

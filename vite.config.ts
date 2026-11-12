@@ -1,10 +1,10 @@
 import { defineConfig } from "vite";
 import { solidStart } from "@solidjs/start/config";
-// import { nitro } from "nitro/vite";
 import solidSvg from 'vite-plugin-solid-svg';
+import { nitro } from "nitro/vite";
 
 export default defineConfig({
-    plugins: [solidStart({ ssr: false }), solidSvg()],
+    plugins: [solidStart({ ssr: false }), nitro({preset: "static"}), solidSvg()],
     clearScreen: false,
     server: {
         port: 3000,

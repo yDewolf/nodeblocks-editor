@@ -251,5 +251,6 @@ export default {
         tags: "Tags",
         details: "Details",
         note: "Note",
+        serverRelease: "Server Release",
     }
 }
