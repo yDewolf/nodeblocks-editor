@@ -4,7 +4,7 @@ import { ServerMessages, ServerMessageTypes, WebsocketStatus } from "~/protocols
 import { PackageManager } from "../engine/packages/package-manager";
 import { ServerMessage } from "~/protocols/nodeblocks/network/message/server-messages";
 import { WorkerEventPayload } from "~/protocols/nodeblocks/network/message/server/payloads/worker-event-payloads";
-import { ServerCmdResponse, ServerEngineEvent, ServerSceneMessages, ServerWorkerEvent } from "~/protocols/nodeblocks/network/message/server/server-scene-messages";
+import { ServerCmdResponse, ServerEngineEvent, ServerWorkerEvent } from "~/protocols/nodeblocks/network/message/server/server-scene-messages";
 import { EngineEventPayload } from "~/protocols/nodeblocks/network/message/server/payloads/engine-event-payloads";
 import { ServerCmdResponsePayload } from "~/protocols/nodeblocks/network/message/server/payloads/server-response-payloads";
 import { createSignal } from "solid-js";
@@ -12,7 +12,7 @@ import { isServer } from "solid-js/web";
 import { SceneHTTPController } from "~/network/api/scene-http-controller";
 import { PackageManagerHTTPController } from "~/network/api/package-http-controller";
 import { SceneProtoTranslator } from "~/protocols/nodeblocks/utils/scene_proto_translator";
-import { ForbiddenError, HttpError, UnauthorizedError } from "~/network/api/http_errors";
+import { HttpError } from "~/network/api/http_errors";
 
 type MessageByType<MessageType extends ServerMessages | ServerMessageTypes> = 
     Extract<ServerMessage, {type: MessageType}>;
@@ -40,6 +40,7 @@ export class SceneConnectionManager {
     private maxReconnectAttempts: number = 10;
     private reconnectTimer: number | null = null;
     private isIntentionalDisconnect: boolean = false;
+    private _reconnectAbortController: AbortController | null = null;
 
     private commandQueue: ClientCommand[] = [];
     private messageListeners: Map<ServerMessageTypes, Set<(msg: any) => void>> = new Map();
@@ -97,7 +98,7 @@ export class SceneConnectionManager {
         if (!this.appSession.isAuthenticated()) {
             throw new Error("User must be logged to connect to a scene");
         }
-
+        this.abortReconnect();
         if (this.socket?.readyState === WebSocket.OPEN || this._isConnecting) {
             return;
         }
@@ -123,6 +124,18 @@ export class SceneConnectionManager {
             return;
         }
         this.notifyConnected();
+    }
+
+    public abortReconnect(): void {
+        if (this._reconnectAbortController) {
+            this._reconnectAbortController.abort();
+            this._reconnectAbortController = null;
+        }
+
+        if (this.reconnectTimer) {
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = null;
+        }
     }
 
     public disconnect(): void {
@@ -195,6 +208,10 @@ export class SceneConnectionManager {
             this.notifyError(error, error.message);
             return;
         }
+
+        this.abortReconnect();
+        const abortController = new AbortController();
+        this._reconnectAbortController = abortController;
 
         const delay = Math.min(1000 * Math.pow(2, this.currentAttempt), 15000);
         this._setReconnectAttempts(this.currentAttempt + 1);

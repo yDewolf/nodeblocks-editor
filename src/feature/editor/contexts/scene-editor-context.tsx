@@ -1,4 +1,4 @@
-import { createContext, ParentComponent, useContext } from "solid-js";
+import { createContext, onCleanup, ParentComponent, useContext } from "solid-js";
 import { SceneEditor } from "../scene-editor";
 import { PackageManager } from "../engine/packages/package-manager";
 import { AppSessionManager } from "~/network/app-session-manager";
@@ -14,6 +14,10 @@ export const EditorProvider: ParentComponent<{
   const {t} = useI18n();
   const editor = new SceneEditor(props.appSession, props.packageManager, props.sceneId);
   editor.notificationController.translationFunc = t;
+
+  onCleanup(() => {
+    editor.sceneConnection.abortReconnect();
+  })
 
   return (
     <EditorContext.Provider value={editor}>

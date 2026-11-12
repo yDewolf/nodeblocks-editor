@@ -30,6 +30,10 @@ export class AppSessionManager {
     private _isConnectedToServer: () => boolean;
     private _setIsConnectedToServer: Setter<boolean>;
 
+    private _connectAbortController: AbortController | null = null;
+    private maxRetries: number = 5;
+    private retryDelayMs: number = 2000;
+
     constructor(host: string = "localhost", port: number = 8080) {
         [this._sessionStore, this._setSessionStore] = createStore<SessionStore>({
             
@@ -59,23 +63,74 @@ export class AppSessionManager {
         this._setSessionStore("user_session", user_session ?? undefined);
     }
 
-    public async tryConnectToServer(serverHost: string, serverPort: number) {
-        try {
-            const serverUrl = `http://${serverHost}:${serverPort}`;
-            console.log("[AppSession] trying to connect to: ", serverUrl);
-            const success = await setServerUrlAction(serverUrl);
-            if (!success) {
-                throw Error();
-            }
-            
-            this._setIsConnectedToServer(true);
-            this.changeServer(serverHost, serverPort);
-            if (this.userSession) {
-                await this.login(this.userSession?.user_id);
-            }
-        } catch (err) {
-            console.error("Failed to connect to server: ", err);
+    public async tryConnectToServer(serverHost: string, serverPort: number): Promise<boolean> {
+        if (this._connectAbortController) {
+            this._connectAbortController.abort();
         }
+
+        const abortController = new AbortController();
+        this._connectAbortController = abortController;
+
+        const serverUrl = `http://${serverHost}:${serverPort}`;
+        console.log("[AppSession] trying to connect to: ", serverUrl);
+
+        for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+            if (abortController.signal.aborted) {
+                return false;
+            }
+
+            try {
+                const success = await setServerUrlAction(serverUrl);
+                if (!success) {
+                    throw Error("Failed to connect to server");
+                }
+                
+                if (this._connectAbortController === abortController) {
+                    this._connectAbortController = null;
+                }
+
+                this._setIsConnectedToServer(true);
+                this.changeServer(serverHost, serverPort);
+                if (this.userSession) {
+                    await this.login(this.userSession?.user_id);
+                }
+                return true;
+            } catch (err) {
+                console.warn(`[AppSession] Attempt ${attempt}/${this.maxRetries} - ${serverUrl}:`, err);
+                if (attempt < this.maxRetries) {
+                    try {
+                        await this._wait(this.retryDelayMs, abortController.signal);
+                    } catch (e) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        console.error(`[AppSession] Failed to connect to ${serverUrl} after ${this.maxRetries} tries`);
+        if (this._connectAbortController === abortController) {
+            this._connectAbortController = null;
+        }
+        return false;
+    }
+
+    private _wait(ms: number, signal: AbortSignal): Promise<void> {
+        return new Promise((resolve, reject) => {
+            if (signal.aborted) {
+                return reject(new Error("Aborted"));
+            }
+            const timer = setTimeout(() => {
+                signal.removeEventListener("abort", onAbort);
+                resolve();
+            }, ms);
+
+            const onAbort = () => {
+                clearTimeout(timer);
+                reject(new Error("Aborted"));
+            };
+
+            signal.addEventListener("abort", onAbort, { once: true });
+        });
     }
 
     public async login(user_id: string, password?: string): Promise<void> {
