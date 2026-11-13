@@ -1,7 +1,7 @@
 import { loginAction, logoutAction } from '~/server/user-session';
 import { UserSessionData } from './protocols/user-session';
 import { createStore, SetStoreFunction } from 'solid-js/store';
-import { setServerUrlAction } from '~/server/connected-server';
+import { IncompatibleServerError, setServerUrlAction } from '~/server/connected-server';
 import { createSignal, Setter } from 'solid-js';
 import { ServerEventTypes, ServerStatuses, ServerStatusEvent } from '~/protocols/nodeblocks/network/server-events';
 
@@ -133,6 +133,10 @@ export class AppSessionManager {
                 }
                 return true;
             } catch (err) {
+                if (err instanceof IncompatibleServerError) {
+                    this._setServerStatus(ServerStatuses.FAILED);
+                    return false;
+                }
                 console.warn(`[AppSession] Attempt ${attempt}/${this.maxRetries} - ${serverUrl}:`, err);
                 this._setServerStatus(ServerStatuses.FAILED);
                 if (attempt < this.maxRetries) {
@@ -239,7 +243,6 @@ export class AppSessionManager {
     public async login(user_id: string, password?: string): Promise<void> {
         if (!this.isConnectedToServer) return;
         try {
-            console.log(this.defaultHeaders);
             const session = await loginAction(user_id, password, this.defaultHeaders);
             this._setSessionStore("user_session", session);
         } catch (error: any) {
