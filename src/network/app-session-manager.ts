@@ -119,6 +119,7 @@ export class AppSessionManager {
                     this._connectAbortController = null;
                 }
                 
+                this._setIsConnectedToServer(true);
                 this.changeServer(serverHost, serverPort);
                 if (this.userSession) {
                     await this.login(this.userSession?.user_id);
@@ -199,7 +200,6 @@ export class AppSessionManager {
 
         eventSource.onopen = () => {
             console.log("[AppSession] Connected to SSE stream");
-            this._setIsConnectedToServer(true);
         };
     }
 
@@ -230,6 +230,7 @@ export class AppSessionManager {
     }
 
     public async login(user_id: string, password?: string): Promise<void> {
+        if (!this.isConnectedToServer) return;
         try {
             const session = await loginAction(user_id, password);
             this._setSessionStore("user_session", session);

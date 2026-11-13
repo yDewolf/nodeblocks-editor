@@ -231,7 +231,8 @@ export default {
         noImplementationFor: (something: string) => `Nenhuma implementação para ${something}`,
         errorWhile: (action: string) => `Erro ao ${action}`,
         noSomethingSelected: (something: string, fem?: boolean) => `Nenhum${fem ? "a" : ""} ${something} selecionad${fem ? "a" : "o"}`,
-        couldntFind: (something: string) => `Não foi possível encontrar ${something}`
+        couldntFind: (something: string) => `Não foi possível encontrar ${something}`,
+        noConnectionWithServer: "Você não está conectado a um servidor. Algumas coisas podem deixar de funcionar."
     },
     words: {
         unknown: "Desconhecido",

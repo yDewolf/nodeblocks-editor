@@ -228,7 +228,8 @@ export default {
         noImplementationFor: (something: string) => `No implementation for ${something}`,
         errorWhile: (action: string) => `Failed to ${action}`,
         noSomethingSelected: (something: string, fem?: boolean) => `No ${something} selected`,
-        couldntFind: (something: string) => `Couldn't find ${something}`
+        couldntFind: (something: string) => `Couldn't find ${something}`,
+        noConnectionWithServer: "Not connected to a server. Some features might stop working."
     },
     words: {
         unknown: "Unknown",

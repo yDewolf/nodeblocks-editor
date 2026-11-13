@@ -39,6 +39,7 @@ export const ScenesView = (props: {
     sessionData?: UserSessionData,
     sceneController: SceneHTTPController
 }) => {
+    const appSession = useAppSession();
     const { t } = useI18n();
     const [sceneName, setSceneName] = createSignal<string>("");
     const [isEditModalOpen, setIsEditModalOpen] = createSignal(false);
@@ -124,34 +125,38 @@ export const ScenesView = (props: {
                 </button>
                 <span class="center-content">{t("pages.scenes.foundScenes", props.sceneController.scenes.length)}</span>
             </div>
-            <Show when={props.sessionData} fallback={
-                <span>{t("messages.mustBeAuthenticated", t("pages.scenes.actions.viewScenes"))}</span>
+            <Show when={appSession.isConnectedToServer} fallback={
+                <span>{t("messages.noConnectionWithServer")}</span>
             }>
-                {(sessionData) => <>
-                    <Show when={!props.sceneController.isLoading} fallback={
-                        <span>{t("messages.loading", t("words.scenes"))}</span>
-                    }>
-                        <div class="scene-card-grid">
-                            <For each={props.sceneController.scenes}>
-                                {(scene) => <SceneCard listedScene={scene} fetchSceneData={fetchSceneData} editScene={editScene}/>}
-                            </For>
-                        </div>
-                    </Show>
-                    <Show when={activeSceneId()}>
-                        {(sceneId) => {
-                            const listedScene = props.sceneController.sceneIndex[sceneId()];
-                            return (
-                                <SceneEditModal 
-                                    sceneController={props.sceneController}
-                                    sessionData={sessionData()}
-                                    listedScene={listedScene}
-                                    closeModal={closeModal} 
-                                    isModalOpened={isEditModalOpen}
-                                />
-                            )
-                        }}
-                    </Show>
-                </>}
+                <Show when={props.sessionData} fallback={
+                    <span>{t("messages.mustBeAuthenticated", t("pages.scenes.actions.viewScenes"))}</span>
+                }>
+                    {(sessionData) => <>
+                        <Show when={!props.sceneController.isLoading} fallback={
+                            <span>{t("messages.loading", t("words.scenes"))}</span>
+                        }>
+                            <div class="scene-card-grid">
+                                <For each={props.sceneController.scenes}>
+                                    {(scene) => <SceneCard listedScene={scene} fetchSceneData={fetchSceneData} editScene={editScene}/>}
+                                </For>
+                            </div>
+                        </Show>
+                        <Show when={activeSceneId()}>
+                            {(sceneId) => {
+                                const listedScene = props.sceneController.sceneIndex[sceneId()];
+                                return (
+                                    <SceneEditModal 
+                                        sceneController={props.sceneController}
+                                        sessionData={sessionData()}
+                                        listedScene={listedScene}
+                                        closeModal={closeModal} 
+                                        isModalOpened={isEditModalOpen}
+                                    />
+                                )
+                            }}
+                        </Show>
+                    </>}
+                </Show>
             </Show>
         </div>
     )

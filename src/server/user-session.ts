@@ -2,7 +2,6 @@ import { UserSessionData } from "~/network/protocols/user-session";
 import { getActiveServerUrl } from "./connected-server";
 import { _setAppSession } from "./session";
 
-// FIXME: isso aqui tem que acontecer sempre depois de já ter conectado ao SSE
 export async function loginAction(user_id: string, password?: string): Promise<UserSessionData> {
     const serverUrl = await getActiveServerUrl();
     const response = await fetch(`${serverUrl}/api/user/login`, {
