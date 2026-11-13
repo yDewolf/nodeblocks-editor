@@ -31,7 +31,11 @@ export class PackageManager {
         this._listeners.forEach((listener) => listener(loadedPackages));
     }
 
-    public loadPackages(packages: PackageManifest[]): void {
+    public loadPackages(packages: PackageManifest[], resetBeforeLoading: boolean = true): void {
+        // FIXME: adicionei isso aqui por padrão porque talvez não fazer isso cause problemas imprevistos
+        if (resetBeforeLoading) {
+            this.reset()
+        }
         for (const pkg of packages) {
             if (pkg.data_types) {
                 for (const dataTypeSpec of Object.values(pkg.data_types)) {

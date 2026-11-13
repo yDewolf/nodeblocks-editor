@@ -1,10 +1,9 @@
-import { createSignal, onMount, Show, For, ParentComponent, createEffect } from "solid-js";
+import { createSignal, onMount, Show, For, ParentComponent, createEffect, onCleanup } from "solid-js";
 import { SceneHTTPController } from "~/network/api/scene-http-controller";
 import { useAppSession } from "~/network/app-session-provider";
 import { UserSessionData } from "~/network/protocols/user-session";
 import { Dropdown } from '../../../components/panels/dropdown';
 import ArrowRightIcon from '~/assets/icons/arrow-right.svg';
-import { PackageManagerHTTPController } from "~/network/api/package-http-controller";
 import { usePackageManager } from "~/feature/editor/contexts/package-manager-context";
 import { SceneCard } from "./components/scene-card";
 
@@ -13,18 +12,23 @@ import "~/style/screens/home/scenes.css";
 import { SceneEditModal } from "./components/scene-edit-modal";
 import { ScenePermissionsMenu } from './components/scene-perms-menu';
 import { useI18n } from "~/i18n/i18n-context";
+import { PackageManagerHTTPController } from "~/network/api/package-http-controller";
 
 export const ScenesRoute: ParentComponent = (props) => {
     const appSession = useAppSession();
     const packageManager = usePackageManager();
+    const packageController = new PackageManagerHTTPController(appSession);
+
+    const unlisten = appSession.listenServerChange(() => {
+        packageController.fetchAndLoadManifests(packageManager);
+    });
+    onCleanup(() => unlisten);
 
     const sceneController = new SceneHTTPController(appSession);
-    const packageController = new PackageManagerHTTPController(appSession);
 
     const [isMounted, setIsMounted] = createSignal(false);
     onMount(() => {
         setIsMounted(true);
-        packageController.fetchAndLoadManifests(packageManager);
     });
 
     return (

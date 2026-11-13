@@ -52,6 +52,7 @@ export class SceneHTTPController {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    ...this.appSession.defaultHeaders,
                 },
                 body: JSON.stringify({
                     user_id: userId,
@@ -89,6 +90,7 @@ export class SceneHTTPController {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    ...this.appSession.defaultHeaders,
                 },
                 body: JSON.stringify({
                     user_id: userId,
@@ -116,6 +118,7 @@ export class SceneHTTPController {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    ...this.appSession.defaultHeaders,
                 },
                 body: JSON.stringify({
                     user_id: userId,
@@ -141,7 +144,10 @@ export class SceneHTTPController {
     public async fetchSceneToken(scene_id: string): Promise<string> {
         try {
             const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${scene_id}/token`, {
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json", 
+                    ...this.appSession.defaultHeaders,
+                },
                 method: "POST",
                 body: JSON.stringify({ user_id: this.appSession.userSession?.user_id })
             });
@@ -181,6 +187,7 @@ export class SceneHTTPController {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    ...this.appSession.defaultHeaders,
                 },
                 body: JSON.stringify({
                     user_id: userId ?? this.appSession.userSession?.user_id,
@@ -208,6 +215,7 @@ export class SceneHTTPController {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    ...this.appSession.defaultHeaders,
                 },
                 body: JSON.stringify({
                     user_id: userId ?? this.appSession.userSession?.user_id,
@@ -246,6 +254,7 @@ export class SceneHTTPController {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
+                    ...this.appSession.defaultHeaders,
                 },
                 body: JSON.stringify({
                     user_id: userId ?? this.appSession.userSession?.user_id,

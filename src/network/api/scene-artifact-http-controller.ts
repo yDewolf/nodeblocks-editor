@@ -12,6 +12,10 @@ export class SceneArtifactHTTPController {
         const cleanPath = artifact_name.replace(/^artifacts\//, "");
         const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${this.sceneId}/artifacts/${node_id}/${cleanPath}`, {
             method: "POST",
+            headers: {
+                // FIXME: aqui a gente provavelmente tinha que incluir o token da cena
+                ...this.appSession.defaultHeaders,
+            },
             credentials: "include",
             body: JSON.stringify({
                 body: JSON.stringify({

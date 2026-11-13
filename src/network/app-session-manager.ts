@@ -36,6 +36,8 @@ export class AppSessionManager {
     private _setServerStatus: Setter<ServerStatuses>;
     
     private _eventSource: EventSource | null = null;
+    private _sessionToken: string | null = null;
+    private _defaultHeaders: Record<string, any> = {};
 
     // Connection Retry
     private _connectAbortController: AbortController | null = null;
@@ -63,6 +65,8 @@ export class AppSessionManager {
     get host() { return this._host; }
 
     get userSession() { return this._sessionStore.user_session; }
+    get sessionToken() { return this._sessionToken; }
+    get defaultHeaders() { return this._defaultHeaders; }
     get isConnectedToServer() { return this._isConnectedToServer(); }
     get serverStatus() { return this._serverStatus(); }
 
@@ -111,9 +115,12 @@ export class AppSessionManager {
                 
                 if (abortController.signal.aborted) return false;
                 const token = await this.fetchConnectionToken(serverUrl, abortController.signal);
-
                 if (abortController.signal.aborted) return false;
                 this.connectServerEvents(serverUrl, token);
+                this._sessionToken = token;
+                this._defaultHeaders = {
+                    "Authorization": `Bearer ${token}`
+                }
 
                 if (this._connectAbortController === abortController) {
                     this._connectAbortController = null;
@@ -232,7 +239,8 @@ export class AppSessionManager {
     public async login(user_id: string, password?: string): Promise<void> {
         if (!this.isConnectedToServer) return;
         try {
-            const session = await loginAction(user_id, password);
+            console.log(this.defaultHeaders);
+            const session = await loginAction(user_id, password, this.defaultHeaders);
             this._setSessionStore("user_session", session);
         } catch (error: any) {
             throw new Error(`Failed to log as ${user_id}: ${error.message || 'Unknown Error'}`);

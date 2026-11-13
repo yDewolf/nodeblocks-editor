@@ -88,7 +88,7 @@ export class MetadataController {
 
     protected check_is_updated = async (package_id: string) => {
         const header_url = new URL(`${this.appSession.baseHttpUrl}/api/plugins/${package_id}/metadata/header`);
-        const headerRes = await fetch(header_url).then(r => r.json());
+        const headerRes = await fetch(header_url, {headers: this.appSession.defaultHeaders}).then(r => r.json());
         const header_meta: MetadataHeader = parse_header(headerRes);
 
         const target_metadata = this.store[headerRes.types.id];
@@ -113,9 +113,9 @@ export class MetadataController {
             // }
             
             const [headerRes, nodesRes, datatypesRes] = await Promise.all([
-                fetch(header_url).then(r => r.json()),
-                fetch(node_url).then(r => r.json()),
-                fetch(datatypes_url).then(r => r.json())
+                fetch(header_url, {headers: this.appSession.defaultHeaders}).then(r => r.json()),
+                fetch(node_url, {headers: this.appSession.defaultHeaders}).then(r => r.json()),
+                fetch(datatypes_url, {headers: this.appSession.defaultHeaders}).then(r => r.json())
             ]);
 
             const header_meta: MetadataHeader = parse_header(headerRes);
