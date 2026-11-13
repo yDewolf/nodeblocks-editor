@@ -1,6 +1,6 @@
 import { Show } from "solid-js";
 import { useI18n } from "~/i18n/i18n-context"
-import { localServerController } from "~/network/api/local-server-controller";
+import { localServerController, LocalServerStates } from "~/network/api/local-server-controller";
 import { useAppSession } from "~/network/app-session-provider";
 
 export const LocalServerLogs = () => {
@@ -28,9 +28,7 @@ export const LocalServerPanel = () => {
             <div class="field-grid">
                 <label for="">{t("components.localServerPanel.serverStatus")}</label>
                 <input type="text" disabled={true} value={
-                    localServerController.isRunning ? t("components.localServerPanel.serverStatusRunning") :
-                    localServerController.isStarting ? t("components.localServerPanel.serverStatusStarting") :
-                    t("components.localServerPanel.serverStatusStopped")
+                    t(`components.localServerPanel.${localServerController.state.toString() as LocalServerStates}`)
                 } />
             </div>
             

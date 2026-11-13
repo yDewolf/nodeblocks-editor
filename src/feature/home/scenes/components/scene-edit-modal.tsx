@@ -7,6 +7,7 @@ import { UserSessionData } from "~/network/protocols/user-session";
 import { ScenePermissionsMenu } from "./scene-perms-menu";
 import CloseIcon from '~/assets/icons/close.svg';
 import { useI18n } from "~/i18n/i18n-context";
+import { useAppSession } from "~/network/app-session-provider";
 
 export const SceneEditModal = (props: {
     listedScene: ListedScene
@@ -88,7 +89,7 @@ export const SceneEditModal = (props: {
                     </div>
                 </div>
                 <For each={Object.keys(allScenePerms?.user_permissions ?? {})}>
-                    {(userId) => <DropdownSection
+                    {(userId) => userId != props.sessionData.user_id ? (<DropdownSection
                         header_content={() => 
                             <div class="keep row-container space-between">
                                 <button class="icon-button" onclick={() => handleDeleteUserPerms(userId)}>
@@ -107,7 +108,7 @@ export const SceneEditModal = (props: {
                             setPermissionStore={setAllScenePerms}
                             permissionStore={allScenePerms}
                         />}
-                    />}
+                    />) : null}
                 </For>
             </ModalOverlay>
         </Show>

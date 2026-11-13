@@ -204,9 +204,9 @@ export default {
             title: "Local Server Panel",
             serverVersion: "Server Version",
             serverStatus: "Server Status",
-            serverStatusRunning: "Running",
-            serverStatusStarting: "Starting",
-            serverStatusStopped: "Stopped",
+            starting: "Starting",
+            running: "Running",
+            stopped: "Stopped",
             stopServer: "Stop Server",
             connectToLocalServer: "Connect to Local Server"
         },

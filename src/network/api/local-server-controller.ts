@@ -3,11 +3,16 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { makePersisted } from '@solid-primitives/storage';
 
+export enum LocalServerStates {
+    STARTING = "starting",
+    RUNNING = "running",
+    STOPPED = "stopped"
+}
+
 export interface LocalServerState {
     isInstalled: boolean;
     installedVersion?: string;
-    isRunning: boolean;
-    isStarting: boolean;
+    serverState: LocalServerStates,
     logs: string[];
 }
 
@@ -23,8 +28,7 @@ export class LocalServerController {
     constructor() {
         [this._state, this._setState] = makePersisted(createStore<LocalServerState>({
             isInstalled: false,
-            isRunning: false,
-            isStarting: false,
+            serverState: LocalServerStates.STOPPED,
             logs: [],
         }), {name: LOCAL_SERVER_CACHE_KEY});
         this.setup();
@@ -32,8 +36,11 @@ export class LocalServerController {
 
     get installedVersion() { return this._state.installedVersion; }
     get isInstalled() { return this._state.isInstalled; }
-    get isRunning() { return this._state.isRunning; }
-    get isStarting() { return this._state.isStarting; }
+
+    get state() { return this._state.serverState }
+    get isRunning() { return this._state.serverState == LocalServerStates.RUNNING; }
+    get isStarting() { return this._state.serverState == LocalServerStates.STARTING; }
+
     get logs() { return this._state.logs; }
 
     private setup() {
@@ -86,7 +93,11 @@ export class LocalServerController {
         if (!window.isTauriEnvironment) return;
         try {
             const isRunning = await invoke<boolean>("is_local_server_running");
-            this._setState("isRunning", isRunning);
+            if (isRunning) {
+                this._setState("serverState", LocalServerStates.RUNNING);
+            } else {
+                this._setState("serverState", LocalServerStates.STOPPED);
+            }
         } catch (err) {
             console.error("Failed to check local server status:", err);
         }
@@ -94,19 +105,16 @@ export class LocalServerController {
 
     public async startServer(): Promise<void> {
         if (!window.isTauriEnvironment) return;
-        this._setState("isStarting", true);
+        this._setState("serverState", LocalServerStates.STARTING);
         try {
             await invoke("start_local_server");
             this.clearLogs();
-            this._setState("isRunning", true);
+            this._setState("serverState", LocalServerStates.RUNNING);
             this.checkStatus();
         
         } catch (err) {
             console.error("Failed to start local server:", err);
             throw err;
-        
-        } finally {
-            this._setState("isStarting", false);
         }
     }
 
@@ -114,7 +122,7 @@ export class LocalServerController {
         if (!window.isTauriEnvironment) return;
         try {
             await invoke("stop_local_server");
-            this._setState("isRunning", false);
+            this._setState("serverState", LocalServerStates.STOPPED);
             this.checkStatus(); 
         } catch (err) {
             console.error("Failed to stop local server:", err);

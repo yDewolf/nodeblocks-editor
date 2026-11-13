@@ -46,6 +46,8 @@ export class SceneHTTPController {
     }
 
     public async fetchScenes(userId?: string, password?: string): Promise<ListedScene[]> {
+        if (!this.appSession.isConnectedToServer) return [];
+
         this._setIsLoading(true);
         try {
             const response = await fetch(this.appSession.baseHttpUrl + "/api/scenes", {

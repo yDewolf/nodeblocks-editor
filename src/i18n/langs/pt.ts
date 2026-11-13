@@ -207,9 +207,9 @@ export default {
             serverOutput: "Saída do servidor",
             serverVersion: "Versão instalada",
             serverStatus: "Status do Servidor",
-            serverStatusRunning: "Rodando",
-            serverStatusStarting: "Iniciando",
-            serverStatusStopped: "Parado",
+            starting: "Iniciando",
+            running: "Rodando",
+            stopped: "Parado",
             stopServer: "Parar servidor",
             connectToLocalServer: "Conectar ao servidor local"
         },
