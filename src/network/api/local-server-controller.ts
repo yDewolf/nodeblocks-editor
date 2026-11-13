@@ -16,7 +16,9 @@ const LOCAL_SERVER_CACHE_KEY = "local-server-cache"
 export class LocalServerController {
     private _state: LocalServerState;
     private _setState: SetStoreFunction<LocalServerState>;
+
     private _unlistenLog?: UnlistenFn;
+    private _unlistenExit?: UnlistenFn;
 
     constructor() {
         [this._state, this._setState] = makePersisted(createStore<LocalServerState>({
@@ -46,6 +48,9 @@ export class LocalServerController {
             this._unlistenLog = await listen<string>("server-log", (event) => {
                 this._setState("logs", (prevLogs) => [...prevLogs.slice(-199), event.payload]);
             });
+            this._unlistenExit = await listen("server-exited", (event) => {
+                console.warn("Local server died.");
+            });
         } catch (err) {
             console.error("Failed to listen to server-log:", err);
         }
@@ -55,6 +60,10 @@ export class LocalServerController {
         if (this._unlistenLog) {
             this._unlistenLog();
             this._unlistenLog = undefined;
+        }
+        if (this._unlistenExit) {
+            this._unlistenExit();
+            this._unlistenExit = undefined;
         }
     }
 
