@@ -207,9 +207,9 @@ export default {
             serverOutput: "Saída do servidor",
             serverVersion: "Versão instalada",
             serverStatus: "Status do Servidor",
-            serverStatusRunning: "Rodando",
-            serverStatusStarting: "Iniciando",
-            serverStatusStopped: "Parado",
+            starting: "Iniciando",
+            running: "Rodando",
+            stopped: "Parado",
             stopServer: "Parar servidor",
             connectToLocalServer: "Conectar ao servidor local",
             openPluginsFolder: "Abrir pasta de plugins"
@@ -232,7 +232,8 @@ export default {
         noImplementationFor: (something: string) => `Nenhuma implementação para ${something}`,
         errorWhile: (action: string) => `Erro ao ${action}`,
         noSomethingSelected: (something: string, fem?: boolean) => `Nenhum${fem ? "a" : ""} ${something} selecionad${fem ? "a" : "o"}`,
-        couldntFind: (something: string) => `Não foi possível encontrar ${something}`
+        couldntFind: (something: string) => `Não foi possível encontrar ${something}`,
+        noConnectionWithServer: "Você não está conectado a um servidor. Algumas coisas podem deixar de funcionar."
     },
     words: {
         unknown: "Desconhecido",

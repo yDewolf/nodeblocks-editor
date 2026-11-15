@@ -8,6 +8,7 @@ export const PackageManagerProvider: ParentComponent<{
     packageManager?: PackageManager,
 }> = (props) => {
     const packageManager = props.packageManager ?? new PackageManager(new TypeSpecRegistry());
+    
     return (
         <PackageManagerContext.Provider value={packageManager}>
             {props.children}

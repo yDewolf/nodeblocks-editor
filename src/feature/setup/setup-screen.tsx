@@ -89,13 +89,17 @@ export const LocalServerSetupContent = (props: {
             <label for="setup-serverRelease" class="field-label">{t("words.serverRelease")}</label>
             <div class="field-input row-container">
               <select id="setup-serverRelease" class="field-input"
-                value={wheelUrl}
+                value={wheelUrl() ?? undefined}
                 oninput={(e) => setWheelUrl(e.target.value)}                
               >
                 <For each={releaseController.serverReleases}>
                   {(release) => 
                     <option value={release.server_wheel_url}>
-                      {release.server_version}
+                      <Show when={release.mightNotBeCompatible}>
+                        {/* Tive que adicionar esse emoji aqui porque não quando eu faço <WarningIcon/> não aparece o ícone */}
+                        ⚠️
+                      </Show>
+                      {release.raw_version}
                     </option>
                   }
                 </For>

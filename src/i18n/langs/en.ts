@@ -204,9 +204,9 @@ export default {
             title: "Local Server Panel",
             serverVersion: "Server Version",
             serverStatus: "Server Status",
-            serverStatusRunning: "Running",
-            serverStatusStarting: "Starting",
-            serverStatusStopped: "Stopped",
+            starting: "Starting",
+            running: "Running",
+            stopped: "Stopped",
             stopServer: "Stop Server",
             connectToLocalServer: "Connect to Local Server",
             openPluginsFolder: "Open Plugins Folder"
@@ -229,7 +229,8 @@ export default {
         noImplementationFor: (something: string) => `No implementation for ${something}`,
         errorWhile: (action: string) => `Failed to ${action}`,
         noSomethingSelected: (something: string, fem?: boolean) => `No ${something} selected`,
-        couldntFind: (something: string) => `Couldn't find ${something}`
+        couldntFind: (something: string) => `Couldn't find ${something}`,
+        noConnectionWithServer: "Not connected to a server. Some features might stop working."
     },
     words: {
         unknown: "Unknown",

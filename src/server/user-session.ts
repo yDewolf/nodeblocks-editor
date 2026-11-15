@@ -2,10 +2,13 @@ import { UserSessionData } from "~/network/protocols/user-session";
 import { getActiveServerUrl } from "./connected-server";
 import { _setAppSession } from "./session";
 
-export async function loginAction(user_id: string, password?: string): Promise<UserSessionData> {
+export async function loginAction(user_id: string, password?: string, authHeaders?: Record<string, any>): Promise<UserSessionData> {
     const serverUrl = await getActiveServerUrl();
     const response = await fetch(`${serverUrl}/api/user/login`, {
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            ...authHeaders
+        },
         method: "POST",
         body: JSON.stringify({ user_id, password })
     });

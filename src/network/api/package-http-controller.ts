@@ -9,9 +9,16 @@ export class PackageManagerHTTPController {
 
     }
 
+    // FIXME: provavelmente existe algum bug escondido relacionado à forma como fazemos fetch aqui
+    // principalmente porque o PackageManager mantém todos os pacotes que ele carregou
     public async fetchAndLoadManifests(packageManager: PackageManager): Promise<void> {
         try {
-            const response = await fetch(`${this.appSession.baseHttpUrl}/api/plugins/manifests`);
+            const response = await fetch(`${this.appSession.baseHttpUrl}/api/plugins/manifests`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...this.appSession.defaultHeaders,
+                }
+            });
             if (!response.ok) {
                 throw new Error("Failed to fetch package manifests");
             }
