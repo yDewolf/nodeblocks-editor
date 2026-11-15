@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api/core";
 import { Show } from "solid-js";
 import { useI18n } from "~/i18n/i18n-context"
 import { localServerController } from "~/network/api/local-server-controller";
@@ -33,7 +34,7 @@ export const LocalServerPanel = () => {
                     t("components.localServerPanel.serverStatusStopped")
                 } />
             </div>
-            
+            <OpenPluginsButton />
             <div class="row-container">
                 <Show when={localServerController.isRunning} fallback={
                     <button class="text-button" onclick={() => {
@@ -59,4 +60,24 @@ export const LocalServerPanel = () => {
             <LocalServerLogs/>
         </div>
     )
+}
+
+export const OpenPluginsButton = () => {
+    const {t} = useI18n();
+    const handleOpenPluginsFolder = async () => {
+        try {
+            await invoke("open_plugins_folder");
+        } catch (error) {
+            console.error("Failed to open plugins folder", error);
+        }
+    };
+
+    return (
+        <button 
+            class="text-button"
+            onClick={handleOpenPluginsFolder}
+        >
+            {t("components.localServerPanel.openPluginsFolder")}
+        </button>
+    );
 }

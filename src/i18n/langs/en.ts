@@ -208,7 +208,8 @@ export default {
             serverStatusStarting: "Starting",
             serverStatusStopped: "Stopped",
             stopServer: "Stop Server",
-            connectToLocalServer: "Connect to Local Server"
+            connectToLocalServer: "Connect to Local Server",
+            openPluginsFolder: "Open Plugins Folder"
         },
         login: {
             username: "Username",

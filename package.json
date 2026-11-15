@@ -14,6 +14,7 @@
     "@solidjs/router": "^1.0.0",
     "@solidjs/start": "^2.2.2",
     "@tauri-apps/api": "^2.12.4",
+    "@tauri-apps/plugin-opener": "^2.7.3",
     "nanoid": "^5.1.9",
     "nitro": "^3.0.261103-rc",
     "protobufjs": "^8.8.1",

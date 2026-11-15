@@ -19,6 +19,7 @@ pub fn run() {
       }
       Ok(())
     })
+    .plugin(tauri_plugin_opener::init())
     .plugin(tauri_plugin_shell::init())
     .manage(environment::SetupGuard::default())
     .manage(server_helper::ServerProcessState::default())
@@ -29,6 +30,7 @@ pub fn run() {
         server_helper::start_local_server,
         server_helper::stop_local_server,
         server_helper::is_local_server_running,
+        server_helper::open_plugins_folder
       ])
     .on_page_load(|window, _| {
       window.eval("window.isTauriEnvironment = true;").unwrap();

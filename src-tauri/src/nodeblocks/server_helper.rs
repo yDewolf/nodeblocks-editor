@@ -5,6 +5,7 @@ use std::sync::Mutex;
 
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager, State};
+use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_shell::process::CommandEvent;
 use tauri_plugin_shell::ShellExt;
 
@@ -173,6 +174,23 @@ pub fn is_local_server_running(state: State<'_, ServerProcessState>) -> Result<b
         .map_err(|_| "server state is poisoned".to_string())?;
     Ok(guard.is_some())
 }
+
+// -- client utils
+
+#[tauri::command]
+pub fn open_plugins_folder(app: tauri::AppHandle) -> Result<(), String> {
+    let dirs: ServerDirs = ServerDirs::new(&app)?;
+    if !dirs.plugins.exists() {
+        return Err("Couldn't find plugin folder.".into());
+    }
+
+    app.opener()
+        .open_path(dirs.plugins.to_string_lossy(), None::<&str>)
+        .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+// -- utils
 
 #[cfg(windows)]
 fn kill_process_tree(pid: u32) {
