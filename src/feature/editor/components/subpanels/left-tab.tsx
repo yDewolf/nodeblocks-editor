@@ -99,7 +99,7 @@ export const EditorLeftTabHolder = (props: {
                     <div class="keep row-container">
                         <div class="keep row-container" style={{gap: 0}}>
                             <span class="icon-span">
-                                <img src="/assets/logo/placeholder-logo.png" alt="Nodeblocks" />
+                                <img class="medium-icon" src="/assets/logo/app-icon.png" alt="Nodeblocks" />
                             </span>
                             <LeftTabDropdown page_viewer={props.main_page_viewer} />
                         </div>

@@ -5,7 +5,7 @@ import SceneEditor from "./feature/editor/scene-editor-route";
 import { AppSessionProvider } from "./network/app-session-provider";
 import { AppSessionManager } from "./network/app-session-manager";
 import { createEffect, onMount } from "solid-js";
-import { UpdateRootDataTheme } from "./feature/app-settings";
+import { appSettings, UpdateRootDataTheme } from "./feature/app-settings";
 import { ContextMenuPortal } from "./feature/context-menu/context-menu-component";
 import { Home } from "./feature/home/home-route";
 import { ScenesRoute } from "./feature/home/scenes/scenes-view";
@@ -15,6 +15,7 @@ import { SettingsRoute } from "./feature/home/settings/settings-route";
 import { getActiveServerUrl } from "./server/connected-server";
 import { SetupScreen } from "./feature/setup/setup-route";
 import { I18nProvider } from "./i18n/i18n-context";
+import { localServerController } from "./network/api/local-server-controller";
 
 declare global {
   interface Window {
@@ -35,6 +36,9 @@ export default function App() {
   };
 
   onMount(async () => {
+    if (appSettings.autoStartLocalServer && !localServerController.isRunning) {
+      await localServerController.startServer();
+    }
     await connectToServer();
   });
 
