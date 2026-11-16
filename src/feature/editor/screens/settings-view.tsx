@@ -1,4 +1,4 @@
-import { For } from "solid-js"
+import { For, Show } from "solid-js"
 import { PageViewer } from "../../../components/page-controller"
 import { appSettings, setTheme } from "~/feature/app-settings";
 import { getCurrentTheme } from "~/feature/app-settings";
@@ -32,12 +32,6 @@ export const EditorSettingsContent = (props: {
         <>
             <div class="field-grid-holder">
                 <div class="field-grid">
-                    <ThemeSelectorField/>
-                </div>
-                <div class="field-grid">
-                    <LangSelectField/>
-                </div>
-                <div class="field-grid">
                     <label for="settings-alwaysShowSlotLabel" class="field-label">{t("pages.settings.editor.alwaysShowSlotLabels")}</label>
                     <input type="checkbox" id="settings-alwaysShowSlotLabel" 
                         checked={editorSettings.alwaysShowSlotLabels}
@@ -45,15 +39,17 @@ export const EditorSettingsContent = (props: {
                     />
                 </div>
             </div>
-            <hr />
-            <h3>{t("words.preview")}</h3>
-            <div class="row-container preview-holder">
-                <div style={{"z-index": 2}}>
-                    <div style={{"max-width": "200px"}}>
-                        <DefaultNodePreview show_slot_labels={false}/>
+            <Show when={props.withPreview}>
+                <hr />
+                <h3>{t("words.preview")}</h3>
+                <div class="row-container preview-holder">
+                    <div style={{"z-index": 2}}>
+                        <div style={{"max-width": "200px"}}>
+                            <DefaultNodePreview show_slot_labels={false}/>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </Show>
         </>
     )
 }

@@ -5,6 +5,7 @@ import { RemoteServerConfigForm } from "~/feature/setup/components/remote-server
 import { setSetupComplete } from "~/feature/app-settings";
 import { useI18n } from "~/i18n/i18n-context";
 import { LocalServerPanel } from "~/feature/local-server/local-server-components";
+import { AppSettingsContent } from "./app-settings-view";
 
 export const SettingsRoute: ParentComponent = (props) => {
     const { t } = useI18n();
@@ -19,7 +20,7 @@ export const SettingsRoute: ParentComponent = (props) => {
                 <div class="settings-view-content container fill">
                     <div class="text-section">
                         <h3>{t("pages.settings.generalTitle")}</h3>
-                        <RemoteServerConfigForm />
+                        <AppSettingsContent />
                     </div>
                     <hr style={{margin: "20px 0"}}/>
                     <div class="text-section">
@@ -27,8 +28,12 @@ export const SettingsRoute: ParentComponent = (props) => {
                         <EditorSettingsContent/>
                     </div>
                     <hr style={{margin: "20px 0"}}/>
+                    <div class="text-section">
+                        <RemoteServerConfigForm />
+                    </div>
                     {/* placeholder */}
                     <Show when={window.isTauriEnvironment}>
+                        <hr style={{margin: "20px 0"}}/>
                         <button class="text-button" onclick={() => {
                             setSetupComplete(false);
                         }}>
