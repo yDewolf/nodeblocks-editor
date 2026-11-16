@@ -45,13 +45,13 @@ export function WizardShell<TData extends object>(props: { wizard: WizardControl
                         <Suspense fallback={<p>{t("messages.loading")}</p>}>
                             <Dynamic component={wizard.currentStep.view} />
                         </Suspense>
+                        <p role="alert" class="wizard-error">
+                            {wizard.error}
+                        </p>
                     </section>
                 </div>
 
                 <footer class="wizard-footer">
-                    <p role="alert" class="wizard-error">
-                        {wizard.error}
-                    </p>
                     <div class="setup-actions">
                         <button class="text-button" type="button" onClick={() => wizard.back()} disabled={!wizard.canGoBack}>
                             {t("actions.goBack")}
