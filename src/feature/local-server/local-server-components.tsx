@@ -40,7 +40,7 @@ export const LocalServerPanel = () => {
                     }}
                         disabled={localServerController.isStarting}
                     >
-                        {localServerController.isStarting ? t("pages.settings.setupWizard.start.startingLocal") : t("pages.settings.setupWizard.start.startLocal")}
+                        {localServerController.isStarting ? t("components.localServerPanel.startingLocal") : t("components.localServerPanel.startLocal")}
                     </button>
                 }>
                     <button class="text-button" onclick={() => {

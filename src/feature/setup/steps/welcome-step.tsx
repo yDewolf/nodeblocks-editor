@@ -1,13 +1,16 @@
-import { SetupData, useSetup } from "../setup-wizard-context";
+import { useI18n } from "~/i18n/i18n-context";
+import { useSetup } from "../setup-wizard-context";
 import { LangSelectField, ThemeSelectorField } from "~/feature/home/settings/app-settings-view";
 
 export default function WelcomeStep() {
-  const wizard = useSetup();
+    const {t} = useI18n();
+    const wizard = useSetup();
 
-  return (
+    return (
         <>
-            <p>This wizard will prepare everything Nodeblocks needs to run on your computer</p>
-            <p>Start by selecting your prefered UI theme and language.</p>
+            <p>{t("pages.setupWizard.welcome.wizardInfo")}</p>
+            <p>{t("pages.setupWizard.welcome.startInstructions")}</p>
+            <br />
             <div class="field-grid">
                 <ThemeSelectorField/>
             </div>
@@ -15,5 +18,5 @@ export default function WelcomeStep() {
                 <LangSelectField/>
             </div>
         </>
-  );
+    );
 }

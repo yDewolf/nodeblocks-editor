@@ -21,8 +21,8 @@ export const LocalServerInstall = () => {
     return (
         <>
             <Show when={localServerController.isInstalled}>
-                <p>Nodeblocks server is already installed. Installed version: <b>{localServerController.installedVersion}</b></p>
-                <p>If you wish, you can install another version using the menu below</p>
+                <p>{t("pages.setupWizard.install.messages.alreadyInstalled")} {t("pages.setupWizard.install.installedVersion")}: <b>{localServerController.installedVersion}</b></p>
+                <p>{t("pages.setupWizard.install.messages.installAnotherVersion")}</p>
             </Show>
             <div class="text-section">
                 <br />
@@ -34,9 +34,6 @@ export const LocalServerInstall = () => {
                     </>}
                 </Show>
             </div>
-            {/* <Switch>
-                <Match when={}></Match>
-            </Switch> */}
         </>
     );
 }
@@ -62,7 +59,7 @@ export const ServerReleaseSelector = (props: {
                             <Show when={release.mightNotBeCompatible}>
                                 ⚠️
                             </Show>
-                            {release.raw_version} {release.prerelease ? "(pre-release)" : ""}
+                            {release.raw_version} {release.prerelease ? `(${t("words.preRelease")})` : ""}
                             </option>
                         }
                         </For>
@@ -72,9 +69,9 @@ export const ServerReleaseSelector = (props: {
                     </button>
                 </div>
             </div>
-            <p class="note">All releases come from <a href="https://github.com/yDewolf/nodeblocks-server/releases">Github Releases</a></p>
-            <p class="note">Beware that versions marked with ⚠️ might not be compatible with this client's version.</p>
-            <p class="note">This client was built for server version: <b>{SERVER_API_VERSION}</b></p>
+            <p class="note">{t("pages.setupWizard.install.releaseSourceNote")}<a href="https://github.com/yDewolf/nodeblocks-server/releases">Github Releases</a></p>
+            <p class="note">{t("pages.setupWizard.install.incompatibleReleasesNote")}</p>
+            <p class="note">{t("pages.setupWizard.install.clientWasBuiltForVersion")}: <b>{SERVER_API_VERSION}</b></p>
         </>
     )
 }
@@ -91,11 +88,11 @@ export const LocalServerInstaller = (props: {
             <Show when={release()}>
                 {(releaseData) => <>
                     <div class="row-container fill">
-                        <p>State: {releaseData().prerelease ? "Pre Release" : "Release"}</p>
+                        <p>{t("words.state")}: {releaseData().prerelease ? t("words.preRelease") : t("words.release")}</p>
                         |
-                        <p>Server Version: {releaseData().server_version}</p>
+                        <p>{t("words.serverVersion")}: {releaseData().server_version}</p>
                         |
-                        <p>Engine Version: {releaseData().engine_version}</p>
+                        <p>{t("words.engineVersion")}: {releaseData().engine_version}</p>
                     </div>
                     <InstallerContent
                         wheelUrl={props.wheelUrl} 
@@ -108,7 +105,7 @@ export const LocalServerInstaller = (props: {
                     />
                     <br />
                     <Show when={localServerController.isInstalled}>
-                        <p>Server '{localServerController.installedVersion}' is installed. <b>You can proceed.</b></p>
+                        <p>{t("pages.setupWizard.install.messages.serverVersionIsInstalled", localServerController.installedVersion ?? t("words.unknown"))} <b>{t("pages.setupWizard.messages.youCanProceed")}</b></p>
                     </Show>
                 </>}
             </Show>
@@ -184,18 +181,18 @@ export const InstallerContent = (props: {
                     <p>{progress().message}</p>
                 </Match>
                 <Match when={phase() == "error"}>
-                    <p style={{ color: "crimson" }}>{t("pages.settings.setupWizard.install.messages.installFailed")}</p>
+                    <p style={{ color: "crimson" }}>{t("pages.setupWizard.install.messages.installFailed")}</p>
                     <pre>
                         {error()}
                     </pre>
                 </Match>
                 <Match when={phase() == "installed"}>
-                    <p>{t("pages.settings.setupWizard.install.messages.installedSuccessfully")}</p>
+                    <p>{t("pages.setupWizard.install.messages.installedSuccessfully")}</p>
                 </Match>
             </Switch>
             <Show when={phase() != "installing"}>
                 <button onclick={handleInstall} class="text-button">
-                    {t("pages.settings.setupWizard.install.install")}
+                    {t("pages.setupWizard.install.install")}
                 </button>
             </Show>
             <Show when={phase() == "installing" || phase() == "installed"}>

@@ -1,10 +1,14 @@
+import { useI18n } from "~/i18n/i18n-context"
+
 export const AllSetUp = () => {
+    const {t} = useI18n();
     return (
         <>
-            <p>Everything is ready for you to create and edit scenes now!</p>
-            <p class="note">Thanks for using Nodeblocks</p>
+            <p>{t("pages.setupWizard.allSetUp.everythingIsSet")}</p>
+            <p class="note">{t("pages.setupWizard.allSetUp.thanksForUsingNodeblocks")}</p>
             <br />
-            <p>To do the setup again you must go to Settings -> Open Setup Wizard</p>
+            <p><a href="https://github.com/yDewolf/nodeblocks-editor/issues/new/choose">{t("pages.setupWizard.allSetUp.reportIssuesHere")}</a></p>
+            <p>{t("pages.setupWizard.allSetUp.redoSetupInstruction")}</p>
         </>
     )
 }

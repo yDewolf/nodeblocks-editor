@@ -13,7 +13,7 @@ export function WizardShell<TData extends object>(props: { wizard: WizardControl
     createEffect(on(() => wizard.currentStepId, () => heading?.focus(), { defer: true }));
 
     const nextLabel = () =>
-        wizard.busy ? "Working..." : (wizard.currentStep.nextLabel ?? (wizard.isLastStep ? "Finish" : "Next"));
+        wizard.busy ? "Working..." : (wizard.currentStep.nextLabel ?? (wizard.isLastStep ? t("actions.finish") : t("actions.continue")));
 
     return (
         <div class="wizard container">

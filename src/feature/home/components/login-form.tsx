@@ -23,7 +23,7 @@ export const LoginForm = () => {
             </div>
         }>
             <div class="container fill">
-                <p>Logged as '{appSession.userSession?.user_id}'</p>
+                <p>{t("components.login.loggedAs", appSession.userSession?.user_id ?? t("words.unknown"))}</p>
                 <button class="text-button" onclick={() => appSession.logout()}>
                     {t("components.login.logout")}
                 </button>

@@ -112,32 +112,53 @@ export default {
                 lang: "Idioma",
                 alwaysShowSlotLabels: "Sempre mostrar nome dos slots"
             },
-            setupWizard: {
-                title: "Configuração do Nodeblocks",
-                finishSetup: "Finalizar configuração",
+        },
+        setupWizard: {
+            messages: {
+                youCanProceed: "Você já pode prosseguir",
+                youCanChangeThisLater: "Você pode alterar essa opção mais tarde."
+            },
+            welcome: {
+                wizardInfo: "Esse utilitário vai preparar tudo que o Nodeblocks precisa para funcionar corretamente no seu computador",
+                startInstructions: "Comece selecionando a sua linguagem e tema preferidos."
+            },
+            serverChoice: {
+                localOrRemoteQuestion: "Você gostaria de rodar o Nodeblocks localmente ou conectar-se a um servidor remoto?",
+                changeAnwserNote: "Você pode alterar isso a qualquer momento através do menu de configurações.",
+                installAndRunLocallyOption: "Instalar e rodar Nodeblocks localmente"
+            },
+            install: {
+                installedVersion: "Versão instalada",
+                releaseSourceNote: "Todas as releases vem do",
+                incompatibleReleasesNote: "Versões marcadas com ⚠️ talvez não sejam compatíveis com a versão atual do client",
+                clientWasBuiltForVersion: "Esse client foi feito para a seguinte versão do servidor",
+                install: "Instalar",
                 messages: {
-                    alreadyConnected: (http: string) => `você já está conectado em: ${http}`
-                },
-                start: {
-                    title: "Como você gostaria de rodar o Nodeblocks?",
-                    description: "Você pode instalar o servidor e rodá-lo localmente ou se conectar a um servidor remoto.",
-                    installLocally: "Instalar servidor local",
-                    connectToRemote: "Conectar a um servidor remoto",
-                    startLocal: "Iniciar servidor local",
-                    startingLocal: "Iniciando..."
-                },
-                install: {
-                    title: "Instalação do Nodeblocks",
-                    setupInfo: "Para rodar o servidor do nodeblocks localmente, esse utilitário instalará o a biblioteca nodeblocks e suas dependências",
-                    setupInfo1: "Essa ação precisa de internet e pode levar alguns minutos.",
-                    install: "Instalar",
-                    messages: {
-                        alreadyInstalled: "Nodeblocks já está instalado.",
-                        installedSuccessfully: "Nodeblocks foi instalado com sucesso.",
-                        checkingInstallation: "Checando instalação...",
-                        installFailed: "A instalação falhou.",
-                    }
+                    serverVersionIsInstalled: (version: string) => `A versão '${version}' do servidor está instalada.`,
+                    installAnotherVersion: "Para instalar outra versão, use o menu abaixo.",
+                    alreadyInstalled: "Nodeblocks já está instalado.",
+                    installedSuccessfully: "Nodeblocks foi instalado com sucesso.",
+                    checkingInstallation: "Checando instalação...",
+                    installFailed: "A instalação falhou.",
                 }
+            },
+            localTest: {
+                beforeContinuingMessage: "Antes de continuar, vamos testar a conexão com o servidor local. Isso deve levar alguns segundos...",
+                testingConnection: "Testando conexão...",
+                runLocalTests: "Rodar testes",
+                localTestsPassed: "Testes concluídos",
+                connectedSuccessfully: "Conectado ao servidor com sucesso."
+            },
+            createUser: {
+                editorRequiresUser: "Para usar o editor você deve criar um usuário.",
+                scenesAreLinkedNote: "As cenas são associadas ao seu usuário. Apenas você e usuários autorizados conseguem acessá-las.",
+                sessionRemainsNote: "A sua sessão vai ser salva depois de fechar o aplicativo."
+            },
+            allSetUp: {
+                everythingIsSet: "Tudo está configurado para você começar a criar e editar cenas!",
+                thanksForUsingNodeblocks: "Obrigado por usar o Nodeblocks",
+                redoSetupInstruction: "Para refazer a configuração vá até Configurações -> Abrir utilitário de instalação",
+                reportIssuesHere: "Reporte problemas aqui"
             }
         }
     },
@@ -212,17 +233,22 @@ export default {
             stopped: "Parado",
             stopServer: "Parar servidor",
             connectToLocalServer: "Conectar ao servidor local",
-            openPluginsFolder: "Abrir pasta de plugins"
+            openPluginsFolder: "Abrir pasta de plugins",
+            startLocal: "Iniciar servidor local",
+            startingLocal: "Iniciando..."
         },
         login: {
             username: "Nome de usuário",
             login: "Entrar",
-            logout: "Sair"
+            logout: "Sair",
+            loggedAs: (user: string) => `Logado como '${user}'`
         }
     },
     actions: {
         loadImage: "carregar imagem",
         goBack: "Voltar",
+        continue: "Continuar",
+        finish: "Finalizar",
         tryAgain: "Tentar novamente",
     },
     messages: {
@@ -270,5 +296,10 @@ export default {
         details: "Detalhes",
         note: "OBS",
         serverRelease: "Server Release",
+        serverVersion: "Versão do Servidor",
+        engineVersion: "Versão da Engine",
+        state: "Estado",
+        release: "Release",
+        preRelease: "Pre-release"
     }
 } satisfies typeof en;

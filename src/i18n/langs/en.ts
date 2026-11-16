@@ -109,32 +109,53 @@ export default {
                 lang: "Language",
                 alwaysShowSlotLabels: "Always Show Slot Labels"
             },
-            setupWizard: {
-                title: "Nodeblocks Setup",
-                finishSetup: "Finish Setup",
+        },
+        setupWizard: {
+            messages: {
+                youCanProceed: "You can proceed",
+                youCanChangeThisLater: "Você pode alterar essa opção mais tarde."
+            },
+            welcome: {
+                wizardInfo: "This wizard will prepare everything Nodeblocks needs to run on your computer",
+                startInstructions: "Start by selecting your prefered UI theme and language."
+            },
+            serverChoice: {
+                localOrRemoteQuestion: "Would you like to run Nodeblocks locally or connect to a remote server?",
+                changeAnwserNote: "you can change your answer anytime by redoing this setup in settings menu.",
+                installAndRunLocallyOption: "Install nodeblocks and run locally"
+            },
+            install: {
+                installedVersion: "Installed Version",
+                releaseSourceNote: "All releases come from",
+                incompatibleReleasesNote: "Beware that versions marked with ⚠️ might not be compatible with this client's version.",
+                clientWasBuiltForVersion: "This client was built for server version",
+                install: "Install",
                 messages: {
-                    alreadyConnected: (http: string) => `you are already connected to: ${http}`
-                },
-                start: {
-                    title: "How would you like to run nodeblocks?",
-                    description: "You can install the server and run it locally or connect to a remote server.",
-                    installLocally: "Install server locally",
-                    connectToRemote: "Connect to a remote server",
-                    startLocal: "Start local server",
-                    startingLocal: "Starting..."
-                },
-                install: {
-                    title: "Nodeblocks Install",
-                    setupInfo: "To run nodeblocks server locally, this installer will download its runtime",
-                    setupInfo1: "This needs an internet connection and might take a few minutes.",
-                    install: "Install",
-                    messages: {
-                        alreadyInstalled: "Nodeblocks is already installed.",
-                        installedSuccessfully: "Nodeblocks was installed successfully.",
-                        checkingInstallation: "Checking installation...",
-                        installFailed: "The installation failed.",
-                    }
+                    serverVersionIsInstalled: (version: string) => `Server '${version}' is installed.`,
+                    alreadyInstalled: "Nodeblocks is already installed.",
+                    installAnotherVersion: "If you wish, you can install another version using the menu below",
+                    installedSuccessfully: "Nodeblocks was installed successfully.",
+                    checkingInstallation: "Checking installation...",
+                    installFailed: "The installation failed.",
                 }
+            },
+            localTest: {
+                beforeContinuingMessage: "Before continuing, setup wizard will test the local server installation. This might take a sec...",
+                testingConnection: "Testing Connection...",
+                runLocalTests: "Run Local Tests",
+                localTestsPassed: "Tests Passed",
+                connectedSuccessfully: "Connected to server successfully."
+            },
+            createUser: {
+                editorRequiresUser: "To use the editor, you must create a user.",
+                scenesAreLinkedNote: "All scenes you create are linked to your user. Only you, and allowed users, can see them.",
+                sessionRemainsNote: "Your session will remain after closing the app."
+            },
+            allSetUp: {
+                everythingIsSet: "Everything is ready for you to create and edit scenes now!",
+                thanksForUsingNodeblocks: "Thanks for using Nodeblocks",
+                redoSetupInstruction: "To do the setup again you must go to Settings -> Open Setup Wizard",
+                reportIssuesHere: "Report issues here"
             }
         }
     },
@@ -209,17 +230,22 @@ export default {
             stopped: "Stopped",
             stopServer: "Stop Server",
             connectToLocalServer: "Connect to Local Server",
-            openPluginsFolder: "Open Plugins Folder"
+            openPluginsFolder: "Open Plugins Folder",
+            startLocal: "Start local server",
+            startingLocal: "Starting..."
         },
         login: {
             username: "Username",
             login: "Login",
-            logout: "Logout"
+            logout: "Logout",
+            loggedAs: (user: string) => `Logged as '${user}'`
         }
     },
     actions: {
         loadImage: "load image",
         goBack: "Go back",
+        continue: "Continue",
+        finish: "Finish",
         tryAgain: "Try again",
     },
     messages: {
@@ -267,5 +293,10 @@ export default {
         details: "Details",
         note: "Note",
         serverRelease: "Server Release",
+        serverVersion: "Server Version",
+        engineVersion: "Engine Version",
+        state: "State",
+        release: "Release",
+        preRelease: "Pre Release"
     }
 }
