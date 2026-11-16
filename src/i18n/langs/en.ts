@@ -104,9 +104,10 @@ export default {
                 connecting: "Connecting...",
                 connect: "Connect to a server"
             },
+            theme: "Theme",
+            lang: "Language",
+            autoStartLocalServer: "Start local server on app startup",
             editor: {
-                theme: "Theme",
-                lang: "Language",
                 alwaysShowSlotLabels: "Always Show Slot Labels"
             },
         },
@@ -145,6 +146,16 @@ export default {
                 runLocalTests: "Run Local Tests",
                 localTestsPassed: "Tests Passed",
                 connectedSuccessfully: "Connected to server successfully."
+            },
+            pluginsSetup: {
+                pluginBasedNotice: "Nodeblocks server is a plugin-based software. That means it doesn't do much without plugins installed. To develop scenes you must have some plugins installed.",
+                responsibilityNotice: "We are not responsible for the use of third-party plugins.",
+                howToInstallPlugins: "How to install plugins: ",
+                pluginInstallStep1: "Open server plugins folder",
+                pluginInstallStep2: "Download a plugin (.nbplugin file)",
+                pluginInstallStep3: "Place the file inside server plugins folder",
+                pluginInstallStep4: "Restart the server and verify if your plugin loaded correctly",
+                installTrustedPluginsOnly: "Only install plugins from trusted sources!"
             },
             createUser: {
                 editorRequiresUser: "To use the editor, you must create a user.",
@@ -231,6 +242,7 @@ export default {
             stopServer: "Stop Server",
             connectToLocalServer: "Connect to Local Server",
             openPluginsFolder: "Open Plugins Folder",
+            restartServer: "Restart Server",
             startLocal: "Start local server",
             startingLocal: "Starting..."
         },
@@ -297,6 +309,7 @@ export default {
         engineVersion: "Engine Version",
         state: "State",
         release: "Release",
-        preRelease: "Pre Release"
+        preRelease: "Pre Release",
+        originalPlugins: "Original Plugins"
     }
 }

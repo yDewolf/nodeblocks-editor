@@ -9,6 +9,7 @@ import { LocalServerSetup } from "./steps/local-server-setup";
 import { CreateUserStep } from "./steps/create-user-step";
 import { ConfigureEditorStep } from './steps/configure-editor-step';
 import { AllSetUp } from "./steps/all-set-up-step";
+import { PluginSetupStep } from "./steps/local-plugins-setup";
 
 export type SetupStep = WizardStepDef<SetupData, Component>;
 export const setupSteps: SetupStep[] = [
@@ -32,6 +33,13 @@ export const setupSteps: SetupStep[] = [
         id: "localServerSetup",
         title: "Local Server Setup",
         view: LocalServerSetup,
+        when: (data) => data.localInstall && data.isLocalServerInstalled,
+        validate: (data) => data.isConnectedToAServer ? null : "Must connect to a server before continuing"
+    },
+    {
+        id: "serverPluginsSetup",
+        title: "Plugins Setup",
+        view: PluginSetupStep,
         when: (data) => data.localInstall && data.isLocalServerInstalled,
         validate: (data) => data.isConnectedToAServer ? null : "Must connect to a server before continuing"
     },

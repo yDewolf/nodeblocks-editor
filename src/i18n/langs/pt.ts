@@ -107,9 +107,10 @@ export default {
                 connecting: "Conectando...",
                 connect: "Conectar com o servidor"
             },
+            theme: "Tema",
+            lang: "Idioma",
+            autoStartLocalServer: "Iniciar o servidor local automaticamente",
             editor: {
-                theme: "Tema",
-                lang: "Idioma",
                 alwaysShowSlotLabels: "Sempre mostrar nome dos slots"
             },
         },
@@ -148,6 +149,16 @@ export default {
                 runLocalTests: "Rodar testes",
                 localTestsPassed: "Testes concluídos",
                 connectedSuccessfully: "Conectado ao servidor com sucesso."
+            },
+            pluginsSetup: {
+                pluginBasedNotice: "O servidor do nodeblocks é baseado em plugins. Por isso é necessário que você adicione plugins para desenvolver cenas.",
+                responsibilityNotice: "Não nos responsabilizamos pelo uso de plugins desenvolvidos por terceiros.",
+                howToInstallPlugins: "Como Instalar Plugins: ",
+                pluginInstallStep1: "Abra a pasta de plugins do servidor",
+                pluginInstallStep2: "Baixe um plugin (arquivo .nbplugin)",
+                pluginInstallStep3: "Coloque o arquivo do plugin na pasta de plugins do servidor",
+                pluginInstallStep4: "Reinicie o servidor e verifique se o plugin foi carregado corretamente",
+                installTrustedPluginsOnly: "Instale apenas plugins de autores que você confia!"
             },
             createUser: {
                 editorRequiresUser: "Para usar o editor você deve criar um usuário.",
@@ -235,6 +246,7 @@ export default {
             connectToLocalServer: "Conectar ao servidor local",
             openPluginsFolder: "Abrir pasta de plugins",
             startLocal: "Iniciar servidor local",
+            restartServer: "Reiniciar servidor",
             startingLocal: "Iniciando..."
         },
         login: {
@@ -300,6 +312,7 @@ export default {
         engineVersion: "Versão da Engine",
         state: "Estado",
         release: "Release",
-        preRelease: "Pre-release"
+        preRelease: "Pre-release",
+        originalPlugins: "Plugins originais"
     }
 } satisfies typeof en;

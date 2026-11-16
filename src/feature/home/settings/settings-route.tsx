@@ -40,7 +40,7 @@ export const SettingsRoute: ParentComponent = (props) => {
                             {t("pages.settings.openSetupWizard")}
                         </button>
                         <hr style={{margin: "20px 0"}}/>
-                        <LocalServerPanel/>
+                        <LocalServerPanel showTitle={true}/>
                     </Show>
                     {props.children}
                 </div>

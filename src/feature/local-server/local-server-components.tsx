@@ -14,12 +14,16 @@ export const LocalServerLogs = () => {
     )
 }
 
-export const LocalServerPanel = () => {
+export const LocalServerPanel = (props: {
+    showTitle?: boolean
+}) => {
     const {t} = useI18n();
     const appSession = useAppSession();
     return (
         <div class="text-section">
-            <h3>{t("components.localServerPanel.title")}</h3>
+            <Show when={props.showTitle}>
+                <h3>{t("components.localServerPanel.title")}</h3>
+            </Show>
             <div class="field-grid">
                 <label for="">{t("components.localServerPanel.serverVersion")}</label>
                 <input type="text" disabled={true} value={
@@ -43,14 +47,22 @@ export const LocalServerPanel = () => {
                         {localServerController.isStarting ? t("components.localServerPanel.startingLocal") : t("components.localServerPanel.startLocal")}
                     </button>
                 }>
+                    <button class="text-button" onclick={async () => {
+                        await localServerController.stopServer();
+                        localServerController.startServer();
+                    }}>
+                        {t("components.localServerPanel.restartServer")}
+                    </button>
                     <button class="text-button" onclick={() => {
                         localServerController.stopServer();
                     }}>
                         {t("components.localServerPanel.stopServer")}
                     </button>
                     <button class="text-button" onclick={() => {
-                        appSession.tryConnectToServer("127.0.0.1", 8080);
-                    }}>
+                            appSession.tryConnectToServer("127.0.0.1", 8080);
+                        }}
+                        disabled={appSession.host == "127.0.0.1" || appSession.host == "localhost"}
+                    >
                         {t("components.localServerPanel.connectToLocalServer")}
                     </button>
                 </Show>

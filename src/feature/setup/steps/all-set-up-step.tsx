@@ -7,7 +7,7 @@ export const AllSetUp = () => {
             <p>{t("pages.setupWizard.allSetUp.everythingIsSet")}</p>
             <p class="note">{t("pages.setupWizard.allSetUp.thanksForUsingNodeblocks")}</p>
             <br />
-            <p><a href="https://github.com/yDewolf/nodeblocks-editor/issues/new/choose">{t("pages.setupWizard.allSetUp.reportIssuesHere")}</a></p>
+            <p><a href="https://github.com/yDewolf/nodeblocks-editor/issues/new/choose" target="_blank">{t("pages.setupWizard.allSetUp.reportIssuesHere")}</a></p>
             <p>{t("pages.setupWizard.allSetUp.redoSetupInstruction")}</p>
         </>
     )

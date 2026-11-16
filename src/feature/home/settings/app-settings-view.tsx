@@ -39,7 +39,7 @@ export const ThemeSelector = () => {
 export const ThemeSelectorField = () => {
     const { t } = useI18n();
     return (<>
-        <label class="field-label" for="settings-theme">{t("pages.settings.editor.theme")}</label>
+        <label class="field-label" for="settings-theme">{t("pages.settings.theme")}</label>
         <ThemeSelector />
     </>);
 };
@@ -49,7 +49,7 @@ export const ThemeSelectorField = () => {
 export const LangSelectField = () => {
     const { t } = useI18n();
     return (<>
-        <label class="field-label" for="settings-lang">{t("pages.settings.editor.lang")}</label>
+        <label class="field-label" for="settings-lang">{t("pages.settings.lang")}</label>
         <LangSelector/>
     </>)
 }
@@ -72,8 +72,9 @@ export const LangSelector = () => {
 // -- local server
 
 export const AutoStartLocalField = () => {
+    const { t } = useI18n();
     return <>
-        <label for="auto-start-local">Start local server on app startup</label>
+        <label for="auto-start-local">{t("pages.settings.autoStartLocalServer")}</label>
         <input class="field-input" type="checkbox" id="auto-start-local"
             checked={appSettings.autoStartLocalServer} oninput={(e) => {
                 setAutoStartLocal(e.target.checked);
