@@ -1,4 +1,4 @@
-![](repo/assets/nodeblocks.svg)
+<img src="/app-icon.png" height="32px">
 
 [NodeEditor](https://github.com/yDewolf/NodeEditor/) • [Nodeblocks::Server](https://github.com/yDewolf/node-editor-server-api) • [Documentação](https://github.com/yDewolf/NodeEditor/blob/server-docs/docs/server-docs.md) • [TODOs](TODO.md)
 
