@@ -1,7 +1,7 @@
 import { createSignal, onMount, ParentComponent, Show } from "solid-js"
 import { EditorSettingsContent } from "~/feature/editor/screens/settings-view";
 import "~/style/screens/settings.css";
-import { RemoteServerConfigForm } from '../../setup/remote-server-setup';
+import { RemoteServerConfigForm } from "~/feature/setup/components/remote-server-connect-form";
 import { setSetupComplete } from "~/feature/app-settings";
 import { useI18n } from "~/i18n/i18n-context";
 import { LocalServerPanel } from "~/feature/local-server/local-server-components";

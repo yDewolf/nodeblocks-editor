@@ -5,15 +5,13 @@ import { useI18n } from "~/i18n/i18n-context";
 import RefreshIcon from '~/assets/icons/refresh.svg';
 import { releaseController } from "~/network/api/github/github-release-controller";
 
-type Phase = "checking" | "idle" | "installing" | "installed" |  "error";
-
-type Progress = { step: string; percent: number; message: string };
-
 function formatElapsed(seconds: number): string {
   const minutes = Math.floor(seconds / 60);
   const sec = seconds % 60;
   return `${minutes}:${sec.toString().padStart(2, "0")}`;
 }
+type Phase = "checking" | "idle" | "installing" | "installed" | "error";
+type Progress = { step: string; percent: number; message: string; };
 
 export const LocalServerSetupContent = (props: { 
   onReady: () => void, 
