@@ -74,7 +74,7 @@ export const EditorView = () => {
         <SceneProvider 
             scene={editor.scene} 
             actionController={editor.actionController}
-          >
+        >
             <SceneRuntimeProvider manager={editor.runtimeController}>
                 <NotificationProvider controller={editor.notificationController}>
                     <SceneCanvasProvider canvasSpace={mainSpace} elementController={editor.elementController}>
@@ -84,7 +84,7 @@ export const EditorView = () => {
                             onPointerUp={(e) => {editor.inputManager.onPointerUp(e); editor.toolController.current_tool?.globalOnPointerUp(e)}}
                             onPointerDown={(e) => {editor.toolController.current_tool?.globalOnPointerDown(e)}}
                             onPointerMove={(e) => editor.toolController.current_tool?.globalOnPointerMove(e)}
-                            >
+                        >
                             <EditorSceneCanvas setWorldSpaceRef={setWorldSpaceRef}></EditorSceneCanvas>
                             <EditorLoadingOverlay />
                             <div
@@ -100,6 +100,6 @@ export const EditorView = () => {
                     </SceneCanvasProvider>
                 </NotificationProvider>
             </SceneRuntimeProvider>
-          </SceneProvider>
+        </SceneProvider>
     );
 }

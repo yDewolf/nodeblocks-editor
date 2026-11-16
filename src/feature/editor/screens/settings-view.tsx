@@ -7,6 +7,7 @@ import { Theme } from "~/feature/app-settings";
 import { editorSettings, setAlwaysShowSlotLabels } from "../editor-settings";
 import { useI18n } from "~/i18n/i18n-context";
 import { Locale, localeDicts } from "~/i18n/i18n-locale";
+import { DefaultNodePreview, NodePreview } from "~/feature/scene/components/node/node-previews";
 
 // TODO: improve this page
 export const EditorSettingsView = (props: {page_viewer: PageViewer}) => {
@@ -23,24 +24,37 @@ export const EditorSettingsView = (props: {page_viewer: PageViewer}) => {
     )
 }
 
-export const EditorSettingsContent = () => {
-    const { t, setLocale } = useI18n();
+export const EditorSettingsContent = (props: {
+    withPreview?: boolean
+}) => {
+    const { t } = useI18n();
     return (
-        <div class="field-grid-holder">
-            <div class="field-grid">
-                <ThemeSelectorField/>
+        <>
+            <div class="field-grid-holder">
+                <div class="field-grid">
+                    <ThemeSelectorField/>
+                </div>
+                <div class="field-grid">
+                    <LangSelectField/>
+                </div>
+                <div class="field-grid">
+                    <label for="settings-alwaysShowSlotLabel" class="field-label">{t("pages.settings.editor.alwaysShowSlotLabels")}</label>
+                    <input type="checkbox" id="settings-alwaysShowSlotLabel" 
+                        checked={editorSettings.alwaysShowSlotLabels}
+                        onchange={(e) => setAlwaysShowSlotLabels(e.target.checked)}
+                    />
+                </div>
             </div>
-            <div class="field-grid">
-                <LangSelectField/>
+            <hr />
+            <h3>{t("words.preview")}</h3>
+            <div class="row-container preview-holder">
+                <div style={{"z-index": 2}}>
+                    <div style={{"max-width": "200px"}}>
+                        <DefaultNodePreview show_slot_labels={false}/>
+                    </div>
+                </div>
             </div>
-            <div class="field-grid">
-                <label for="settings-alwaysShowSlotLabel" class="field-label">{t("pages.settings.editor.alwaysShowSlotLabels")}</label>
-                <input type="checkbox" id="settings-alwaysShowSlotLabel" 
-                    checked={editorSettings.alwaysShowSlotLabels}
-                    onchange={(e) => setAlwaysShowSlotLabels(e.target.checked)}
-                />
-            </div>
-        </div>
+        </>
     )
 }
 

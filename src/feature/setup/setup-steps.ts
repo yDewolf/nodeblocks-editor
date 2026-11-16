@@ -7,6 +7,7 @@ import { LocalServerInstall } from "./steps/local-server-install";
 import { RemoteServerConnection } from "./steps/remote-server-connection";
 import { LocalServerSetup } from "./steps/local-server-setup";
 import { CreateUserStep } from "./steps/create-user-step";
+import { ConfigureEditorStep } from "./steps/configure-editor-step";
 
 export type SetupStep = WizardStepDef<SetupData, Component>;
 export const setupSteps: SetupStep[] = [
@@ -47,4 +48,9 @@ export const setupSteps: SetupStep[] = [
         when: (data) => data.isConnectedToAServer,
         validate: (data) => data.isAuthenticated ? null : "Must authenticate before continuing"
     },
+    {
+        id: "editorSettings",
+        title: "Configure editor",
+        view: ConfigureEditorStep
+    }
 ];

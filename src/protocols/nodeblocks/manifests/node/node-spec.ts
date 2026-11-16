@@ -14,4 +14,3 @@ export interface NodeTypeSpec extends NamespaceModel {
     parameters: Record<string, ParameterSpec>;
     slots: Record<string, NodeSlotSpec>;
 }
-

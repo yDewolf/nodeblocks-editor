@@ -23,14 +23,6 @@ export class NodeInstanceFactory {
 
     public create(nodeFqn: string, nodeSceneData: NodeSceneData): NodeInstance {
         const spec = this.registry.getNodeTypeSpec(nodeFqn);
-
-        if (Object.keys(nodeSceneData.data).length === 0) {
-            for (const [key, paramSpec] of Object.entries(spec.parameters)) {
-                if (paramSpec.default !== undefined) {
-                    nodeSceneData.data[key] = paramSpec.default;
-                }
-            }
-        }
         return NodeInstanceFactory.fromSpec(spec, nodeSceneData.uid, nodeSceneData);
     }
 
@@ -40,6 +32,15 @@ export class NodeInstanceFactory {
             uid: node_id, nodetype_fqn: spec.fqn, 
             position: {x: 0, y: 0}, data: {}
         };
+
+        if (Object.keys(scene_data.data).length === 0) {
+            for (const [key, paramSpec] of Object.entries(spec.parameters)) {
+                if (paramSpec.default != undefined) {
+                    scene_data.data[key] = paramSpec.default;
+                }
+            }
+        }
+        
         scene_data.uid = node_id;
         const slots = NodeInstanceFactory._createSlotsFromSpec(spec, node_id);
         return new NodeInstance(

@@ -85,19 +85,10 @@ export const NodeComponent = (props: {
     );
 };
 
-export const NodePreview = (props: {spec: NodeTypeSpec}) => {
-    return (
-        <NodeComponentV2
-            spec={props.spec}
-            default_show_output={false}
-            default_show_slot_labels={true}
-        />
-    )
-}
-
 export const NodeComponentV2 = (props: {
     node?: SceneNode, spec?: NodeTypeSpec
     default_show_output?: boolean
+    default_expanded?: boolean
     default_show_slot_labels?: boolean
 }) => {
     let ref_node = props.node;
@@ -108,7 +99,7 @@ export const NodeComponentV2 = (props: {
         throw new Error("Reference node can't be undefined on NodeComponent. 'node' field or 'constructor' should be set");
     }
     // const node_meta = metadata.get_node_meta(ref_node.fqn);
-    const [isExpanded, setIsExpanded] = createSignal(false);
+    const [isExpanded, setIsExpanded] = createSignal(props.default_expanded ?? false);
     const [isHovered, setIsHovered] = createSignal(props.default_show_slot_labels ?? false);
 
     createEffect(() => {

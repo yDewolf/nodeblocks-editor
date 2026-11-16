@@ -12,7 +12,7 @@ import { DataTypeSpec, ParameterSpec } from "~/protocols/nodeblocks/manifests/no
 import { DropdownSection } from "~/components/panels/dropdown";
 import { ParsedMetaText } from "~/feature/metadata/components/metadata-text";
 import { NodeMetaProvider, ensureMetadata } from "~/feature/metadata/metadata-context";
-import { NodePreview } from "~/feature/scene/components/node/node-component";
+import { NodePreview } from "~/feature/scene/components/node/node-previews";
 import { SlotHeader } from "~/feature/scene/components/node/slot-components";
 import { DocsPathUtils } from "../../helpers/docs-path-utils";
 import { DataTypeFieldSelector } from "~/feature/scene/components/value/datatype-field";
