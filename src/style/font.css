@@ -11,3 +11,13 @@
 html {
   font-size: var(--default-font-size);
 }
+
+p {
+  font-size: 0.9rem;
+}
+
+
+.note {
+  font-size: 0.9rem;
+  color: var(--secondary-font-color)
+}

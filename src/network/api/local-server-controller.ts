@@ -84,6 +84,8 @@ export class LocalServerController {
             const is_installed = await invoke<boolean>("check_server_installed");
             this._setState("isInstalled", is_installed);
             this.checkInstalledVersion();
+            return this.isInstalled;
+        
         } catch (err) {
             console.error("Failed to check local server status:", err)
         }
@@ -98,6 +100,7 @@ export class LocalServerController {
             } else {
                 this._setState("serverState", LocalServerStates.STOPPED);
             }
+            return this.state;
         } catch (err) {
             console.error("Failed to check local server status:", err);
         }
