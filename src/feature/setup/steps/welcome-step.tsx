@@ -1,5 +1,5 @@
 import { SetupData, useSetup } from "../setup-wizard-context";
-import { LangSelectField, ThemeSelectorField } from '../../editor/screens/settings-view';
+import { LangSelectField, ThemeSelectorField } from "~/feature/home/settings/app-settings-view";
 
 export default function WelcomeStep() {
   const wizard = useSetup();
