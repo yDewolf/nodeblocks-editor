@@ -1,7 +1,7 @@
 import { createSignal, onMount, ParentComponent, Show } from "solid-js";
 import "~/style/screens/setup/setup.css";
 import { appSettings } from "../app-settings";
-import { SetupWizard } from "./components/setup-wizard";
+import SetupWizard from "./setup-wizard";
 
 export type WizardSteps = "start" | "local" | "remote";
 

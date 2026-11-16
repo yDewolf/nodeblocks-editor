@@ -1,5 +1,5 @@
 @layer custom {
-    .setup-wizard {
+    .wizard {
         width: 100vw;
         height: 100vh;
         max-height: 100vh;
@@ -8,14 +8,34 @@
         color: var(--font-color);
     }
 
-    .setup-title {
+    .wizard-step-list {
+        padding: 0;
+        list-style: none;
+    }
+
+    .wizard-steps {
+        margin-bottom: 40px;
+    }
+
+    .wizard-position {
+        font-size: 0.8rem;
+    }
+
+    .wizard-title {
         margin-bottom: 30px;
         text-align: center;
     }
 
-    .setup-wizard-content {
-        height: 50%;
-        width: 50%;
+    .wizard-content {
+        padding: 40px;
+        height: 100%;
+        width: calc(100% - (40px * 2));
+        justify-content: space-between;
+    }
+
+    .wizard-body {
+        width: 70%;
+        height: fit-content;
         margin: auto;
     }
     
@@ -25,9 +45,14 @@
         justify-content: space-evenly;
     }
 
+    .wizard-footer {
+        justify-content: space-between;
+    }
+
     .setup-actions {
         margin-top: auto;
         display: flex;
+        gap: 10px;
         justify-content: right;
     }       
 }

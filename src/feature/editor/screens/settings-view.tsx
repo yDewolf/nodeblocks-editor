@@ -28,28 +28,10 @@ export const EditorSettingsContent = () => {
     return (
         <div class="field-grid-holder">
             <div class="field-grid">
-                <label class="field-label" for="settings-theme">{t("pages.settings.editor.theme")}</label>
-                <select id="settings-theme" 
-                    value={getCurrentTheme()} 
-                    onchange={(e) => {
-                        setTheme(e.currentTarget.value as Theme)
-                }}>
-                    <For each={THEMES}>
-                        {(theme) => <option value={theme}>{t(`themes.${theme as Theme}`)}</option>}
-                    </For>
-                </select>
+                <ThemeSelectorField/>
             </div>
             <div class="field-grid">
-                <label class="field-label" for="settings-lang">{t("pages.settings.editor.lang")}</label>
-                <select id="settings-lang" 
-                    value={appSettings.locale} 
-                    onchange={(e) => {
-                        setLocale(e.target.value as Locale);
-                }}>
-                    <For each={Object.keys(localeDicts)}>
-                        {(locale) => <option value={locale}>{t(`locale.${locale as Locale}`)}</option>}
-                    </For>
-                </select>
+                <LangSelectField/>
             </div>
             <div class="field-grid">
                 <label for="settings-alwaysShowSlotLabel" class="field-label">{t("pages.settings.editor.alwaysShowSlotLabels")}</label>
@@ -62,3 +44,49 @@ export const EditorSettingsContent = () => {
     )
 }
 
+export const ThemeSelectorField = () => {
+    const { t } = useI18n();
+    return (<>
+        <label class="field-label" for="settings-theme">{t("pages.settings.editor.theme")}</label>
+        <ThemeSelector/>
+    </>)
+}
+
+export const ThemeSelector = () => {
+    const { t } = useI18n();
+    return (
+        <select id="settings-theme" 
+            value={getCurrentTheme()} 
+            onchange={(e) => {
+                setTheme(e.currentTarget.value as Theme)
+        }}>
+            <For each={THEMES}>
+                {(theme) => <option value={theme}>{t(`themes.${theme as Theme}`)}</option>}
+            </For>
+        </select>
+    )
+}
+
+
+export const LangSelectField = () => {
+    const { t } = useI18n();
+    return (<>
+        <label class="field-label" for="settings-lang">{t("pages.settings.editor.lang")}</label>
+        <LangSelector/>
+    </>)
+}
+
+export const LangSelector = () => {
+    const { t, setLocale } = useI18n();
+    return (
+        <select id="settings-lang" 
+            value={appSettings.locale} 
+            onchange={(e) => {
+                setLocale(e.target.value as Locale);
+        }}>
+            <For each={Object.keys(localeDicts)}>
+                {(locale) => <option value={locale}>{t(`locale.${locale as Locale}`)}</option>}
+            </For>
+        </select>
+    )
+}
