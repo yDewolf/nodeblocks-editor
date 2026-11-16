@@ -8,6 +8,7 @@ export const THEMES = ["light", "dark", "dark-contrast", "auto"];
 
 interface AppSettings {
     isSetupComplete: boolean
+    autoStartLocalServer: boolean
     locale: Locale
     theme: Theme
 }
@@ -36,6 +37,7 @@ export const defaultSystemLanguage = (): Locale => {
 const [appSettings, _setAppSettings] = makePersisted(
     createStore<AppSettings>({
         isSetupComplete: false,
+        autoStartLocalServer: true,
         locale: defaultSystemLanguage(),
         theme: getSystemTheme(),
     }), 
@@ -45,6 +47,7 @@ const [appSettings, _setAppSettings] = makePersisted(
 export { appSettings }
 export const setLocale = (l: Locale) => _setAppSettings("locale", l);
 export const setSetupComplete = (v: boolean) => _setAppSettings("isSetupComplete", v);
+export const setAutoStartLocal = (v: boolean) => _setAppSettings("autoStartLocalServer", v);
 
 export const getCurrentTheme = () => appSettings.theme;
 

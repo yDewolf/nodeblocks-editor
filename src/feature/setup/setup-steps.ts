@@ -5,6 +5,8 @@ import WelcomeStep from "./steps/welcome-step";
 import { LocalOrRemoteStep } from "./steps/local-or-remote-step";
 import { LocalServerInstall } from "./steps/local-server-install";
 import { RemoteServerConnection } from "./steps/remote-server-connection";
+import { LocalServerSetup } from "./steps/local-server-setup";
+import { CreateUserStep } from "./steps/create-user-step";
 
 export type SetupStep = WizardStepDef<SetupData, Component>;
 export const setupSteps: SetupStep[] = [
@@ -19,10 +21,17 @@ export const setupSteps: SetupStep[] = [
         view: LocalOrRemoteStep
     },
     {
-        id: "localServerSetup",
+        id: "localServerInstall",
         title: "Local Server Installation",
         view: LocalServerInstall,
         when: (data) => data.localInstall
+    },
+    {
+        id: "localServerSetup",
+        title: "Local Server Setup",
+        view: LocalServerSetup,
+        when: (data) => data.localInstall && data.isLocalServerInstalled,
+        validate: (data) => data.isConnectedToAServer ? null : "Must connect to a server before continuing"
     },
     {
         id: "remoteServerSetup",
@@ -30,5 +39,12 @@ export const setupSteps: SetupStep[] = [
         view: RemoteServerConnection,
         when: (data) => !data.localInstall,
         validate: (data) => data.isConnectedToAServer ? null : "Must connect to a server before continuing"
+    },
+    {
+        id: "userCreate",
+        title: "Create a user",
+        view: CreateUserStep,
+        when: (data) => data.isConnectedToAServer,
+        validate: (data) => data.isAuthenticated ? null : "Must authenticate before continuing"
     },
 ];

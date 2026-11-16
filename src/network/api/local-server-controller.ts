@@ -17,6 +17,8 @@ export interface LocalServerState {
 }
 
 const LOCAL_SERVER_CACHE_KEY = "local-server-cache"
+const LOCAL_SERVER_HOST = "127.0.0.1";
+const LOCAL_SERVER_PORT = 8080;
 
 export class LocalServerController {
     private _state: LocalServerState;
@@ -34,6 +36,7 @@ export class LocalServerController {
         this.setup();
     }
 
+    get localUrl() { return `http://${LOCAL_SERVER_HOST}:${LOCAL_SERVER_PORT}`}
     get installedVersion() { return this._state.installedVersion; }
     get isInstalled() { return this._state.isInstalled; }
 

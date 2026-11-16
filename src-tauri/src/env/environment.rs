@@ -98,12 +98,13 @@ pub async fn ensure_environment(
     app: AppHandle,
     guard: State<'_, SetupGuard>,
     wheel_url: String,
+    remove_previous: bool
 ) -> Result<(), String> {
     let _running = guard.try_acquire()?;
     let paths = EnvPaths::new(&app)?;
     fs::create_dir_all(&paths.root).map_err(|e| e.to_string())?;
 
-    let _ = install_local_server(app, paths, wheel_url).await;
+    let _ = install_local_server(app, paths, wheel_url, remove_previous).await;
     Ok(())
 }
 
@@ -164,8 +165,9 @@ pub async fn install_local_server(
     app: AppHandle,
     paths: EnvPaths,
     wheel_url: String,
+    remove_previous: bool
 ) -> Result<String, String> {
-    let mut state = load_state(&paths);
+    let mut state = if remove_previous {InstallState::default()} else {load_state(&paths)};
     if state.wheel_url.as_ref() != Some(&wheel_url) && state.step == InstallStep::Completed {
         state.step = InstallStep::VenvCreated;
     }
@@ -179,6 +181,7 @@ pub async fn install_local_server(
             vec![
                 "venv".into(),
                 paths.venv.to_string_lossy().into(),
+                "--clear".into(),
                 "--python".into(),
                 PYTHON_VERSION.into(),
             ],

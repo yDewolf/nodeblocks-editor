@@ -3,7 +3,6 @@ import { useSetup } from "../setup-wizard-context";
 
 export const RemoteServerConnection = () => {
     const wizard = useSetup();
-    
     return (
         <>
             <RemoteServerConfigForm/>

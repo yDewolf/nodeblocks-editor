@@ -38,7 +38,7 @@ export const LocalServerSetupContent = (props: {
     timer = setInterval(() => setElapsed((s) => s + 1), 1000);
  
     try {
-      await invoke("ensure_environment", {wheelUrl: url});
+      await invoke("ensure_environment", {wheelUrl: url, removePrevious: false});
       setPhase("installed");
       props.onReady();
     } catch (e) {

@@ -8,13 +8,15 @@ import RefreshIcon from '~/assets/icons/refresh.svg';
 import { localServerController } from "~/network/api/local-server-controller";
 import { SERVER_API_VERSION } from "~/network/api/api-version";
 
-type Phase = "checking" | "idle" | "installing" | "installed" | "error";
-type Progress = { step: string; percent: number; message: string; };
 
 export const LocalServerInstall = () => {
     const wizard = useSetup();
     const {t} = useI18n();
     const [wheelUrl, setWheelUrl] = createSignal<string | null>(releaseController.serverReleases.at(0)?.server_wheel_url ?? null);
+
+    createEffect(() => {
+        wizard.setData("isLocalServerInstalled", localServerController.isInstalled);
+    });
 
     return (
         <>
@@ -24,7 +26,7 @@ export const LocalServerInstall = () => {
             </Show>
             <div class="text-section">
                 <br />
-                <ServerInstallationSelector wheel={wheelUrl()} setWheel={setWheelUrl}/>
+                <ServerReleaseSelector wheel={wheelUrl()} setWheel={setWheelUrl}/>
                 <Show when={wheelUrl()}>
                     {(url) => <>
                         <br />
@@ -40,7 +42,7 @@ export const LocalServerInstall = () => {
 }
 
 
-export const ServerInstallationSelector = (props: {
+export const ServerReleaseSelector = (props: {
     wheel: string | null,
     setWheel: (wheel: string) => void,
 }) => {
@@ -95,7 +97,7 @@ export const LocalServerInstaller = (props: {
                         |
                         <p>Engine Version: {releaseData().engine_version}</p>
                     </div>
-                    <InstallingPhase
+                    <InstallerContent
                         wheelUrl={props.wheelUrl} 
                         onFinished={() => {
 
@@ -114,7 +116,8 @@ export const LocalServerInstaller = (props: {
     )
 }
 
-export const InstallingPhase = (props: {
+type Progress = { step: string; percent: number; message: string; };
+export const InstallerContent = (props: {
     wheelUrl: string,
     onFinished: () => void,
     onError: (message: string) => void,
@@ -137,7 +140,7 @@ export const InstallingPhase = (props: {
         timer = setInterval(() => setElapsed((s) => s + 1), 1000);
      
         try {
-            await invoke("ensure_environment", {wheelUrl: props.wheelUrl});
+            await invoke("ensure_environment", {wheelUrl: props.wheelUrl, removePrevious: true});
             installedWheel = props.wheelUrl;
             props.onFinished();
         } catch (e) {

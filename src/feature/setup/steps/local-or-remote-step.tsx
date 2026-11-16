@@ -6,7 +6,7 @@ export const LocalOrRemoteStep = () => {
     return (
         <>
             <p>Would you like to run Nodeblocks locally or connect to a remote server?</p>
-            <p><b>Note:</b> you can change your answer anytime by redoing this setup in settings menu.</p>
+            <p class="note"><b>Note:</b> you can change your answer anytime by redoing this setup in settings menu.</p>
             
             <div class="field-grid">
                 <label for="local-install">Install nodeblocks and run locally</label>
