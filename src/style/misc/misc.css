@@ -73,7 +73,7 @@
     stroke: var(--selection-color);
     color: var(--selection-color);
   }
-
+  
   .connection-group.current-step > text {
     fill: var(--selection-color);
   }
