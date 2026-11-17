@@ -262,6 +262,7 @@ export default {
         continue: "Continuar",
         finish: "Finalizar",
         tryAgain: "Tentar novamente",
+        cancel: "Cancelar",
     },
     messages: {
         mustBeAuthenticated: (action: string) => `Você deve se autenticar para ${action}`,

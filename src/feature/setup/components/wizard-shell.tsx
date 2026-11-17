@@ -1,4 +1,4 @@
-import { For, Suspense, createEffect, on, type Component } from "solid-js";
+import { For, Show, Suspense, createEffect, on, type Component } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { WizardController } from "../utils/wizard-controller";
 import { useI18n } from "~/i18n/i18n-context";
@@ -52,14 +52,24 @@ export function WizardShell<TData extends object>(props: { wizard: WizardControl
                         {wizard.error}
                     </p>
                 </section>
-                <footer class="wizard-footer">
-                    <div class="setup-actions">
-                        <button class="text-button" type="button" onClick={() => wizard.back()} disabled={!wizard.canGoBack}>
-                            {t("actions.goBack")}
+                <footer class="wizard-footer fill">
+                    <Show when={wizard.canCancel}>
+                        <button class="text-button" type="button" 
+                            onClick={() => wizard.cancel()} 
+                            disabled={!wizard.canCancel}
+                        >
+                            {t("actions.cancel")}
                         </button>
-                        <button class="text-button" type="button" onClick={() => void wizard.next()} disabled={wizard.busy}>
-                            {nextLabel()}
-                        </button>
+                    </Show>
+                    <div class="setup-actions space-between fill">
+                        <div class="row-container">
+                            <button class="text-button" type="button" onClick={() => wizard.back()} disabled={!wizard.canGoBack}>
+                                {t("actions.goBack")}
+                            </button>
+                            <button class="text-button" type="button" onClick={() => void wizard.next()} disabled={wizard.busy}>
+                                {nextLabel()}
+                            </button>
+                        </div>
                     </div>
                 </footer>
             </div>

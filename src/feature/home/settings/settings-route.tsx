@@ -2,7 +2,7 @@ import { createSignal, onMount, ParentComponent, Show } from "solid-js"
 import { EditorSettingsContent } from "~/feature/editor/screens/settings-view";
 import "~/style/screens/settings.css";
 import { RemoteServerConfigForm } from "~/feature/setup/components/remote-server-connect-form";
-import { setSetupComplete } from "~/feature/app-settings";
+import { _setSetupComplete } from "~/feature/app-settings";
 import { useI18n } from "~/i18n/i18n-context";
 import { LocalServerPanel } from "~/feature/local-server/local-server-components";
 import { AppSettingsContent } from "./app-settings-view";
@@ -35,7 +35,7 @@ export const SettingsRoute: ParentComponent = (props) => {
                     <Show when={window.isTauriEnvironment}>
                         <hr style={{margin: "20px 0"}}/>
                         <button class="text-button" onclick={() => {
-                            setSetupComplete(false);
+                            _setSetupComplete(false);
                         }}>
                             {t("pages.settings.openSetupWizard")}
                         </button>

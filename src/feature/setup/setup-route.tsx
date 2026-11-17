@@ -1,6 +1,6 @@
 import { createSignal, onMount, ParentComponent, Show } from "solid-js";
 import "~/style/screens/setup/setup.css";
-import { appSettings, setSetupComplete } from "../app-settings";
+import { appSettings, _setSetupComplete, _setIsFirstTimeSetup } from '../app-settings';
 import SetupWizard from "./setup-wizard";
 
 export type WizardSteps = "start" | "local" | "remote";
@@ -13,9 +13,15 @@ export const SetupScreen: ParentComponent = (props) => {
     return (
         <Show when={isMounted()}>
             <Show when={appSettings.isSetupComplete || !window.isTauriEnvironment} fallback={
-                <SetupWizard onFinished={() => {
-                    setSetupComplete(true);
-                }}/>
+                <SetupWizard 
+                    onFinished={() => {
+                        _setSetupComplete(true);
+                        _setIsFirstTimeSetup(false);
+                    }}
+                    onCancel={() => {
+                        _setSetupComplete(true);
+                    }}
+                />
             }>
                 {props.children}
             </Show>

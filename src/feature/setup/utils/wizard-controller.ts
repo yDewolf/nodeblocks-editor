@@ -18,10 +18,15 @@ export class WizardController<TData extends object, TView> {
     private _error: () => string | null;
     private _setError: Setter<string | null>;
 
+    private _canCancel: () => boolean;
+    private _setCanCancel: Setter<boolean>;
+
     constructor(
         private readonly steps: WizardStepDef<TData, TView>[],
-        initialData: TData,
+        private initialData: TData,
+        cancelable: boolean,
         private onFinish?: (data: TData) => void | Promise<void>,
+        private onCancel?: (data: TData) => void | Promise<void>,
     ) {
         [this._data, this.setData] = createStore<TData>(initialData);
         [this._completed, this._setCompleted] = createSignal<readonly string[]>([]);
@@ -30,6 +35,7 @@ export class WizardController<TData extends object, TView> {
         );
         [this._isBusy, this._setIsBusy] = createSignal<boolean>(false);
         [this._error, this._setError] = createSignal<string | null>(null);
+        [this._canCancel, this._setCanCancel] = createSignal<boolean>(cancelable);
     }
 
     get data() { return this._data; }
@@ -41,6 +47,11 @@ export class WizardController<TData extends object, TView> {
     get visibleSteps() { return this.steps.filter((step) => isStepVisible(step, this.data)); }
     get isLastStep() { return this.neighborId(1) == null; }
     get canGoBack() { return !this._isBusy() && this.previousId() != null; }
+    get canCancel() { return this._canCancel() || this._isBusy(); }
+
+    public setCancelable(v: boolean) {
+        this._setCanCancel(v);
+    }
 
     public markCompleted(id: string) {
         this._setCompleted((ids) => (ids.includes(id) ? ids : [...ids, id]))
@@ -110,6 +121,19 @@ export class WizardController<TData extends object, TView> {
         } finally {
             this._setIsBusy(false);
         }
+    }
+
+    public async cancel() {
+        if (!this.canCancel) return;
+        await this.onCancel?.(this.data);
+
+        this.setData(this.initialData);
+        this._setCompleted([]);
+        this._setCurrentId(
+            (this.steps.find((step) => isStepVisible(step, this.data)) ?? this.steps[0]).id
+        );
+        this._setError(null);
+        this._setIsBusy(false);
     }
 
     // -- utils
