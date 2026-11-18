@@ -277,7 +277,7 @@ export const NodeBodySections = (props: {
             class="node-body-sections container fill"
             onpointerdown={(e) => e.stopImmediatePropagation()}
         >
-            <Show when={Object.keys(props.node.parameters).length > 0}>
+            <Show when={Object.keys(props.node.parameterSpecs).length > 0}>
                 <DropdownSection header={t("node.parameters")} content={
                     <div class="field-grid-holder">
                         <For each={Object.entries(props.node.parameterSpecs)}>
