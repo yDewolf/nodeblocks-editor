@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { createEffect, createSignal, For, JSX, JSXElement, onMount, ParentComponent, Show } from "solid-js"
+import { createEffect, createSignal, For, JSX, JSXElement, on, onCleanup, onMount, ParentComponent, Show } from "solid-js"
 import { Transition } from "solid-transition-group";
 import ArrowDownIcon from "~/assets/icons/arrow-down.svg";
 
@@ -83,36 +83,70 @@ export const DropdownSection = (props: {
 }
 
 export const Dropdown: ParentComponent<{
-    animated?: boolean 
+    animated?: boolean
     class?: string
     icon?: JSXElement
-    iconClass?: String
+    iconClass?: string
 }> = (props) => {
     let containerRef: HTMLDivElement | undefined;
+    let wrapperRef: HTMLDivElement | undefined;
+    let buttonRef: HTMLButtonElement | undefined;
 
     const [expanded, setExpanded] = createSignal(false);
     const [alignRight, setAlignRight] = createSignal(false);
+
+    const updateAlignment = () => {
+        if (!containerRef || !wrapperRef) return;
+        const parentRect = containerRef.getBoundingClientRect();
+        const dropdownWidth = wrapperRef.offsetWidth;
+
+        setAlignRight(parentRect.left + dropdownWidth > window.innerWidth);
+    };
+
+    const observer = new ResizeObserver(() => {
+        if (expanded()) {
+            updateAlignment();
+        }
+    });
+
+    const handleContainerRef = (el: HTMLDivElement) => {
+        containerRef = el;
+        observer.observe(el);
+    };
+
+    const handleWrapperRef = (el: HTMLDivElement) => {
+        wrapperRef = el;
+        observer.observe(el);
+        requestAnimationFrame(updateAlignment);
+    };
+
+    const handlePointerDownOutside = (e: PointerEvent) => {
+        if (containerRef && !containerRef.contains(e.target as Node)) {
+            setExpanded(false);
+        }
+    };
+
     const handleOnFocusOut = (e: FocusEvent) => {
-        const nextTarget = e.relatedTarget as Node
+        const nextTarget = e.relatedTarget as Node | null;
         if (nextTarget && !containerRef?.contains(nextTarget)) {
             setExpanded(false);
         }
-    }
+    };
 
-    const handleWrapperRef = (el: HTMLDivElement) => {
-        requestAnimationFrame(() => {
-            if (containerRef && el) {
-                const parentRect = containerRef.getBoundingClientRect();
-                const dropdownWidth = el.offsetWidth;
+    createEffect(() => {
+        if (expanded()) {
+            document.addEventListener("pointerdown", handlePointerDownOutside);
+            return;
+        }
+        document.removeEventListener("pointerdown", handlePointerDownOutside);
+    });
 
-                if (parentRect.left + dropdownWidth > window.innerWidth) {
-                    setAlignRight(true);
-                    return;
-                } 
-                setAlignRight(false);
-            }
-        });
-    }
+    window.addEventListener("resize", updateAlignment);
+    onCleanup(() => {
+        observer.disconnect();
+        window.removeEventListener("resize", updateAlignment);
+        document.removeEventListener("pointerdown", handlePointerDownOutside);
+    });
 
     const renderContent = () => (
         <Show when={expanded()}>
@@ -127,31 +161,32 @@ export const Dropdown: ParentComponent<{
                 </div>
             </div>
         </Show>
-    )
+    );
+
     return (
-        <div 
-            ref={containerRef}
+        <div
+            ref={handleContainerRef}
             onFocusOut={handleOnFocusOut}
-            class={"dropdown" + (props.class ? (" " + props.class) : "")}
-            classList={{"expanded": expanded(), "no-animation": !props.animated}}
+            class={"dropdown" + (props.class ? " " + props.class : "")}
+            classList={{ expanded: expanded(), "no-animation": !props.animated }}
         >
-            <div class="dropdown-header" classList={{"expanded": expanded()}}>
-                <button class={"icon-button section-dropdown-icon" + (props.iconClass ? (" " + props.iconClass) : "")} onclick={() => {
-                    if (expanded()) setExpanded(false); else setExpanded(true);
-                }}>
-                    {props.icon ?? <DropdownIcon expanded={expanded()}/>}
+            <div class="dropdown-header" classList={{ expanded: expanded() }}>
+                <button
+                    ref={buttonRef}
+                    class={"icon-button section-dropdown-icon" + (props.iconClass ? " " + props.iconClass : "")}
+                    onClick={() => setExpanded((prev) => !prev)}
+                >
+                    {props.icon ?? <DropdownIcon expanded={expanded()} />}
                 </button>
             </div>
-            <Show when={props.animated} fallback={
-                renderContent()
-            }>
-                <Transition name={"dropdown-slide"} >
+            <Show when={props.animated} fallback={renderContent()}>
+                <Transition name="dropdown-slide">
                     {renderContent()}
                 </Transition>
             </Show>
         </div>
-    )
-}
+    );
+};
 
 export const DropdownItemButton = (props: {label: string, onClick: () => void, onMouseOver?: () => void}) => {
     return (
