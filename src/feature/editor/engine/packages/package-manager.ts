@@ -34,7 +34,7 @@ export class PackageManager {
     public loadPackages(packages: PackageManifest[], resetBeforeLoading: boolean = true): void {
         // FIXME: adicionei isso aqui por padrão porque talvez não fazer isso cause problemas imprevistos
         if (resetBeforeLoading) {
-            this.reset()
+            this.reset();
         }
         for (const pkg of packages) {
             if (pkg.data_types) {
