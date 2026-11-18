@@ -7,6 +7,8 @@ import { CanvasSpace } from "../../../scene/canvas/editor-space";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { ServerMessageTypes } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { NotificationFactory } from "./notification-factory";
+import { TranslationFunc } from "~/i18n/i18n-locale";
+import { createSignal } from "solid-js";
 
 type NotificationStore = {
     nodes: Record<string, NotificationWithMeta[]>;
@@ -19,6 +21,8 @@ type NotificationStore = {
 export class NotificationController {
     private _notifications: NotificationStore;
     private _set_notifications: SetStoreFunction<NotificationStore>;
+
+    private _translationFunc?: TranslationFunc = undefined;;
 
     ignored_level: NotificationLevel[] = [NotificationLevel.DEBUG];
 
@@ -37,9 +41,11 @@ export class NotificationController {
         this.setupCommandResponseHandlers()
     }
     
+    set translationFunc(t: TranslationFunc) { this._translationFunc = t; }
+
     private setupEngineHandlers() {
         this.sceneConnection.onMessage(ServerMessageTypes.GRAPH_EVENT, (msg) => {
-            const notif = NotificationFactory.fromEngineEvent(msg.event_payload);
+            const notif = NotificationFactory.fromEngineEvent(msg.event_payload, this._translationFunc);
             if (!notif || this.ignored_level.includes(notif.level)) return;
 
             this._handle_notification(notif);
@@ -48,7 +54,7 @@ export class NotificationController {
 
     private setupCommandResponseHandlers() {
         this.sceneConnection.onMessage(ServerMessageTypes.COMMAND_RESPONSE, (msg) => {
-            const notif = NotificationFactory.fromCommandResponse(msg.response_payload);
+            const notif = NotificationFactory.fromCommandResponse(msg.response_payload, this._translationFunc);
             if (!notif || this.ignored_level.includes(notif.level)) return;
 
             this._handle_notification(notif);

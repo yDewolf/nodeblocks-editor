@@ -1,0 +1,152 @@
+import { createStore, SetStoreFunction } from "solid-js/store";
+import { invoke } from "@tauri-apps/api/core";
+import { listen, UnlistenFn } from "@tauri-apps/api/event";
+import { makePersisted } from '@solid-primitives/storage';
+
+export enum LocalServerStates {
+    STARTING = "starting",
+    RUNNING = "running",
+    STOPPED = "stopped"
+}
+
+export interface LocalServerState {
+    isInstalled: boolean;
+    installedVersion?: string;
+    serverState: LocalServerStates,
+    logs: string[];
+}
+
+const LOCAL_SERVER_CACHE_KEY = "local-server-cache"
+const LOCAL_SERVER_HOST = "127.0.0.1";
+const LOCAL_SERVER_PORT = 8080;
+
+export class LocalServerController {
+    private _state: LocalServerState;
+    private _setState: SetStoreFunction<LocalServerState>;
+
+    private _unlistenLog?: UnlistenFn;
+    private _unlistenExit?: UnlistenFn;
+
+    constructor() {
+        [this._state, this._setState] = makePersisted(createStore<LocalServerState>({
+            isInstalled: false,
+            serverState: LocalServerStates.STOPPED,
+            logs: [],
+        }), {name: LOCAL_SERVER_CACHE_KEY});
+        this.setup();
+    }
+
+    get localUrl() { return `http://${LOCAL_SERVER_HOST}:${LOCAL_SERVER_PORT}`}
+    get installedVersion() { return this._state.installedVersion; }
+    get isInstalled() { return this._state.isInstalled; }
+
+    get state() { return this._state.serverState }
+    get isRunning() { return this._state.serverState == LocalServerStates.RUNNING; }
+    get isStarting() { return this._state.serverState == LocalServerStates.STARTING; }
+
+    get logs() { return this._state.logs; }
+
+    private setup() {
+        this.checkIsInstalled();
+        this.checkStatus();
+        this.initListener();
+    }
+
+    private async initListener() {
+        if (!window.isTauriEnvironment || this._unlistenLog) return;
+        try {
+            this._unlistenLog = await listen<string>("server-log", (event) => {
+                this._setState("logs", (prevLogs) => [...prevLogs.slice(-199), event.payload]);
+            });
+            this._unlistenExit = await listen("server-exited", (event) => {
+                console.warn("Local server died.");
+            });
+        } catch (err) {
+            console.error("Failed to listen to server-log:", err);
+        }
+    }
+
+    public cleanup() {
+        if (this._unlistenLog) {
+            this._unlistenLog();
+            this._unlistenLog = undefined;
+        }
+        if (this._unlistenExit) {
+            this._unlistenExit();
+            this._unlistenExit = undefined;
+        }
+    }
+
+    public clearLogs() {
+        this._setState("logs", []);
+    }
+
+    public async checkIsInstalled() {
+        if (!window.isTauriEnvironment) return;
+        try {
+            const is_installed = await invoke<boolean>("check_server_installed");
+            this._setState("isInstalled", is_installed);
+            this.checkInstalledVersion();
+            return this.isInstalled;
+        
+        } catch (err) {
+            console.error("Failed to check local server status:", err)
+        }
+    }
+
+    public async checkStatus() {
+        if (!window.isTauriEnvironment) return;
+        try {
+            const isRunning = await invoke<boolean>("is_local_server_running");
+            if (isRunning) {
+                this._setState("serverState", LocalServerStates.RUNNING);
+            } else {
+                this._setState("serverState", LocalServerStates.STOPPED);
+            }
+            return this.state;
+        } catch (err) {
+            console.error("Failed to check local server status:", err);
+        }
+    }
+
+    public async startServer(): Promise<void> {
+        if (!window.isTauriEnvironment) return;
+        this._setState("serverState", LocalServerStates.STARTING);
+        try {
+            await invoke("start_local_server");
+            this.clearLogs();
+            this._setState("serverState", LocalServerStates.RUNNING);
+            this.checkStatus();
+        
+        } catch (err) {
+            console.error("Failed to start local server:", err);
+            throw err;
+        }
+    }
+
+    public async stopServer(): Promise<void> {
+        if (!window.isTauriEnvironment) return;
+        try {
+            await invoke("stop_local_server");
+            this._setState("serverState", LocalServerStates.STOPPED);
+            this.checkStatus(); 
+        } catch (err) {
+            console.error("Failed to stop local server:", err);
+            throw err;
+        }
+    }
+
+    public async checkInstalledVersion() {
+        try {
+            const version = await invoke<string>("get_local_server_version");
+            console.log("Installed server version:", version);
+            this._setState("installedVersion", version);
+            return version;
+        } catch (error) {
+            console.error("Couldn't get local server version:", error);
+            return null;
+        }
+    }
+}
+
+export const localServerController = new LocalServerController();

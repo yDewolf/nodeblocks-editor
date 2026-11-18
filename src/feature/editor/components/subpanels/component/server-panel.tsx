@@ -6,6 +6,7 @@ import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
 import { SceneWorkerExecutionMode } from "~/protocols/nodeblocks/network/scene-worker-protocol";
 import { WebsocketStatus } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { Dropdown, Dropside } from '../../../../../components/panels/dropdown';
+import { useI18n } from "~/i18n/i18n-context";
 
 export const SceneStatus = () => {
     const editor = useEditor();
@@ -22,6 +23,7 @@ export const SceneStatus = () => {
 }
 
 export const ScenePanel = (props: {state_controller: StateController}) => {
+    const {t} = useI18n();
     return (
         <div class="fill keep row-container space-between">
             <div class="keep row-container">
@@ -55,8 +57,8 @@ export const ScenePanel = (props: {state_controller: StateController}) => {
                 <select value={props.state_controller.runtime_mode} name="" id="" onInput={(e) => {
                     props.state_controller.requestModeUpdate(e.target.value as SceneWorkerExecutionMode)
                 }}>
-                    <option value={SceneWorkerExecutionMode.GRAPH_STEP}>Step</option>
-                    <option value={SceneWorkerExecutionMode.FULL_GRAPH}>Graph</option>
+                    <option value={SceneWorkerExecutionMode.GRAPH_STEP}>{t("pages.editor.runtimeModes.step")}</option>
+                    <option value={SceneWorkerExecutionMode.FULL_GRAPH}>{t("pages.editor.runtimeModes.graph")}</option>
                 </select>
                 {/* <button class="icon-button" onclick={() => {props.editor._sync_controller.send_local_scene()}}>
                     <img src="assets/icons/send-file.svg" alt="Upload Scene" title="Upload Scene"/>

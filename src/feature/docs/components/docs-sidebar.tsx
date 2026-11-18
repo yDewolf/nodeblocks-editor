@@ -8,10 +8,12 @@ import { DocSearchBar } from './docs-searchbar';
 import { DocsHref } from './docs-reference';
 import { DocsPathUtils } from '~/feature/docs/helpers/docs-path-utils';
 import { MetadataStoreSubContent } from './docs-components';
+import { useI18n } from '~/i18n/i18n-context';
 
 export const DocsSidebar = (props: {
     docs_data?: DocPayload
 }) => {
+    const { t } = useI18n();
     const docs = useDocs();
     const loaded_docs = createMemo(() => {
         return Object.keys(docs.allDocs);
@@ -63,7 +65,7 @@ export const DocsSidebar = (props: {
             </div>
             <div class="tab-history scrollable keep fill container">
                 <Switch fallback={
-                    <p>Previous tabs will show up here</p>
+                    <p>{t("pages.docs.messages.previousTabsShowUp")}</p>
                 }>
                     <Match when={docs.opened_tabs.length > 0}>
                         <For each={docs.opened_tabs.toReversed()}>

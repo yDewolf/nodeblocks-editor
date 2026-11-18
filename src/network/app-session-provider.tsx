@@ -8,8 +8,8 @@ const AppSessionContext = createContext<AppSessionManager>();
 export const AppSessionProvider: ParentComponent<{
     appSession: AppSessionManager
 }> = (props) => {
-  const initialSession = createAsync(() => getUserSession());
-  props.appSession.setUserSession(initialSession());
+  const initialSession = getUserSession();
+  props.appSession.setUserSession(initialSession);
   return (
     <AppSessionContext.Provider value={props.appSession}>
       {props.children}

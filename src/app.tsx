@@ -4,37 +4,77 @@ import { Router, Route, Navigate } from "@solidjs/router";
 import SceneEditor from "./feature/editor/scene-editor-route";
 import { AppSessionProvider } from "./network/app-session-provider";
 import { AppSessionManager } from "./network/app-session-manager";
-import { createEffect } from "solid-js";
-import { UpdateRootDataTheme } from "./feature/ui-themes";
+import { createEffect, onMount } from "solid-js";
+import { appSettings, UpdateRootDataTheme } from "./feature/app-settings";
 import { ContextMenuPortal } from "./feature/context-menu/context-menu-component";
-import {} from "~/feature/ui-themes";
-
 import { Home } from "./feature/home/home-route";
 import { ScenesRoute } from "./feature/home/scenes/scenes-view";
 import { PackageManagerProvider } from './feature/editor/contexts/package-manager-context';
 import DocsRoute from "./feature/docs/docs-route";
+import { SettingsRoute } from "./feature/home/settings/settings-route";
+import { getActiveServerUrl } from "./server/connected-server";
+import { SetupScreen } from "./feature/setup/setup-route";
+import { I18nProvider } from "./i18n/i18n-context";
+import { localServerController } from "./network/api/local-server-controller";
+import { ComponentEventHandler } from './feature/editor/tools/base-tool';
+import { AppSettingsContent } from "./feature/home/settings/app-settings-view";
+import { EditorSettingsContent } from "./feature/editor/screens/settings-view";
+import { LocalServerSettingsContent } from "./feature/local-server/local-server-settings";
+
+declare global {
+  interface Window {
+    isTauriEnvironment?: boolean;
+  }
+}
 
 const app_session = new AppSessionManager();
 export default function App() {
-    createEffect(() => {
-      UpdateRootDataTheme();
-    });
+  const connectToServer = async () => {
+    const activeServerUrl = await getActiveServerUrl();
+    const parsedUrl = new URL(activeServerUrl);
 
-    return (
+    const serverHost = parsedUrl.hostname;
+    const serverPort = Number.parseInt(parsedUrl.port) || (parsedUrl.protocol === "https:" ? 443 : 80);
+    
+    app_session.tryConnectToServer(serverHost, serverPort);
+  };
+
+  onMount(async () => {
+    if (appSettings.autoStartLocalServer && !localServerController.isRunning) {
+      await localServerController.startServer();
+    }
+    await connectToServer();
+  });
+
+  createEffect(() => {
+    UpdateRootDataTheme();
+  });
+
+  return (
+    <I18nProvider>
       <AppSessionProvider appSession={app_session}>
-        <PackageManagerProvider>
-          <main>
-            <ContextMenuPortal />
-            <Router>
-                <Route path="/" component={Home}>
-                  <Route path="" component={() => <Navigate href="/scenes" />} />
-                  <Route path="scenes" component={ScenesRoute}/>
-                  <Route path="docs" component={DocsRoute}/>
-                </Route>
-                <Route path="/scene/:scene_id" component={SceneEditor} />
-            </Router>
-          </main>
-        </PackageManagerProvider>
+        <SetupScreen>
+          <PackageManagerProvider>
+            <main>
+              <ContextMenuPortal />
+              <Router>
+                  <Route path="/" component={Home}>
+                    <Route path="" component={() => <Navigate href="/scenes" />}/>
+                    <Route path="scenes" component={ScenesRoute}/>
+                    <Route path="docs" component={DocsRoute}/>
+                    <Route path="settings" component={SettingsRoute}>
+                      <Route path="" component={() => <Navigate href="/settings/general" />}/>
+                      <Route path="general" component={AppSettingsContent}/>
+                      <Route path="editor" component={EditorSettingsContent}/>
+                      <Route path="localServer" component={LocalServerSettingsContent}/>
+                    </Route>
+                  </Route>
+                  <Route path="/scene/:scene_id" component={SceneEditor} />
+              </Router>
+            </main>
+          </PackageManagerProvider>
+        </SetupScreen>
       </AppSessionProvider>
-    );
+    </I18nProvider>
+  );
 }

@@ -17,6 +17,7 @@ import { useNotifications } from "~/feature/editor/contexts/notification-context
 import { editorSettings } from "~/feature/editor/editor-settings";
 import { NodeInstanceFactory } from "~/feature/editor/engine/helpers/node-instance-factory";
 import { NodeParamField } from "./node-field";
+import { useI18n } from "~/i18n/i18n-context";
 
 // TODO: create a setting for this
 const USE_ANCHORED_NODES: boolean = true;
@@ -84,19 +85,10 @@ export const NodeComponent = (props: {
     );
 };
 
-export const NodePreview = (props: {spec: NodeTypeSpec}) => {
-    return (
-        <NodeComponentV2
-            spec={props.spec}
-            default_show_output={false}
-            default_show_slot_labels={true}
-        />
-    )
-}
-
 export const NodeComponentV2 = (props: {
     node?: SceneNode, spec?: NodeTypeSpec
     default_show_output?: boolean
+    default_expanded?: boolean
     default_show_slot_labels?: boolean
 }) => {
     let ref_node = props.node;
@@ -107,7 +99,7 @@ export const NodeComponentV2 = (props: {
         throw new Error("Reference node can't be undefined on NodeComponent. 'node' field or 'constructor' should be set");
     }
     // const node_meta = metadata.get_node_meta(ref_node.fqn);
-    const [isExpanded, setIsExpanded] = createSignal(false);
+    const [isExpanded, setIsExpanded] = createSignal(props.default_expanded ?? false);
     const [isHovered, setIsHovered] = createSignal(props.default_show_slot_labels ?? false);
 
     createEffect(() => {
@@ -279,13 +271,14 @@ const AnchoredSlotGrid = (props: {
 export const NodeBodySections = (props: {
     node: SceneNode, 
 }) => {
+    const {t} = useI18n();
     return (
         <div 
             class="node-body-sections container fill"
             onpointerdown={(e) => e.stopImmediatePropagation()}
         >
             <Show when={Object.keys(props.node.parameters).length > 0}>
-                <DropdownSection header="Parameters" content={
+                <DropdownSection header={t("node.parameters")} content={
                     <div class="field-grid-holder">
                         <For each={Object.entries(props.node.parameterSpecs)}>
                             {([paramId, paramSpec]) => <NodeParamField
@@ -299,7 +292,7 @@ export const NodeBodySections = (props: {
                 }/>
             </Show>
             <DropdownSection 
-                header="Output" 
+                header={t("node.output")}
                 content={
                     <NodeOutput node={props.node}/>
                 }

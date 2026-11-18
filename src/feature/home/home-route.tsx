@@ -1,8 +1,9 @@
-import { JSXElement, ParentComponent } from "solid-js";
-import { useAppSession } from "~/network/app-session-provider"
+import { ParentComponent } from "solid-js";
 import { HomeLeftTab } from "./components/home-left-tab";
 import FileIcon from '~/assets/icons/file.svg';
 import DocsIcon from '~/assets/icons/book.svg';
+import { useI18n } from "~/i18n/i18n-context";
+import { RouteDisplayConfig } from "../routing/route-display";
 
 export const Home: ParentComponent = (props) => {
     return (
@@ -12,22 +13,17 @@ export const Home: ParentComponent = (props) => {
     )
 }
 
-export interface HomeRouteConfig {
-    iconElement: () => JSXElement
-    label: string
-    route: string
-}
-
 const HomeView: ParentComponent = (props) => {
-    const routes: HomeRouteConfig[] = [
+    const { t } = useI18n();
+    const routes: RouteDisplayConfig[] = [
         {
             iconElement: () => <FileIcon class="smaller-icon" />,
-            label: "Scenes",
+            label: t("routes.scenes"),
             route: "/scenes"
         },
         {
             iconElement: () => <DocsIcon class="smaller-icon"/>,
-            label: "Documentation",
+            label: t("routes.docs"),
             route: "/docs"
         }
     ]
@@ -35,7 +31,7 @@ const HomeView: ParentComponent = (props) => {
     return (
         <div class="home-view">
             <HomeLeftTab routes={routes} />
-            <div class="home-content-holder fill">
+            <div class="home-content-holder container scrollable fill">
                 {props.children}
             </div>
         </div>

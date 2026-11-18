@@ -3,6 +3,7 @@ import { DataTypeValuePack } from "./datatype-value-view";
 import { ScalarView } from "./scalar-view";
 import { DefaultDataTypes } from "~/protocols/nodeblocks/manifests/node/datatype-enums";
 import { NDArrayView } from "~/protocols/nodeblocks/utils/ndarray_view";
+import { useI18n } from "~/i18n/i18n-context";
 
 const ArrayCanvas = (props: { data: any, shape: number[], target_channel: number }) => {
     let canvasRef: HTMLCanvasElement | undefined;
@@ -111,7 +112,8 @@ const get_array_shape = (array: any): number[] => {
 };
 
 export const ArrayView = (props: { output_value?: DataTypeValuePack }) => {
-    if (!props.output_value) return <div>Empty</div>;
+    const {t} = useI18n();
+    if (!props.output_value) return <div>{t("words.empty")}</div>;
     const [target_channel, setTargetChannel] = createSignal(0);
     const shape = createMemo(() => {
         if (props.output_value?.value_meta?.type === DefaultDataTypes.ARRAY && props.output_value?.value_meta?.shape) {
@@ -136,12 +138,12 @@ export const ArrayView = (props: { output_value?: DataTypeValuePack }) => {
         <div class="output-array-container container">
             <div class="field-grid-holder">
                 <div class="field-grid">
-                    <span class="field-value-label">Shape</span>
+                    <span class="field-value-label">{t("datatype.shape")}</span>
                     <span class="field-value">({shape().join(", ")})</span>
                 </div>
                 <Show when={channelCount() > 1 && channelCount() != 3 && channelCount() != 4}>
                     <div class="field-grid">
-                        <label class="field-value-label" for="target-channels">Channel:</label>
+                        <label class="field-value-label" for="target-channels">{t("datatype.channel")}</label>
                         <div class="field-value">
                             <select 
                                 value={target_channel()} 
@@ -169,8 +171,7 @@ export const ArrayView = (props: { output_value?: DataTypeValuePack }) => {
                     </Match>
                     <Match when={dims() > 3}>
                         <div class="simplified-view">
-                            High-dimensional tensor. 
-                            Size: {shape().reduce((a, b) => a * b, 1)} elements
+                            {t("datatype.message.highDimTensor", shape().reduce((a, b) => a * b, 1))}
                         </div>
                     </Match>
                 </Switch>

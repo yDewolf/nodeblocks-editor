@@ -8,14 +8,15 @@ import { useEditor } from "~/feature/editor/contexts/scene-editor-context"
 import { useNotifications } from "../../contexts/notification-context"
 import { BaseNotification, SidebarNotifications } from "../notification-badges"
 import { LOCAL_DOCS_ID } from "~/feature/docs/docs-resolver"
+import { useI18n } from "~/i18n/i18n-context"
 
 const NotificationLog = (props: {node?: SceneNode}) => {
     const notificationController = useNotifications();
     
-    const all_notifications = createMemo(() => [...notificationController.forAll(),]);
+    const all_notifications = createMemo(() => [...(notificationController?.forAll() ?? []),]);
     const notifications = createMemo(() => {
         if (props.node) {
-            return notificationController.relatedToNode(props.node);
+            return notificationController?.relatedToNode(props.node);
         }
 
         return all_notifications();

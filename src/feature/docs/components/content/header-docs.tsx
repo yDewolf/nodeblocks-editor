@@ -5,14 +5,16 @@ import { SimpleField, FieldValueDisplayer } from "~/components/input-fields";
 import { unixToDate } from "~/utils/time-utils";
 import { DocsTags } from "../docs-components";
 import { MetadataContentIndex } from "../docs-sidebar";
+import { useI18n } from "~/i18n/i18n-context";
 
 export const HeaderDocsContent = (props: {
     path: string | undefined,
     data?: MetadataHeader,
     devMode: boolean
 }) => {
+    const { t } = useI18n();
     if (!props.data) {
-        return <span>Couldn't load documentation</span>
+        return <span>{t("messages.errorWhile", t("pages.docs.loadDocs"))}</span>
     }
     const docs = useDocs();
     const metadata = createMemo(() => {
@@ -26,22 +28,22 @@ export const HeaderDocsContent = (props: {
         <div class="keep fill container docs-sections">
             <div class="text-section">
                 <h3>Info</h3>
-                <SimpleField field_name="id" field_displayer={
+                <SimpleField field_name={t("words.id")} field_displayer={
                     () => <FieldValueDisplayer value_element={() => <input readonly value={props.data?.package_id} id={props.data?.package_id + "-id"}/>}/>
                 } field_id={props.data?.package_id + "-id"}/>
-                <SimpleField field_name="version" field_displayer={
+                <SimpleField field_name={t("words.version")} field_displayer={
                     () => <FieldValueDisplayer value_element={() => <input readonly value={props.data?.package_version} id={props.data?.package_id + "-version"}/>}/>
                 } field_id={props.data?.package_id + "-version"}/>
-                <SimpleField field_name="meta_version" field_displayer={
+                <SimpleField field_name={t("pages.docs.labels.meta_version")} field_displayer={
                     () => <FieldValueDisplayer value_element={() => <input readonly value={props.data?.meta_version} id={props.data?.package_id + "-meta_version"}/>}/>
                 } field_id={props.data?.package_id + "-meta_version"}/>
-                <SimpleField field_name="last_modified" field_displayer={
+                <SimpleField field_name={t("pages.docs.labels.last_modified")} field_displayer={
                     () => <FieldValueDisplayer value_element={() => <input readonly value={unixToDate(props.data?.last_modified ?? 0)} id={props.data?.package_id + "-last_modified"}/>}/>
                 } field_id={props.data?.package_id + "-last_modified"}/>
             </div>
-            <DocsTags section_title="All tags" docs_data={{type: "header", data: props.data}}/>
+            <DocsTags section_title={t("pages.docs.sections.allTags")} docs_data={{type: "header", data: props.data}}/>
             <div class="text-section">
-                <h3>Index</h3>
+                <h3>{t("words.index")}</h3>
                 <MetadataContentIndex data={metadata()} root_id={props.data.package_id}/>
             </div>
         </div>

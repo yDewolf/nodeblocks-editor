@@ -1,0 +1,75 @@
+@layer custom {
+    .wizard {
+        width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        
+        background-color: var(--dark-overlay-background);
+        color: var(--font-color);
+    }
+
+    .wizard-step-list {
+        padding: 0;
+        list-style: none;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .wizard-steps {
+        margin-bottom: 40px;
+    }
+
+    .wizard-position {
+        font-size: 0.8rem;
+    }
+
+    .wizard-title {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .wizard-holder {
+        padding: 40px;
+        height: 100%;
+        max-height: calc(100% - 40px * 2);
+        width: calc(100% - (40px * 2));
+        justify-content: space-between;
+        
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        grid-template-columns: 1fr;
+    }
+
+    .wizard-body {
+        width: 70%;
+        margin: 0 auto;
+        padding-bottom: 20px;
+
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+    }
+    
+    .setup-options {
+        margin-top: 30px;
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    .wizard-footer {
+        justify-content: space-between;
+    }
+
+    .setup-actions {
+        margin-top: auto;
+        display: flex;
+        gap: 10px;
+        justify-content: right;
+    }
+    
+    .wizard-error {
+        margin-top: 20px;
+        color: var(--secondary-font-color);
+    }
+}

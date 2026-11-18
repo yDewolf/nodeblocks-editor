@@ -1,4 +1,5 @@
 import { For, JSXElement, ParentComponent, Show } from "solid-js";
+import { useI18n } from "~/i18n/i18n-context";
 
 
 export const ModalOverlay: ParentComponent<{
@@ -7,6 +8,7 @@ export const ModalOverlay: ParentComponent<{
     isModalOpened: () => boolean
     buttons?: JSXElement[]
 }> = (props) => {
+    const { t } = useI18n(); 
     return (
         <Show when={props.isModalOpened()}>
             <div class="modal-overlay">
@@ -21,7 +23,7 @@ export const ModalOverlay: ParentComponent<{
                     <div class="modal-bottom">
                         <div class="row-container">
                             <button class="text-button" onclick={props.closeModal}>
-                                Close
+                                {t("words.close")}
                             </button>
                             <For each={props.buttons ?? []}>
                                 {(button) => button}

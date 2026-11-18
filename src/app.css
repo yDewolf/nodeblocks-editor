@@ -5,6 +5,10 @@
 @import url("style/components/import.css") layer(reset);
 @import url("style/containers.css") layer(reset);
 
+:root {
+  --default-border-radius: 2px;
+}
+
 @layer reset {
   * {
     margin: 0;

@@ -5,16 +5,18 @@
     "dev": "npm run build:protos && vite dev",
     "build": "npm run build:protos && vite build",
     "preview": "vite preview",
-    
     "build:protos": "pbjs -t static-module -w es6 -p src/protocols/nodeblocks/protos -o src/protocols/nodeblocks/generated/proto.js src/protocols/nodeblocks/protos/**/*.proto && pbts -o src/protocols/nodeblocks/generated/proto.d.ts src/protocols/nodeblocks/generated/proto.js"
   },
   "dependencies": {
+    "@solid-primitives/i18n": "^2.2.1",
     "@solid-primitives/map": "^0.7.3",
     "@solid-primitives/storage": "^4.3.4",
     "@solidjs/router": "^1.0.0",
-    "@solidjs/start": "^2.0.0",
+    "@solidjs/start": "^2.2.2",
+    "@tauri-apps/api": "^2.12.4",
+    "@tauri-apps/plugin-opener": "^2.7.3",
     "nanoid": "^5.1.9",
-    "nitro": "^3.0.260610-beta",
+    "nitro": "^3.0.261103-rc",
     "protobufjs": "^8.8.1",
     "solid-js": "^1.9.5",
     "solid-transition-group": "^0.3.0",
@@ -24,6 +26,7 @@
     "node": ">=24"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4",
     "@types/node": "^26.6.5",
     "protobufjs-cli": "^2.7.1",
     "vite-plugin-solid-svg": "^0.8.1"

@@ -6,6 +6,7 @@ import { ScalarView } from "./scalar-view";
 import { MarkdownText } from "~/feature/editor/components/markdown-text";
 import { DataTypeValueMeta } from "~/protocols/nodeblocks/manifests/node/datatype-value-meta";
 import { ArtifactView } from './artifact-view';
+import { useI18n } from "~/i18n/i18n-context";
 
 
 export interface DataTypeValuePack {
@@ -18,10 +19,13 @@ export interface DataTypeValuePack {
 }
 
 export const DataTypeValueSelector = (props: { value?: DataTypeValuePack; }) => {
+    const {t} = useI18n();
     return (
-        <Show when={props.value} fallback={<span class="none">No Value</span>}>
-            {(output) => <Show when={props.value?.value != undefined} fallback={<span class="none">No Value</span>}>
-                <Switch>
+        <Show when={props.value} fallback={<span class="none">{t("datatype.message.noValue")}</span>}>
+            {(output) => <Show when={props.value?.value != undefined} fallback={<span class="none">{t("datatype.message.noValue")}</span>}>
+                <Switch fallback={
+                        <span>{t("datatype.message.rendererNotImplemented")}</span>
+                }>
                     <Match when={output().renderer === DefaultRenderers.SCALAR}>
                         <ScalarView output_value={props.value} />
                     </Match>
@@ -37,9 +41,6 @@ export const DataTypeValueSelector = (props: { value?: DataTypeValuePack; }) => 
                     </Match>
                     <Match when={output().renderer === DefaultRenderers.FILE}>
                         <ArtifactView artifact_name={props.value?.value} root_id={props.value?.font_id}/>
-                    </Match>
-                    <Match when={output().renderer === DefaultRenderers.NOT_IMPLEMENTED}>
-                        <span>Can't render Unknown Type</span>
                     </Match>
                 </Switch>
             </Show>}

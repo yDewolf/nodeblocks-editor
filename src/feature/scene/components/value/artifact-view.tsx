@@ -1,5 +1,6 @@
 import { createResource, Show } from "solid-js";
 import { useSceneArtifacts } from "~/feature/editor/contexts/artifact-context";
+import { useI18n } from "~/i18n/i18n-context";
 
 
 // TODO: style
@@ -8,6 +9,7 @@ export const ArtifactView = (props: {
     artifact_name: string,
     root_id?: string
 }) => {
+    const { t } = useI18n();
     const artifacts = useSceneArtifacts();
     const [artifactUrl] = createResource(
         () => props.artifact_name, 
@@ -17,11 +19,11 @@ export const ArtifactView = (props: {
     return (
         <div class="artifact-container">
             <Show when={artifactUrl.loading}>
-                <span>Carregando artefato...</span>
+                <span>{t("messages.loading", t("words.artifact"))}</span>
             </Show>
 
             <Show when={artifactUrl.error}>
-                <span>Erro ao carregar imagem.</span>
+                <span>{t("messages.errorWhile", t("actions.loadImage"))}</span>
             </Show>
 
             <Show when={artifactUrl()}>

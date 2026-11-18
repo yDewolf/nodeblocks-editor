@@ -21,8 +21,10 @@ import { nanoid } from 'nanoid';
 import { setMainCameraPos, setMainCameraZoom } from './editor-state';
 import { EditorLoadingOverlay } from './components/subpanels/editor-loading-overlay';
 import "~/style/screens/editor.css";
+import { useI18n } from '~/i18n/i18n-context';
 
 export const EditorView = () => {
+    const {t} = useI18n();
     const editor = useEditor();
     const main_page_viewer = new PageViewer();
     
@@ -32,7 +34,7 @@ export const EditorView = () => {
     // FIXME: Implement a better way of indexing pages on a pageviewer and accessing them
     const DocsCallback = () => <DocsView />;
     const docsPage = {
-        page_title: "Documentation",
+        page_title: t("words.documentation"),
         view_displayer_css: "docs-view",
         icon_element: () => <MinimizeIcon class="small-icon"/>,
         element: DocsCallback
@@ -72,7 +74,7 @@ export const EditorView = () => {
         <SceneProvider 
             scene={editor.scene} 
             actionController={editor.actionController}
-          >
+        >
             <SceneRuntimeProvider manager={editor.runtimeController}>
                 <NotificationProvider controller={editor.notificationController}>
                     <SceneCanvasProvider canvasSpace={mainSpace} elementController={editor.elementController}>
@@ -82,7 +84,7 @@ export const EditorView = () => {
                             onPointerUp={(e) => {editor.inputManager.onPointerUp(e); editor.toolController.current_tool?.globalOnPointerUp(e)}}
                             onPointerDown={(e) => {editor.toolController.current_tool?.globalOnPointerDown(e)}}
                             onPointerMove={(e) => editor.toolController.current_tool?.globalOnPointerMove(e)}
-                            >
+                        >
                             <EditorSceneCanvas setWorldSpaceRef={setWorldSpaceRef}></EditorSceneCanvas>
                             <EditorLoadingOverlay />
                             <div
@@ -98,6 +100,6 @@ export const EditorView = () => {
                     </SceneCanvasProvider>
                 </NotificationProvider>
             </SceneRuntimeProvider>
-          </SceneProvider>
+        </SceneProvider>
     );
 }

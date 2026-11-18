@@ -8,9 +8,9 @@
     align-content: center;
 }
 
-div {
+/* div {
     border-radius: var(--default-border-radius);
-}
+} */
 
 .view-displayer {
     padding: 4px;
@@ -137,6 +137,24 @@ svg.smaller-icon {
 
 .fill {
     width: stretch;
+}
+
+pre {
+    padding: 4px;
+    overflow: auto;
+
+    width: stretch;
+    /* max-width: 500px; */
+    max-height: 200px;
+    
+    border: 1px solid var(--stroke-color);
+    background-color: var(--dark-overlay-highlight);
+}
+
+.preview-holder {
+    display: flex;
+    padding: 20px;
+    overflow: hidden;
 }
 
 @media only screen and (max-width: 768px) {

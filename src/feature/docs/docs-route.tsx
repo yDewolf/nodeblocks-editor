@@ -27,6 +27,7 @@ export default function DocsRoute() {
                 when={appSession.isAuthenticated() && isMounted()} 
                 fallback={
                     <div>
+                        You must authenticate to view Documentation
                     </div>
                 }
             >

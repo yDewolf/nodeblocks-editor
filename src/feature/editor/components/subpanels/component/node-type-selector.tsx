@@ -3,7 +3,7 @@ import { ensureScene } from "~/feature/scene/scene-context";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
-import { NodePreview } from "~/feature/scene/components/node/node-component";
+import { NodePreview } from "~/feature/scene/components/node/node-previews";
 
 
 export const NodeTypeSelector = (props: {

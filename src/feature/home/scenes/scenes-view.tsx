@@ -1,10 +1,9 @@
-import { createSignal, onMount, Show, For, ParentComponent, createEffect } from "solid-js";
+import { createSignal, onMount, Show, For, ParentComponent, createEffect, onCleanup } from "solid-js";
 import { SceneHTTPController } from "~/network/api/scene-http-controller";
 import { useAppSession } from "~/network/app-session-provider";
 import { UserSessionData } from "~/network/protocols/user-session";
 import { Dropdown } from '../../../components/panels/dropdown';
 import ArrowRightIcon from '~/assets/icons/arrow-right.svg';
-import { PackageManagerHTTPController } from "~/network/api/package-http-controller";
 import { usePackageManager } from "~/feature/editor/contexts/package-manager-context";
 import { SceneCard } from "./components/scene-card";
 
@@ -12,18 +11,24 @@ import RefreshIcon from '~/assets/icons/refresh.svg';
 import "~/style/screens/home/scenes.css";
 import { SceneEditModal } from "./components/scene-edit-modal";
 import { ScenePermissionsMenu } from './components/scene-perms-menu';
+import { useI18n } from "~/i18n/i18n-context";
+import { PackageManagerHTTPController } from "~/network/api/package-http-controller";
 
 export const ScenesRoute: ParentComponent = (props) => {
     const appSession = useAppSession();
     const packageManager = usePackageManager();
+    const packageController = new PackageManagerHTTPController(appSession);
+
+    const unlisten = appSession.listenServerChange(() => {
+        packageController.fetchAndLoadManifests(packageManager);
+    });
+    onCleanup(() => unlisten);
 
     const sceneController = new SceneHTTPController(appSession);
-    const packageController = new PackageManagerHTTPController(appSession);
 
     const [isMounted, setIsMounted] = createSignal(false);
     onMount(() => {
         setIsMounted(true);
-        packageController.fetchAndLoadManifests(packageManager);
     });
 
     return (
@@ -38,6 +43,8 @@ export const ScenesView = (props: {
     sessionData?: UserSessionData,
     sceneController: SceneHTTPController
 }) => {
+    const appSession = useAppSession();
+    const { t } = useI18n();
     const [sceneName, setSceneName] = createSignal<string>("");
     const [isEditModalOpen, setIsEditModalOpen] = createSignal(false);
     const [activeSceneId, setActiveSceneId] = createSignal<string | null>(null);
@@ -65,25 +72,25 @@ export const ScenesView = (props: {
     return (
         <div class="container">
             <div class="keep row-container fill space-between">
-                <span><strong>Scenes</strong></span>
+                <span><strong>{t("pages.scenes.title")}</strong></span>
                 <div class="scenes-page-actions">
                     <Dropdown icon={
-                        <span>New Scene</span>
+                        <span>{t("pages.scenes.newScene")}</span>
                     } iconClass="text-button">
                         <Show when={props.sessionData} fallback={
-                            <span>You must authenticate before creating scenes</span>
+                            <span>{t("messages.mustBeAuthenticated", t("pages.scenes.actions.createScene"))}</span>
                         }>
                             {(sessionData) => {
                                 const [defaultPerm, setDefaultPerm] = createSignal<number>(0);
                                 return <>
                                     <div class="create-scene-action container">
                                         <div class="field-grid">
-                                            <label class="field-label" for="scene-name">Scene Id:</label>
+                                            <label class="field-label" for="scene-name">{t("pages.scenes.labels.sceneId")}</label>
                                             <input class="field-input" type="text" id="scene-name" oninput={(e) => setSceneName(e.target.value)} autocomplete="off"/>
                                         </div>
                                     </div>
                                     <div class="text-section">
-                                        <span>Default Permissions</span>
+                                        <span>{t("pages.scenes.defaultPermissions")}</span>
                                         <ScenePermissionsMenu 
                                             sessionData={sessionData()}
                                             initialPerms={0}
@@ -99,8 +106,8 @@ export const ScenesView = (props: {
                                             onclick={() => {
                                                 props.sceneController.createScene(sessionData().user_id, sceneName(), defaultPerm())
                                             }}
-                                            >
-                                            Create <ArrowRightIcon class="smaller-icon"/>
+                                        >
+                                            {t("words.create")} <ArrowRightIcon class="smaller-icon"/>
                                         </button>
                                     </div>
                                 </>
@@ -120,36 +127,40 @@ export const ScenesView = (props: {
                 }}>
                     <RefreshIcon class="smaller-icon"/>
                 </button>
-                <span class="center-content">Found {props.sceneController.scenes.length} scenes</span>
+                <span class="center-content">{t("pages.scenes.foundScenes", props.sceneController.scenes.length)}</span>
             </div>
-            <Show when={props.sessionData} fallback={
-                <span>You must log in to view scenes</span>
+            <Show when={appSession.isConnectedToServer} fallback={
+                <span>{t("messages.noConnectionWithServer")}</span>
             }>
-                {(sessionData) => <>
-                    <Show when={!props.sceneController.isLoading} fallback={
-                        <span>Loading Scenes...</span>
-                    }>
-                        <div class="scene-card-grid">
-                            <For each={props.sceneController.scenes}>
-                                {(scene) => <SceneCard listedScene={scene} fetchSceneData={fetchSceneData} editScene={editScene}/>}
-                            </For>
-                        </div>
-                    </Show>
-                    <Show when={activeSceneId()}>
-                        {(sceneId) => {
-                            const listedScene = props.sceneController.sceneIndex[sceneId()];
-                            return (
-                                <SceneEditModal 
-                                    sceneController={props.sceneController}
-                                    sessionData={sessionData()}
-                                    listedScene={listedScene}
-                                    closeModal={closeModal} 
-                                    isModalOpened={isEditModalOpen}
-                                />
-                            )
-                        }}
-                    </Show>
-                </>}
+                <Show when={props.sessionData} fallback={
+                    <span>{t("messages.mustBeAuthenticated", t("pages.scenes.actions.viewScenes"))}</span>
+                }>
+                    {(sessionData) => <>
+                        <Show when={!props.sceneController.isLoading} fallback={
+                            <span>{t("messages.loading", t("words.scenes"))}</span>
+                        }>
+                            <div class="scene-card-grid">
+                                <For each={props.sceneController.scenes}>
+                                    {(scene) => <SceneCard listedScene={scene} fetchSceneData={fetchSceneData} editScene={editScene}/>}
+                                </For>
+                            </div>
+                        </Show>
+                        <Show when={activeSceneId()}>
+                            {(sceneId) => {
+                                const listedScene = props.sceneController.sceneIndex[sceneId()];
+                                return (
+                                    <SceneEditModal 
+                                        sceneController={props.sceneController}
+                                        sessionData={sessionData()}
+                                        listedScene={listedScene}
+                                        closeModal={closeModal} 
+                                        isModalOpened={isEditModalOpen}
+                                    />
+                                )
+                            }}
+                        </Show>
+                    </>}
+                </Show>
             </Show>
         </div>
     )
