@@ -40,8 +40,10 @@ export default function App() {
   };
 
   onMount(async () => {
-    if (appSettings.autoStartLocalServer && !localServerController.isRunning) {
-      await localServerController.startServer();
+    if (localServerController.isInstalled) {
+      if (appSettings.autoStartLocalServer && !localServerController.isRunning) {
+        await localServerController.startServer();
+      }
     }
     await connectToServer();
   });

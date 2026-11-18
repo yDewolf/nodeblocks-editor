@@ -5,6 +5,7 @@ import { setupSteps } from "./setup-steps";
 import { WizardShell } from "./components/wizard-shell";
 import { useAppSession } from "~/network/app-session-provider";
 import { appSettings } from "../app-settings";
+import { localServerController } from "~/network/api/local-server-controller";
 
 export default function SetupWizard(props: { onFinished?: () => void, onCancel?: () => void }) {
     const appSession = useAppSession();
@@ -23,6 +24,7 @@ export default function SetupWizard(props: { onFinished?: () => void, onCancel?:
     );
 
     createEffect(() => {
+        wizard.setData("isLocalServerInstalled", localServerController.isInstalled);
         wizard.setData("isConnectedToAServer", appSession.isConnectedToServer);
         wizard.setData("isAuthenticated", appSession.isAuthenticated());
     });

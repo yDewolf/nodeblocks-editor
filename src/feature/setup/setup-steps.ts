@@ -27,21 +27,22 @@ export const setupSteps: SetupStep[] = [
         id: "localServerInstall",
         title: "Local Server Installation",
         view: LocalServerInstall,
-        when: (data) => data.localInstall
+        when: (data) => data.localInstall,
+        validate: (data) => data.isLocalServerInstalled ? null : "Server wasn't installed"
     },
     {
         id: "localServerSetup",
         title: "Local Server Setup",
         view: LocalServerSetup,
-        when: (data) => data.localInstall && data.isLocalServerInstalled,
-        validate: (data) => data.isConnectedToAServer ? null : "Must connect to a server before continuing"
+        when: (data) => data.localInstall,
+        validate: (data) => data.isLocalServerInstalled && data.isConnectedToAServer ? null : "Server wasn't setup properly"
     },
     {
         id: "serverPluginsSetup",
         title: "Plugins Setup",
         view: PluginSetupStep,
-        when: (data) => data.localInstall && data.isLocalServerInstalled,
-        validate: (data) => data.isConnectedToAServer ? null : "Must connect to a server before continuing"
+        when: (data) => data.localInstall,
+        validate: (data) => data.isLocalServerInstalled && data.isConnectedToAServer ? null : "Must connect to a server before continuing"
     },
     {
         id: "remoteServerSetup",

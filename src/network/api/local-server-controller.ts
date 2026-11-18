@@ -81,6 +81,16 @@ export class LocalServerController {
         this._setState("logs", []);
     }
 
+    public async installEnvironment(wheelUrl: string) {
+        if (!window.isTauriEnvironment) return;
+        try {
+            await invoke("ensure_environment", {wheelUrl: wheelUrl, removePrevious: true});
+            this.checkIsInstalled();
+        } catch (err) {
+            console.error("Failed to install server environment", err);
+        }
+    }
+
     public async checkIsInstalled() {
         if (!window.isTauriEnvironment) return;
         try {
@@ -90,7 +100,7 @@ export class LocalServerController {
             return this.isInstalled;
         
         } catch (err) {
-            console.error("Failed to check local server status:", err)
+            console.error("Failed to check local server status:", err);
         }
     }
 

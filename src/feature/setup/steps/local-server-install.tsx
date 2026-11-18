@@ -1,4 +1,3 @@
-import { invoke } from "@tauri-apps/api/core";
 import { UnlistenFn, listen } from "@tauri-apps/api/event";
 import { createSignal, onMount, onCleanup, Switch, Match, For, Show, createMemo, createEffect } from "solid-js";
 import { useI18n } from "~/i18n/i18n-context";
@@ -14,10 +13,6 @@ export const LocalServerInstall = () => {
     const {t} = useI18n();
     const [wheelUrl, setWheelUrl] = createSignal<string | null>(releaseController.serverReleases.at(0)?.server_wheel_url ?? null);
 
-    createEffect(() => {
-        wizard.setData("isLocalServerInstalled", localServerController.isInstalled);
-    });
-
     return (
         <>
             <Show when={localServerController.isInstalled}>
@@ -30,7 +25,9 @@ export const LocalServerInstall = () => {
                 <Show when={wheelUrl()}>
                     {(url) => <>
                         <br />
-                        <LocalServerInstaller wheelUrl={url()}/>
+                        <LocalServerInstaller wheelUrl={url()} onInstallFinish={() => {
+
+                        }}/>
                     </>}
                 </Show>
             </div>
@@ -78,7 +75,8 @@ export const ServerReleaseSelector = (props: {
 
 type InstallationPhase = "idle" | "installing" | "installed" | "error";
 export const LocalServerInstaller = (props: {
-    wheelUrl: string
+    wheelUrl: string,
+    onInstallFinish?: () => void
 }) => {
     const {t} = useI18n();
     const release = createMemo(() => releaseController.serverReleases.find((release) => release.server_wheel_url == props.wheelUrl));
@@ -96,9 +94,6 @@ export const LocalServerInstaller = (props: {
                     </div>
                     <InstallerContent
                         wheelUrl={props.wheelUrl} 
-                        onFinished={() => {
-
-                        }}
                         onError={(message) => {
 
                         }}
@@ -116,7 +111,7 @@ export const LocalServerInstaller = (props: {
 type Progress = { step: string; percent: number; message: string; };
 export const InstallerContent = (props: {
     wheelUrl: string,
-    onFinished: () => void,
+    onFinished?: () => void,
     onError: (message: string) => void,
 }) => {
     const {t} = useI18n();
@@ -137,9 +132,9 @@ export const InstallerContent = (props: {
         timer = setInterval(() => setElapsed((s) => s + 1), 1000);
      
         try {
-            await invoke("ensure_environment", {wheelUrl: props.wheelUrl, removePrevious: true});
+            localServerController.installEnvironment(props.wheelUrl);
             installedWheel = props.wheelUrl;
-            props.onFinished();
+            props.onFinished?.();
         } catch (e) {
             const error = String(e);
             setError(error);
