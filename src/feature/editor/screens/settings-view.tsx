@@ -22,6 +22,7 @@ export const EditorSettingsView = (props: {page_viewer: PageViewer}) => {
 export const EditorSettingsContent = (props: {
     withPreview?: boolean
 }) => {
+    const withPreview = props.withPreview ?? true;
     const { t } = useI18n();
     return (
         <>
@@ -34,7 +35,7 @@ export const EditorSettingsContent = (props: {
                     />
                 </div>
             </div>
-            <Show when={props.withPreview}>
+            <Show when={withPreview}>
                 <hr />
                 <h3>{t("words.preview")}</h3>
                 <div class="row-container preview-holder">

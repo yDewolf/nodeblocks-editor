@@ -8,9 +8,9 @@
     align-content: center;
 }
 
-div {
+/* div {
     border-radius: var(--default-border-radius);
-}
+} */
 
 .view-displayer {
     padding: 4px;

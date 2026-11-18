@@ -1,5 +1,4 @@
 import { createSignal, For, onMount, Show } from "solid-js"
-import { HomeRouteConfig } from "../home-route";
 import { useAppSession } from "~/network/app-session-provider";
 import "~/style/screens/home/home.css";
 import { Dropdown } from "~/components/panels/dropdown";
@@ -7,14 +6,13 @@ import { useLocation } from "@solidjs/router";
 import SettingsIcon from "~/assets/icons/settings.svg";
 import { useI18n } from "~/i18n/i18n-context";
 import { LoginForm } from "./login-form";
+import { RouteDisplayConfig, RouteRef } from "~/feature/routing/route-display";
 
 export const HomeLeftTab = (props: {
-    routes: HomeRouteConfig[]
+    routes: RouteDisplayConfig[]
 }) => {
     const { t } = useI18n();
     const appSession = useAppSession();
-    const [userId, setUserId] = createSignal<string>("");
-
     const [isMounted, setIsMounted] = createSignal(false);
     onMount(() => {
         setIsMounted(true);
@@ -39,33 +37,14 @@ export const HomeLeftTab = (props: {
                 </div>
                 <div class="home-left-tab-routes keep container fill">
                     <For each={props.routes}>
-                        {(route) => {
-                            const isActive = () => location.pathname === route.route;
-                            return (
-                                <a 
-                                    href={route.route} 
-                                    class="home-left-tab-route keep row-container align-center"
-                                    classList={{selected: isActive()}}                    
-                                >
-                                    {route.iconElement()}
-                                    <span class="home-route-label">
-                                        {route.label}
-                                    </span>
-                                </a>
-                            )
-                        }}
+                        {(route) => <RouteRef route={route} />}
                     </For>
                 </div>
-                <a 
-                    href="/settings"
-                    class="home-left-tab-route keep row-container align-center"
-                    classList={{selected: location.pathname == "/settings"}}
-                >
-                    <SettingsIcon class="smaller-icon"/>
-                    <span class="home-route-label">
-                        {t("words.settings")}
-                    </span>
-                </a>
+                <RouteRef route={{
+                    route: "/settings",
+                    iconElement: () => <SettingsIcon class="smaller-icon"/>,
+                    label: t("words.settings")
+                }} />
                 {/* TODO: add settings button here */}
             </div>
         </Show>

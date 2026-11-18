@@ -16,6 +16,10 @@ import { getActiveServerUrl } from "./server/connected-server";
 import { SetupScreen } from "./feature/setup/setup-route";
 import { I18nProvider } from "./i18n/i18n-context";
 import { localServerController } from "./network/api/local-server-controller";
+import { ComponentEventHandler } from './feature/editor/tools/base-tool';
+import { AppSettingsContent } from "./feature/home/settings/app-settings-view";
+import { EditorSettingsContent } from "./feature/editor/screens/settings-view";
+import { LocalServerSettingsContent } from "./feature/local-server/local-server-settings";
 
 declare global {
   interface Window {
@@ -58,7 +62,12 @@ export default function App() {
                     <Route path="" component={() => <Navigate href="/scenes" />}/>
                     <Route path="scenes" component={ScenesRoute}/>
                     <Route path="docs" component={DocsRoute}/>
-                    <Route path="settings" component={SettingsRoute}/>
+                    <Route path="settings" component={SettingsRoute}>
+                      <Route path="" component={() => <Navigate href="/settings/general" />}/>
+                      <Route path="general" component={AppSettingsContent}/>
+                      <Route path="editor" component={EditorSettingsContent}/>
+                      <Route path="localServer" component={LocalServerSettingsContent}/>
+                    </Route>
                   </Route>
                   <Route path="/scene/:scene_id" component={SceneEditor} />
               </Router>

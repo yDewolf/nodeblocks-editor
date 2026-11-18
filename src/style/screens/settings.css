@@ -10,8 +10,17 @@
         min-height: 200px;
     }
 
+    .settings-view-body {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 10px;
+    }
 
-    .settings-view-content {
-        margin-top: 20px;
+    .settings-index {
+        display: flex;
+        flex-direction: column;
+        width: fit-content;
+        gap: 10px;
     }
 }

@@ -1,0 +1,18 @@
+.route-reference {
+    padding: 0 4px;
+    text-decoration: none;
+    border-radius: var(--default-border-radius);
+    padding: 1px 8px;
+}
+
+.route-reference.selected {
+    background-color: var(--dark-overlay-highlight);
+}
+
+.route-reference:hover {
+    background-color: var(--overlay-highlight);
+}
+
+.route-reference .route-reference-label {
+    align-content: center;
+}

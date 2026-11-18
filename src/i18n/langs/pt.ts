@@ -95,6 +95,7 @@ export default {
             title: "Configurações",
             generalTitle: "Configurações Gerais",
             editorTitle: "Configurações do Editor",
+            localServerTitle: "Configurações do servidor local",
             openSetupWizard: "Abrir utilitário de instalação",
             remoteHost: {
                 hostLabel: "Host do servidor",
@@ -314,6 +315,9 @@ export default {
         state: "Estado",
         release: "Release",
         preRelease: "Pre-release",
-        originalPlugins: "Plugins originais"
+        originalPlugins: "Plugins originais",
+        general: "Geral",
+        editor: "Editor",
+        localServer: "Servidor Local"
     }
 } satisfies typeof en;

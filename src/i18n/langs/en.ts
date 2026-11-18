@@ -93,6 +93,7 @@ export default {
             title: "Settings",
             generalTitle: "General Settings",
             editorTitle: "Editor Settings",
+            localServerTitle: "Local Server Settings",
             openSetupWizard: "Open Setup Wizard",
             remoteHost: {
                 hostLabel: "Server Host",
@@ -311,6 +312,9 @@ export default {
         state: "State",
         release: "Release",
         preRelease: "Pre Release",
-        originalPlugins: "Original Plugins"
+        originalPlugins: "Original Plugins",
+        general: "General",
+        editor: "Editor",
+        localServer: "Local Server"
     }
 }

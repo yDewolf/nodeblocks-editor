@@ -1,8 +1,9 @@
-import { JSXElement, ParentComponent } from "solid-js";
+import { ParentComponent } from "solid-js";
 import { HomeLeftTab } from "./components/home-left-tab";
 import FileIcon from '~/assets/icons/file.svg';
 import DocsIcon from '~/assets/icons/book.svg';
 import { useI18n } from "~/i18n/i18n-context";
+import { RouteDisplayConfig } from "../routing/route-display";
 
 export const Home: ParentComponent = (props) => {
     return (
@@ -12,15 +13,9 @@ export const Home: ParentComponent = (props) => {
     )
 }
 
-export interface HomeRouteConfig {
-    iconElement: () => JSXElement
-    label: string
-    route: string
-}
-
 const HomeView: ParentComponent = (props) => {
     const { t } = useI18n();
-    const routes: HomeRouteConfig[] = [
+    const routes: RouteDisplayConfig[] = [
         {
             iconElement: () => <FileIcon class="smaller-icon" />,
             label: t("routes.scenes"),
