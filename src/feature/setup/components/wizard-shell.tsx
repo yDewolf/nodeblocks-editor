@@ -22,11 +22,17 @@ export function WizardShell<TData extends object>(props: { wizard: WizardControl
                     <ul class="wizard-step-list">
                         <For each={wizard.visibleSteps}>
                             {(step, index) => (
-                                <li
-                                    aria-current={step.id === wizard.currentStepId ? "step" : undefined}
-                                    classList={{ done: wizard.isCompleted(step.id) }}
-                                >
-                                    <button class="text-button" type="button" disabled={!wizard.canGoTo(step.id)} onClick={() => wizard.goTo(step.id)}>
+                                <li>
+                                    <button 
+                                        class="wizard-step"
+                                        classList={{ 
+                                            done: wizard.isCompleted(step.id), 
+                                            current: step.id == wizard.currentStepId
+                                        }}
+                                        type="button" 
+                                        disabled={!wizard.canGoTo(step.id)} 
+                                        onClick={() => wizard.goTo(step.id)}
+                                    >
                                         {index() + 1}. {step.title}
                                     </button>
                                 </li>

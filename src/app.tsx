@@ -16,7 +16,6 @@ import { getActiveServerUrl } from "./server/connected-server";
 import { SetupScreen } from "./feature/setup/setup-route";
 import { I18nProvider } from "./i18n/i18n-context";
 import { localServerController } from "./network/api/local-server-controller";
-import { ComponentEventHandler } from './feature/editor/tools/base-tool';
 import { AppSettingsContent } from "./feature/home/settings/app-settings-view";
 import { EditorSettingsContent } from "./feature/editor/screens/settings-view";
 import { LocalServerSettingsContent } from "./feature/local-server/local-server-settings";

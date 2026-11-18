@@ -18,16 +18,18 @@ export const ScenesRoute: ParentComponent = (props) => {
     const appSession = useAppSession();
     const packageManager = usePackageManager();
     const packageController = new PackageManagerHTTPController(appSession);
-
     const unlisten = appSession.listenServerChange(() => {
         packageController.fetchAndLoadManifests(packageManager);
     });
     onCleanup(() => unlisten);
-
+    
     const sceneController = new SceneHTTPController(appSession);
 
     const [isMounted, setIsMounted] = createSignal(false);
-    onMount(() => {
+    onMount(async () => {
+        if (Object.keys(packageManager.getAllPackages()).length == 0) {
+            await packageController.fetchAndLoadManifests(packageManager);
+        }
         setIsMounted(true);
     });
 

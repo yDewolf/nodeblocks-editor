@@ -6,11 +6,11 @@
 }
 
 .route-reference.selected {
-    background-color: var(--dark-overlay-highlight);
+    background-color: var(--overlay-highlight);
 }
 
 .route-reference:hover {
-    background-color: var(--overlay-highlight);
+    background-color: var(--dark-overlay-highlight);
 }
 
 .route-reference .route-reference-label {
