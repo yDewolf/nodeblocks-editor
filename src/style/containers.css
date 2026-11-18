@@ -140,6 +140,7 @@ svg.smaller-icon {
 }
 
 pre {
+    font-size: 0.8rem;
     padding: 4px;
     overflow: auto;
 

@@ -5,6 +5,7 @@ export interface SetupData {
     localInstall: boolean,
     isLocalServerInstalled: boolean,
     isConnectedToAServer: boolean,
+    isServerReady: boolean,
     isAuthenticated: boolean,
 }
 
@@ -12,6 +13,7 @@ export const initialSetupData: SetupData = {
     localInstall: true,
     isLocalServerInstalled: false,
     isConnectedToAServer: false,
+    isServerReady: false,
     isAuthenticated: false,
 };
 

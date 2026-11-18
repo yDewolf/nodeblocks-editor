@@ -69,6 +69,9 @@ export class AppSessionManager {
     get defaultHeaders() { return this._defaultHeaders; }
     get isConnectedToServer() { return this._isConnectedToServer(); }
     get serverStatus() { return this._serverStatus(); }
+    get isLocal() {
+        return this.host == "127.0.0.1" || this.host == "localhost";
+    }
 
     public setUserSession(user_session?: UserSessionData | null) {
         if (!user_session?.user_id) {

@@ -1,10 +1,18 @@
 import { useI18n } from "~/i18n/i18n-context";
 import { useSetup } from "../setup-wizard-context";
 import { LocalServerPanel } from "~/feature/local-server/local-server-components";
+import { createEffect, Show } from "solid-js";
+import { useAppSession } from "~/network/app-session-provider";
+import { ServerStatuses } from "~/protocols/nodeblocks/network/server-events";
 
 export const PluginSetupStep = () => {
+    const appSession = useAppSession();
     const wizard = useSetup();
     const {t} = useI18n();
+
+    createEffect(() => {
+        wizard.setData("isServerReady", appSession.serverStatus == ServerStatuses.READY);
+    })
 
     return (
         <>
@@ -28,6 +36,9 @@ export const PluginSetupStep = () => {
             </details>
             <br />
             <h3>{t("pages.setupWizard.pluginsSetup.installTrustedPluginsOnly")}</h3>
+            <Show when={wizard.data.isServerReady}>
+                <span>{t("pages.setupWizard.pluginsSetup.pluginsSetupComplete")} <b>{t("pages.setupWizard.messages.youCanProceed")}</b></span>
+            </Show>
             <br />
             <LocalServerPanel/>
         </>

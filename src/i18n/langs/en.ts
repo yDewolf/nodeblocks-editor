@@ -156,7 +156,8 @@ export default {
                 pluginInstallStep2: "Download a plugin (.nbplugin file)",
                 pluginInstallStep3: "Place the file inside server plugins folder",
                 pluginInstallStep4: "Restart the server and verify if your plugin loaded correctly",
-                installTrustedPluginsOnly: "Only install plugins from trusted sources!"
+                installTrustedPluginsOnly: "Only install plugins from trusted sources!",
+                pluginsSetupComplete: "Plugins were loaded successfully"
             },
             createUser: {
                 editorRequiresUser: "To use the editor, you must create a user.",
@@ -237,15 +238,22 @@ export default {
             title: "Local Server Panel",
             serverVersion: "Server Version",
             serverStatus: "Server Status",
+            serverState: "Server State",
             starting: "Starting",
             running: "Running",
             stopped: "Stopped",
+            disconnected: "Disconnected",
+            connecting: "Connecting",
+            initializing: "Initializing",
+            setting_up: "Setting Up",
+            ready: "Ready",
+            failed: "Failed",
             stopServer: "Stop Server",
             connectToLocalServer: "Connect to Local Server",
             openPluginsFolder: "Open Plugins Folder",
             restartServer: "Restart Server",
             startLocal: "Start local server",
-            startingLocal: "Starting..."
+            startingLocal: "Starting...",
         },
         login: {
             username: "Username",

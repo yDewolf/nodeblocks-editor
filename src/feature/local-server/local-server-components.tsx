@@ -3,6 +3,7 @@ import { Show } from "solid-js";
 import { useI18n } from "~/i18n/i18n-context"
 import { localServerController, LocalServerStates } from "~/network/api/local-server-controller";
 import { useAppSession } from "~/network/app-session-provider";
+import { ServerStatuses } from "~/protocols/nodeblocks/network/server-events";
 
 export const LocalServerLogs = () => {
     const {t} = useI18n();
@@ -31,11 +32,19 @@ export const LocalServerPanel = (props: {
                 } />
             </div>
             <div class="field-grid">
-                <label for="">{t("components.localServerPanel.serverStatus")}</label>
+                <label for="">{t("components.localServerPanel.serverState")}</label>
                 <input type="text" disabled={true} value={
                     t(`components.localServerPanel.${localServerController.state.toString() as LocalServerStates}`)
                 } />
             </div>
+            <Show when={appSession.isLocal}>
+                <div class="field-grid">
+                    <label for="">{t("components.localServerPanel.serverStatus")}</label>
+                    <input type="text" disabled={true} value={
+                        t(`components.localServerPanel.${appSession.serverStatus.toString() as ServerStatuses}`)
+                    } />
+                </div>
+            </Show>
             <OpenPluginsButton />
             <div class="row-container">
                 <Show when={localServerController.isRunning} fallback={
@@ -61,7 +70,7 @@ export const LocalServerPanel = (props: {
                     <button class="text-button" onclick={() => {
                             appSession.tryConnectToServer("127.0.0.1", 8080);
                         }}
-                        disabled={(appSession.host == "127.0.0.1" || appSession.host == "localhost") && appSession.isConnectedToServer}
+                        disabled={(appSession.isLocal) && appSession.isConnectedToServer}
                     >
                         {t("components.localServerPanel.connectToLocalServer")}
                     </button>

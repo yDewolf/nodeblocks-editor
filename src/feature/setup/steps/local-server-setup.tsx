@@ -1,4 +1,3 @@
-import { appSettings, setAutoStartLocal } from "~/feature/app-settings";
 import { useSetup } from "../setup-wizard-context";
 import { createSignal, Show } from "solid-js";
 import { localServerController } from "~/network/api/local-server-controller";

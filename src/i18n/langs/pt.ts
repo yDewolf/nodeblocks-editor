@@ -159,7 +159,8 @@ export default {
                 pluginInstallStep2: "Baixe um plugin (arquivo .nbplugin)",
                 pluginInstallStep3: "Coloque o arquivo do plugin na pasta de plugins do servidor",
                 pluginInstallStep4: "Reinicie o servidor e verifique se o plugin foi carregado corretamente",
-                installTrustedPluginsOnly: "Instale apenas plugins de autores que você confia!"
+                installTrustedPluginsOnly: "Instale apenas plugins de autores que você confia!",
+                pluginsSetupComplete: "Os plugins foram carregados com sucesso"
             },
             createUser: {
                 editorRequiresUser: "Para usar o editor você deve criar um usuário.",
@@ -240,9 +241,16 @@ export default {
             serverOutput: "Saída do servidor",
             serverVersion: "Versão instalada",
             serverStatus: "Status do Servidor",
+            serverState: "Estado do Servidor",
             starting: "Iniciando",
             running: "Rodando",
             stopped: "Parado",
+            disconnected: "Desconectado",
+            connecting: "Conectando",
+            initializing: "Inicializando",
+            setting_up: "Preparando",
+            ready: "Pronto",
+            failed: "Falhou",
             stopServer: "Parar servidor",
             connectToLocalServer: "Conectar ao servidor local",
             openPluginsFolder: "Abrir pasta de plugins",

@@ -66,7 +66,7 @@ export const ServerReleaseSelector = (props: {
                     </button>
                 </div>
             </div>
-            <p class="note">{t("pages.setupWizard.install.releaseSourceNote")}<a href="https://github.com/yDewolf/nodeblocks-server/releases">Github Releases</a></p>
+            <p class="note">{t("pages.setupWizard.install.releaseSourceNote")} <a href="https://github.com/yDewolf/nodeblocks-server/releases">Github Releases</a></p>
             <p class="note">{t("pages.setupWizard.install.incompatibleReleasesNote")}</p>
             <p class="note">{t("pages.setupWizard.install.clientWasBuiltForVersion")}: <b>{SERVER_API_VERSION}</b></p>
         </>
