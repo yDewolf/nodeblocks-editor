@@ -255,6 +255,9 @@ export default {
             startLocal: "Start local server",
             startingLocal: "Starting...",
         },
+        searchbar: {
+            searchPlaceholder: "Search for something here",
+        },
         login: {
             username: "Username",
             login: "Login",

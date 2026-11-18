@@ -5,7 +5,7 @@ import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
 import { CanvasElementController } from "~/feature/scene/controllers/canvas-element-controller";
 import { createSignal } from "solid-js";
-import { NodeTypePreview } from "../components/subpanels/component/node-type-selector";
+import { NodeTypePreview } from "../components/subpanels/component/node-type-components";
 import { InputContext } from '../../../utils/keybinds/input-context';
 import { ConnSceneRequestData, NodeSceneRequestData } from "~/protocols/nodeblocks/network/message/commands/node-graph-commands";
 import { nanoid } from "nanoid";

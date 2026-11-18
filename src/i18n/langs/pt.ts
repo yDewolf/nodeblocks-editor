@@ -258,6 +258,9 @@ export default {
             restartServer: "Reiniciar servidor",
             startingLocal: "Iniciando..."
         },
+        searchbar: {
+            searchPlaceholder: "Busque por algo aqui",
+        },
         login: {
             username: "Nome de usuário",
             login: "Entrar",

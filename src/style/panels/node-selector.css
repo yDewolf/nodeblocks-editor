@@ -1,4 +1,37 @@
 @layer custom {
+  .node-type-selector-holder {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .nodetype-filter-holder {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .tag-filter-holder {
+    display: flex;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    gap: 10px;
+  }
+
+  .tag-filter {
+    display: flex;
+    background-color: var(--overlay-highlight);
+    border-radius: 8px;
+    padding: 0 6px;
+  }
+
+  .tag-filter * {
+    font-size: 0.7rem;
+  }
+  
+  .tag-filter .tag-icon,.tag-filter .smaller-icon {
+    width: 16px;
+  }
+
   .node-type-selector {
     height: 100%;
     overflow-y: scroll;

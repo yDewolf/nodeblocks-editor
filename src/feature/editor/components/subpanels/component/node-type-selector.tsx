@@ -1,10 +1,19 @@
-import { createSignal, createMemo, mapArray, Show, For } from "solid-js";
+import { createMemo, mapArray, For, createSignal, Show } from "solid-js";
 import { ensureScene } from "~/feature/scene/scene-context";
-import { Vector2 } from "~/protocols/nodeblocks/geometry";
-import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
-import { useEditor } from "~/feature/editor/contexts/scene-editor-context";
-import { NodePreview } from "~/feature/scene/components/node/node-previews";
+import { NodeTypePreview } from "./node-type-components";
+import { Dropdown } from '../../../../../components/panels/dropdown';
+import FilterIcon from '~/assets/icons/filter.svg';
+import { useI18n } from "~/i18n/i18n-context";
+import { SearchBar } from "~/components/search-bar";
+import TagIcon from '~/assets/icons/tag.svg';
+import CloseIcon from '~/assets/icons/close.svg';
 
+interface NodeTypeSearch {
+    package_id: string
+    type_id: string
+    capitalized_name: string
+    brief: string
+}
 
 export const NodeTypeSelector = (props: {
     onClickOnPreview: (node_preview: NodeTypePreview) => void
@@ -49,11 +58,84 @@ export const NodeTypeSelector = (props: {
     //     })
     // })
 
+    const handleSearch = (query: string): NodeTypeSearch[] => {
+        return [{
+            package_id: "placeholder",
+            type_id: "place",
+            capitalized_name: "Placeholder",
+            brief: "lorem ipsum"
+        }]
+    }
+
     return (
-        <div class="container" style={{
-            "overflow-x": "hidden",
-            width: "auto"
-        }}>
+        <div class="node-type-selector-holder">
+            <div class="container fill">
+                {SearchBar<NodeTypeSearch>(
+                    handleSearch,
+                    (result, setQuery) => (
+                        <div class="container fill">
+                            <div class="row-container space-between center-items">
+                                <span class="search-result-title">{result.capitalized_name}</span>
+                                <span class="search-result-root">
+                                    {result.type_id} ({result.package_id})
+                                </span>
+                            </div>
+                            <Show when={result.brief}>
+                                <p class="search-result-description">{result.brief}</p>
+                            </Show>
+                        </div>
+                    )
+                )}
+                <div class="nodetype-filter-holder">
+                    <div class="tag-filter-holder">
+                        {/*  */}
+                        <div class="tag-filter">
+                            {/*  */}
+                            <div class="keep row-container center-items">
+                                <TagIcon class="tag-icon"/>
+                                <span>place/holder</span>
+                            </div>
+                            <button class="icon-button" onclick={() => {
+                                
+                            }}>
+                                <CloseIcon class="smaller-icon"/>
+                            </button>
+                        </div>
+
+
+                        <div class="tag-filter">
+                            <div class="keep row-container center-items">
+                                <TagIcon class="tag-icon"/>
+                                <span>place/holder</span>
+                            </div>
+                            <button class="icon-button" onclick={() => {
+                                
+                            }}>
+                                <CloseIcon class="smaller-icon"/>
+                            </button>
+                        </div>
+                        <div class="tag-filter">
+                            <div class="keep row-container center-items">
+                                <TagIcon class="tag-icon"/>
+                                <span>place/holder</span>
+                            </div>
+                            <button class="icon-button" onclick={() => {
+                                
+                            }}>
+                                <CloseIcon class="smaller-icon"/>
+                            </button>
+                        </div>
+
+                        
+                    </div>
+                    <Dropdown icon={<FilterIcon class="smaller-icon"/>}>
+
+                    </Dropdown>
+                </div>
+            </div>
+            <div class="container fill" style={{"background-color": "red"}}>
+                
+            </div>
             {/* <div class="container fill" style={{color: "white"}}>
                 <div class="keep row-container">
                     <h3>Categories</h3>
@@ -82,76 +164,66 @@ export const NodeTypeSelector = (props: {
                     </button>
                 </Show>
             </div> */}
-            <div class="node-type-selector">
+            {/* <div class="node-type-selector">
                 <For each={node_previews()}>
                     {(item) => item.View(props.onClickOnPreview)}
                 </For>
-            </div>
+            </div> */}
         </div>
     );
 }
 
 
-export class NodeTypePreview {
-    private _set_selected: (v: boolean) => void;
-    private _selected: () => boolean;
+export const NodeTypeSearchbar = () => {
+    const { t } = useI18n();
+    let containerRef: HTMLDivElement | undefined;
+    const [query, setQuery] = createSignal("");
+    const [isFocused, setIsFocused] = createSignal(false);
 
-    constructor(
-        private readonly _spec: NodeTypeSpec
-    ) {
-        [this._selected, this._set_selected] = createSignal(false);
-    }
-
-    get nodetype() { return this._spec.fqn; }
-    get spec() { return this._spec; }
-    set selected(value: boolean) { this._set_selected(value) }
-
-    public View(onPointerDown: (node_preview: NodeTypePreview) => void) {
-        return (
-            <div 
-                has-docs={true}
-                onPointerDown={() => onPointerDown(this)}
-                class="node-type-preview"
-                classList={{
-                    "selected-node-type": this._selected()
-                }}
-                style={{
-                    cursor: "pointer"
-                }}
-            >
-                <div class="remove-input">
-                    <NodePreview spec={this._spec}/>
-                </div>
-            </div>
-        );
-    };
-}
-
-
-export const SelectedNodeType = (props: {
-    node_pos: Vector2, 
-}) => {
-    const editor = useEditor();
-    const PreviewComponent = () => {
-        if (!editor.selectionController.selected_node_type) {
-            return null;
+    const searchResults = createMemo(() => undefined);
+    const handleOnFocusOut = (e: FocusEvent) => {
+        const nextTarget = e.relatedTarget as Node
+        if (!nextTarget || !containerRef?.contains(nextTarget)) {
+            setIsFocused(false);
         }
-        const spec = editor.packageManager.registry.getNodeTypeSpec(editor.selectionController.selected_node_type);
-        return <NodePreview spec={spec}/>
     }
 
     return (
-        <Show when={PreviewComponent()}>
-            <div
-                class="selected-type-preview"
-                style={{
-                    position: "absolute",
-                    transform: `translate(${props.node_pos.x}px, ${props.node_pos.y}px)`,
-                    "pointer-events": "none"
+        <div 
+            ref={containerRef}
+            class="fill search-container" 
+            onFocusOut={handleOnFocusOut}
+        >
+            <input
+                onFocusOut={handleOnFocusOut}
+                onfocusin={() => {
+                    setIsFocused(true);
                 }}
-            >
-                {PreviewComponent()}
-            </div>
-        </Show>
-    )
+                class="fill search-bar"
+                classList={{
+                    "dropdown-visible": query().trim().length > 0
+                }}
+                type="text"
+                placeholder={t("pages.docs.messages.searchForTopics")}
+                value={query()}
+                onInput={(e) => setQuery(e.currentTarget.value)}
+            />
+            <Show when={query().trim().length > 0}>
+                <div 
+                    class="scrollable container search-results-dropdown"
+                    classList={{
+                        "unfocused": !isFocused()
+                    }}
+                >
+                    {/* <For each={searchResults()} fallback={
+                        <div>{t("pages.docs.messages.noTopicFound")}</div>
+                    }>
+                        {(topic) => (
+                            
+                        )}
+                    </For> */}
+                </div>
+            </Show>
+        </div>
+    );
 }

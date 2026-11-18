@@ -39,7 +39,9 @@ export default function App() {
   };
 
   onMount(async () => {
+    await localServerController.checkIsInstalled();
     if (localServerController.isInstalled) {
+      await localServerController.checkStatus();
       if (appSettings.autoStartLocalServer && !localServerController.isRunning) {
         await localServerController.startServer();
       }
