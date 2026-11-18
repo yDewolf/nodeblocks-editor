@@ -9,11 +9,13 @@ interface EditorState {
 
 interface EditorStateStore {
     scenes: Record<string, EditorState>
+    leftTabExpanded: boolean
 }
 
 const [editorState, _setEditorState] = makePersisted(
     createStore<EditorStateStore>({
-        scenes: {}
+        scenes: {},
+        leftTabExpanded: true
     }),
     {name: "editor-state"}
 );
@@ -21,4 +23,5 @@ const [editorState, _setEditorState] = makePersisted(
 export const createSceneState = (scene_id: string) => _setEditorState("scenes", scene_id, {})
 export const setMainCameraPos = (scene_id: string, pos: Vector2) => _setEditorState("scenes", scene_id, "mainCameraPos", pos);
 export const setMainCameraZoom = (scene_id: string, zoom: number) => _setEditorState("scenes", scene_id, "mainCameraZoom", zoom);
+export const setLeftTabExpanded = (v: boolean) => _setEditorState("leftTabExpanded", v);
 export { editorState };

@@ -13,6 +13,7 @@ import { editorSettings, setAutosaveScenes } from "../../editor-settings";
 import { useNavigate } from "@solidjs/router";
 import { ensureScene } from "~/feature/scene/scene-context";
 import { useI18n } from "~/i18n/i18n-context";
+import { editorState, setLeftTabExpanded } from "../../editor-state";
 
 
 const LeftTabDropdown = (props: {
@@ -90,6 +91,8 @@ export const EditorLeftTabHolder = (props: {
     return (
         <div class="left-tab-holder" docs-id="editor-left-tab" docs-root={LOCAL_DOCS_ID}>
             <DropdownSection
+                default_expanded={editorState.leftTabExpanded}
+                expanded_states={[() => editorState.leftTabExpanded, setLeftTabExpanded]}
                 icon={() => <LeftTabIcon class="medium-icon"/>}
                 dropdown_class="left-tab-dropdown"                
                 header_class="left-tab-header"
