@@ -35,6 +35,12 @@ export const SettingsRoute: ParentComponent = (props) => {
             label: t("words.localServer"),
             title: t("pages.settings.localServerTitle"),
             iconElement: () => <ServerIcon class="smaller-icon"/>
+        },
+        {
+            route: "/settings/remoteServer",
+            label: t("words.remoteServer"),
+            title: t("pages.settings.remoteServerTitle"),
+            iconElement: () => <ServerIcon class="smaller-icon"/>
         }
     ];
 

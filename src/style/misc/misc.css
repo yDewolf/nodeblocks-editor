@@ -147,4 +147,16 @@
   .selected-docs-popup.right.top {
     border-top-right-radius: 0;
   }
+
+
+  .dev-mode-button {
+    svg {
+        width: 16px;
+        height: 16px;
+    }
+  }
+
+  .dev-mode-button.active > svg > path {
+    color: var(--selection-color);
+  }
 }

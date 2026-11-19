@@ -4,7 +4,7 @@ import { createSignal } from "solid-js";
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
 import { DocsController } from "~/feature/docs/docs-controller";
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
-import { NodeTypePreview } from "../components/subpanels/component/node-type-selector";
+import { NodeTypePreview } from "../components/subpanels/component/node-type-components";
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { DocsPathPrefix } from "~/feature/docs/docs-protocols";
 import { NamespaceUtils } from "~/protocols/nodeblocks/namespace-model";
@@ -90,6 +90,7 @@ export class DocsTool extends BaseEditorTool {
                 if (this.selected_docs_path) { 
                     this.onSelectDocumentation?.();
                 }
+                e.preventDefault();
             }
         }
     }

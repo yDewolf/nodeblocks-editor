@@ -49,7 +49,7 @@ export const SceneCard = (props: {
                 <div class="container stretch">
                     <span>{props.listedScene.uid}</span>
                 </div>
-                <div class="scene-actions">
+                <div class="scene-actions row-container">
                     <Show when={hasPermission(props.listedScene.user_perms, ScenePermission.ADMIN)}>
                         <button class="icon-button" onclick={() => props.editScene(props.listedScene.uid)}>
                             <ToolIcon class="smaller-icon"/>

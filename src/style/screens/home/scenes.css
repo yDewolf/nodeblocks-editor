@@ -47,6 +47,11 @@
         display: flex;
     }
 
+    .scene-actions {
+        gap: 8px;
+        justify-content: right;
+    }
+
     .scenes-page-actions {
         display: flex;
     }

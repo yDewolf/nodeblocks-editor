@@ -21,7 +21,6 @@ export default {
             parseNodePreview: "parse node preview",
             messages: {
                 previousTabsShowUp: "Previous opened tabs show up here.",
-                noTopicFound: "No topic found",
                 noParametersForRenderer: "No parameters available for this renderer",
                 nodeHasNoSlots: "This node has no slots",
                 nodeHasNoParam: "This node has no parameters",
@@ -94,6 +93,7 @@ export default {
             generalTitle: "General Settings",
             editorTitle: "Editor Settings",
             localServerTitle: "Local Server Settings",
+            remoteServerTitle: "Remote Server Settings",
             openSetupWizard: "Open Setup Wizard",
             remoteHost: {
                 hostLabel: "Server Host",
@@ -255,11 +255,39 @@ export default {
             startLocal: "Start local server",
             startingLocal: "Starting...",
         },
+        searchbar: {
+            searchPlaceholder: "Search for something here",
+            noResultsForQuery: "No results for query",
+        },
         login: {
             username: "Username",
             login: "Login",
             logout: "Logout",
             loggedAs: (user: string) => `Logged as '${user}'`
+        },
+        nodeTypeSelector: {
+            searchPlaceholder: "Search for nodes here",
+            nodeTypeFilters: "Nodetype filters",
+            messages: {
+                noActiveFilters: "No active filters",
+            },
+            views: {
+                active_filters: "Active Filters",   
+                tags: "Tags",   
+                categories: "Categories",   
+            },
+            filterTypes: {
+                tag: "Tag",
+                category: "Category"
+            },
+            sortModes: {
+                id: "ID",
+                recent: "Recent"
+            },
+            displayModes: {
+                by_plugin: "By plugin",
+                all: "All"
+            }
         }
     },
     actions: {
@@ -278,6 +306,7 @@ export default {
         errorWhile: (action: string) => `Failed to ${action}`,
         noSomethingSelected: (something: string, fem?: boolean) => `No ${something} selected`,
         couldntFind: (something: string) => `Couldn't find ${something}`,
+        noSomethingFound: (something: string) => `No ${something} was found`,
         noConnectionWithServer: "Not connected to a server. Some features might stop working."
     },
     words: {
@@ -323,6 +352,9 @@ export default {
         originalPlugins: "Original Plugins",
         general: "General",
         editor: "Editor",
-        localServer: "Local Server"
+        localServer: "Local Server",
+        remoteServer: "Remote Server",
+        filter: (plural?: boolean) => `Filter${plural ? "s" : ""}`,
+        category: (plural?: boolean) => `Categor${plural ? "ies" : "y"}`
     }
 }

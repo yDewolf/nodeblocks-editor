@@ -1,7 +1,7 @@
 import { SceneNode } from "~/feature/scene/objects/scene-node";
 import { SceneNodeSlot } from "~/feature/scene/objects/scene-slot";
 import { Vector2 } from "~/protocols/nodeblocks/geometry";
-import { NodeTypePreview } from "../components/subpanels/component/node-type-selector";
+import { NodeTypePreview } from "../components/subpanels/component/node-type-components";
 import { InputManager } from "~/utils/keybinds/input-manager";
 import { InputContext } from "~/utils/keybinds/input-context";
 

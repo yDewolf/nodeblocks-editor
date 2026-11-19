@@ -1,6 +1,138 @@
 @layer custom {
+  .node-type-selector-holder {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 10px;
+    max-height: 100%;
+    min-height: 0;
+  }
+
+  .nodetype-filter-holder {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .node-type-filter-path {
+    font-size: 0.7rem;
+    color: var(--secondary-font-color);
+  }
+
+  .filter-counter {
+    background-color: var(--dark-overlay-highlight);
+    font-size: 0.9rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .filter-counter .icon-button > svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .filter-dropdown {
+    min-width: 400px;
+    height: 200px;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+    overflow: visible;
+    gap: 10px;
+    
+    font-size: 0.9rem;
+  }
+
+  .filter-dropdown-header {
+
+  }
+
+  .filter-dropdown-body {
+    overflow-y: scroll;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: 1fr;
+    gap: 10px;
+  }
+
+  .filter-dropdown-body > div {
+    padding: 2px;
+  }
+
+  .filter-dropdown-content {
+    width: stretch;
+    height: max-content;
+  }
+
+  .plugin-selector {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    max-height: 100%;
+    min-height: 0;
+    border-right: 1px solid var(--stroke-color);
+  }
+
+  .plugin-select-dropside {
+    position: relative;
+  }
+
+  .active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    height: fit-content;
+    width: stretch;
+    min-height: 0;
+  }
+
+  .package-filter-section {
+    height: fit-content;
+  }
+
+  .nodetype-filter {
+    height: fit-content;
+    background-color: var(--dark-overlay-highlight);
+    
+    border: 2px solid var(--dark-overlay-highlight);
+    border-radius: 8px;
+    transform: scale(0.9);
+  }
+
+  .nodetype-filter:hover {
+    transform: scale(1.0);
+  }
+  
+  .nodetype-filter.active {
+    background-color: var(--overlay-highlight);
+    transform: scale(1.0);
+  }
+
+  .nodetype-filter.active:hover {
+    transform: scale(1.05);
+  }
+
+  .nodetype-filter-holder > .active-filters {
+    /* TODO: pensar em um jeito melhor de fazer isso aqui */
+    overflow: hidden;
+    flex-wrap: nowrap;
+  }
+
+  .node-search-result {
+    padding: 2px 4px;
+    border: none;
+    border-radius: 4px;
+    background-color: transparent;
+  }
+
+  .node-search-result:hover {
+    cursor: pointer;
+    background-color: var(--overlay-highlight);
+  }
+
+
+
   .node-type-selector {
-    height: 100%;
     overflow-y: scroll;
     justify-content: left;
     display: flex;

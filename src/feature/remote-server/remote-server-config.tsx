@@ -3,6 +3,12 @@ import { useI18n } from "~/i18n/i18n-context";
 import { useAppSession } from "~/network/app-session-provider";
 
 
+export const RemoteServerSettingsContents = () =>  {
+    return <>
+        <RemoteServerConfigForm/>
+    </>
+}
+
 export const RemoteServerConfigForm = () => {
     const { t } = useI18n();
     const appSession = useAppSession();

@@ -16,7 +16,7 @@ export const EditorMidTab = (props: {
             }>
                 <div class="middle-tab-overlay container">
                     <div class="keep fill row-container space-between">
-                        <div class="theme-button-holder">
+                        <div class="theme-button-holder row-container">
                             <button class="icon-button" onclick={() => {
                                 props.page_viewer.current_page = props.docs_page;
                             }}>

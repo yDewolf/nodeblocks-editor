@@ -9,27 +9,31 @@ export class SceneArtifactHTTPController {
     }
 
     public async fetchArtifactBlob(node_id: string, artifact_name: string): Promise<Blob> {
-        const cleanPath = artifact_name.replace(/^artifacts\//, "");
-        const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${this.sceneId}/artifacts/${node_id}/${cleanPath}`, {
-            method: "POST",
-            headers: {
-                // FIXME: aqui a gente provavelmente tinha que incluir o token da cena
-                ...this.appSession.defaultHeaders,
-            },
-            credentials: "include",
-            body: JSON.stringify({
+        try {
+            const cleanPath = artifact_name.replace(/^artifacts\//, "");
+            const response = await fetch(`${this.appSession.baseHttpUrl}/api/scene/${this.sceneId}/artifacts/${node_id}/${cleanPath}`, {
+                method: "POST",
+                headers: {
+                    // FIXME: aqui a gente provavelmente tinha que incluir o token da cena
+                    ...this.appSession.defaultHeaders,
+                },
+                credentials: "include",
                 body: JSON.stringify({
-                    user_id: this.appSession.userSession?.user_id,
-                    password: undefined
+                    body: JSON.stringify({
+                        user_id: this.appSession.userSession?.user_id,
+                        password: undefined
+                    })
                 })
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Failed to load artifact: ${response.statusText} (${response.status})`);
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Failed to load artifact: ${response.statusText} (${response.status})`);
+            }
+    
+            return await response.blob();
+        } catch (err) {
+            console.error("Failed to fetch artifact blob: ", err);
         }
-
-        return await response.blob();
     }
 
     public async fetchArtifactObjectUrl(node_id: string, artifact_name: string): Promise<string> {

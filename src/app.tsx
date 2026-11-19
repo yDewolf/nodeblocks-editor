@@ -19,6 +19,7 @@ import { localServerController } from "./network/api/local-server-controller";
 import { AppSettingsContent } from "./feature/home/settings/app-settings-view";
 import { EditorSettingsContent } from "./feature/editor/screens/settings-view";
 import { LocalServerSettingsContent } from "./feature/local-server/local-server-settings";
+import { RemoteServerSettingsContents } from "./feature/remote-server/remote-server-config";
 
 declare global {
   interface Window {
@@ -39,7 +40,9 @@ export default function App() {
   };
 
   onMount(async () => {
+    await localServerController.checkIsInstalled();
     if (localServerController.isInstalled) {
+      await localServerController.checkStatus();
       if (appSettings.autoStartLocalServer && !localServerController.isRunning) {
         await localServerController.startServer();
       }
@@ -68,6 +71,7 @@ export default function App() {
                       <Route path="general" component={AppSettingsContent}/>
                       <Route path="editor" component={EditorSettingsContent}/>
                       <Route path="localServer" component={LocalServerSettingsContent}/>
+                      <Route path="remoteServer" component={RemoteServerSettingsContents}/>
                     </Route>
                   </Route>
                   <Route path="/scene/:scene_id" component={SceneEditor} />
