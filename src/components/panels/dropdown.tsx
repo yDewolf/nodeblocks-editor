@@ -19,14 +19,14 @@ export const DropdownIcon = (props: {expanded: boolean, icon?: () => JSXElement,
     )
 }
 
-export const DropdownSection = (props: {
+export const DropdownSection: ParentComponent<{
     id?: string,
     header?: string, 
     header_class?: string,
     dropdown_class?: string, 
     body_class?: string, 
 
-    content: JSXElement, 
+    content?: JSXElement, 
     header_content?: () => JSXElement, 
     default_expanded?: boolean,
     icon?: () => JSXElement,
@@ -34,12 +34,12 @@ export const DropdownSection = (props: {
     animated?: boolean,
     no_button?: boolean,
     expanded_states?: [() => boolean, (value: boolean) => void]
-}) => {
+}> = (props) => {
     const [expanded, setExpanded] = props.expanded_states ?? createSignal(props?.default_expanded ?? false);
     const no_button = props.no_button ?? false;
     const renderContent = () => (
         <Show when={expanded()}>
-            {props.content}
+            {props.content || props.children}
         </Show>
     )
 
@@ -228,6 +228,8 @@ export const Dropside = (props: {
     animated?: boolean,
     visible?: () => boolean,
     onMouseEnter?: () => void
+    onMouseLeave?: () => void
+    dropsideClass?: string
 }) => {
     const [localVisible, setLocalVisible] = createSignal(true);
     const is_visible = props.visible ?? localVisible;
@@ -247,7 +249,7 @@ export const Dropside = (props: {
 
     return (
         <div 
-            class="dropdown-item"
+            class={"dropdown-item" + (props.dropsideClass ? " " + props.dropsideClass : "")}
             classList={{
                 "expanded": is_visible()
             }}
@@ -257,6 +259,13 @@ export const Dropside = (props: {
                     return;
                 }
                 setLocalVisible(true)
+            }}
+            onmouseleave={() => {
+                if (props.onMouseLeave) {
+                    props.onMouseLeave();
+                    return;
+                }
+                setLocalVisible(false);
             }}
         >
             <div class="dropdown-label space-between">
@@ -279,16 +288,18 @@ export const Dropside = (props: {
 }
 
 export interface DropsideItemData {
-    label_element?: () => JSXElement,
-    label?: string,
-    content: () => JSXElement,
+    label_element?: () => JSXElement
+    label?: string
+    content: () => JSXElement
     animated?: boolean
+    dropsideClass?: string
 }
 
 export const DropsideManager = (props: {
     dropsides: Map<string, DropsideItemData>,
     currentItem?: () => string | undefined,
     setCurrentItem?: (item: string | undefined) => void,
+    closeOnMouseOut?: boolean
 }) => {
     const [currentItem, setCurrentItem] = createSignal<string | undefined>(undefined);
     const current_item = props.currentItem ?? currentItem;
@@ -306,6 +317,8 @@ export const DropsideManager = (props: {
                             animated={data.animated}
                             visible={() => current_item() === id}
                             onMouseEnter={() => set_current_item(id)}
+                            onMouseLeave={() => props.closeOnMouseOut ? set_current_item(undefined) : undefined}
+                            dropsideClass={data.dropsideClass}
                         />
                     );
                 }}
