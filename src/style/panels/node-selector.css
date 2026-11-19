@@ -92,11 +92,10 @@
     height: fit-content;
     width: stretch;
     min-height: 0;
-    overflow-y: auto;
   }
 
   .package-filter-section {
-    max-height: 80px;
+    height: fit-content;
   }
 
   .nodetype-filter {

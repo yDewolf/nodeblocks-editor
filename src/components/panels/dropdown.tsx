@@ -222,11 +222,11 @@ export const DropdownItemInput = (props: {
 }
 
 export const Dropside = (props: {
-    label_element?: JSXElement,
-    label?: string,
-    content: JSXElement,
-    animated?: boolean,
-    visible?: () => boolean,
+    label_element?: JSXElement
+    label?: string
+    content: JSXElement
+    animated?: boolean
+    visible?: () => boolean
     onMouseEnter?: () => void
     onMouseLeave?: () => void
     dropsideClass?: string
@@ -253,7 +253,7 @@ export const Dropside = (props: {
             classList={{
                 "expanded": is_visible()
             }}
-            onMouseEnter={() => {
+            onmouseenter={() => {
                 if (props.onMouseEnter) {
                     props.onMouseEnter();
                     return;

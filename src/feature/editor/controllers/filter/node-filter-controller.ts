@@ -1,8 +1,7 @@
 import { createStore, SetStoreFunction } from "solid-js/store";
-import { createDefaultNodeFilterState, FilterTypes, makeNodeFilterKey, NodeFilterState } from "./node-filter-protocol";
+import { ActiveFilterDisplayMode, createDefaultNodeFilterState, FilterTypes, FilterViewMode, makeNodeFilterKey, NodeFilterState } from "./node-filter-protocol";
 import { _setEditorState, editorState } from "../../editor-state";
 
-export type FilterViewMode = "active_filters" | "tags" | "categories";
 export interface ActiveFilterItem {
     packageId: string;
     type: FilterTypes;
@@ -108,5 +107,11 @@ export class NodeFilterController {
     public deactivateFilter(packageId: string, type: FilterTypes, id: string) {
         const key = makeNodeFilterKey(packageId, type, id);
         this.setActiveFilterEntry(key, undefined!);
+    }
+
+    public setDisplayMode(mode: ActiveFilterDisplayMode) {
+        this.updateState(() => ({
+            activeFilterDisplayMode: mode
+        }));
     }
 }

@@ -1,19 +1,17 @@
-import { createMemo, mapArray, For, createSignal, Show, onCleanup, createEffect } from "solid-js";
+import { createMemo, mapArray, For, createSignal, Show, onCleanup, createEffect, Switch, Match } from "solid-js";
 import { NodeTypePreview } from "./node-type-components";
 import { Dropdown, DropdownSection, DropsideItemData, DropsideManager } from '../../../../../components/panels/dropdown';
 import FilterIcon from '~/assets/icons/filter.svg';
 import { useI18n } from "~/i18n/i18n-context";
 import { SearchBar } from "~/components/search-bar";
-import TagIcon from '~/assets/icons/tag.svg';
-import CloseIcon from '~/assets/icons/close.svg';
 import { usePackageManager } from "~/feature/editor/contexts/package-manager-context";
 import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
-import { useDocs } from "~/feature/docs/docs-context";
 import { useMetadata } from "~/feature/metadata/metadata-context";
-import { BooleanParam } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
 import { NodeFilterController } from "~/feature/editor/controllers/filter/node-filter-controller";
 import { ensureNodeFilters } from "~/feature/editor/contexts/node-filter-context";
-import { PackageManager } from '../../../engine/packages/package-manager';
+import { ACTIVE_FILTER_DISPLAY_MODES, ActiveFilterDisplayMode } from "~/feature/editor/controllers/filter/node-filter-protocol";
+import TagIcon from '~/assets/icons/tag.svg';
+import CloseIcon from '~/assets/icons/close.svg';
 
 interface NodeTypeSearch {
     package_id: string
@@ -97,12 +95,14 @@ export const NodeTypeSelector = (props: {
 
 
 const PackageNavigator = (props: {
-    controller: NodeFilterController
+    controller: NodeFilterController,
+    onNavigate?: () => void
 }) => {
     const metadata = useMetadata();
     const packageManager = usePackageManager();
+    const [currentItem, setCurrentItem] = createSignal<string | undefined>(undefined);
+    
     const [dropsides, setDropsides] = createSignal<Map<string, DropsideItemData>>(new Map());
-
     const prepareDropsides = () => {
         const nextMap = new Map<string, DropsideItemData>();
         for (const [package_id] of Object.entries(packageManager.getAllPackages())) {
@@ -114,13 +114,21 @@ const PackageNavigator = (props: {
                     <div class="container">
                         <button
                             class="text-button"
-                            onclick={() => props.controller.openPackageTags(package_id)}
+                            onclick={() => {
+                                props.controller.openPackageTags(package_id);
+                                setCurrentItem(undefined);
+                                props.onNavigate?.();
+                            }}
                         >
                             Tags ({Object.keys(meta?.tags ?? {}).length})
                         </button>
                         <button
                             class="text-button"
-                            onclick={() => props.controller.openPackageCategories(package_id)}
+                            onclick={() => {
+                                props.controller.openPackageCategories(package_id);
+                                setCurrentItem(undefined);
+                                props.onNavigate?.();
+                            }}
                         >
                             Categories ({Object.keys(meta?.categories ?? {}).length})
                         </button>
@@ -137,8 +145,9 @@ const PackageNavigator = (props: {
     onCleanup(() => unlisten);
 
     prepareDropsides();
+    
     return (
-        <DropsideManager dropsides={dropsides()} closeOnMouseOut={true}>
+        <DropsideManager dropsides={dropsides()} closeOnMouseOut={true} currentItem={currentItem} setCurrentItem={setCurrentItem}>
             {/* FIXME: responsivity */}
         </DropsideManager>
     )
@@ -220,11 +229,28 @@ const NodeFilterDropdown = () => {
             </div>
             <div class="filter-dropdown-body">
                 <div class="plugin-selector">
-                    <PackageNavigator controller={filterController} />
+                    <PackageNavigator controller={filterController}/>
                 </div>
                 <div class="filter-dropdown-content container">
                     {/* TODO: Tradução */}
-                    <span><b>{filterController.currentSection}</b></span>
+                    <div class="keep row-container fill center-items space-between">
+                        <span><b>{filterController.currentSection}</b></span>
+                        <Show when={filterController.currentView == "active_filters"}>
+                            <select 
+                                value={filterController.state.activeFilterDisplayMode}
+                                oninput={(e) => {
+                                    filterController.setDisplayMode(e.target.value as ActiveFilterDisplayMode)
+                                }
+                            }>
+                                <For each={ACTIVE_FILTER_DISPLAY_MODES}>
+                                    {(mode) => <option value={mode}>
+                                        {/* TODO: translate */}
+                                        {mode}
+                                    </option>}
+                                </For>
+                            </select>
+                        </Show>
+                    </div>
                     <Show when={filterController.currentView == "active_filters"} fallback={
                         <div class="active-filters">
                             <For each={currentPackageItems()} fallback={
@@ -253,26 +279,41 @@ const NodeFilterDropdown = () => {
                         <Show when={filterController.activeFiltersList.length > 0} fallback={
                             <span class="node-type-filter-path">No active filters</span>
                         }>
-                            <For each={packageIds()}>
-                                {(packageId) => {
-                                    const activeFilters = filterController.getPackageActiveFilters(packageId);
-                                    return <Show when={activeFilters.length > 0}>
-                                        <div class="text-section package-filter-section">
-                                            <span>{packageId}</span>
-                                            <div class="active-filters">
-                                                <For each={activeFilters}>
-                                                    {(filter) => <NodeTypeFilter
-                                                        label={filter.label}
-                                                        isActive={true}
-                                                        activate={() => {}}
-                                                        deactivate={() => filterController.deactivateFilter(filter.packageId, filter.type, filter.id)}
-                                                    />}
-                                                </For>
+                            <Switch fallback={
+                                // Show all
+                                <div class="active-filters">
+                                    <For each={filterController.activeFiltersList} fallback={
+                                        <span class="node-type-filter-path">No active filter</span>
+                                    }>
+                                        {(filter) => <NodeTypeFilter
+                                            label={`${filter.packageId}: ${filter.label}`}
+                                            isActive={true}
+                                            activate={() => {}}
+                                            deactivate={() => filterController.deactivateFilter(filter.packageId, filter.type, filter.id)}
+                                        />}
+                                    </For>
+                                </div>
+                            }>
+                                <Match when={filterController.state.activeFilterDisplayMode == "by_plugin"}>
+                                    <For each={packageIds()}>
+                                        {(packageId) => <Show when={filterController.getPackageActiveFilters(packageId).length > 0}>
+                                            <div class="text-section package-filter-section">
+                                                <span>{packageId}</span>
+                                                <div class="active-filters">
+                                                    <For each={filterController.getPackageActiveFilters(packageId)}>
+                                                        {(filter) => <NodeTypeFilter
+                                                            label={filter.label}
+                                                            isActive={true}
+                                                            activate={() => {}}
+                                                            deactivate={() => filterController.deactivateFilter(filter.packageId, filter.type, filter.id)}
+                                                        />}
+                                                    </For>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </Show>
-                                }}
-                            </For>
+                                        </Show>}
+                                    </For>
+                                </Match>
+                            </Switch>
                         </Show>
                     </Show>
                 </div>
