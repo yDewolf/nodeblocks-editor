@@ -93,6 +93,7 @@ export default {
             generalTitle: "General Settings",
             editorTitle: "Editor Settings",
             localServerTitle: "Local Server Settings",
+            remoteServerTitle: "Remote Server Settings",
             openSetupWizard: "Open Setup Wizard",
             remoteHost: {
                 hostLabel: "Server Host",
@@ -351,6 +352,7 @@ export default {
         general: "General",
         editor: "Editor",
         localServer: "Local Server",
+        remoteServer: "Remote Server",
         filter: (plural?: boolean) => `Filter${plural ? "s" : ""}`,
         category: (plural?: boolean) => `Categor${plural ? "ies" : "y"}`
     }

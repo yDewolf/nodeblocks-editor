@@ -95,6 +95,7 @@ export default {
             generalTitle: "Configurações Gerais",
             editorTitle: "Configurações do Editor",
             localServerTitle: "Configurações do servidor local",
+            remoteServerTitle: "Configurações do servidor remoto",
             openSetupWizard: "Abrir utilitário de instalação",
             remoteHost: {
                 hostLabel: "Host do servidor",
@@ -354,6 +355,7 @@ export default {
         general: "Geral",
         editor: "Editor",
         localServer: "Servidor Local",
+        remoteServer: "Servidor Remoto",
         filter: (plural?: boolean) => `Filtro${plural ? "s" : ""}`,
         category: (plural?: boolean) => `Categoria${plural ? "s" : ""}`
     }
