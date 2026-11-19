@@ -11,6 +11,7 @@ import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { useDocs } from "~/feature/docs/docs-context";
 import { useMetadata } from "~/feature/metadata/metadata-context";
 import { BooleanParam } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
+import { NodeFilterController } from "~/feature/editor/controllers/node-filter-controller";
 
 interface NodeTypeSearch {
     package_id: string
@@ -22,6 +23,7 @@ interface NodeTypeSearch {
 export const NodeTypeSelector = (props: {
     onClickOnPreview: (node_preview: NodeTypePreview) => void
 }) => {
+    const metadata = useMetadata();
     const packageManager = usePackageManager();
     // const [categoryFilter, setCategoryFilter] = createSignal<string | undefined>(undefined);
     const [specs, setSpecs] = createSignal<NodeTypeSpec[]>(
@@ -35,7 +37,7 @@ export const NodeTypeSelector = (props: {
     const node_previews = mapArray(specs, (spec) => {
         return new NodeTypePreview(spec);
     });
-
+    
     const handleSearch = (query: string): NodeTypeSearch[] => {
         return [{
             package_id: "placeholder",
@@ -44,6 +46,26 @@ export const NodeTypeSelector = (props: {
             brief: "lorem ipsum"
         }]
     }
+
+    const filterController = new NodeFilterController();
+    const currentPackageItems = createMemo(() => {
+        const pkgId = filterController.selectedPackageId;
+        const view = filterController.currentView;
+        if (!pkgId || view == "active_filters") return [];
+
+        const meta = metadata?.get_header(pkgId);
+        if (!meta) return [];
+
+        const source = view == "tags" ? meta.tags : meta.categories;
+        if (!source) return [];
+
+        return Object.entries(source).map(([id, data]) => ({
+            id,
+            label: typeof data === "string" ? data : (
+                data.capitalized_name ?? id
+            ),
+        }));
+    });
 
     return (
         <div class="node-type-selector-holder">
@@ -65,19 +87,27 @@ export const NodeTypeSelector = (props: {
                     )
                 )}
                 <div class="nodetype-filter-holder center-items">
-                    <div class="row-container">
-                        <NodeTypeFilter 
-                            label="test" 
-                            isActive={true} 
-                            activate={() => {}}
-                            deactivate={() => {}}
-                        />
+                    <div class="row-container active-filters">
+                        {/* TODO: aqui acho que ficaria melhor se ele mostrasse*/}
+                        {/* a quantidade de filtros de tags ou categorias*/}
+                        <For each={filterController.activeFiltersList}>
+                            {(filter) => (
+                                <NodeTypeFilter
+                                    label={`${filter.packageId}/${filter.label}`}
+                                    isActive={true}
+                                    activate={() => {}}
+                                    deactivate={() => filterController.deactivateFilter(filter.packageId, filter.type, filter.id)}
+                                />
+                            )}
+                        </For>
                     </div>
                     <Dropdown icon={<FilterIcon class="smaller-icon"/>}>
                         <div class="filter-dropdown">
                             <div class="filter-dropdown-header row-container fill">
                                 <button class="icon-button" onclick={() => {
-                                    // TODO: voltar uma 'página'
+                                    if (filterController.canGoBack) {
+                                        filterController.goBack();
+                                    }
                                 }}>
                                     {"<"}
                                 </button>
@@ -85,26 +115,61 @@ export const NodeTypeSelector = (props: {
                                     <span>Node Type Filters</span>
                                     |
                                     <span class="node-type-filter-path">
-                                        {/* current filter path. Example: packages -> mypackages -> tags */}
-                                        packages
+                                        {filterController.currentPath.join(" -> ")}
                                     </span>
                                 </div>
                             </div>
                             <div class="filter-dropdown-body">
                                 <div class="plugin-selector">
-                                    <PackageNavigator/>
+                                    <PackageNavigator controller={filterController} />
                                 </div>
                                 <div class="fill container">
-                                    Active Filters
+                                    {/* TODO: Tradução */}
+                                    <span>{filterController.currentSection}</span>
                                     <div class="active-filters">
-                                        <NodeTypeFilter 
-                                            label="test" 
-                                            isActive={true} 
-                                            activate={() => {}}
-                                            deactivate={() => {}}
-                                        />
+                                        <Show
+                                            when={filterController.currentView == "active_filters"}
+                                            fallback={
+                                                <For each={currentPackageItems()} fallback={
+                                                    <span class="node-type-filter-path">No item found</span>
+                                                }>
+                                                    {(item) => {
+                                                        const pkgId = filterController.selectedPackageId!;
+                                                        const type = filterController.currentView === "tags" ? "tag" : "category";
+                                                        return (
+                                                            <NodeTypeFilter
+                                                                label={item.label}
+                                                                isActive={filterController.isFilterActive(pkgId, type, item.id)}
+                                                                activate={() => filterController.activateFilter({
+                                                                    packageId: pkgId,
+                                                                    type,
+                                                                    id: item.id,
+                                                                    label: item.label,
+                                                                })}
+                                                                deactivate={() => filterController.deactivateFilter(pkgId, type, item.id)}
+                                                            />
+                                                        );
+                                                    }}
+                                                </For>
+                                            }
+                                        >
+                                            <For
+                                                each={filterController.activeFiltersList}
+                                                fallback={
+                                                    <span class="node-type-filter-path">No active filter</span>
+                                                }
+                                            >
+                                                {(filter) => (
+                                                    <NodeTypeFilter
+                                                        label={`${filter.packageId}: ${filter.label}`}
+                                                        isActive={true}
+                                                        activate={() => {}}
+                                                        deactivate={() => filterController.deactivateFilter(filter.packageId, filter.type, filter.id)}
+                                                    />
+                                                )}
+                                            </For>
+                                        </Show>
                                     </div>
-                                    {/* TODO: mostrar os filtros ativos aqui */}
                                 </div>
                             </div>
                         </div>
@@ -121,31 +186,40 @@ export const NodeTypeSelector = (props: {
 }
 
 
-const PackageNavigator = () => {
+const PackageNavigator = (props: {
+    controller: NodeFilterController
+}) => {
     const metadata = useMetadata();
     const packageManager = usePackageManager();
-    let dropsides: Map<string, DropsideItemData> = new Map();
+    const [dropsides, setDropsides] = createSignal<Map<string, DropsideItemData>>(new Map());
+
     const prepareDropsides = () => {
-        for (const [package_id, pack] of Object.entries(packageManager.getAllPackages())) {
+        const nextMap = new Map<string, DropsideItemData>();
+        for (const [package_id] of Object.entries(packageManager.getAllPackages())) {
             const meta = metadata?.get_header(package_id);
-            dropsides.set(package_id, {
+            nextMap.set(package_id, {
                 label: package_id,
                 dropsideClass: "plugin-select-dropside",
-                content: () => <div class="container">
-                    <button class="text-button" onclick={() => {
-                        // go to this package's tag list
-                    }}>
-                        Tags ({Object.keys(meta?.tags ?? {}).length})
-                    </button>
-                    <button class="text-button" onclick={() => {
-                        // go to this package's category list
-                    }}>
-                        Categories ({Object.keys(meta?.categories ?? {}).length})
-                    </button>
-                </div>
-            })
+                content: () => (
+                    <div class="container">
+                        <button
+                            class="text-button"
+                            onclick={() => props.controller.openPackageTags(package_id)}
+                        >
+                            Tags ({Object.keys(meta?.tags ?? {}).length})
+                        </button>
+                        <button
+                            class="text-button"
+                            onclick={() => props.controller.openPackageCategories(package_id)}
+                        >
+                            Categories ({Object.keys(meta?.categories ?? {}).length})
+                        </button>
+                    </div>
+                ),
+            });
         }
-    }
+        setDropsides(nextMap);
+    };
     
     const unlisten = packageManager.subscribePackageLoad(() => {
         prepareDropsides();
@@ -154,7 +228,7 @@ const PackageNavigator = () => {
 
     prepareDropsides();
     return (
-        <DropsideManager dropsides={dropsides} closeOnMouseOut={true}>
+        <DropsideManager dropsides={dropsides()} closeOnMouseOut={true}>
             {/* FIXME: responsivity */}
         </DropsideManager>
     )

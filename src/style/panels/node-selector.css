@@ -81,6 +81,9 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+
+    min-height: 0;
+    overflow-y: auto;
   }
 
   .nodetype-filter {
@@ -103,6 +106,11 @@
 
   .nodetype-filter.active:hover {
     transform: scale(1.05);
+  }
+
+  .nodetype-filter-holder > .active-filters {
+    overflow-x: scroll;
+    flex-wrap: nowrap;
   }
 
   /* antigo */
