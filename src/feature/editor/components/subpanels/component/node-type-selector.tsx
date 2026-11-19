@@ -13,6 +13,7 @@ import { ensureNodeFilters } from "~/feature/editor/contexts/node-filter-context
 import { ACTIVE_FILTER_DISPLAY_MODES, ActiveFilterDisplayMode } from "~/feature/editor/controllers/filter/node-filter-protocol";
 import { NodeTypeSearch } from "~/feature/editor/controllers/filter/node-search-helper";
 import LongArrowDownIcon from "~/assets/icons/long-arrow-down.svg";
+import CloseIcon from '~/assets/icons/close.svg';
 
 export const NodeTypeSelector = (props: {
     onClickOnPreview: (node_preview: NodeTypePreview) => void
@@ -100,7 +101,17 @@ export const NodeTypeSelector = (props: {
                     <div class="row-container active-filters">
                         {/* TODO: aqui acho que ficaria melhor se ele mostrasse*/}
                         {/* a quantidade de filtros de tags ou categorias*/}
-                        <For each={filterController.activeFiltersList}>
+                        <Show when={filterController.activeFiltersList.length > 0}>
+                            <div class="filter-counter row-container center-items">
+                                {filterController.activeFiltersList.length} filters
+                                <button class="icon-button" onclick={() => {
+                                    filterController.clearActiveFilters();  
+                                }}>
+                                    <CloseIcon class="smaller-icon"/>
+                                </button>
+                            </div>
+                        </Show>
+                        {/* <For each={filterController.activeFiltersList}>
                             {(filter) => (
                                 <NodeTypeFilter
                                     title={`${filter.packageId}:${filter.label}`}
@@ -110,7 +121,7 @@ export const NodeTypeSelector = (props: {
                                     deactivate={() => filterController.deactivateFilter(filter.packageId, filter.type, filter.id)}
                                 />
                             )}
-                        </For>
+                        </For> */}
                     </div>
                     <div class="row-container center-items">
                         <button class="icon-button" onclick={() => {

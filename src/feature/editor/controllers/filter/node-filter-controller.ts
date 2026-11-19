@@ -90,6 +90,12 @@ export class NodeFilterController {
     }
 
 
+    public clearActiveFilters() {
+        this.updateState(() => ({
+            activeFilters: {}
+        }));
+    }
+
     public isFilterActive(packageId: string, type: FilterTypes, id: string): boolean {
         return Boolean(this.state.activeFilters[makeNodeFilterKey(packageId, type, id)]);
     }
