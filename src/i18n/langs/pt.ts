@@ -269,6 +269,7 @@ export default {
             loggedAs: (user: string) => `Logado como '${user}'`
         },
         nodeTypeSelector: {
+            searchPlaceholder: "Busque por nodes aqui",
             nodeTypeFilters: "Filtros de Node",
             messages: {
                 noActiveFilters: "Nenhum filtro ativo",

@@ -9,9 +9,10 @@ import { DocTopic } from '../helpers/docs-helper';
 export const DocSearchBar = () => {
     const { t } = useI18n();
     const docs = useDocs();
-    const searchbar = SearchBar<DocTopic>(
-        (query) => DocSearchHelper.search_topic(docs.doc_topics, query), 
-        (topic, setQuery) => (
+    
+    return <SearchBar<DocTopic>
+        search={(query) => DocSearchHelper.search_topic(docs.doc_topics, query)}
+        searchResultComponent={(topic, setQuery) => (
             <DocsHref route={{path: topic.path}} onclick={() => setQuery("")}>
                 <div class="row-container space-between center-items">
                     <span class="search-result-title">{topic.capitalized_name}</span>
@@ -23,9 +24,7 @@ export const DocSearchBar = () => {
                     <p class="search-result-description">{topic.description}</p>
                 </Show>
             </DocsHref>
-        ),
-        t("pages.docs.messages.searchForTopics")
-    );
-
-    return searchbar;
+        )}
+        searchPlaceholder={t("pages.docs.messages.searchForTopics")}
+    />;
 };

@@ -1,20 +1,20 @@
 import { Accessor, createMemo, createSignal, For, JSXElement, Setter, Show } from "solid-js";
 import { useI18n } from "~/i18n/i18n-context";
 
-export function SearchBar<T = object>(
+export function SearchBar<T = object>(props: {
     search: (query: string) => T[], 
     searchResultComponent: (result: T, setQuery: (v: string) => void) => JSXElement,
     searchPlaceholder?: string,
     searchResultsAccessor?: Accessor<T[]>,
     querySignal?: [Accessor<string>, Setter<string>]
-) {
+
+}) {
     const { t } = useI18n();
 
-    const placeholder = searchPlaceholder ?? t("pages.docs.messages.searchForTopics")
     let containerRef: HTMLDivElement | undefined;
-    const [query, setQuery] = querySignal ?? createSignal("");
+    const [query, setQuery] = props.querySignal ?? createSignal("");
     const [isFocused, setIsFocused] = createSignal(false);
-    const searchResults = searchResultsAccessor ?? createMemo(() => search(query()));
+    const searchResults = props.searchResultsAccessor ?? createMemo(() => props.search(query()));
 
     const handleOnFocusOut = (e: FocusEvent) => {
         const nextTarget = e.relatedTarget as Node
@@ -39,7 +39,7 @@ export function SearchBar<T = object>(
                     "dropdown-visible": query().trim().length > 0
                 }}
                 type="text"
-                placeholder={placeholder}
+                placeholder={props.searchPlaceholder ?? t("components.searchbar.searchPlaceholder")}
                 value={query()}
                 onInput={(e) => setQuery(e.currentTarget.value)}
             />
@@ -53,7 +53,7 @@ export function SearchBar<T = object>(
                     <For each={searchResults()} fallback={
                         <div>{t("components.searchbar.noResultsForQuery")}</div>
                     }>
-                        {(result) => searchResultComponent(result, setQuery)}
+                        {(result) => props.searchResultComponent(result, setQuery)}
                     </For>
                 </div>
             </Show>

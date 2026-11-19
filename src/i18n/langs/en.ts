@@ -266,6 +266,7 @@ export default {
             loggedAs: (user: string) => `Logged as '${user}'`
         },
         nodeTypeSelector: {
+            searchPlaceholder: "Search for nodes here",
             nodeTypeFilters: "Nodetype filters",
             messages: {
                 noActiveFilters: "No active filters",

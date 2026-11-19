@@ -19,6 +19,7 @@ import ArrowRightIcon from '~/assets/icons/arrow-right.svg';
 export const NodeTypeSelector = (props: {
     onClickOnPreview: (node_preview: NodeTypePreview) => void
 }) => {
+    const {t} = useI18n();
     const metadata = useMetadata();
     const packageManager = usePackageManager();
     const {filterController, searchSpec, searchNode} = ensureNodeFilters();
@@ -80,9 +81,9 @@ export const NodeTypeSelector = (props: {
     return (
         <div class="node-type-selector-holder">
             <div class="container fill">
-                {SearchBar<NodeTypeSearch>(
-                    handleSearch,
-                    (result, setQuery) => (
+                <SearchBar<NodeTypeSearch>
+                    search={handleSearch}
+                    searchResultComponent={(result, setQuery) => (
                         <button class="node-search-result" onclick={() => setQuery(result.id)}>
                             <div class="container fill">
                                 <div class="row-container space-between center-items">
@@ -96,8 +97,9 @@ export const NodeTypeSelector = (props: {
                                 </Show>
                             </div>
                         </button>
-                    )
-                )}
+                    )}
+                    searchPlaceholder={t("components.nodeTypeSelector.searchPlaceholder")}
+                />
                 <div class="nodetype-filter-holder center-items">
                     <div class="row-container">
                         <ClearActiveFiltersButton />
