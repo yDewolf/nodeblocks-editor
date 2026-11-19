@@ -1,13 +1,8 @@
-import { createStore, SetStoreFunction } from "solid-js/store";
-import { ActiveFilterDisplayMode, createDefaultNodeFilterState, FilterTypes, FilterViewMode, makeNodeFilterKey, NodeFilterState } from "./node-filter-protocol";
+import { createStore } from "solid-js/store";
+import { ActiveFilterDisplayMode, ActiveFilterItem, createDefaultNodeFilterState, FilterTypes, FilterViewMode, makeNodeFilterKey, NodeFilterState } from "./node-filter-protocol";
 import { _setEditorState, editorState } from "../../editor-state";
-
-export interface ActiveFilterItem {
-    packageId: string;
-    type: FilterTypes;
-    id: string;
-    label: string;
-}
+import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
+import { MetadataController } from "~/feature/metadata/metadata_controller";
 
 export class NodeFilterController {
     private getState: () => NodeFilterState;
@@ -113,5 +108,32 @@ export class NodeFilterController {
         this.updateState(() => ({
             activeFilterDisplayMode: mode
         }));
+    }
+
+    public filterNodeSpecs(specs: NodeTypeSpec[], metadata: MetadataController): NodeTypeSpec[] {
+        if (this.activeFiltersList.length == 0) return specs;
+        return specs.filter((spec) => {
+            const meta = metadata.get_node_meta(spec.id, spec.namespace);
+            if (!meta) return true;
+            
+            
+            for (const filter of this.activeFiltersList) {
+                if (filter.type == "tag" && 
+                    (meta.tags.some((tag) => typeof tag === "string" ? 
+                        tag == filter.id : tag.tag_id == filter.id
+                    ) ||  (typeof meta.category != "string" ? meta.category.default_tags.some(
+                        (tag) => typeof tag === "string" ? 
+                            tag == filter.id : tag.tag_id == filter.id
+                    ) : false))
+                ) {
+                    return true;
+                }
+                if (filter.type == "category" && (typeof meta.category === "string" ?
+                    meta.category == filter.id : meta.category.category_id == filter.id    
+                )) {
+                    return true;
+                }
+            }
+        });
     }
 }

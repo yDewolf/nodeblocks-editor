@@ -8,10 +8,12 @@ import { usePackageManager } from "~/feature/editor/contexts/package-manager-con
 import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { useMetadata } from "~/feature/metadata/metadata-context";
 import { NodeFilterController } from "~/feature/editor/controllers/filter/node-filter-controller";
+import { ActiveFilterItem } from "~/feature/editor/controllers/filter/node-filter-protocol";
 import { ensureNodeFilters } from "~/feature/editor/contexts/node-filter-context";
 import { ACTIVE_FILTER_DISPLAY_MODES, ActiveFilterDisplayMode } from "~/feature/editor/controllers/filter/node-filter-protocol";
 import TagIcon from '~/assets/icons/tag.svg';
 import CloseIcon from '~/assets/icons/close.svg';
+import { DocsPathPrefix } from "~/feature/docs/docs-protocols";
 
 interface NodeTypeSearch {
     package_id: string
@@ -23,17 +25,20 @@ interface NodeTypeSearch {
 export const NodeTypeSelector = (props: {
     onClickOnPreview: (node_preview: NodeTypePreview) => void
 }) => {
+    const metadata = useMetadata();
     const packageManager = usePackageManager();
+    const filterController = ensureNodeFilters();
     // const [categoryFilter, setCategoryFilter] = createSignal<string | undefined>(undefined);
     const [specs, setSpecs] = createSignal<NodeTypeSpec[]>(
-        Object.values(packageManager.registry.nodeTypes
-    ));
+        Object.values(packageManager.registry.nodeTypes)
+    );
     const unlisten = packageManager.subscribePackageLoad(() => {
         setSpecs(Object.values(packageManager.registry.nodeTypes));
     });
     onCleanup(() => unlisten);
 
-    const node_previews = mapArray(specs, (spec) => {
+    const filtered_specs = createMemo(() => metadata ? filterController.filterNodeSpecs(specs(), metadata) : specs());
+    const node_previews = mapArray(filtered_specs, (spec) => {
         return new NodeTypePreview(spec);
     });
     
@@ -46,7 +51,6 @@ export const NodeTypeSelector = (props: {
         }]
     }
 
-    const filterController = ensureNodeFilters();
     return (
         <div class="node-type-selector-holder">
             <div class="container fill">
@@ -73,7 +77,8 @@ export const NodeTypeSelector = (props: {
                         <For each={filterController.activeFiltersList}>
                             {(filter) => (
                                 <NodeTypeFilter
-                                    label={`${filter.packageId}/${filter.label}`}
+                                    title={`${filter.packageId}:${filter.label}`}
+                                    filter={filter}
                                     isActive={true}
                                     activate={() => {}}
                                     deactivate={() => filterController.deactivateFilter(filter.packageId, filter.type, filter.id)}
@@ -154,13 +159,18 @@ const PackageNavigator = (props: {
 }
 
 const NodeTypeFilter = (props: {
-    label: string
+    title?: string
+    filter: ActiveFilterItem
     isActive: boolean
     activate: () => void
     deactivate: () => void
 }) => {
     return (
-        <button 
+        <button
+            // TODO: seria interessante poder selecionar as tags e ver a descrição delas 
+            // docs-prefix={DocsPathPrefix.HEADER}
+            // docs-id={props.filter.packageId}
+            title={props.title ?? props.filter.label}
             class="nodetype-filter keep row-container center-items" 
             classList={{active: props.isActive}}
             onclick={() => {
@@ -171,7 +181,7 @@ const NodeTypeFilter = (props: {
                 props.deactivate();
             }}
         >
-            {props.label}
+            {props.filter.label}
         </button>
     )
 }
@@ -179,7 +189,7 @@ const NodeTypeFilter = (props: {
 const NodeFilterDropdown = () => {
     const metadata = useMetadata();
     const filterController = ensureNodeFilters();
-    const currentPackageItems = createMemo(() => {
+    const currentPackageItems = createMemo<ActiveFilterItem[]>(() => {
         const pkgId = filterController.selectedPackageId;
         const view = filterController.currentView;
         if (!pkgId || view == "active_filters") return [];
@@ -192,9 +202,11 @@ const NodeFilterDropdown = () => {
 
         return Object.entries(source).map(([id, data]) => ({
             id,
+            type: view == "tags" ? "tag" : "category",
             label: typeof data === "string" ? data : (
                 data.capitalized_name ?? id
             ),
+            packageId: pkgId
         }));
     });
 
@@ -210,15 +222,6 @@ const NodeFilterDropdown = () => {
     return <Dropdown icon={<FilterIcon class="smaller-icon"/>}>
         <div class="filter-dropdown">
             <div class="filter-dropdown-header row-container fill">
-                <Show when={filterController.canGoBack}>
-                    <button class="icon-button" onclick={() => {
-                        if (filterController.canGoBack) {
-                            filterController.goBack();
-                        }
-                    }}>
-                        {"<"}
-                    </button>
-                </Show>
                 <div class="row-container fill center-items">
                     <span>Node Type Filters</span>
                     |
@@ -234,7 +237,18 @@ const NodeFilterDropdown = () => {
                 <div class="filter-dropdown-content container">
                     {/* TODO: Tradução */}
                     <div class="keep row-container fill center-items space-between">
-                        <span><b>{filterController.currentSection}</b></span>
+                        <div class="row-container center-items">
+                            <Show when={filterController.canGoBack}>
+                                <button class="icon-button" onclick={() => {
+                                    if (filterController.canGoBack) {
+                                        filterController.goBack();
+                                    }
+                                }}>
+                                    {"<"}
+                                </button>
+                            </Show>
+                            <span><b>{filterController.currentSection}</b></span>
+                        </div>
                         <Show when={filterController.currentView == "active_filters"}>
                             <select 
                                 value={filterController.state.activeFilterDisplayMode}
@@ -256,20 +270,15 @@ const NodeFilterDropdown = () => {
                             <For each={currentPackageItems()} fallback={
                                 <span class="node-type-filter-path">No item found</span>
                             }>
-                                {(item) => {
+                                {(filter) => {
                                     const pkgId = filterController.selectedPackageId!;
                                     const type = filterController.currentView === "tags" ? "tag" : "category";
                                     return (
                                         <NodeTypeFilter
-                                            label={item.label}
-                                            isActive={filterController.isFilterActive(pkgId, type, item.id)}
-                                            activate={() => filterController.activateFilter({
-                                                packageId: pkgId,
-                                                type,
-                                                id: item.id,
-                                                label: item.label,
-                                            })}
-                                            deactivate={() => filterController.deactivateFilter(pkgId, type, item.id)}
+                                            filter={filter}
+                                            isActive={filterController.isFilterActive(pkgId, type, filter.id)}
+                                            activate={() => filterController.activateFilter(filter)}
+                                            deactivate={() => filterController.deactivateFilter(pkgId, type, filter.id)}
                                         />
                                     );
                                 }}
@@ -286,7 +295,7 @@ const NodeFilterDropdown = () => {
                                         <span class="node-type-filter-path">No active filter</span>
                                     }>
                                         {(filter) => <NodeTypeFilter
-                                            label={`${filter.packageId}: ${filter.label}`}
+                                            filter={filter}
                                             isActive={true}
                                             activate={() => {}}
                                             deactivate={() => filterController.deactivateFilter(filter.packageId, filter.type, filter.id)}
@@ -302,7 +311,7 @@ const NodeFilterDropdown = () => {
                                                 <div class="active-filters">
                                                     <For each={filterController.getPackageActiveFilters(packageId)}>
                                                         {(filter) => <NodeTypeFilter
-                                                            label={filter.label}
+                                                            filter={filter}
                                                             isActive={true}
                                                             activate={() => {}}
                                                             deactivate={() => filterController.deactivateFilter(filter.packageId, filter.type, filter.id)}

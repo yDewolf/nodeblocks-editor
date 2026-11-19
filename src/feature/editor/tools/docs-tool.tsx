@@ -90,6 +90,7 @@ export class DocsTool extends BaseEditorTool {
                 if (this.selected_docs_path) { 
                     this.onSelectDocumentation?.();
                 }
+                e.preventDefault();
             }
         }
     }

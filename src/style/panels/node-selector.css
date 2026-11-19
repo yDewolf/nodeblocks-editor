@@ -121,7 +121,8 @@
   }
 
   .nodetype-filter-holder > .active-filters {
-    overflow-x: scroll;
+    /* TODO: pensar em um jeito melhor de fazer isso aqui */
+    overflow: hidden;
     flex-wrap: nowrap;
   }
 
