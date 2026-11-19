@@ -263,6 +263,29 @@ export default {
             login: "Login",
             logout: "Logout",
             loggedAs: (user: string) => `Logged as '${user}'`
+        },
+        nodeTypeSelector: {
+            nodeTypeFilters: "Nodetype filters",
+            messages: {
+                noActiveFilters: "No active filters",
+            },
+            views: {
+                active_filters: "Active Filters",   
+                tags: "Tags",   
+                categories: "Categories",   
+            },
+            filterTypes: {
+                tag: "Tag",
+                category: "Category"
+            },
+            sortModes: {
+                id: "ID",
+                recent: "Recent"
+            },
+            displayModes: {
+                by_plugin: "By plugin",
+                all: "All"
+            }
         }
     },
     actions: {
@@ -281,6 +304,7 @@ export default {
         errorWhile: (action: string) => `Failed to ${action}`,
         noSomethingSelected: (something: string, fem?: boolean) => `No ${something} selected`,
         couldntFind: (something: string) => `Couldn't find ${something}`,
+        noSomethingFound: (something: string) => `No ${something} was found`,
         noConnectionWithServer: "Not connected to a server. Some features might stop working."
     },
     words: {
@@ -326,6 +350,8 @@ export default {
         originalPlugins: "Original Plugins",
         general: "General",
         editor: "Editor",
-        localServer: "Local Server"
+        localServer: "Local Server",
+        filter: (plural?: boolean) => `Filter${plural ? "s" : ""}`,
+        category: (plural?: boolean) => `Categor${plural ? "ies" : "y"}`
     }
 }

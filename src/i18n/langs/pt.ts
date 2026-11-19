@@ -266,6 +266,29 @@ export default {
             login: "Entrar",
             logout: "Sair",
             loggedAs: (user: string) => `Logado como '${user}'`
+        },
+        nodeTypeSelector: {
+            nodeTypeFilters: "Filtros de Node",
+            messages: {
+                noActiveFilters: "Nenhum filtro ativo",
+            },
+            views: {
+                active_filters: "Filtros ativos",   
+                tags: "Tags",   
+                categories: "Categorias",   
+            },
+            filterTypes: {
+                tag: "Tag",
+                category: "Categoria"
+            },
+            sortModes: {
+                id: "ID",
+                recent: "Recentes"
+            },
+            displayModes: {
+                by_plugin: "Por plugin",
+                all: "Todos"
+            }
         }
     },
     actions: {
@@ -284,6 +307,7 @@ export default {
         errorWhile: (action: string) => `Erro ao ${action}`,
         noSomethingSelected: (something: string, fem?: boolean) => `Nenhum${fem ? "a" : ""} ${something} selecionad${fem ? "a" : "o"}`,
         couldntFind: (something: string) => `Não foi possível encontrar ${something}`,
+        noSomethingFound: (something: string, fem?: boolean) => `Nenhum${fem ? "a" : ""} ${something} foi encontrad${fem ? "a" : "o"}`,
         noConnectionWithServer: "Você não está conectado a um servidor. Algumas coisas podem deixar de funcionar."
     },
     words: {
@@ -329,6 +353,8 @@ export default {
         originalPlugins: "Plugins originais",
         general: "Geral",
         editor: "Editor",
-        localServer: "Servidor Local"
+        localServer: "Servidor Local",
+        filter: (plural?: boolean) => `Filtro${plural ? "s" : ""}`,
+        category: (plural?: boolean) => `Categoria${plural ? "s" : ""}`
     }
 } satisfies typeof en;

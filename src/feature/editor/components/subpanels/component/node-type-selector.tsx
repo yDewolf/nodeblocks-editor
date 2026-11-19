@@ -14,6 +14,7 @@ import { ACTIVE_FILTER_DISPLAY_MODES, ActiveFilterDisplayMode } from "~/feature/
 import { NodeTypeSearch } from "~/feature/editor/controllers/filter/node-search-helper";
 import LongArrowDownIcon from "~/assets/icons/long-arrow-down.svg";
 import CloseIcon from '~/assets/icons/close.svg';
+import ArrowRightIcon from '~/assets/icons/arrow-right.svg';
 
 export const NodeTypeSelector = (props: {
     onClickOnPreview: (node_preview: NodeTypePreview) => void
@@ -122,6 +123,7 @@ const PackageNavigator = (props: {
     controller: NodeFilterController,
     onNavigate?: () => void
 }) => {
+    const {t} = useI18n();
     const metadata = useMetadata();
     const packageManager = usePackageManager();
     const [currentItem, setCurrentItem] = createSignal<string | undefined>(undefined);
@@ -144,7 +146,7 @@ const PackageNavigator = (props: {
                                 props.onNavigate?.();
                             }}
                         >
-                            Tags ({Object.keys(meta?.tags ?? {}).length})
+                            {t("words.tags")} ({Object.keys(meta?.tags ?? {}).length})
                         </button>
                         <button
                             class="text-button"
@@ -154,7 +156,7 @@ const PackageNavigator = (props: {
                                 props.onNavigate?.();
                             }}
                         >
-                            Categories ({Object.keys(meta?.categories ?? {}).length})
+                            {t("words.category", true)} ({Object.keys(meta?.categories ?? {}).length})
                         </button>
                     </div>
                 ),
@@ -206,6 +208,7 @@ const NodeTypeFilter = (props: {
 }
 
 const NodeFilterDropdown = () => {
+    const {t} = useI18n();
     const metadata = useMetadata();
     const { filterController } = ensureNodeFilters();
     const currentPackageItems = createMemo<ActiveFilterItem[]>(() => {
@@ -242,10 +245,10 @@ const NodeFilterDropdown = () => {
         <div class="filter-dropdown">
             <div class="filter-dropdown-header row-container fill">
                 <div class="row-container fill center-items">
-                    <span>Node Type Filters</span>
+                    <span>{t("components.nodeTypeSelector.nodeTypeFilters")}</span>
                     |
                     <span class="node-type-filter-path">
-                        {filterController.currentPath.join(" -> ")}
+                        {filterController.currentPath.join(" > ")}
                     </span>
                 </div>
             </div>
@@ -254,7 +257,6 @@ const NodeFilterDropdown = () => {
                     <PackageNavigator controller={filterController}/>
                 </div>
                 <div class="filter-dropdown-content container">
-                    {/* TODO: Tradução */}
                     <div class="keep row-container fill center-items space-between">
                         <div class="row-container center-items">
                             <Show when={filterController.canGoBack}>
@@ -263,31 +265,19 @@ const NodeFilterDropdown = () => {
                                         filterController.goBack();
                                     }
                                 }}>
-                                    {"<"}
+                                    <ArrowRightIcon class="smaller-icon flip"/>
                                 </button>
                             </Show>
-                            <span><b>{filterController.currentSection}</b></span>
+                            <span><b>{t(`components.nodeTypeSelector.views.${filterController.currentSection}`)}</b></span>
                         </div>
                         <Show when={filterController.currentView == "active_filters"}>
-                            <select 
-                                value={filterController.state.activeFilterDisplayMode}
-                                oninput={(e) => {
-                                    filterController.setDisplayMode(e.target.value as ActiveFilterDisplayMode)
-                                }
-                            }>
-                                <For each={ACTIVE_FILTER_DISPLAY_MODES}>
-                                    {(mode) => <option value={mode}>
-                                        {/* TODO: translate */}
-                                        {mode}
-                                    </option>}
-                                </For>
-                            </select>
+                            <FilterDisplayModeSelector/>
                         </Show>
                     </div>
                     <Show when={filterController.currentView == "active_filters"} fallback={
                         <div class="active-filters">
                             <For each={currentPackageItems()} fallback={
-                                <span class="node-type-filter-path">No item found</span>
+                                <span class="node-type-filter-path">{t("messages.noSomethingFound", t("words.filter"))}</span>
                             }>
                                 {(filter) => {
                                     const pkgId = filterController.selectedPackageId!;
@@ -305,13 +295,13 @@ const NodeFilterDropdown = () => {
                         </div>
                     }>
                         <Show when={filterController.activeFiltersList.length > 0} fallback={
-                            <span class="node-type-filter-path">No active filters</span>
+                            <span class="node-type-filter-path">{t("components.nodeTypeSelector.messages.noActiveFilters")}</span>
                         }>
                             <Switch fallback={
                                 // Show all
                                 <div class="active-filters">
                                     <For each={filterController.activeFiltersList} fallback={
-                                        <span class="node-type-filter-path">No active filter</span>
+                                        <span class="node-type-filter-path">{t("components.nodeTypeSelector.messages.noActiveFilters")}</span>
                                     }>
                                         {(filter) => <NodeTypeFilter
                                             filter={filter}
@@ -352,11 +342,12 @@ const NodeFilterDropdown = () => {
 
 
 export const ClearActiveFiltersButton = () => {
+    const {t} = useI18n();
     const { filterController } = ensureNodeFilters();
     return (
         <Show when={filterController.activeFiltersList.length > 0}>
             <div class="filter-counter row-container center-items">
-                {filterController.activeFiltersList.length} filters
+                {filterController.activeFiltersList.length} {t("words.filter", filterController.activeFiltersList.length > 1)}
                 <button class="icon-button" onclick={() => {
                     filterController.clearActiveFilters();  
                 }}>
@@ -368,6 +359,7 @@ export const ClearActiveFiltersButton = () => {
 }
 
 export const NodeSpecSortModeSelector = () => {
+    const {t} = useI18n();
     const {filterController} = ensureNodeFilters();
     return (
         <div class="keep row-container center-items">
@@ -381,11 +373,30 @@ export const NodeSpecSortModeSelector = () => {
             }} id="type-selector-order">
                 <For each={NODE_SPEC_SORT_MODES}>
                     {(mode) => <option value={mode}>
-                        {/* TODO: translate */}
-                        {mode}
+                        {t(`components.nodeTypeSelector.sortModes.${mode as NodeSpecSortMode}`)}
                     </option>}
                 </For>
             </select>
         </div>
+    )
+}
+
+export const FilterDisplayModeSelector = () => {
+    const {t} = useI18n();
+    const {filterController} = ensureNodeFilters();
+
+    return (
+        <select 
+            value={filterController.state.activeFilterDisplayMode}
+            oninput={(e) => {
+                filterController.setDisplayMode(e.target.value as ActiveFilterDisplayMode)
+            }
+        }>
+            <For each={ACTIVE_FILTER_DISPLAY_MODES}>
+                {(mode) => <option value={mode}>
+                    {t(`components.nodeTypeSelector.displayModes.${mode as ActiveFilterDisplayMode}`)}
+                </option>}
+            </For>
+        </select>
     )
 }

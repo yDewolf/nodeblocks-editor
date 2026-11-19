@@ -53,7 +53,7 @@ export class NodeFilterController {
     get currentView(): FilterViewMode { return this.state.view; }
     get selectedPackageId(): string | null { return this.state.selectedPackageId; }
     get canGoBack(): boolean { return this.state.view !== "active_filters"; }
-    get currentSection(): string { return this.state.view; }
+    get currentSection(): FilterViewMode { return this.state.view; }
     get currentPath(): string[] {
         return ["packages"].concat((this.state.selectedPackageId 
             ? [this.state.selectedPackageId, this.state.view] : [])
