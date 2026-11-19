@@ -12,6 +12,7 @@ import { SceneArtifactProvider } from "./contexts/artifact-context";
 import { SceneArtifactHTTPController } from "~/network/api/scene-artifact-http-controller";
 
 import "~/style/screens/editor.css";
+import { NodeFilterProvider } from "./contexts/node-filter-context";
 
 export default function SceneEditor() {
     const appSession = useAppSession();
@@ -58,14 +59,16 @@ const EditorSetup = (props: {sceneId: string}) => {
         <MetadataProvider controller={editor.metadataController}>
             <DocsProvider controller={editor.docsController}>
                 <DocsUrlSync />
-                <InputManagerProvider manager={editor.inputManager}>
-                    <DefinedInputScope context={editor.globalInputContext}>
-                        {/* TODO adicionar um editor keybind provider */}
-                        <EventManagerProvider manager={editor.eventManager}>
-                            <EditorView />
-                        </EventManagerProvider>
-                    </DefinedInputScope>
-                </InputManagerProvider>
+                <NodeFilterProvider controller={editor.nodeFilterController}>
+                    <InputManagerProvider manager={editor.inputManager}>
+                        <DefinedInputScope context={editor.globalInputContext}>
+                            {/* TODO adicionar um editor keybind provider */}
+                            <EventManagerProvider manager={editor.eventManager}>
+                                <EditorView />
+                            </EventManagerProvider>
+                        </DefinedInputScope>
+                    </InputManagerProvider>
+                </NodeFilterProvider>
             </DocsProvider>
         </MetadataProvider>
     )

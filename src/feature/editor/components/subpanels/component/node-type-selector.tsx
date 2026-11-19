@@ -11,7 +11,8 @@ import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { useDocs } from "~/feature/docs/docs-context";
 import { useMetadata } from "~/feature/metadata/metadata-context";
 import { BooleanParam } from "~/protocols/nodeblocks/manifests/node/datatype-spec";
-import { NodeFilterController } from "~/feature/editor/controllers/node-filter-controller";
+import { NodeFilterController } from "~/feature/editor/controllers/filter/node-filter-controller";
+import { ensureNodeFilters } from "~/feature/editor/contexts/node-filter-context";
 
 interface NodeTypeSearch {
     package_id: string
@@ -47,7 +48,7 @@ export const NodeTypeSelector = (props: {
         }]
     }
 
-    const filterController = new NodeFilterController();
+    const filterController = ensureNodeFilters();
     const currentPackageItems = createMemo(() => {
         const pkgId = filterController.selectedPackageId;
         const view = filterController.currentView;

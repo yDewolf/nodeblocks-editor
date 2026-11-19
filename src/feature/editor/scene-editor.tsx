@@ -25,6 +25,7 @@ import { nanoid } from 'nanoid';
 import { ClientSceneCommandTypes, CommandGroups } from '~/protocols/nodeblocks/network/client-command-protocol';
 import { SceneExecutionCmdTypes } from '../../protocols/nodeblocks/network/client-command-protocol';
 import { createSceneState, editorState } from './editor-state';
+import { NodeFilterController } from './controllers/filter/node-filter-controller';
 
 export class SceneEditor {
     private _scene: NodeScene;
@@ -45,6 +46,8 @@ export class SceneEditor {
     private _notificationController: NotificationController;
     private _metadataController: MetadataController;
     private _docsController: DocsController;
+
+    private _nodeFilterController: NodeFilterController;
 
     constructor(
         private _appSession: AppSessionManager,
@@ -72,6 +75,7 @@ export class SceneEditor {
 
         this._metadataController = new MetadataController(this.appSession, this.packageManager);
         this._docsController= new DocsController(this.metadataController);
+        this._nodeFilterController = new NodeFilterController(this.sceneId);
 
         this._register_handlers();
         this.setup_event_handlers();
@@ -94,6 +98,7 @@ export class SceneEditor {
     get notificationController() { return this._notificationController; }
     get metadataController() { return this._metadataController; }
     get docsController() { return this._docsController; }
+    get nodeFilterController() { return this._nodeFilterController; }
 
     get appSession() { return this._appSession; }
     get packageManager() { return this._packageManager; }
