@@ -47,4 +47,13 @@
         background-color: var(--dark-overlay-highlight);
         opacity: 0.5;
     }
+
+
+    .y-flip {
+        transform: scaleY(-1);
+    }
+
+    .flip {
+        transform: scaleX(-1);
+    }
 }

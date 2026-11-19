@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { ActiveFilterDisplayMode, ActiveFilterItem, createDefaultNodeFilterState, FilterTypes, FilterViewMode, makeNodeFilterKey, NodeFilterState } from "./node-filter-protocol";
+import { ActiveFilterDisplayMode, ActiveFilterItem, createDefaultNodeFilterState, FilterTypes, FilterViewMode, makeNodeFilterKey, NodeFilterState, NodeSpecSortMode } from "./node-filter-protocol";
 import { _setEditorState, editorState } from "../../editor-state";
 import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { MetadataController } from "~/feature/metadata/metadata_controller";
@@ -107,6 +107,24 @@ export class NodeFilterController {
     public setDisplayMode(mode: ActiveFilterDisplayMode) {
         this.updateState(() => ({
             activeFilterDisplayMode: mode
+        }));
+    }
+
+    public setSortMode(mode: NodeSpecSortMode) {
+        this.updateState(() => ({
+            specSortMode: mode
+        }));
+    }
+
+    public addFqnToRecent(fqn: string) {
+        this.updateState((prev) => ({
+            recentNodeFqns: [...prev.recentNodeFqns.filter((a) => a != fqn), fqn]
+        }));
+    }
+
+    public setCrescentOrder(v: boolean) {
+        this.updateState(() => ({
+            isCrescentOrder: v
         }));
     }
 

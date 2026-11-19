@@ -8,10 +8,11 @@ import { usePackageManager } from "~/feature/editor/contexts/package-manager-con
 import { NodeTypeSpec } from "~/protocols/nodeblocks/manifests/node/node-spec";
 import { useMetadata } from "~/feature/metadata/metadata-context";
 import { NodeFilterController } from "~/feature/editor/controllers/filter/node-filter-controller";
-import { ActiveFilterItem } from "~/feature/editor/controllers/filter/node-filter-protocol";
+import { ActiveFilterItem, NODE_SPEC_SORT_MODES, NodeSpecSortMode } from "~/feature/editor/controllers/filter/node-filter-protocol";
 import { ensureNodeFilters } from "~/feature/editor/contexts/node-filter-context";
 import { ACTIVE_FILTER_DISPLAY_MODES, ActiveFilterDisplayMode } from "~/feature/editor/controllers/filter/node-filter-protocol";
 import { NodeTypeSearch } from "~/feature/editor/controllers/filter/node-search-helper";
+import LongArrowDownIcon from "~/assets/icons/long-arrow-down.svg";
 
 export const NodeTypeSelector = (props: {
     onClickOnPreview: (node_preview: NodeTypePreview) => void
@@ -38,7 +39,6 @@ export const NodeTypeSelector = (props: {
             fqns.add(result.fqn);
         }
         setFilteredFqns(fqns);
-        console.warn(fqns);
         return results;
     }
     
@@ -56,11 +56,24 @@ export const NodeTypeSelector = (props: {
         );
     });
 
-    const node_previews = mapArray(() => (filtered_specs().sort((a, b) => 
-        ('' + a.id).localeCompare(b.id)
-    )), (spec) => {
+    const sortSpecs = (a: NodeTypeSpec, b: NodeTypeSpec) => {
+        if (filterController.state.specSortMode == "recent") {
+            return (
+                filterController.state.recentNodeFqns.findIndex((v) => v == b.fqn)
+                - filterController.state.recentNodeFqns.findIndex((v) => v == a.fqn)
+            ) * (filterController.state.isCrescentOrder ? 1 : -1);
+        }
+        return ('' + a.id).localeCompare(b.id) * (filterController.state.isCrescentOrder ? 1 : -1);
+    }
+
+    const node_previews = mapArray(() => filtered_specs().sort(sortSpecs), (spec) => {
         return new NodeTypePreview(spec);
     });
+
+    const handleOnClickPreview = (node_preview: NodeTypePreview) => {
+        props.onClickOnPreview(node_preview);
+        filterController.addFqnToRecent(node_preview.spec.fqn);
+    }
 
     return (
         <div class="node-type-selector-holder">
@@ -99,12 +112,29 @@ export const NodeTypeSelector = (props: {
                             )}
                         </For>
                     </div>
-                    <NodeFilterDropdown />
+                    <div class="row-container center-items">
+                        <button class="icon-button" onclick={() => {
+                            filterController.setCrescentOrder(!filterController.state.isCrescentOrder);
+                        }}>
+                            <LongArrowDownIcon class="smaller-icon" classList={{"y-flip": !filterController.state.isCrescentOrder}}/>
+                        </button>
+                        <select value={filterController.state.specSortMode} oninput={(e) => {
+                            filterController.setSortMode(e.target.value as NodeSpecSortMode)
+                        }} id="type-selector-order">
+                            <For each={NODE_SPEC_SORT_MODES}>
+                                {(mode) => <option value={mode}>
+                                    {/* TODO: translate */}
+                                    {mode}
+                                </option>}
+                            </For>
+                        </select>
+                        <NodeFilterDropdown />
+                    </div>
                 </div>
             </div>
             <div class="node-type-selector">
                 <For each={node_previews()}>
-                    {(item) => item.View(props.onClickOnPreview)}
+                    {(item) => item.View(handleOnClickPreview)}
                 </For>
             </div>
         </div>
