@@ -69,6 +69,9 @@ export class NodeFilterController {
     get activeFiltersList(): ActiveFilterItem[] {
         return Object.values(this.state.activeFilters);
     }
+    public getPackageActiveFilters(packageId: string) {
+        return this.activeFiltersList.filter((filter) => filter.packageId == packageId);
+    }
 
 
     public openPackageTags(packageId: string) {

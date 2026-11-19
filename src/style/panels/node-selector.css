@@ -56,12 +56,19 @@
 
   .filter-dropdown-body {
     overflow-y: scroll;
-    display: flex;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: 1fr;
     gap: 10px;
   }
 
   .filter-dropdown-body > div {
     padding: 2px;
+  }
+
+  .filter-dropdown-content {
+    width: stretch;
+    height: max-content;
   }
 
   .plugin-selector {
@@ -82,8 +89,14 @@
     flex-wrap: wrap;
     gap: 6px;
 
+    height: fit-content;
+    width: stretch;
     min-height: 0;
     overflow-y: auto;
+  }
+
+  .package-filter-section {
+    max-height: 80px;
   }
 
   .nodetype-filter {
