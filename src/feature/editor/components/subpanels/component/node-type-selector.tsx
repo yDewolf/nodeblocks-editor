@@ -11,9 +11,6 @@ import { NodeFilterController } from "~/feature/editor/controllers/filter/node-f
 import { ActiveFilterItem } from "~/feature/editor/controllers/filter/node-filter-protocol";
 import { ensureNodeFilters } from "~/feature/editor/contexts/node-filter-context";
 import { ACTIVE_FILTER_DISPLAY_MODES, ActiveFilterDisplayMode } from "~/feature/editor/controllers/filter/node-filter-protocol";
-import TagIcon from '~/assets/icons/tag.svg';
-import CloseIcon from '~/assets/icons/close.svg';
-import { DocsPathPrefix } from "~/feature/docs/docs-protocols";
 import { NodeTypeSearch } from "~/feature/editor/controllers/filter/node-search-helper";
 
 export const NodeTypeSelector = (props: {
@@ -58,7 +55,10 @@ export const NodeTypeSelector = (props: {
             filteredFqns().size > 0 ? filteredFqns().has(spec.fqn) : true
         );
     });
-    const node_previews = mapArray(filtered_specs, (spec) => {
+
+    const node_previews = mapArray(() => (filtered_specs().sort((a, b) => 
+        ('' + a.id).localeCompare(b.id)
+    )), (spec) => {
         return new NodeTypePreview(spec);
     });
 
@@ -68,17 +68,19 @@ export const NodeTypeSelector = (props: {
                 {SearchBar<NodeTypeSearch>(
                     handleSearch,
                     (result, setQuery) => (
-                        <div class="container fill">
-                            <div class="row-container space-between center-items">
-                                <span class="search-result-title">{result.capitalized_name}</span>
-                                <span class="search-result-root">
-                                    {result.id} ({result.package_id})
-                                </span>
+                        <button class="node-search-result" onclick={() => setQuery(result.id)}>
+                            <div class="container fill">
+                                <div class="row-container space-between center-items">
+                                    <span class="search-result-title">{result.capitalized_name}</span>
+                                    <span class="search-result-root">
+                                        {result.id} ({result.package_id})
+                                    </span>
+                                </div>
+                                <Show when={result.brief}>
+                                    <p class="search-result-description">{result.brief}</p>
+                                </Show>
                             </div>
-                            <Show when={result.brief}>
-                                <p class="search-result-description">{result.brief}</p>
-                            </Show>
-                        </div>
+                        </button>
                     )
                 )}
                 <div class="nodetype-filter-holder center-items">

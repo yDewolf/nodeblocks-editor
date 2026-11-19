@@ -126,6 +126,18 @@
     flex-wrap: nowrap;
   }
 
+  .node-search-result {
+    padding: 2px 4px;
+    border: none;
+    border-radius: 4px;
+    background-color: transparent;
+  }
+
+  .node-search-result:hover {
+    cursor: pointer;
+    background-color: var(--overlay-highlight);
+  }
+
   /* antigo */
 
 
