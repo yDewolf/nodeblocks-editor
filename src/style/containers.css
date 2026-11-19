@@ -23,6 +23,7 @@
 }
 
 .view-header {
+    margin-bottom: 4px;
     display: flex;
     align-items: center;
 }

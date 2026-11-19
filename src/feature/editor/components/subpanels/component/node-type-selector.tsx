@@ -98,47 +98,11 @@ export const NodeTypeSelector = (props: {
                     )
                 )}
                 <div class="nodetype-filter-holder center-items">
-                    <div class="row-container active-filters">
-                        {/* TODO: aqui acho que ficaria melhor se ele mostrasse*/}
-                        {/* a quantidade de filtros de tags ou categorias*/}
-                        <Show when={filterController.activeFiltersList.length > 0}>
-                            <div class="filter-counter row-container center-items">
-                                {filterController.activeFiltersList.length} filters
-                                <button class="icon-button" onclick={() => {
-                                    filterController.clearActiveFilters();  
-                                }}>
-                                    <CloseIcon class="smaller-icon"/>
-                                </button>
-                            </div>
-                        </Show>
-                        {/* <For each={filterController.activeFiltersList}>
-                            {(filter) => (
-                                <NodeTypeFilter
-                                    title={`${filter.packageId}:${filter.label}`}
-                                    filter={filter}
-                                    isActive={true}
-                                    activate={() => {}}
-                                    deactivate={() => filterController.deactivateFilter(filter.packageId, filter.type, filter.id)}
-                                />
-                            )}
-                        </For> */}
+                    <div class="row-container">
+                        <ClearActiveFiltersButton />
                     </div>
-                    <div class="row-container center-items">
-                        <button class="icon-button" onclick={() => {
-                            filterController.setCrescentOrder(!filterController.state.isCrescentOrder);
-                        }}>
-                            <LongArrowDownIcon class="smaller-icon" classList={{"y-flip": !filterController.state.isCrescentOrder}}/>
-                        </button>
-                        <select value={filterController.state.specSortMode} oninput={(e) => {
-                            filterController.setSortMode(e.target.value as NodeSpecSortMode)
-                        }} id="type-selector-order">
-                            <For each={NODE_SPEC_SORT_MODES}>
-                                {(mode) => <option value={mode}>
-                                    {/* TODO: translate */}
-                                    {mode}
-                                </option>}
-                            </For>
-                        </select>
+                    <div class="keep row-container center-items">
+                        <NodeSpecSortModeSelector/>
                         <NodeFilterDropdown />
                     </div>
                 </div>
@@ -152,6 +116,7 @@ export const NodeTypeSelector = (props: {
     );
 }
 
+// -- selector components
 
 const PackageNavigator = (props: {
     controller: NodeFilterController,
@@ -383,4 +348,44 @@ const NodeFilterDropdown = () => {
             </div>
         </div>
     </Dropdown>;
+}
+
+
+export const ClearActiveFiltersButton = () => {
+    const { filterController } = ensureNodeFilters();
+    return (
+        <Show when={filterController.activeFiltersList.length > 0}>
+            <div class="filter-counter row-container center-items">
+                {filterController.activeFiltersList.length} filters
+                <button class="icon-button" onclick={() => {
+                    filterController.clearActiveFilters();  
+                }}>
+                    <CloseIcon class="smaller-icon"/>
+                </button>
+            </div>
+        </Show>
+    )
+}
+
+export const NodeSpecSortModeSelector = () => {
+    const {filterController} = ensureNodeFilters();
+    return (
+        <div class="keep row-container center-items">
+            <button class="icon-button" onclick={() => {
+                filterController.setCrescentOrder(!filterController.state.isCrescentOrder);
+            }}>
+                <LongArrowDownIcon class="smaller-icon" classList={{"y-flip": !filterController.state.isCrescentOrder}}/>
+            </button>
+            <select value={filterController.state.specSortMode} oninput={(e) => {
+                filterController.setSortMode(e.target.value as NodeSpecSortMode)
+            }} id="type-selector-order">
+                <For each={NODE_SPEC_SORT_MODES}>
+                    {(mode) => <option value={mode}>
+                        {/* TODO: translate */}
+                        {mode}
+                    </option>}
+                </For>
+            </select>
+        </div>
+    )
 }

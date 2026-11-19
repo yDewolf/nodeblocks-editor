@@ -40,6 +40,7 @@
 }
 
 .icon-button {
+    padding: 0;
     /* animation: scaleUp 100ms ease-out; */
     display: flex;
     align-items: center;
@@ -127,17 +128,6 @@ button.go-back {
     grid-area: 1 / 1;
 }
 .button-with-dropdown-holder > .dropdown {
-    margin-left: 75%;
+    margin-left: 100%;
 }
 
-
-.dev-mode-button {
-    svg {
-        width: 16px;
-        height: 16px;
-    }
-}
-
-.dev-mode-button.active {
-    color: var(--selection-color);
-}

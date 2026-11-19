@@ -29,7 +29,7 @@ export const StaticViewDisplayer = (props: {page_viewer: PageViewer}) => {
 
     return (
         <div class={`view-displayer ` + (props.page_viewer.current_page.view_displayer_css ?? "")}>
-            <div class="view-header">
+            <div class="view-header keep row-container">
                 <button class="icon-button" onclick={() => props.page_viewer.current_page = undefined}>
                     <Show when={props.page_viewer.current_page.icon_element} fallback={
                         <CloseIcon class="small-icon" />
