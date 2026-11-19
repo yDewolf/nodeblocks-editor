@@ -14,42 +14,53 @@ import { ACTIVE_FILTER_DISPLAY_MODES, ActiveFilterDisplayMode } from "~/feature/
 import TagIcon from '~/assets/icons/tag.svg';
 import CloseIcon from '~/assets/icons/close.svg';
 import { DocsPathPrefix } from "~/feature/docs/docs-protocols";
-
-interface NodeTypeSearch {
-    package_id: string
-    type_id: string
-    capitalized_name: string
-    brief: string
-}
+import { NodeTypeSearch } from "~/feature/editor/controllers/filter/node-search-helper";
 
 export const NodeTypeSelector = (props: {
     onClickOnPreview: (node_preview: NodeTypePreview) => void
 }) => {
     const metadata = useMetadata();
     const packageManager = usePackageManager();
-    const filterController = ensureNodeFilters();
+    const {filterController, searchSpec, searchNode} = ensureNodeFilters();
     // const [categoryFilter, setCategoryFilter] = createSignal<string | undefined>(undefined);
+
     const [specs, setSpecs] = createSignal<NodeTypeSpec[]>(
         Object.values(packageManager.registry.nodeTypes)
     );
+    const [filteredFqns, setFilteredFqns] = createSignal<Set<string>>(new Set());
     const unlisten = packageManager.subscribePackageLoad(() => {
         setSpecs(Object.values(packageManager.registry.nodeTypes));
     });
     onCleanup(() => unlisten);
 
-    const filtered_specs = createMemo(() => metadata ? filterController.filterNodeSpecs(specs(), metadata) : specs());
+    
+    const handleSearch = (query: string): NodeTypeSearch[] => {
+        const results = searchNode(query);
+        let fqns: Set<string> = new Set();
+        for (const result of results) {
+            fqns.add(result.fqn);
+        }
+        setFilteredFqns(fqns);
+        console.warn(fqns);
+        return results;
+    }
+    
+    const filtered_specs = createMemo(() => {
+        if (!metadata) return specs(); 
+        
+        const filtersAndQuery = filterController.filterNodeSpecs(specs(), metadata).filter((spec) => 
+            filteredFqns().size > 0 ? filteredFqns().has(spec.fqn) : true
+        );
+        if (filtersAndQuery.length > 0) return filtersAndQuery;
+
+        // Filter only using query
+        return specs().filter((spec) => 
+            filteredFqns().size > 0 ? filteredFqns().has(spec.fqn) : true
+        );
+    });
     const node_previews = mapArray(filtered_specs, (spec) => {
         return new NodeTypePreview(spec);
     });
-    
-    const handleSearch = (query: string): NodeTypeSearch[] => {
-        return [{
-            package_id: "placeholder",
-            type_id: "place",
-            capitalized_name: "Placeholder",
-            brief: "lorem ipsum"
-        }]
-    }
 
     return (
         <div class="node-type-selector-holder">
@@ -61,7 +72,7 @@ export const NodeTypeSelector = (props: {
                             <div class="row-container space-between center-items">
                                 <span class="search-result-title">{result.capitalized_name}</span>
                                 <span class="search-result-root">
-                                    {result.type_id} ({result.package_id})
+                                    {result.id} ({result.package_id})
                                 </span>
                             </div>
                             <Show when={result.brief}>
@@ -188,7 +199,7 @@ const NodeTypeFilter = (props: {
 
 const NodeFilterDropdown = () => {
     const metadata = useMetadata();
-    const filterController = ensureNodeFilters();
+    const { filterController } = ensureNodeFilters();
     const currentPackageItems = createMemo<ActiveFilterItem[]>(() => {
         const pkgId = filterController.selectedPackageId;
         const view = filterController.currentView;

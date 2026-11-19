@@ -1,18 +1,20 @@
-import { createMemo, createSignal, For, JSXElement, Show } from "solid-js";
+import { Accessor, createMemo, createSignal, For, JSXElement, Setter, Show } from "solid-js";
 import { useI18n } from "~/i18n/i18n-context";
 
 export function SearchBar<T = object>(
     search: (query: string) => T[], 
     searchResultComponent: (result: T, setQuery: (v: string) => void) => JSXElement,
-    searchPlaceholder?: string
+    searchPlaceholder?: string,
+    searchResultsAccessor?: Accessor<T[]>,
+    querySignal?: [Accessor<string>, Setter<string>]
 ) {
     const { t } = useI18n();
 
     const placeholder = searchPlaceholder ?? t("pages.docs.messages.searchForTopics")
     let containerRef: HTMLDivElement | undefined;
-    const [query, setQuery] = createSignal("");
+    const [query, setQuery] = querySignal ?? createSignal("");
     const [isFocused, setIsFocused] = createSignal(false);
-    const searchResults = createMemo(() => search(query()));
+    const searchResults = searchResultsAccessor ?? createMemo(() => search(query()));
 
     const handleOnFocusOut = (e: FocusEvent) => {
         const nextTarget = e.relatedTarget as Node
@@ -49,7 +51,7 @@ export function SearchBar<T = object>(
                     }}
                 >
                     <For each={searchResults()} fallback={
-                        <div>{t("pages.docs.messages.noTopicFound")}</div>
+                        <div>{t("components.searchbar.noResultsForQuery")}</div>
                     }>
                         {(result) => searchResultComponent(result, setQuery)}
                     </For>

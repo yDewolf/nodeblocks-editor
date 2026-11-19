@@ -23,7 +23,6 @@ export default {
             parseNodePreview: "gerar preview do node",
             messages: {
                 previousTabsShowUp: "Abas abertas anteriormente aparecem aqui.",
-                noTopicFound: "Nenhum tópico foi encontrado",
                 noParametersForRenderer: "Nenhum parâmetro disponível para esse renderizador",
                 nodeHasNoSlots: "Esse node não tem nenhum slot",
                 nodeHasNoParam: "Esse node não tem nenhum parâmetro",
@@ -259,6 +258,7 @@ export default {
             startingLocal: "Iniciando..."
         },
         searchbar: {
+            noResultsForQuery: "Nenhum resultado foi encontrado",
             searchPlaceholder: "Busque por algo aqui",
         },
         login: {

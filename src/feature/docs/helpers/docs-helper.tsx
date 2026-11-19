@@ -1,5 +1,6 @@
 import { DocsPathUtils } from "~/feature/docs/helpers/docs-path-utils";
 import { MetadataStoreData } from "../../metadata/metadata_controller";
+import { escapeRegex } from "~/utils/regex-utils";
 export type DocTopicType = 'node' | 'datatype' | 'interface' | "header";
 export interface DocTopic {
     id: string;
@@ -8,10 +9,6 @@ export interface DocTopic {
     capitalized_name: string;
     description?: string;
     path: string;
-}
-
-function escapeRegex(text: string): string {
-    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 export class DocSearchHelper {

@@ -21,7 +21,6 @@ export default {
             parseNodePreview: "parse node preview",
             messages: {
                 previousTabsShowUp: "Previous opened tabs show up here.",
-                noTopicFound: "No topic found",
                 noParametersForRenderer: "No parameters available for this renderer",
                 nodeHasNoSlots: "This node has no slots",
                 nodeHasNoParam: "This node has no parameters",
@@ -257,6 +256,7 @@ export default {
         },
         searchbar: {
             searchPlaceholder: "Search for something here",
+            noResultsForQuery: "No results for query",
         },
         login: {
             username: "Username",
