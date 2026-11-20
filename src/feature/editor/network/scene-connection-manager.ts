@@ -76,6 +76,26 @@ export class SceneConnectionManager {
     get maxAttempts() { return this.maxReconnectAttempts; }
 
 
+    public cleanup(): void {
+        this.disconnect();
+        this.abortReconnect();
+
+        this._isConnecting = false;
+        this._sceneId = null;
+        this.sceneToken = null;
+        this._setReconnectAttempts(0);
+        this._setStatus(WebsocketStatus.DISCONNECTED);
+
+        this.commandQueue = [];
+        this.messageListeners.clear();
+        this.commandResponseListeners.clear();
+        this.workerEventListeners.clear();
+        this.engineEventListeners.clear();
+        this._connectListeners.clear();
+        this._errorListeners.clear();
+    }
+
+
     public onConnect(listener: (sceneConn: SceneConnectionManager) => void) {
         this._connectListeners.add(listener);
         return () => this._connectListeners.delete(listener);
@@ -160,6 +180,13 @@ export class SceneConnectionManager {
             this.socket = new WebSocket(websocketUrl.toString());
 
             this.socket.onopen = () => {
+                if (this.isIntentionalDisconnect) {
+                    this.socket?.close(1000, "User disconnected from scene");
+                    this.socket = null;
+                    resolve();
+                    return;
+                }
+                
                 this._setStatus(WebsocketStatus.CONNECTED);
                 this._isConnecting = false;
                 this._setReconnectAttempts(0);

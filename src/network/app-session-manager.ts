@@ -73,6 +73,18 @@ export class AppSessionManager {
         return this.host == "127.0.0.1" || this.host == "localhost";
     }
 
+    public cleanup() {
+        this.disconnect();
+        this._sessionToken = null;
+        this._defaultHeaders = {};
+        
+        this._setSessionStore("user_session", undefined as any);
+
+        this._loginListeners.clear();
+        this._logoutListeners.clear();
+        this._serverListeners.clear();
+    }
+
     public setUserSession(user_session?: UserSessionData | null) {
         if (!user_session?.user_id) {
             return;
@@ -219,6 +231,8 @@ export class AppSessionManager {
 
     private disconnectServerEvents() {
         if (this._eventSource) {
+            this._eventSource.onerror = null;
+            this._eventSource.onopen = null;
             this._eventSource.close();
             this._eventSource = null;
         }

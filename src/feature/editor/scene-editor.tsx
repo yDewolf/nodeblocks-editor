@@ -115,7 +115,7 @@ export class SceneEditor {
     get  grid() { return this._selectionController.grid; }
 
     public async cleanup() {
-        this.sceneConnection.abortReconnect();
+        this.sceneConnection.cleanup();
         this.eventManager.cleanup();
     }
 
@@ -289,7 +289,7 @@ export class SceneEditor {
                         e,
                         data.targetElement
                     );
-                    
+
                     this.selectionController.space.cursorWorldPos = world_pos;
                     const delta = data.delta ?? { x: e.movementX, y: e.movementY };
                     this._toolController.current_tool?.onMoveCursor(

@@ -1,17 +1,35 @@
-import { createContext, ParentComponent, useContext } from "solid-js";
+import { createContext, onCleanup, onMount, ParentComponent, useContext } from "solid-js";
 import { AppSessionManager } from "./app-session-manager";
-import { createAsync } from "@solidjs/router";
 import { getUserSession } from "~/server/session";
+import { getActiveServerUrl } from "~/server/connected-server";
 
 
 const AppSessionContext = createContext<AppSessionManager>();
 export const AppSessionProvider: ParentComponent<{
-    appSession: AppSessionManager
+    appSession?: AppSessionManager
 }> = (props) => {
+  const session = props.appSession ?? new AppSessionManager();
   const initialSession = getUserSession();
-  props.appSession.setUserSession(initialSession);
+  session.setUserSession(initialSession);
+  
+  const connectToServer = async () => {
+    const activeServerUrl = await getActiveServerUrl();
+    const parsedUrl = new URL(activeServerUrl);
+
+    const serverHost = parsedUrl.hostname;
+    const serverPort = Number.parseInt(parsedUrl.port) || (parsedUrl.protocol === "https:" ? 443 : 80);
+    
+    session.tryConnectToServer(serverHost, serverPort);
+  };
+  
+  onMount(async () => {
+    if (session.isConnectedToServer) return;
+    await connectToServer();
+  });
+  onCleanup(() => session.cleanup());
+
   return (
-    <AppSessionContext.Provider value={props.appSession}>
+    <AppSessionContext.Provider value={session}>
       {props.children}
     </AppSessionContext.Provider>
   );
