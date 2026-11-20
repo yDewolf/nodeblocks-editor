@@ -4,6 +4,7 @@ import { createStore, SetStoreFunction } from 'solid-js/store';
 import { IncompatibleServerError, setServerUrlAction } from '~/server/connected-server';
 import { createSignal, Setter } from 'solid-js';
 import { ServerEventTypes, ServerStatuses, ServerStatusEvent } from '~/protocols/nodeblocks/network/server-events';
+import { localServerController } from './api/local-server-controller';
 
 interface SessionStore {
     user_session?: UserSessionData
@@ -70,7 +71,7 @@ export class AppSessionManager {
     get isConnectedToServer() { return this._isConnectedToServer(); }
     get serverStatus() { return this._serverStatus(); }
     get isLocal() {
-        return this.host == "127.0.0.1" || this.host == "localhost";
+        return this.host == localServerController.host;
     }
 
     public cleanup() {

@@ -7,6 +7,8 @@
 
         gap: 16px;
         width: 100%;
+        min-height: 0;
+        overflow-y: auto;
     }
 
     .scene-card {

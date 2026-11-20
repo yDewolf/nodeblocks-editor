@@ -1,4 +1,4 @@
-use crate::nodeblocks::server::server_helper::{ServerProcessState, is_local_server_running_internal, open_plugins_folder_internal, start_local_server_internal, stop_local_server_internal};
+use crate::nodeblocks::server::server_helper::{ServerProcessState, get_server_host_and_port_internal, is_local_server_running_internal, open_plugins_folder_internal, start_local_server_internal, stop_local_server_internal};
 use tauri::{self, AppHandle, State};
 
 #[tauri::command]
@@ -19,4 +19,11 @@ pub fn is_local_server_running(state: State<'_, ServerProcessState>) -> Result<b
 #[tauri::command]
 pub fn open_plugins_folder(app: AppHandle) -> Result<(), String> {
     open_plugins_folder_internal(&app)
+}
+
+#[tauri::command]
+pub fn get_server_host_and_port(
+    state: State<'_, ServerProcessState>,
+) -> Result<Option<(String, u16)>, String> {
+    get_server_host_and_port_internal(&state)
 }

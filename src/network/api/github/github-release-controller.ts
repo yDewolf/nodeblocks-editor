@@ -1,6 +1,6 @@
 import { makePersisted } from "@solid-primitives/storage";
 import { createStore, SetStoreFunction } from "solid-js/store";
-import { SERVER_API_VERSION } from "../api-version";
+import { ENGINE_VERSION, SERVER_API_VERSION } from "../api-version";
 
 export interface GithubAsset {
     name: string;
@@ -40,6 +40,21 @@ function compareVersions(v1: string, v2: string): number {
         if (n1 < n2) return -1;
     }
     return 0;
+}
+
+function splitNodeblocksVersion(rawVersion: string): [string, string] {
+    let engineVersion = rawVersion;
+    let serverVersion = "0.0.0";
+
+    if (rawVersion.includes("+server.")) {
+        const parts = rawVersion.split("+server.");
+        engineVersion = parts[0];
+        serverVersion = parts[1];
+    } else if (rawVersion.includes("+")) {
+        engineVersion = rawVersion.split("+")[0];
+    }
+
+    return [engineVersion, serverVersion];
 }
 
 export class GithubReleaseController {
@@ -84,19 +99,8 @@ export class GithubReleaseController {
                 if (wheelAsset) {
                     const match = wheelAsset.name.match(/^nodeblocks-(.+)-py3-none-any\.whl$/);
                     const rawVersion = match ? match[1] : release.tag_name;
-
-                    let engineVersion = rawVersion;
-                    let serverVersion = "0.0.0";
-
-                    if (rawVersion.includes("+server.")) {
-                        const parts = rawVersion.split("+server.");
-                        engineVersion = parts[0];
-                        serverVersion = parts[1];
-                    } else if (rawVersion.includes("+")) {
-                        engineVersion = rawVersion.split("+")[0];
-                    }
-
-                    const mightNotBeCompatible = compareVersions(serverVersion, SERVER_API_VERSION) < 0;
+                    const [engineVersion, serverVersion] = splitNodeblocksVersion(rawVersion);
+                    const mightNotBeCompatible = this.checkMightNotBeCompatible(rawVersion);
                     validReleases.push({
                         ...release,
                         raw_version: rawVersion,
@@ -115,6 +119,21 @@ export class GithubReleaseController {
             console.error("Failed to load server releases:", error);
             return this._releaseStore.serverReleases;
         }
+    }
+
+    public checkMightNotBeCompatible(
+        rawVersion: string, 
+        targetApiVersion: string = SERVER_API_VERSION, 
+        targetEngineVersion: string = ENGINE_VERSION
+    ): boolean {
+        const [engineVersion, serverVersion] = splitNodeblocksVersion(rawVersion);
+        let mightNotBeCompatible = compareVersions(serverVersion, targetApiVersion) < 0;
+        if (!mightNotBeCompatible) {
+            const comparison = compareVersions(engineVersion, targetEngineVersion);
+            mightNotBeCompatible = comparison < 0;
+        }
+
+        return mightNotBeCompatible;
     }
 }
 

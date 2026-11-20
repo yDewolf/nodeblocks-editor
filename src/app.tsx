@@ -20,6 +20,7 @@ import { LocalServerSettingsContent } from "./feature/local-server/local-server-
 import { RemoteServerSettingsContents } from "./feature/remote-server/remote-server-config";
 import { syncAppSettingsWithTauri } from "./feature/app-settings-sync";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { releaseController } from "./network/api/github/github-release-controller";
 
 declare global {
   interface Window {
@@ -46,6 +47,15 @@ export default function App() {
           unlisten();
       });
     };
+  });
+
+  onMount(() => {
+    if (localServerController.installedVersion) {
+      const notCompatible = releaseController.checkMightNotBeCompatible(localServerController.installedVersion);
+      if (notCompatible) {
+        console.warn("Current installed server version might not be compatible with this client's target versions.");
+      }
+    }
   });
 
   onCleanup(() => {

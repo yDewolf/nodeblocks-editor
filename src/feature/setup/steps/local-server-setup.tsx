@@ -20,7 +20,7 @@ export const LocalServerSetup = () => {
         if (!localServerController.isRunning) {
             await localServerController.startServer();
         }
-        const successful = await appSession.tryConnectToServer("127.0.0.1", 8080);
+        const successful = await appSession.tryConnectToServer(localServerController.host, localServerController.port);
         setSuccessfulConnection(successful);
         setTesting(false);
     }

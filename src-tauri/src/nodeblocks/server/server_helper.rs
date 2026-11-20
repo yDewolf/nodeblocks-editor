@@ -1,12 +1,13 @@
 use std::fs::{self, OpenOptions};
 use std::io::Write;
+use std::net::TcpListener;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
 use tauri_plugin_opener::OpenerExt;
-use tauri_plugin_shell::process::CommandEvent;
+use tauri_plugin_shell::process::{CommandChild, CommandEvent};
 use tauri_plugin_shell::ShellExt;
 
 use crate::env::env_structs::{EnvPaths, get_local_server_dir, uv_env};
@@ -14,9 +15,16 @@ use crate::utils::path_utils::path_str;
 
 const LOG_EVENT: &str = "server-log";
 const EXITED_EVENT: &str = "server-exited";
+const LOCAL_SERVER_HOST: &str = "127.0.0.1";
+
+pub struct RunningServer {
+    pub child: CommandChild,
+    pub host: String,
+    pub port: u16,
+}
 
 #[derive(Default)]
-pub struct ServerProcessState(pub Mutex<Option<tauri_plugin_shell::process::CommandChild>>);
+pub struct ServerProcessState(pub Mutex<Option<RunningServer>>);
 
 #[derive(Clone, Serialize)]
 struct ServerExited {
@@ -92,6 +100,8 @@ pub async fn start_local_server_internal(app: &AppHandle) -> Result<String, Stri
     env.insert("PYTHONIOENCODING".to_string(), "utf-8".to_string());
     env.insert("PYTHONUNBUFFERED".to_string(), "1".to_string());
 
+    let port = find_available_port()?;
+
     let args = vec![
         "run:server".to_string(),
         "--plugins".to_string(),
@@ -100,6 +110,10 @@ pub async fn start_local_server_internal(app: &AppHandle) -> Result<String, Stri
         path_str(&dirs.extraction),
         "--scenes".to_string(),
         path_str(&dirs.scenes),
+        "--host".to_string(),
+        LOCAL_SERVER_HOST.to_string(),
+        "--port".to_string(),
+        port.to_string()
     ];
 
     let (mut rx, child) = app
@@ -114,7 +128,11 @@ pub async fn start_local_server_internal(app: &AppHandle) -> Result<String, Stri
     *state
         .0
         .lock()
-        .map_err(|_| "server state is poisoned".to_string())? = Some(child);
+        .map_err(|_| "server state is poisoned".to_string())? = Some(RunningServer {
+            child,
+            host: LOCAL_SERVER_HOST.to_string(),
+            port
+        });
 
     let monitor_app = app.clone();
     let log_path = dirs.log.clone();
@@ -158,15 +176,15 @@ pub async fn start_local_server_internal(app: &AppHandle) -> Result<String, Stri
 }
 
 pub fn stop_local_server_internal(state: &ServerProcessState) -> Result<String, String> {
-    let child = state
+    let running_server = state
         .0
         .lock()
         .map_err(|_| "server state is poisoned".to_string())?
         .take();
 
-    if let Some(child) = child {
-        kill_process_tree(child.pid());
-        let _ = child.kill();
+    if let Some(running_server) = running_server {
+        kill_process_tree(running_server.child.pid());
+        let _ = running_server.child.kill();
         Ok("Server Finished Successfully.".into())
     } else {
         Ok("No local server was running.".into())
@@ -191,6 +209,17 @@ pub fn open_plugins_folder_internal(app: &AppHandle) -> Result<(), String> {
         .open_path(dirs.plugins.to_string_lossy(), None::<&str>)
         .map_err(|e| e.to_string())?;
     Ok(())
+}
+
+pub fn get_server_host_and_port_internal(
+    state: &ServerProcessState,
+) -> Result<Option<(String, u16)>, String> {
+    let guard = state
+        .0
+        .lock()
+        .map_err(|_| "server state is poisoned".to_string())?;
+
+    Ok(guard.as_ref().map(|server| (server.host.clone(), server.port)))
 }
 
 // -- utils
@@ -219,4 +248,15 @@ fn nodeblocks_executable(paths: &EnvPaths) -> PathBuf {
     } else {
         paths.venv.join("bin").join("nodeblocks")
     }
+}
+
+
+fn find_available_port() -> Result<u16, String> {
+    let listener = TcpListener::bind((LOCAL_SERVER_HOST, 0))
+        .map_err(|e| format!("failed to bind to an available port: {e}"))?;
+    let port = listener
+        .local_addr()
+        .map_err(|e| format!("failed to read bound port: {e}"))?
+        .port();
+    Ok(port)
 }

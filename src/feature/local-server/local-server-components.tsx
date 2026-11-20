@@ -68,7 +68,7 @@ export const LocalServerPanel = (props: {
                         {t("components.localServerPanel.stopServer")}
                     </button>
                     <button class="text-button" onclick={() => {
-                            appSession.tryConnectToServer("127.0.0.1", 8080);
+                            appSession.tryConnectToServer(localServerController.host, localServerController.port);
                         }}
                         disabled={(appSession.isLocal) && appSession.isConnectedToServer}
                     >

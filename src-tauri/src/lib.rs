@@ -13,7 +13,7 @@ use nodeblocks::server_config::server_config;
 use crate::env::env_tauri_commands::{check_server_installed, ensure_environment, get_local_server_version};
 use crate::env::environment::{SetupGuard, check_server_installed_internal};
 use crate::nodeblocks::server::server_helper::{ServerProcessState, is_local_server_running_internal, start_local_server_internal, stop_local_server_internal};
-use crate::nodeblocks::server::server_tauri_commands::{is_local_server_running, open_plugins_folder, start_local_server, stop_local_server};
+use crate::nodeblocks::server::server_tauri_commands::{get_server_host_and_port, is_local_server_running, open_plugins_folder, start_local_server, stop_local_server};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -32,6 +32,7 @@ pub fn run() {
         open_plugins_folder,
         get_auto_start_local_server,
         set_auto_start_local_server,
+        get_server_host_and_port
     ])
     .setup(|app| {
       if cfg!(debug_assertions) {

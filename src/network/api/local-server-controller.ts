@@ -21,8 +21,6 @@ interface LogsStore {
 
 const LOCAL_SERVER_CACHE_KEY = "local-server-cache";
 const LOCAL_SERVER_LOGS = "local-server-logs";
-const LOCAL_SERVER_HOST = "127.0.0.1";
-const LOCAL_SERVER_PORT = 8080;
 
 export class LocalServerController {
     private _state: LocalServerState;
@@ -33,6 +31,9 @@ export class LocalServerController {
 
     private _logsStore: LogsStore;
     private _setLogsStore: SetStoreFunction<LogsStore>;
+
+    private _host: string = "127.0.0.1";
+    private _port: number = 8080;
 
     constructor() {
         [this._state, this._setState] = makePersisted(createStore<LocalServerState>({
@@ -50,7 +51,10 @@ export class LocalServerController {
         this.setup();
     }
 
-    get localUrl() { return `http://${LOCAL_SERVER_HOST}:${LOCAL_SERVER_PORT}`}
+    get host() { return this._host; }
+    get port() { return this._port; }
+
+    get localUrl() { return `http://${this._host}:${this._port}`}
     get installedVersion() { return this._state.installedVersion; }
     get isInstalled() { return this._state.isInstalled; }
 
@@ -145,6 +149,7 @@ export class LocalServerController {
             await invoke("start_local_server");
             this.clearLogs();
             this._setState("serverState", LocalServerStates.RUNNING);
+            this.checkLocalServerHost();
             this.checkStatus();
         
         } catch (err) {
@@ -163,6 +168,17 @@ export class LocalServerController {
             console.error("Failed to stop local server:", err);
             throw err;
         }
+    }
+
+    public async checkLocalServerHost(): Promise<[string, number] | null> {
+        if (!window.isTauriEnvironment) return null;
+        
+        const result =  await invoke<[string, number] | null>("get_server_host_and_port");
+        if (result) {
+            this._host = result[0];
+            this._port = result[1];
+        }
+        return result;
     }
 
     public async checkInstalledVersion() {
