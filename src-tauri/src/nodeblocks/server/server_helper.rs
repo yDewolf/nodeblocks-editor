@@ -4,13 +4,13 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 
 use serde::Serialize;
-use tauri::{AppHandle, Emitter, Manager, State};
+use tauri::{AppHandle, Emitter, Manager};
 use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_shell::process::CommandEvent;
 use tauri_plugin_shell::ShellExt;
 
-use crate::env::environment::get_local_server_dir;
-use crate::environment::{uv_env, EnvPaths};
+use crate::env::env_structs::{EnvPaths, get_local_server_dir, uv_env};
+use crate::utils::path_utils::path_str;
 
 const LOG_EVENT: &str = "server-log";
 const EXITED_EVENT: &str = "server-exited";
@@ -34,7 +34,8 @@ struct ServerDirs {
 
 impl ServerDirs {
     fn new(app: &AppHandle) -> Result<Self, String> {
-        let root = get_local_server_dir(app).unwrap();
+        let root = get_local_server_dir(app)
+            .map_err(|e| format!("could not resolve local server dir: {e}"))?;
         let plugins = root.join("plugins");
         let internal = root.join("internal");
 
@@ -50,22 +51,29 @@ impl ServerDirs {
 
     fn create_all(&self) -> Result<(), String> {
         for dir in [&self.plugins, &self.extraction, &self.scenes, &self.plugin_libs] {
-            fs::create_dir_all(dir).map_err(|e| format!("could not create {}: {e}", dir.display()))?;
+            fs::create_dir_all(dir)
+                .map_err(|e| format!("could not create {}: {e}", dir.display()))?;
         }
         Ok(())
     }
 }
 
-#[tauri::command]
-pub async fn start_local_server(app: AppHandle, state: State<'_, ServerProcessState>) -> Result<String, String> {
+// -- internal functions
+
+pub async fn start_local_server_internal(app: &AppHandle) -> Result<String, String> {
+    let state = app.state::<ServerProcessState>();
+
     {
-        let guard = state.0.lock().map_err(|_| "server state might be poisoned".to_string())?;
+        let guard = state
+            .0
+            .lock()
+            .map_err(|_| "server state might be poisoned".to_string())?;
         if guard.is_some() {
             return Err("the server is already running".to_string());
         }
     }
 
-    let env_paths = EnvPaths::new(&app)?;
+    let env_paths = EnvPaths::new(app)?;
     let executable = nodeblocks_executable(&env_paths);
     if !executable.is_file() {
         return Err(format!(
@@ -74,7 +82,7 @@ pub async fn start_local_server(app: AppHandle, state: State<'_, ServerProcessSt
         ));
     }
 
-    let dirs = ServerDirs::new(&app)?;
+    let dirs = ServerDirs::new(app)?;
     dirs.create_all()?;
 
     let mut env = uv_env(&env_paths);
@@ -149,8 +157,7 @@ pub async fn start_local_server(app: AppHandle, state: State<'_, ServerProcessSt
     Ok("Started Local Server".into())
 }
 
-#[tauri::command]
-pub fn stop_local_server(state: State<'_, ServerProcessState>) -> Result<String, String> {
+pub fn stop_local_server_internal(state: &ServerProcessState) -> Result<String, String> {
     let child = state
         .0
         .lock()
@@ -166,8 +173,7 @@ pub fn stop_local_server(state: State<'_, ServerProcessState>) -> Result<String,
     }
 }
 
-#[tauri::command]
-pub fn is_local_server_running(state: State<'_, ServerProcessState>) -> Result<bool, String> {
+pub fn is_local_server_running_internal(state: &ServerProcessState) -> Result<bool, String> {
     let guard = state
         .0
         .lock()
@@ -175,11 +181,8 @@ pub fn is_local_server_running(state: State<'_, ServerProcessState>) -> Result<b
     Ok(guard.is_some())
 }
 
-// -- client utils
-
-#[tauri::command]
-pub fn open_plugins_folder(app: tauri::AppHandle) -> Result<(), String> {
-    let dirs: ServerDirs = ServerDirs::new(&app)?;
+pub fn open_plugins_folder_internal(app: &AppHandle) -> Result<(), String> {
+    let dirs = ServerDirs::new(app)?;
     if !dirs.plugins.exists() {
         return Err("Couldn't find plugin folder.".into());
     }
@@ -216,8 +219,4 @@ fn nodeblocks_executable(paths: &EnvPaths) -> PathBuf {
     } else {
         paths.venv.join("bin").join("nodeblocks")
     }
-}
-
-fn path_str(path: &PathBuf) -> String {
-    path.to_string_lossy().to_string()
 }
