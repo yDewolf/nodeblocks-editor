@@ -101,6 +101,9 @@ export const LocalServerInstaller = (props: {
                     <br />
                     <Show when={localServerController.isInstalled}>
                         <p>{t("pages.setupWizard.install.messages.serverVersionIsInstalled", localServerController.installedVersion ?? t("words.unknown"))} <b>{t("pages.setupWizard.messages.youCanProceed")}</b></p>
+                        <Show when={localServerController.isInstalledVersionIncompatible}>
+                            <p><b>{t("words.note")}:</b> {t("pages.setupWizard.install.messages.installedVersionMightNotBeCompatible")}</p>
+                        </Show>
                     </Show>
                 </>}
             </Show>

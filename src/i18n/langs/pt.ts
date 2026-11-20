@@ -136,6 +136,7 @@ export default {
                 clientWasBuiltForVersion: "Esse client foi feito para a seguinte versão do servidor",
                 install: "Instalar",
                 messages: {
+                    installedVersionMightNotBeCompatible: "A versão instalada pode não ser compatível com esse client! Você pode encontrar comportamentos inesperados.",
                     serverVersionIsInstalled: (version: string) => `A versão '${version}' do servidor está instalada.`,
                     installAnotherVersion: "Para instalar outra versão, use o menu abaixo.",
                     alreadyInstalled: "Nodeblocks já está instalado.",
@@ -182,6 +183,13 @@ export default {
             nodeFqn: "Tipo",
             uid: "UID",
             position: "Posição",
+        }
+    },
+    uiAlerts: {
+        localServer: {
+            incompatibleInstalledVersion: "A versão do servidor instalada não é compatível com  este client. Instale uma versão suportada por meio do setup.",
+            incompatibleVersionTitle: "Versão de servidor incompatível",
+            gotoSetupAction: "Ir para o setup."
         }
     },
     notifications: {

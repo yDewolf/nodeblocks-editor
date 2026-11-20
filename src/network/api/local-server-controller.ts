@@ -2,6 +2,7 @@ import { createStore, SetStoreFunction } from "solid-js/store";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { makePersisted } from '@solid-primitives/storage';
+import { releaseController } from "./github/github-release-controller";
 
 export enum LocalServerStates {
     STARTING = "starting",
@@ -10,9 +11,10 @@ export enum LocalServerStates {
 }
 
 export interface LocalServerState {
+    isIncompatible: boolean;
     isInstalled: boolean;
     installedVersion?: string;
-    serverState: LocalServerStates,
+    serverState: LocalServerStates;
 }
 
 interface LogsStore {
@@ -39,6 +41,7 @@ export class LocalServerController {
         [this._state, this._setState] = makePersisted(createStore<LocalServerState>({
             isInstalled: false,
             serverState: LocalServerStates.STOPPED,
+            isIncompatible: false
         }), {name: LOCAL_SERVER_CACHE_KEY});
         [this._logsStore, this._setLogsStore] = makePersisted(
             createStore<LogsStore>({ 
@@ -55,6 +58,8 @@ export class LocalServerController {
     get port() { return this._port; }
 
     get localUrl() { return `http://${this._host}:${this._port}`}
+
+    get isInstalledVersionIncompatible() { return this._state.isIncompatible; }
     get installedVersion() { return this._state.installedVersion; }
     get isInstalled() { return this._state.isInstalled; }
 
@@ -186,6 +191,9 @@ export class LocalServerController {
             const version = await invoke<string>("get_local_server_version");
             console.log("Installed server version:", version);
             this._setState("installedVersion", version);
+
+            const notCompatible = releaseController.checkMightNotBeCompatible(version);
+            this._setState("isIncompatible", notCompatible);
             return version;
         } catch (error) {
             console.error("Couldn't get local server version:", error);

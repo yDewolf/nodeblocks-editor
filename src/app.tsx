@@ -4,7 +4,7 @@ import { Router, Route, Navigate } from "@solidjs/router";
 import SceneEditor from "./feature/editor/scene-editor-route";
 import { AppSessionProvider } from "./network/app-session-provider";
 import { createEffect, onCleanup, onMount } from "solid-js";
-import { UpdateRootDataTheme } from "./feature/app-settings";
+import { _setSetupComplete, UpdateRootDataTheme } from "./feature/app-settings";
 import { ContextMenuPortal } from "./feature/context-menu/context-menu-component";
 import { Home } from "./feature/home/home-route";
 import { ScenesRoute } from "./feature/home/scenes/scenes-view";
@@ -12,7 +12,7 @@ import { PackageManagerProvider } from './feature/editor/contexts/package-manage
 import DocsRoute from "./feature/docs/docs-route";
 import { SettingsRoute } from "./feature/home/settings/settings-route";
 import { SetupScreen } from "./feature/setup/setup-route";
-import { I18nProvider } from "./i18n/i18n-context";
+import { I18nProvider, useI18n } from "./i18n/i18n-context";
 import { localServerController } from "./network/api/local-server-controller";
 import { AppSettingsContent } from "./feature/home/settings/app-settings-view";
 import { EditorSettingsContent } from "./feature/editor/screens/settings-view";
@@ -51,16 +51,6 @@ export default function App() {
     };
   });
 
-  onMount(() => {
-    if (localServerController.installedVersion) {
-      const notCompatible = releaseController.checkMightNotBeCompatible(localServerController.installedVersion);
-      if (notCompatible) {
-        console.warn("Current installed server version might not be compatible with this client's target versions.");
-        alertController.warning("Current installed server version might not be compatible with this client's target versions.", "Server version is old", 0, {label: "test", onclick: () => {}});
-      }
-    }
-  });
-
   onCleanup(() => {
     localServerController.cleanup()
   })
@@ -71,31 +61,51 @@ export default function App() {
 
   return (
     <I18nProvider>
-      <AppSessionProvider>
-        <SetupScreen>
-          <PackageManagerProvider>
-            <main>
-              <UIAlertOverlay/>
-              <ContextMenuPortal />
-              <Router>
-                  <Route path="/" component={Home}>
-                    <Route path="" component={() => <Navigate href="/scenes" />}/>
-                    <Route path="scenes" component={ScenesRoute}/>
-                    <Route path="docs" component={DocsRoute}/>
-                    <Route path="settings" component={SettingsRoute}>
-                      <Route path="" component={() => <Navigate href="/settings/general" />}/>
-                      <Route path="general" component={AppSettingsContent}/>
-                      <Route path="editor" component={EditorSettingsContent}/>
-                      <Route path="localServer" component={LocalServerSettingsContent}/>
-                      <Route path="remoteServer" component={RemoteServerSettingsContents}/>
-                    </Route>
-                  </Route>
-                  <Route path="/scene/:scene_id" component={SceneEditor} />
-              </Router>
-            </main>
-          </PackageManagerProvider>
-        </SetupScreen>
-      </AppSessionProvider>
+      <AppSetup/>
     </I18nProvider>
   );
+}
+
+
+const AppSetup = () => {
+  const {t} = useI18n();
+  onMount(() => {
+    if (localServerController.installedVersion && localServerController.isInstalledVersionIncompatible) {
+      alertController.warning(
+        t("uiAlerts.localServer.incompatibleInstalledVersion"), 
+        t("uiAlerts.localServer.incompatibleVersionTitle"),
+        0, 
+        {label: t("uiAlerts.localServer.gotoSetupAction"), onclick: () => {
+          _setSetupComplete(false);
+      }});
+    }
+  });
+
+  return (
+    <AppSessionProvider>
+      <SetupScreen>
+        <PackageManagerProvider>
+          <main>
+            <UIAlertOverlay/>
+            <ContextMenuPortal />
+            <Router>
+                <Route path="/" component={Home}>
+                  <Route path="" component={() => <Navigate href="/scenes" />}/>
+                  <Route path="scenes" component={ScenesRoute}/>
+                  <Route path="docs" component={DocsRoute}/>
+                  <Route path="settings" component={SettingsRoute}>
+                    <Route path="" component={() => <Navigate href="/settings/general" />}/>
+                    <Route path="general" component={AppSettingsContent}/>
+                    <Route path="editor" component={EditorSettingsContent}/>
+                    <Route path="localServer" component={LocalServerSettingsContent}/>
+                    <Route path="remoteServer" component={RemoteServerSettingsContents}/>
+                  </Route>
+                </Route>
+                <Route path="/scene/:scene_id" component={SceneEditor} />
+            </Router>
+          </main>
+        </PackageManagerProvider>
+      </SetupScreen>
+    </AppSessionProvider>
+  )
 }
