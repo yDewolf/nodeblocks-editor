@@ -46,4 +46,19 @@ export class AddNodesAction extends Action<NodeGraphCommand> {
         }
         this._createdInstances = [];
     }
+
+    public partialRevert(scene: NodeScene, failedTargetIds: Set<string>): void {
+        const remainingInstances: NodeInstance[] = [];
+        for (const instance of this._createdInstances) {
+            if (failedTargetIds.has(instance.uid)) {
+                scene.removeNode(instance.uid);
+                delete this.nodesData[instance.uid];
+                this._targetIds.delete(instance.uid);
+                continue;
+            }
+            remainingInstances.push(instance);
+        }
+
+        this._createdInstances = remainingInstances;
+    }
 }

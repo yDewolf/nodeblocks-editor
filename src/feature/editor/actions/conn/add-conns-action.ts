@@ -36,4 +36,15 @@ export class AddConnectionsAction extends Action<ConnGraphCommand> {
             scene.removeConnection(connData.uid);
         }
     }
+
+    public partialRevert(scene: NodeScene, failedTargetIds: Set<string>): void {
+        for (const uid of failedTargetIds) {
+            const connData = this.connsData[uid];
+            if (!connData) continue;
+
+            scene.removeConnection(connData.uid);
+            delete this.connsData[uid];
+            this._targetIds.delete(uid);
+        }
+    }
 }

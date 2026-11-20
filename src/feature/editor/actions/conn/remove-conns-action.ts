@@ -45,4 +45,25 @@ export class RemoveConnectionsAction extends Action<ConnGraphCommand> {
         }
         this._backupConnections = [];
     }
+
+    public partialRevert(scene: NodeScene, failedTargetIds: Set<string>): void {
+        const remainingBackupConns: ConnectionSceneData[] = [];
+        for (const conn of this._backupConnections) {
+            if (failedTargetIds.has(conn.uid)) {
+                const bothNodesExist =
+                    Boolean(scene.graph.getNode(conn.from_slot.node_id)) &&
+                    Boolean(scene.graph.getNode(conn.to_slot.node_id));
+
+                if (bothNodesExist) {
+                    scene.addConnection(conn);
+                }
+                this._targetIds.delete(conn.uid);
+                continue;
+            }
+            remainingBackupConns.push(conn);
+        }
+
+        this._backupConnections = remainingBackupConns;
+        this.connectionUids = this.connectionUids.filter((uid) => !failedTargetIds.has(uid));
+    }
 }

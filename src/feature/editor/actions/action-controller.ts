@@ -1,5 +1,5 @@
 import { ClientCommand } from "~/protocols/nodeblocks/network/message/client-commands";
-import { EditorActionStatus, ServerMessageTypes } from "~/protocols/nodeblocks/network/server-message-protocol";
+import { EditorActionStatus, ServerCmdResponseTypes, ServerMessageTypes } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { NodeScene } from "../engine/node_scene";
 import { SceneConnectionManager } from "../network/scene-connection-manager";
 import { Action } from "./action";
@@ -71,7 +71,23 @@ export class ActionController {
         }
 
         if (status.status === CommandStatus.PARTIAL_SUCCESS) {
-            // FIXME: Partial revert
+            console.warn(`[ActionController] Command ${cmd_uid} partially failed on server. Reverting failed targets...`);
+            if (msg.response_payload.type === ServerCmdResponseTypes.MULTIPLE_STATUS) {
+                const failedIds = new Set<string>();
+                for (const [targetId, itemStatus] of Object.entries(msg.response_payload.statuses)) {
+                    if (itemStatus.status !== CommandStatus.SUCCESSFUL) {
+                        failedIds.add(targetId);
+                    }
+                }
+
+                if (failedIds.size > 0) {
+                    action.partialRevert(this.scene, failedIds);
+                    action.setStatus(EditorActionStatus.PARTIAL_SUCCESS);
+                }
+            } else {
+                action.revert(this.scene);
+                action.setStatus(EditorActionStatus.REVERTED);
+            }
         }
 
         this._pendingActions.delete(cmd_uid);

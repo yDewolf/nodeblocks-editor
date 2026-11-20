@@ -2,6 +2,7 @@ import { nanoid } from "nanoid";
 import { ClientCommand } from "~/protocols/nodeblocks/network/message/client-commands";
 import { EditorActionStatus } from "~/protocols/nodeblocks/network/server-message-protocol";
 import { NodeScene } from "../engine/node_scene";
+import { CmdStatusPack } from "~/protocols/nodeblocks/engine/server-ipc-event-protocol";
 
 export type StatusChangeListener = (status: EditorActionStatus) => void;
 
@@ -41,5 +42,5 @@ export abstract class Action<TCommand extends ClientCommand = ClientCommand> {
 
     public abstract revert(scene: NodeScene): void;
 
-    // public abstract partialRevert(scene: NodeScene, statuses: Record<string, CmdStatusPack>): void;
+    public abstract partialRevert(scene: NodeScene, failedIds: Set<string>): void;
 }

@@ -57,4 +57,20 @@ export class UpdateNodesAction extends Action<NodeGraphCommand> {
         }
         this._backupData = {};
     }
+
+    public partialRevert(scene: NodeScene, failedTargetIds: Set<string>): void {
+        for (const uid of failedTargetIds) {
+            const previousData = this._backupData[uid];
+            if (!previousData) continue;
+
+            const node = scene.graph.getNode(uid);
+            if (node) {
+                node.updateSceneData(previousData.data, previousData.position, true);
+            }
+
+            delete this._backupData[uid];
+            delete this.updateData[uid];
+            this._targetIds.delete(uid);
+        }
+    }
 }

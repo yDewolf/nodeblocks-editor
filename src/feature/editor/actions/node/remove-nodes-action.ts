@@ -57,4 +57,36 @@ export class RemoveNodesAction extends Action<NodeGraphCommand> {
         this._backupNodes = [];
         this._backupConnections = [];
     }
+
+    public partialRevert(scene: NodeScene, failedTargetIds: Set<string>): void {
+        const remainingBackupNodes: NodeInstance[] = [];
+        for (const node of this._backupNodes) {
+            if (failedTargetIds.has(node.uid)) {
+                scene.addNode(node);
+                this._targetIds.delete(node.uid);
+                continue;
+            } 
+            remainingBackupNodes.push(node);
+        }
+        this._backupNodes = remainingBackupNodes;
+        this.nodeUids = this.nodeUids.filter((uid) => !failedTargetIds.has(uid));
+
+        const remainingBackupConns: ConnectionSceneData[] = [];
+        for (const conn of this._backupConnections) {
+            const involvesFailedNode =
+                failedTargetIds.has(conn.from_slot.node_id) ||
+                failedTargetIds.has(conn.to_slot.node_id);
+
+            const bothNodesExist =
+                Boolean(scene.graph.getNode(conn.from_slot.node_id)) &&
+                Boolean(scene.graph.getNode(conn.to_slot.node_id));
+
+            if (involvesFailedNode && bothNodesExist) {
+                scene.addConnection(conn);
+                continue;
+            } 
+            remainingBackupConns.push(conn);
+        }
+        this._backupConnections = remainingBackupConns;
+    }
 }
