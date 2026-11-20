@@ -4,6 +4,7 @@ import { NodeScene } from "../engine/node_scene";
 import { SceneConnectionManager } from "../network/scene-connection-manager";
 import { Action } from "./action";
 import { CmdStatusPack, CommandStatus } from "~/protocols/nodeblocks/engine/server-ipc-event-protocol";
+import { ServerCmdResponse } from "~/protocols/nodeblocks/network/message/server/server-scene-messages";
 
 type PendingChangeListener = (targetIds: Set<string>) => void;
 export class ActionController {
@@ -21,7 +22,7 @@ export class ActionController {
     ) {
         this.sceneClient.onMessage(ServerMessageTypes.COMMAND_RESPONSE, 
             (msg) => {
-                this.handleServerSync(msg.cmd_uid, msg.response_payload.status);
+                this.handleServerSync(msg.cmd_uid, msg.response_payload.status, msg);
             }
         );
     }
@@ -57,7 +58,7 @@ export class ActionController {
         this.sceneClient.sendCommand(command);
     }
 
-    private handleServerSync(cmd_uid: string, status: CmdStatusPack): void {
+    private handleServerSync(cmd_uid: string, status: CmdStatusPack, msg: ServerCmdResponse): void {
         const action = this._pendingActions.get(cmd_uid);
         if (!action) return;
 
@@ -67,6 +68,10 @@ export class ActionController {
             console.warn(`[ActionController] Command ${cmd_uid} failed on server. Reverting...`);
             action.revert(this.scene);
             action.setStatus(EditorActionStatus.REVERTED);
+        }
+
+        if (status.status === CommandStatus.PARTIAL_SUCCESS) {
+            // FIXME: Partial revert
         }
 
         this._pendingActions.delete(cmd_uid);

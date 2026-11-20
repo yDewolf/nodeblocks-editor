@@ -41,7 +41,13 @@ export type SaveScenePayload = CommandResponsePayload & {
     type: ServerCmdResponseTypes.SAVE_SCENE
 }
 
+export type MultipleStatusPayload = CommandResponsePayload & {
+    type: ServerCmdResponseTypes.MULTIPLE_STATUS
+    statuses: Record<string, CmdStatusPack>
+}
+
 export type ServerCmdResponsePayload = 
     | GenericCmdPayload | ExecutionStateSyncPayload 
     | AddNodePayload | AddConnPayload
-    | GetSceneDataPayload | SaveScenePayload;
+    | GetSceneDataPayload | SaveScenePayload
+    | MultipleStatusPayload;

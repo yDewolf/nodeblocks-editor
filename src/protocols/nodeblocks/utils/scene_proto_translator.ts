@@ -1,12 +1,12 @@
 import { nodeblocks } from '~/protocols/nodeblocks/generated/proto';
 import { NodeExecutionStatus, JobStatus } from '../engine/engine-status-protocols';
-import { CommandStatus } from '../engine/server-ipc-event-protocol';
+import { CmdStatusPack, CommandStatus } from '../engine/server-ipc-event-protocol';
 import { WorkerEventTypes } from '../engine/worker-event-types';
 import { DefaultDataTypes } from '../manifests/node/datatype-enums';
 import { SerializedDataTypeValue } from '../manifests/node/datatype-value-meta';
 import { ConnectionSceneData, NodeSceneData, SceneData } from '../manifests/node/node-graph-data';
 import { EngineEventPayload, NodeStatusPayload, JobStatusPayload, FailedProcessPayload, RuntimeErrorPayload, EngineTracker } from '../network/message/server/payloads/engine-event-payloads';
-import { ServerCmdResponsePayload, GetSceneDataPayload, ExecutionStateSyncPayload, AddNodePayload, AddConnPayload } from '../network/message/server/payloads/server-response-payloads';
+import { ServerCmdResponsePayload, GetSceneDataPayload, ExecutionStateSyncPayload, AddNodePayload, AddConnPayload, MultipleStatusPayload } from '../network/message/server/payloads/server-response-payloads';
 import { WorkerEventPayload } from '../network/message/server/payloads/worker-event-payloads';
 import { ServerSceneMessages } from '../network/message/server/server-scene-messages';
 import { ServerCmdResponseTypes, ServerEngineEventTypes, ServerMessageTypes } from '../network/server-message-protocol';
@@ -142,6 +142,23 @@ export class SceneProtoTranslator {
                 ...basePayload,
                 conns: protoCmd.addConn?.conns
             } as AddConnPayload;
+        }
+
+        if (type === ServerCmdResponseTypes.MULTIPLE_STATUS) {
+            const statuses: Record<string, CmdStatusPack> = {};
+            if (protoCmd.multipleStatus?.statuses) {
+                for (const [key, val] of Object.entries(protoCmd.multipleStatus.statuses)) {
+                    statuses[key] = {
+                        status: val.status === "successful" ? CommandStatus.SUCCESSFUL : CommandStatus.FAILED,
+                        message: val.message ?? undefined
+                    };
+                }
+            }
+
+            return {
+                ...basePayload,
+                statuses
+            } as MultipleStatusPayload;
         }
 
         return basePayload as ServerCmdResponsePayload;
@@ -307,4 +324,5 @@ export class SceneProtoTranslator {
             value_meta: valueMeta
         };
     }
+
 }

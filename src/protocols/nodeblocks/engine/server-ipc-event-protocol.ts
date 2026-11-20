@@ -1,5 +1,6 @@
 export enum CommandStatus {
     SUCCESSFUL = "successful",
+    PARTIAL_SUCCESS = "partial_success",
     FAILED = "failed"
 }
 

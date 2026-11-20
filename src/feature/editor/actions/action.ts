@@ -40,4 +40,6 @@ export abstract class Action<TCommand extends ClientCommand = ClientCommand> {
     public abstract apply(scene: NodeScene): void;
 
     public abstract revert(scene: NodeScene): void;
+
+    // public abstract partialRevert(scene: NodeScene, statuses: Record<string, CmdStatusPack>): void;
 }

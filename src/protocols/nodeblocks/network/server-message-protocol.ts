@@ -31,6 +31,7 @@ export enum WebsocketStatus {
 export enum EditorActionStatus {
     SUCCESSFUL = "successful",
     UNSYNCED = "unsynced",
+    PARTIAL_SUCCESS = "partial_success",
     FAILED = "failed",
     REVERTED = "reverted"
 }
@@ -38,10 +39,12 @@ export enum EditorActionStatus {
 
 export enum ServerCmdResponseTypes {
     SCENE_WORKER = "scene_worker",
+    MULTIPLE_STATUS = "multiple_status",
     
     EXECUTION_STATE_SYNC = "execution_state_sync",
     ADD_NODE = "add_node",
     ADD_CONN = "add_conn",
+
     GET_SCENE_DATA = "get_scene_data",
     SAVE_SCENE = "save_scene"
 }
