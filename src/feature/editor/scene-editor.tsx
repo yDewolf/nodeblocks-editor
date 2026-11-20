@@ -114,6 +114,11 @@ export class SceneEditor {
 
     get  grid() { return this._selectionController.grid; }
 
+    public async cleanup() {
+        this.sceneConnection.abortReconnect();
+        this.eventManager.cleanup();
+    }
+
     // Methods
 
     public async connectToScene(scene_uid: string) {
@@ -279,11 +284,19 @@ export class SceneEditor {
             "EditorPointerMoving",
             new EventHandler("onPointerMoving", (data) => {
                 const e = data.event;
-                if (e instanceof PointerEvent) {
-                    const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(e)
+                if (e instanceof PointerEvent && data.targetElement) {
+                    const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(
+                        e,
+                        data.targetElement
+                    );
+                    
                     this.selectionController.space.cursorWorldPos = world_pos;
-
-                    this._toolController.current_tool?.onMoveCursor(world_pos, {x: e.movementX, y: e.movementY}, Object.values(this.elementController.nodes));
+                    const delta = data.delta ?? { x: e.movementX, y: e.movementY };
+                    this._toolController.current_tool?.onMoveCursor(
+                        world_pos,
+                        delta,
+                        Object.values(this.elementController.nodes)
+                    );
                 }
             })
         )

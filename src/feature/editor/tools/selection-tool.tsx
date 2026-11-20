@@ -37,7 +37,7 @@ export class SelectionTool extends BaseEditorTool {
             handle_just_released: (event) => {
                 const e = event.nativeEvent;
                 if (e instanceof PointerEvent) {
-                    const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(e)
+                    const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(e, e.currentTarget as HTMLElement)
                     if (e.target !== e.currentTarget) return;
 
                     if (!this.selectionController.selected_node_type) return;
@@ -106,7 +106,7 @@ export class SelectionTool extends BaseEditorTool {
 
     // FIXME: rename this event to mainToolAction
     onPointerDown(e: PointerEvent): void {
-        const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(e)
+        const [screen_pos, world_pos] = this.selectionController.space.get_cursor_pos(e, e.currentTarget as HTMLElement)
         if (this.selectionController.has_selected && !e.shiftKey) {
             console.log("Cleared selection")
             this.selectionController.clearSelection();

@@ -16,7 +16,7 @@ export const EditorProvider: ParentComponent<{
   editor.notificationController.translationFunc = t;
 
   onCleanup(() => {
-    editor.sceneConnection.abortReconnect();
+    editor.cleanup();
   })
 
   return (

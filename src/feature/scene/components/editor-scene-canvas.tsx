@@ -177,8 +177,8 @@ export const SceneCanvasKeybindsAndEvents: ParentComponent<{
             if (e instanceof PointerEvent) {
                 if (inputManager.getKeybindState("PanCamera")) {
                     scene_canvas.canvasSpace.camera.move({
-                        x: -e.movementX / scene_canvas.canvasSpace.camera.zoom,
-                        y: -e.movementY / scene_canvas.canvasSpace.camera.zoom
+                        x: -(data.delta?.x ?? e.movementX) / scene_canvas.canvasSpace.camera.zoom,
+                        y: -(data.delta?.y ?? e.movementY)/ scene_canvas.canvasSpace.camera.zoom
                     });
                     e.stopPropagation();
                     return;
@@ -200,7 +200,7 @@ export const SceneCanvasKeybindsAndEvents: ParentComponent<{
                 // TODO: arrumar um jeito de determinar se a pessoa tá usando touchpad ou não
                 const delta = Math.min(Math.abs(e.deltaY), 0.23) * (-e.deltaY < 0 ? -1 : 1);
                 const new_zoom = Math.max(0.1, Math.min(5.0, scene_canvas.canvasSpace.camera.zoom + delta));
-                const [screen_pos, world_pos] = scene_canvas.canvasSpace.get_cursor_pos(e)
+                const [screen_pos, world_pos] = scene_canvas.canvasSpace.get_cursor_pos(e, e.currentTarget as HTMLElement)
                 
                 scene_canvas.canvasSpace.camera.zoom = new_zoom;
                 scene_canvas.canvasSpace.camera.updateOffset({

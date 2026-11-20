@@ -93,8 +93,8 @@ export class CanvasSpace {
         return this.camera.camera_rect.overlaps(rect);
     }
 
-    public get_cursor_pos(e: MouseEvent): [Vector2, Vector2] {
-        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    public get_cursor_pos(e: MouseEvent, targetElement: HTMLElement): [Vector2, Vector2] {
+        const rect = (targetElement as HTMLElement).getBoundingClientRect();
         const mouse_x = e.clientX - rect.left;
         const mouse_y = e.clientY - rect.top;
 
