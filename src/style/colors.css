@@ -21,6 +21,11 @@
   --dark-overlay-highlight-color: #3c414b;
 
   --dark-overlay-background: #e7f1fa;
+
+  --info-accent-color: #6a7aa7;
+  --debug-accent-color: #69b484;
+  --warning-accent-color: #d39f45;
+  --error-accent-color: #db5050;
 }
 
 /* Color Schemes */

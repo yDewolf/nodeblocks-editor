@@ -21,6 +21,8 @@ import { RemoteServerSettingsContents } from "./feature/remote-server/remote-ser
 import { syncAppSettingsWithTauri } from "./feature/app-settings-sync";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { releaseController } from "./network/api/github/github-release-controller";
+import { UIAlertOverlay } from "./feature/alerts/ui-alert-overlay";
+import { alertController } from "./feature/alerts/ui-alert-controller";
 
 declare global {
   interface Window {
@@ -54,6 +56,7 @@ export default function App() {
       const notCompatible = releaseController.checkMightNotBeCompatible(localServerController.installedVersion);
       if (notCompatible) {
         console.warn("Current installed server version might not be compatible with this client's target versions.");
+        alertController.warning("Current installed server version might not be compatible with this client's target versions.", "Server version is old", 0, {label: "test", onclick: () => {}});
       }
     }
   });
@@ -72,6 +75,7 @@ export default function App() {
         <SetupScreen>
           <PackageManagerProvider>
             <main>
+              <UIAlertOverlay/>
               <ContextMenuPortal />
               <Router>
                   <Route path="/" component={Home}>

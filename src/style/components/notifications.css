@@ -104,15 +104,15 @@
     }
     
     .notification-badge.error {
-        background-color: red;
+        background-color: var(--error-accent-color);
     }
     
     .notification-badge.warning {
-        background-color: orange;
+        background-color: var(--warning-accent-color);
     }
     
     .notification-badge.debug {
-        background-color: green;
+        background-color: var(--debug-accent-color);
     }
     
     .notification-badge.info {

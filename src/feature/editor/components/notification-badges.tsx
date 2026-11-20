@@ -12,23 +12,21 @@ import { useNotifications } from "../contexts/notification-context";
 import { useSceneCanvas } from "~/feature/scene/scene-canvas-context";
 import { NotificationLevel, NotificationLevelOrder, NotificationTarget, NotificationWithMeta } from "~/protocols/notification-protocol";
 import { timeSignal } from "~/utils/time-utils";
-import { THEMES } from "~/feature/app-settings";
-import { Theme } from "~/feature/app-settings";
 
-const NotificationIcon = (props: {level: NotificationLevel}) => {
+export const NotificationIcon = (props: {level: NotificationLevel, iconClass?: string}) => {
     return (
         <Switch fallback={<img src="" alt="Unknown"/>}>
             <Match when={props.level == NotificationLevel.INFO}>
-                <span class="icon-span small-icon"><InfoIcon /></span>
+                <span class={`icon-span ${props.iconClass ?? "small-icon"}`}><InfoIcon /></span>
             </Match>
             <Match when={props.level == NotificationLevel.DEBUG}>
-                <span class="icon-span small-icon"><DebugIcon /></span>
+                <span class={`icon-span ${props.iconClass ?? "small-icon"}`}><DebugIcon /></span>
             </Match>
             <Match when={props.level == NotificationLevel.WARNING}>
-                <span class="icon-span small-icon"><WarningIcon /></span>
+                <span class={`icon-span ${props.iconClass ?? "small-icon"}`}><WarningIcon /></span>
             </Match>
             <Match when={props.level == NotificationLevel.ERROR}>
-                <span class="icon-span small-icon"><ErrorIcon /></span>
+                <span class={`icon-span ${props.iconClass ?? "small-icon"}`}><ErrorIcon /></span>
             </Match>
         </Switch>
     )

@@ -1,0 +1,65 @@
+@layer reset {
+    .ui-alert-overlay {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 350px;
+        width: calc(100vw - 40px);
+
+        pointer-events: none;
+    }
+    
+    .ui-alert-card {
+        pointer-events: auto;
+        padding: 12px;
+        border-radius: 4px;
+
+        background-color: var(--overlay-background);
+
+        border: 1px solid var(--stroke-color);
+        border-left: 2px solid var(--alert-accent);
+    }
+    
+    .ui-alert-card[data-level="info"] {
+        --alert-accent: var(--info-accent-color);
+    }
+    
+    .ui-alert-card[data-level="debug"] {
+        --alert-accent: var(--debug-accent-color);
+    }
+    
+    .ui-alert-card[data-level="warning"] {
+        --alert-accent: var(--warning-accent-color);
+    }
+    
+    .ui-alert-card[data-level="error"] {
+        --alert-accent: var(--error-accent-color);
+    }
+    
+    .ui-alert-content {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+    
+    .ui-alert-title {
+        font-size: 0.9rem;
+    }
+    
+    .ui-alert-message {
+        font-size: 0.85rem;
+        color: var(--secondary-font-color);
+        word-wrap: break-word;
+    }
+    
+    .ui-alert-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+}
