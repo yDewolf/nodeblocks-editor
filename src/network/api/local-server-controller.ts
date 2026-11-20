@@ -113,7 +113,7 @@ export class LocalServerController {
         if (!window.isTauriEnvironment) return;
         try {
             await invoke("ensure_environment", {wheelUrl: wheelUrl, removePrevious: true});
-            this.checkIsInstalled();
+            await this.checkIsInstalled();
         } catch (err) {
             console.error("Failed to install server environment", err);
         }
@@ -124,7 +124,7 @@ export class LocalServerController {
         try {
             const is_installed = await invoke<boolean>("check_server_installed");
             this._setState("isInstalled", is_installed);
-            this.checkInstalledVersion();
+            await this.checkInstalledVersion();
             return this.isInstalled;
         
         } catch (err) {
@@ -154,8 +154,9 @@ export class LocalServerController {
             await invoke("start_local_server");
             this.clearLogs();
             this._setState("serverState", LocalServerStates.RUNNING);
-            this.checkLocalServerHost();
-            this.checkStatus();
+            
+            await this.checkLocalServerHost();
+            await this.checkStatus();
         
         } catch (err) {
             console.error("Failed to start local server:", err);
@@ -168,7 +169,7 @@ export class LocalServerController {
         try {
             await invoke("stop_local_server");
             this._setState("serverState", LocalServerStates.STOPPED);
-            this.checkStatus(); 
+            await this.checkStatus(); 
         } catch (err) {
             console.error("Failed to stop local server:", err);
             throw err;
