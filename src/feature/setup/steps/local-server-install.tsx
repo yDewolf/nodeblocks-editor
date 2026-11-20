@@ -13,6 +13,10 @@ export const LocalServerInstall = () => {
     const {t} = useI18n();
     const [wheelUrl, setWheelUrl] = createSignal<string | null>(releaseController.serverReleases.at(0)?.server_wheel_url ?? null);
 
+    createEffect(() => {
+        setWheelUrl(releaseController.serverReleases.at(0)?.server_wheel_url ?? wheelUrl());
+    });
+
     return (
         <>
             <Show when={localServerController.isInstalled}>
