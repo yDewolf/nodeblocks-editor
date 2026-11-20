@@ -3,8 +3,8 @@ import "~/app.css";
 import { Router, Route, Navigate } from "@solidjs/router";
 import SceneEditor from "./feature/editor/scene-editor-route";
 import { AppSessionProvider } from "./network/app-session-provider";
-import { createEffect, onMount } from "solid-js";
-import { appSettings, UpdateRootDataTheme } from "./feature/app-settings";
+import { createEffect, onCleanup, onMount } from "solid-js";
+import { UpdateRootDataTheme } from "./feature/app-settings";
 import { ContextMenuPortal } from "./feature/context-menu/context-menu-component";
 import { Home } from "./feature/home/home-route";
 import { ScenesRoute } from "./feature/home/scenes/scenes-view";
@@ -18,6 +18,8 @@ import { AppSettingsContent } from "./feature/home/settings/app-settings-view";
 import { EditorSettingsContent } from "./feature/editor/screens/settings-view";
 import { LocalServerSettingsContent } from "./feature/local-server/local-server-settings";
 import { RemoteServerSettingsContents } from "./feature/remote-server/remote-server-config";
+import { syncAppSettingsWithTauri } from "./feature/app-settings-sync";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 declare global {
   interface Window {
@@ -26,21 +28,33 @@ declare global {
 }
 
 export default function App() {
-  // FIXME: implementar a inicialização automática no lado do Tauri
   onMount(async () => {
+    await syncAppSettingsWithTauri();
+    
     await localServerController.checkIsInstalled();
     if (localServerController.isInstalled) {
       await localServerController.checkStatus();
-      if (appSettings.autoStartLocalServer && !localServerController.isRunning) {
-        await localServerController.startServer();
-      }
     }
+
+    if (window.isTauriEnvironment) {
+      const appWindow = getCurrentWindow();
+      const unlisten = await appWindow.onCloseRequested(() => {
+        localServerController.onWindowClose();
+      });
+  
+      onCleanup(() => {
+          unlisten();
+      });
+    };
   });
+
+  onCleanup(() => {
+    localServerController.cleanup()
+  })
 
   createEffect(() => {
     UpdateRootDataTheme();
   });
-
 
   return (
     <I18nProvider>

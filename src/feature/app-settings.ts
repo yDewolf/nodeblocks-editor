@@ -1,4 +1,5 @@
 import { makePersisted } from "@solid-primitives/storage";
+import { invoke } from "@tauri-apps/api/core";
 import { createStore } from "solid-js/store";
 import { isServer } from "solid-js/web";
 import { Locale, localeDicts } from "~/i18n/i18n-locale";
@@ -46,13 +47,18 @@ const [appSettings, _setAppSettings] = makePersisted(
     {name: "app-settings"}
 );
 
-export { appSettings }
+export { appSettings, _setAppSettings }
 export const setLocale = (l: Locale) => _setAppSettings("locale", l);
 
 export const _setSetupComplete = (v: boolean) => _setAppSettings("isSetupComplete", v);
 export const _setIsFirstTimeSetup = (v: boolean) => _setAppSettings("isFirstTimeSetup", v);
 
-export const setAutoStartLocal = (v: boolean) => _setAppSettings("autoStartLocalServer", v);
+export const setAutoStartLocal = async (v: boolean) => {
+    if (window.isTauriEnvironment) {
+        await invoke("set_auto_start_local_server", { enabled: v });
+    }
+    _setAppSettings("autoStartLocalServer", v);
+};
 
 export const getCurrentTheme = () => appSettings.theme;
 

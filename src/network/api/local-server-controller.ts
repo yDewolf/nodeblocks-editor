@@ -13,10 +13,14 @@ export interface LocalServerState {
     isInstalled: boolean;
     installedVersion?: string;
     serverState: LocalServerStates,
+}
+
+interface LogsStore {
     logs: string[];
 }
 
-const LOCAL_SERVER_CACHE_KEY = "local-server-cache"
+const LOCAL_SERVER_CACHE_KEY = "local-server-cache";
+const LOCAL_SERVER_LOGS = "local-server-logs";
 const LOCAL_SERVER_HOST = "127.0.0.1";
 const LOCAL_SERVER_PORT = 8080;
 
@@ -27,12 +31,22 @@ export class LocalServerController {
     private _unlistenLog?: UnlistenFn;
     private _unlistenExit?: UnlistenFn;
 
+    private _logsStore: LogsStore;
+    private _setLogsStore: SetStoreFunction<LogsStore>;
+
     constructor() {
         [this._state, this._setState] = makePersisted(createStore<LocalServerState>({
             isInstalled: false,
             serverState: LocalServerStates.STOPPED,
-            logs: [],
         }), {name: LOCAL_SERVER_CACHE_KEY});
+        [this._logsStore, this._setLogsStore] = makePersisted(
+            createStore<LogsStore>({ 
+                logs: []
+            }), {
+                name: LOCAL_SERVER_LOGS,
+                storage: sessionStorage
+            }
+        );
         this.setup();
     }
 
@@ -44,7 +58,7 @@ export class LocalServerController {
     get isRunning() { return this._state.serverState == LocalServerStates.RUNNING; }
     get isStarting() { return this._state.serverState == LocalServerStates.STARTING; }
 
-    get logs() { return this._state.logs; }
+    get logs() { return this._logsStore.logs; }
 
     private setup() {
         this.checkIsInstalled();
@@ -56,7 +70,7 @@ export class LocalServerController {
         if (!window.isTauriEnvironment || this._unlistenLog) return;
         try {
             this._unlistenLog = await listen<string>("server-log", (event) => {
-                this._setState("logs", (prevLogs) => [...prevLogs.slice(-199), event.payload]);
+                this._setLogsStore("logs", (prevLogs) => [...prevLogs.slice(-199), event.payload]);
             });
             this._unlistenExit = await listen("server-exited", (event) => {
                 console.warn("Local server died.");
@@ -77,8 +91,13 @@ export class LocalServerController {
         }
     }
 
+    public onWindowClose() {
+        this.cleanup();
+        this.clearLogs();
+    }
+
     public clearLogs() {
-        this._setState("logs", []);
+        this._setLogsStore("logs", []);
     }
 
     public async installEnvironment(wheelUrl: string) {
