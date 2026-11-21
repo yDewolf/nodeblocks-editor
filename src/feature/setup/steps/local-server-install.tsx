@@ -139,7 +139,7 @@ export const InstallerContent = (props: {
         timer = setInterval(() => setElapsed((s) => s + 1), 1000);
      
         try {
-            localServerController.installEnvironment(props.wheelUrl);
+            await localServerController.installEnvironment(props.wheelUrl);
             installedWheel = props.wheelUrl;
             props.onFinished?.();
         } catch (e) {
