@@ -1,8 +1,11 @@
 /* Raw colors (default theme) */
 :root, [data-theme="light"] {
+  --dark-background-font-color: #e6e9ee;
+  --light-background-font-color: #33373f;
+
   --editor-background-color: #fbffff;
   --grid-color: #a7a8ac75;
-  --font-color: #33373f;
+  --font-color: var(--light-background-font-color);
   --secondary-font-color: #3C3D3F;
 
   --node-color: #f4f6fada;
@@ -22,17 +25,25 @@
 
   --dark-overlay-background: #e7f1fa;
 
-  --info-accent-color: #6a7aa7;
-  --debug-accent-color: #69b484;
-  --warning-accent-color: #d39f45;
-  --error-accent-color: #db5050;
+
+  --info-accent-color: #7389c4;
+  --info-font-color: var(--dark-background-font-color);
+
+  --debug-accent-color: #5bb174;
+  --debug-font-color: var(var(--light-background-font-color));
+
+  --warning-accent-color: #f3a838;
+  --warning-font-color: var(--light-background-font-color);
+
+  --error-accent-color: #e04545;
+  --error-font-color: var(--dark-background-font-color);
 }
 
 /* Color Schemes */
 [data-theme="dark"] {
   --grid-color: #5d5f6875;
   --editor-background-color: #0e1013;
-  --font-color: #e6e9ee;
+  --font-color: var(--dark-background-font-color);
   --secondary-font-color: #a1a1aa;
 
   --node-color: #1a1d25da;
@@ -54,9 +65,12 @@
 }
 
 [data-theme="dark-contrast"] {
+  --dark-background-font-color: #F4F6FA;
+  --light-background-font-color: #2a2c30;
+
   --grid-color: #51576e75;
   --editor-background-color: #040506;
-  --font-color: #F4F6FA;
+  --font-color: var(--dark-background-font-color);
   --secondary-font-color: #a1a1aa;
 
   --node-color: #090C14da;
@@ -75,6 +89,8 @@
   --dark-overlay-highlight: #394e63;
   --disabled-button-background: #343f49;
   --dark-overlay-highlight-color: var(--font-color);
+
+
 }
 
 

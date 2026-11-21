@@ -119,7 +119,7 @@ export const NotificationCard = (props: {
 
     return (
         <div 
-            data-theme={"light"}
+            // data-theme={"light"}
             class="notification-badge animated container padded space-between"
             classList={{
                 "popup": props.is_popup ?? false,

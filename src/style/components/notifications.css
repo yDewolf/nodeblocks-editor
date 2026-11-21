@@ -104,19 +104,31 @@
     }
     
     .notification-badge.error {
-        background-color: var(--error-accent-color);
+        background-color: color-mix(in srgb, var(--error-accent-color), transparent 10%);
+    }
+    .notification-badge.error * {
+        color: var(--error-font-color);
     }
     
     .notification-badge.warning {
-        background-color: var(--warning-accent-color);
+        background-color: color-mix(in srgb, var(--warning-accent-color), transparent 10%);
+    }
+    .notification-badge.warning * {
+        color: var(--warning-font-color);
     }
     
     .notification-badge.debug {
-        background-color: var(--debug-accent-color);
+        background-color: color-mix(in srgb, var(--debug-accent-color), transparent 10%);
+    }
+    .notification-badge.debug * {
+        color: var(--debug-font-color);
     }
     
     .notification-badge.info {
-        background-color: rgba(187, 187, 209, 0.205);
+        background-color: color-mix(in srgb, var(--info-accent-color), transparent 10%);
+    }
+    .notification-badge.info * {
+        color: var(--info-font-color);
     }
     
     .notification-badge.read {
