@@ -17,7 +17,7 @@ export class TypeSpecRegistry {
 
     
     public registerDataType(spec: DataTypeSpec): void {
-        console.log("Registering datatype: ", spec.fqn, spec);
+        // console.log("Registering datatype: ", spec.fqn, spec);
         if (spec.fqn in this.dataTypes) {
             throw new Error(`DataType '${spec.fqn}' is already registered`);
         }
@@ -25,7 +25,7 @@ export class TypeSpecRegistry {
     }
 
     public registerNodeType(spec: NodeTypeSpec): void {
-        console.log("Registering nodetype: ", spec.fqn);
+        // console.log("Registering nodetype: ", spec.fqn);
         if (spec.fqn in this.nodeTypes) {
             throw new Error(`NodeType '${spec.fqn}' is already registered`);
         }

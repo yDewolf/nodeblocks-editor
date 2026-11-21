@@ -9,6 +9,9 @@ export interface MetadataVersion {
 
 export interface MetadataHeader extends MetadataVersion, BaseMetadata {
     package_id: string,
+    package_version: string,
+
+    content_hash?: string,
     last_modified: number,
 
     tags: Record<string, MetaTag>,
@@ -37,6 +40,7 @@ export const parse_header = (json_data: any): MetadataHeader => {
         brief: json_data.brief ?? "",
         description: json_data.description ?? "",
         package_version: json_data.package_version,
+        content_hash: json_data.content_hash,
         meta_version: json_data.meta_version,
         package_id: json_data.package_id ?? "",
         last_modified: json_data.last_modified ?? 0,

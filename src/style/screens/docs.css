@@ -189,4 +189,9 @@
             grid-template-rows: minmax(0, 150px) minmax(0, 1fr);
         }
     }
+
+
+    .home-view .docs-left-panel {
+        background-color: var(--overlay-background);
+    }
 }

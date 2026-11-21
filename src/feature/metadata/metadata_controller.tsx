@@ -45,24 +45,6 @@ export class MetadataController {
                 this.update_metadata(package_id);
             }
         })
-
-        // this._client.add_handler(ServerMessages.SYNC_VERSIONS, async (message) => {
-        //     if (message.types && message.metadata) {
-        //         this.update_metadata(
-        //             message.types.package_id, {
-        //                 meta_version: message.metadata.meta_version, 
-        //                 types_version: message.metadata.types_version
-        //             }
-        //         );
-        //     }
-        //     if (!message.metadata) {
-        //         this.request_metadata();
-        //     }
-        // });
-
-        // this._client.add_handler(ServerMessages.METADATA_UPDATED, (message) => {
-        //     this.request_metadata();
-        // });
     }
 
     public insertMetadata(id: string, metadata: MetadataStoreData) {
@@ -71,18 +53,6 @@ export class MetadataController {
 
     public update_metadata = async (package_id: string) => {
         const target_metadata = this.store[package_id];
-        // FIXME: fix how we handle meta version
-        // if (
-        //     target_metadata &&
-        //     target_metadata.header?.package_version === new_version.package_version &&
-        //     target_metadata.header?.meta_version === new_version.meta_version
-        // ) {
-        //     console.log("Metadata loaded from cache...");
-        //     this.current_types_id = package_id;
-        //     return;
-        // }
-        
-        // console.warn("Couldn't load metadata from cache. Fetching metadata from server");
         this.request_metadata(package_id);
     };
 
@@ -104,23 +74,33 @@ export class MetadataController {
             const header_url = new URL(`${this.appSession.baseHttpUrl}/api/plugins/${package_id}/metadata/header`);
             const node_url = new URL("nodetypes", header_url);
             const datatypes_url = new URL("datatypes", header_url);
-            // if (this._client.session_token) {
-            //     header_url.searchParams.append("token", this._client.session_token);
-            //     node_url.searchParams.append("token", this._client.session_token);
-            //     datatypes_url.searchParams.append("token", this._client.session_token);
-            // } else {
-            //     throw Error("Missing Session Token");
-            // }
+            if (package_id in this.store) {
+                const current_hash = this.store[package_id].header?.content_hash;
+                if (current_hash) {
+                    header_url.searchParams.append("hash", current_hash);
+                    node_url.searchParams.append("hash", current_hash);
+                    datatypes_url.searchParams.append("hash", current_hash);
+                }
+            }
             
             const [headerRes, nodesRes, datatypesRes] = await Promise.all([
-                fetch(header_url, {headers: this.appSession.defaultHeaders}).then(r => r.json()),
-                fetch(node_url, {headers: this.appSession.defaultHeaders}).then(r => r.json()),
-                fetch(datatypes_url, {headers: this.appSession.defaultHeaders}).then(r => r.json())
+                fetch(header_url, {headers: this.appSession.defaultHeaders}).then(r => {
+                    if (r.status == 304) { return null; }
+                    return r.json();
+                }),
+                fetch(node_url, {headers: this.appSession.defaultHeaders}).then(r => {
+                    if (r.status == 304) { return null; }
+                    return r.json();
+                }),
+                fetch(datatypes_url, {headers: this.appSession.defaultHeaders}).then(r => {
+                    if (r.status == 304) { return null; }
+                    return r.json();
+                })
             ]);
 
-            const header_meta: MetadataHeader = parse_header(headerRes);
-            const node_types: Record<string, NodeTypeMeta> = parse_node_types(nodesRes, header_meta.tags, header_meta.categories);
-            const data_types: Record<string, DataTypeMeta> = parse_data_types(datatypesRes);
+            const header_meta: MetadataHeader = headerRes ? parse_header(headerRes) : this.store[package_id].header!;
+            const node_types: Record<string, NodeTypeMeta> = nodesRes ? parse_node_types(nodesRes, header_meta.tags, header_meta.categories) : this.store[package_id].node_types;
+            const data_types: Record<string, DataTypeMeta> = datatypesRes ? parse_data_types(datatypesRes) : this.store[package_id].node_types;
             
             const data: MetadataStoreData = {
                 header: header_meta,
@@ -129,7 +109,7 @@ export class MetadataController {
             };
             
             this.insertMetadata(header_meta.package_id, data);
-            console.log("Fetched meta: ", header_meta);
+            // console.log("Fetched meta: ", header_meta);
 
         } catch (error) {
             console.error("Failed to fetch metadata from server", error);
