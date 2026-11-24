@@ -26,8 +26,8 @@
   --dark-overlay-background: #e7f1fa;
 
 
-  --info-accent-color: #7389c4;
-  --info-font-color: var(--dark-background-font-color);
+  --info-accent-color: #cfd1d8;
+  --info-font-color: var(--light-background-font-color);
 
   --debug-accent-color: #5bb174;
   --debug-font-color: var(var(--light-background-font-color));
@@ -62,6 +62,9 @@
   --dark-overlay-highlight: #343d46;
   --disabled-button-background: #2b2d30;
   --dark-overlay-highlight-color: var(--font-color);
+
+  --info-accent-color: #8396c9;
+  --info-font-color: var(--dark-background-font-color);
 }
 
 [data-theme="dark-contrast"] {
@@ -90,7 +93,8 @@
   --disabled-button-background: #343f49;
   --dark-overlay-highlight-color: var(--font-color);
 
-
+  --info-accent-color: #8396c9;
+  --info-font-color: var(--dark-background-font-color);
 }
 
 
