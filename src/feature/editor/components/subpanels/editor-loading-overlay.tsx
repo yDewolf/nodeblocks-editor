@@ -18,8 +18,13 @@ export const EditorLoadingOverlay = () => {
     const editor = useEditor();
     const navigate = useNavigate();
 
+    let timeout: NodeJS.Timeout | undefined;
+    const clearCountdownTimeout = () => {
+        clearTimeout(timeout);
+        timeout = undefined;
+    }
     const startCountDown = () => {
-        setTimeout(() => {
+        timeout = setTimeout(() => {
             if (state() != StateTypes.LOADING || state() != StateTypes.CONNECTING) {
                 setCountDown((n) => n - 1);
                 if (countDown() <= 0) {
@@ -31,8 +36,15 @@ export const EditorLoadingOverlay = () => {
         }, 1000);
     }
 
+    onCleanup(() => clearCountdownTimeout);
+
     const [message, setMessage] = createSignal<string>("");
     const [state, setState] = createSignal<StateTypes | undefined>(undefined);
+    
+    editor.sceneConnection.onConnect((connection) => {
+        setMessage("Connected to server");
+        clearCountdownTimeout();
+    });
     const unsubscribe = editor.sceneConnection.onError((error, message) => {
         setMessage(message);
         if (error instanceof UnauthorizedError || error instanceof ForbiddenError) {

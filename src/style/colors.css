@@ -30,7 +30,7 @@
   --info-font-color: var(--light-background-font-color);
 
   --debug-accent-color: #5bb174;
-  --debug-font-color: var(var(--light-background-font-color));
+  --debug-font-color: var(--light-background-font-color);
 
   --warning-accent-color: #f3a838;
   --warning-font-color: var(--light-background-font-color);
