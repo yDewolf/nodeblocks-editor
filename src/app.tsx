@@ -1,7 +1,7 @@
 import "~/app.css";
 
 import { Router, Route, Navigate } from "@solidjs/router";
-import SceneEditor from "./feature/editor/scene-editor-route";
+import SceneEditorRoute from "./feature/editor/scene-editor-route";
 import { AppSessionProvider } from "./network/app-session-provider";
 import { createEffect, onCleanup, onMount } from "solid-js";
 import { _setSetupComplete, UpdateRootDataTheme } from "./feature/app-settings";
@@ -101,7 +101,7 @@ const AppSetup = () => {
                     <Route path="remoteServer" component={RemoteServerSettingsContents}/>
                   </Route>
                 </Route>
-                <Route path="/scene/:scene_id" component={SceneEditor} />
+                <Route path="/scene/:scene_id" component={SceneEditorRoute} />
             </Router>
           </main>
         </PackageManagerProvider>

@@ -1,5 +1,5 @@
 import { useParams } from "@solidjs/router";
-import { createSignal, onMount, Show } from "solid-js";
+import { createSignal, onCleanup, onMount, Show } from "solid-js";
 import { EditorProvider, useEditor } from "./contexts/scene-editor-context";
 import { EventManagerProvider } from "~/utils/events/event-provider";
 import { InputManagerProvider, DefinedInputScope } from "~/utils/keybinds/input-provider";
@@ -14,7 +14,7 @@ import { SceneArtifactHTTPController } from "~/network/api/scene-artifact-http-c
 import "~/style/screens/editor.css";
 import { NodeFilterProvider } from "./contexts/node-filter-context";
 
-export default function SceneEditor() {
+export default function SceneEditorRoute() {
     const appSession = useAppSession();
     const params = useParams<{ scene_id: string }>();
     const sceneId = params.scene_id;
@@ -48,12 +48,17 @@ export default function SceneEditor() {
 const EditorSetup = (props: {sceneId: string}) => {
     const editor = useEditor();
     const appSession = useAppSession();
-    onMount(async () => {
-        if (!appSession.isConnectedToServer) {
-            await appSession.tryConnectToServer(appSession.host, appSession.port);
-        }
+    
+    const unlisten = appSession.listenServerChange(async () => {
         await editor.connectToScene(props.sceneId);
-    }) 
+    });
+    onCleanup(() => unlisten);
+    onMount(async () => {
+        // if (!appSession.isConnectedToServer) {
+        //     await appSession.tryConnectToServer(appSession.host, appSession.port);
+        // }
+        await editor.connectToScene(props.sceneId);
+    });
 
     return (
         <MetadataProvider controller={editor.metadataController}>
