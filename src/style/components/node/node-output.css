@@ -2,8 +2,8 @@
     gap: 5px;
 }
 
-.output-selector {
-
+.output-selector > button {
+    padding: 2px 4px;
 }
 
 .node-output-container {

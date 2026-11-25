@@ -52,7 +52,7 @@ export const NodeOutput = (props: {node: SceneNode}) => {
                     {(slot_id) => {
                         return (
                             <button 
-                                class="icon-button selectable-button" 
+                                class="text-button selectable-button" 
                                 classList={{"active": targetOutputSlot() == slot_id}}
                                 onclick={() => setTargetOutputSlot(slot_id)}
                             >

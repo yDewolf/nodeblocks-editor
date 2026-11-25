@@ -83,6 +83,7 @@ button.go-back {
 
 .text-button:hover {
     background-color: var(--overlay-highlight);
+    cursor: pointer;
 }
 
 .text-button:disabled {
