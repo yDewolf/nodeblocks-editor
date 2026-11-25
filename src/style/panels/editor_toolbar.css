@@ -1,7 +1,7 @@
 @layer custom {
     .toolbar-holder {
         pointer-events: auto;
-        min-width: 150px;
+        /* min-width: 150px; */
     
         color: var(--font-color);
         margin: 0 auto;

@@ -49,7 +49,7 @@ export const EditorToolbar = () => {
                     </For>
                 </div>
                 <div class="toolbar-scene-states">
-                    TODO
+                    {/* TODO */}
                 </div>
             </div>
         </div>

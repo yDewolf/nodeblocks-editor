@@ -3,7 +3,7 @@ import { Portal } from 'solid-js/web';
 import { useDocs } from "~/feature/docs/docs-context";
 import DocsIcon from '~/assets/icons/book.svg';
 import ExpandIcon from '~/assets/icons/expand.svg';
-import { MetaProvider } from '~/feature/metadata/metadata-context';
+import { DynamicMetaProvider, MetaProvider } from '~/feature/metadata/metadata-context';
 import { ParsedMetaText } from '../../metadata/components/metadata-text';
 import { useEditor } from '~/feature/editor/contexts/scene-editor-context';
 import { DocsTool } from '../tools/docs-tool';
@@ -148,40 +148,42 @@ export const DocsElementIndicator = (props: {
 
     return (
         <MetaProvider value={{metadata: docs.currentRoot}}>
-            <Show when={target() != null && isToolActive()}>
-                <Portal mount={isInsideGraph() ? props.world_space_ref : props.editor_view_ref}>
-                    <div 
-                        class="selected-docs-indicator" 
-                        classList={{"in-graph": isInsideGraph()}}
-                        style={style()} 
-                    />
-                </Portal>
-            </Show>
-            <Show when={docs.selectedDocElement() && isToolActive() && !props.docsPageVisible()}>
-                <Portal mount={isSelectedInsideGraph() ? props.world_space_ref : props.editor_view_ref}>
-                    <div
-                        ref={PopupRef}
-                        class="container selected-docs-popup"
-                        classList={{ "right": isToRight(), "top": isToTop() }}
-                        style={popupStyle()} 
-                    >  
-                        <div class="fill keep row-container space-between docs-popup-header" style={{"align-items": 'center'}}>
-                            <div class="keep fill center-items docs-popup-name-holder">
-                                <DocsIcon class="small-icon"/>
-                                <p>{docs.docsData.latest?.data.capitalized_name ?? "Not found"}</p>
+            <DynamicMetaProvider payload={docs.docsData.latest}>
+                <Show when={target() != null && isToolActive()}>
+                    <Portal mount={isInsideGraph() ? props.world_space_ref : props.editor_view_ref}>
+                        <div 
+                            class="selected-docs-indicator" 
+                            classList={{"in-graph": isInsideGraph()}}
+                            style={style()} 
+                            />
+                    </Portal>
+                </Show>
+                <Show when={docs.selectedDocElement() && isToolActive() && !props.docsPageVisible()}>
+                    <Portal mount={isSelectedInsideGraph() ? props.world_space_ref : props.editor_view_ref}>
+                        <div
+                            ref={PopupRef}
+                            class="container selected-docs-popup"
+                            classList={{ "right": isToRight(), "top": isToTop() }}
+                            style={popupStyle()} 
+                            >  
+                            <div class="fill keep row-container space-between docs-popup-header" style={{"align-items": 'center'}}>
+                                <div class="keep fill center-items docs-popup-name-holder">
+                                    <DocsIcon class="small-icon"/>
+                                    <p>{docs.docsData.latest?.data.capitalized_name ?? "Not found"}</p>
+                                </div>
+                                {/* FIXME: arrumar isso aqui para ele sempre abrir a página relacionada à esse popup */}
+                                <button class="icon-button" onclick={() => props.open_docs_page()}>
+                                    <ExpandIcon class="small-icon"/>
+                                </button>
                             </div>
-                            {/* FIXME: arrumar isso aqui para ele sempre abrir a página relacionada à esse popup */}
-                            <button class="icon-button" onclick={() => props.open_docs_page()}>
-                                <ExpandIcon class="small-icon"/>
-                            </button>
+                            <Show when={docs.docs_section}>
+                                <p class="docs-popup-section">Section: <b>{docs.docs_section}</b></p>
+                            </Show>
+                            <ParsedMetaText class="docs-popup-description" text={(docs.docsData.latest?.data.brief)} default={docs.docsData.latest?.data.description}/>
                         </div>
-                        <Show when={docs.docs_section}>
-                            <p class="docs-popup-section">Section: <b>{docs.docs_section}</b></p>
-                        </Show>
-                        <ParsedMetaText class="docs-popup-description" text={(docs.docsData.latest?.data.brief ?? docs.docsData.latest?.data.description)} default=""/>
-                    </div>
-                </Portal>
-            </Show>
+                    </Portal>
+                </Show>
+            </DynamicMetaProvider>
         </MetaProvider>
     );
 };
