@@ -41,7 +41,7 @@ export interface SceneData {
 
 export class NodePathUtils {
     static parse_node_path(path: string): SlotPathData | undefined {
-        const regex = new RegExp("nodes:([a-z0-9-]+):slots:([^:\\s]+)", "i");
+        const regex = new RegExp("nodes:([^:\\s]+):slots:([^:\\s]+)", "i");
         const match = regex.exec(path);
         if (match && match.length == 3) {
             return {
