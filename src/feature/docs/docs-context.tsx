@@ -35,9 +35,11 @@ export const DocsUrlSync = () => {
         if (isSyncing) return;
 
         const route = DocsPathUtils.parseHash(hash);
+        if (!route) return;
+        
         const currentRoute = docs.route;
 
-        if (route?.path !== currentRoute?.path || route?.section !== currentRoute?.section) {
+        if (route?.path != currentRoute?.path || route?.section != currentRoute?.section) {
             isSyncing = true;
             docs.setRoute(route);
             

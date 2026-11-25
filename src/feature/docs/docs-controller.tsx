@@ -1,4 +1,4 @@
-import { createSignal, createResource, Resource, createMemo, Accessor } from "solid-js";
+import { createSignal, createResource, Resource, createMemo, Accessor, batch } from "solid-js";
 import { isServer } from "solid-js/web";
 import { DocPayload } from "~/feature/docs/docs-protocols";
 import { MetadataController, MetadataStoreData } from "~/feature/metadata/metadata_controller";
@@ -40,13 +40,13 @@ export class DocsController {
     private _docs_route: () => DocsRoute | undefined;
     private _set_docs_route: (route: DocsRoute | undefined) => void;
     get route() { return this._docs_route(); }
-    protected set route(new_route: DocsRoute | undefined) { 
-        this._set_docs_route(new_route); 
-        if (new_route) {
-            if (!this.opened_tabs.find((value) => value === new_route.path)) {
-                this.opened_tabs = [...this.opened_tabs, new_route.path];
+    protected set route(new_route: DocsRoute | undefined) {
+        batch(() => {
+            this._set_docs_route(new_route);
+            if (new_route && !this.state_store.opened_tabs.includes(new_route.path)) {
+                this.setStore("opened_tabs", (prev) => [...prev, new_route.path]);
             }
-        }
+        });
     }
 
     get docs_path() { return this.route?.path; }
@@ -90,7 +90,7 @@ export class DocsController {
         [this._docs_route, this._set_docs_route] = createSignal<DocsRoute | undefined>(undefined);
     
         const currentPathMemo = createMemo(() => this.route?.path);
-        const docsDataResource = createResource(currentPathMemo, async (path) => {
+        const [docsDataResource, { mutate, refetch }] = createResource(currentPathMemo, async (path) => {
             if (!path || isServer) {
                 return undefined;
             }
@@ -102,7 +102,7 @@ export class DocsController {
                 return undefined;
             }
         });
-        this.docsData = docsDataResource[0];
+        this.docsData = docsDataResource;
     }
 
     get currentRootId(): string | undefined {
