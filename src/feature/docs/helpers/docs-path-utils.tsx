@@ -95,7 +95,7 @@ export class DocsPathUtils {
     /**
      * Parses a path string and returns its components.
      */
-    public static parsePath(path: string, default_root: string): { rootId: string; docType?: DocsPathPrefix; targetId?: string } {
+    public static parsePath(path: string, default_root: string, docsType?: DocsPathPrefix): { rootId: string; docType?: DocsPathPrefix; targetId?: string } {
         if (!path) {
             return { rootId: "" };
         }
@@ -107,13 +107,22 @@ export class DocsPathUtils {
                 targetId: path
             }
         }
+        
         if (parts.length == 2) {
+            if (docsType) {
+                return {
+                    rootId: parts[0],
+                    docType: docsType,
+                    targetId: parts[1] || undefined
+                }
+            }
             return {
                 rootId: default_root,
                 docType: parts[0] as DocsPathPrefix | undefined,
                 targetId: parts[1] || undefined
             }
         }
+        
         return {
             rootId: parts[0] || "",
             docType: parts[1] as DocsPathPrefix | undefined,

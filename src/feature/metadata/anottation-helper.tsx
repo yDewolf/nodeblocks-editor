@@ -1,10 +1,11 @@
 import { JSX } from "solid-js";
-import {  InterfaceElementMeta } from "../docs/docs-protocols";
+import {  DocsPathPrefix, InterfaceElementMeta } from "../docs/docs-protocols";
 import { useResolvedMeta } from "~/feature/metadata/metadata-context";
 import { CURRENT_PATH, DocsPathUtils, DocsRoute } from "../docs/helpers/docs-path-utils";
 import { MetadataHeader } from "~/protocols/nodeblocks/metadata/header_metadata";
 import { NodeTypeMeta, DataTypeMeta } from "~/protocols/nodeblocks/metadata/type_metadata";
 import { DocsHref } from "../docs/components/docs-reference";
+import { MetadataStoreData } from "./metadata_controller";
 
 export type ResolvedMeta = ReturnType<typeof useResolvedMeta>;
 
@@ -18,6 +19,7 @@ export class DocAnnotationHelper {
     static parse(
         text: string | undefined | null,
         resolvedMeta: ResolvedMeta,
+        metaStore?: Record<string, MetadataStoreData>,
         super_path?: string
     ): JSX.Element {
         if (!text) return null;
@@ -36,8 +38,8 @@ export class DocAnnotationHelper {
 
             const label = match[1] ?? "auto";
             const annotation = match[2] ?? match[3];
-
-            elements.push(this.resolveAnnotation(annotation, label, resolvedMeta));
+            
+            elements.push(this.resolveAnnotation(annotation, label, resolvedMeta, metaStore));
             lastIndex = regex.lastIndex;
         }
 
@@ -52,6 +54,7 @@ export class DocAnnotationHelper {
         annotation_str: string,
         label: string,
         resolvedMeta: ResolvedMeta,
+        metaStore?: Record<string, MetadataStoreData>,
         super_path?: string
     ): JSX.Element {
         const cleanStr = annotation_str.startsWith("@") ? annotation_str.slice(1) : annotation_str;
@@ -69,6 +72,7 @@ export class DocAnnotationHelper {
         const rootMeta = resolvedMeta.rootMeta?.metadata;
         const nodeMeta = resolvedMeta.nodeMeta?.meta;
         const dataTypeMeta = resolvedMeta.dataTypeMeta;
+        const allMeta = metaStore ?? {};
 
         const currentTypesId = rootMeta?.header?.package_id || "";
         const defaultRoot = currentTypesId;
@@ -108,11 +112,11 @@ export class DocAnnotationHelper {
 
             // --- Referências Globais a Outros Nós ---
             case "node": {
-                // Suporta "@node:target_id" (mesmo root) ou "@node:other_root.target_id"
-                const {rootId, docType, targetId} = DocsPathUtils.parsePath(annotation_target, defaultRoot)
+                // Suporta "@node:target_id" (uses default root) ou "@node:package_id.target_id"
+                const {rootId, docType, targetId} = DocsPathUtils.parsePath(annotation_target, defaultRoot, DocsPathPrefix.NODE)
                 if (!targetId) { break; }
-                if (rootMeta && rootId === currentTypesId) {
-                    const targetNode = rootMeta.node_types?.[targetId];
+                if (rootId in allMeta) {
+                    const targetNode = allMeta[rootId].node_types?.[targetId];
                     if (targetNode && label === "auto") {
                         displayLabel = targetNode.capitalized_name;
                     }
@@ -123,10 +127,11 @@ export class DocAnnotationHelper {
 
             // --- Referências Globais a Data Types ---
             case "datatype": {
-                const {rootId, docType, targetId} = DocsPathUtils.parsePath(annotation_target, defaultRoot)
+                // @datatype:datatype_id (uses default root) or @datatype:package_id.datatype_id
+                const {rootId, docType, targetId} = DocsPathUtils.parsePath(annotation_target, defaultRoot, DocsPathPrefix.DATATYPE)
                 if (!targetId) { break; }
-                if (rootMeta && rootId === currentTypesId) {
-                    const targetType = rootMeta.data_types?.[targetId];
+                if (rootId in allMeta) {
+                    const targetType = allMeta[rootId].data_types?.[targetId];
                     if (targetType && label === "auto") {
                         displayLabel = targetType.capitalized_name;
                     }

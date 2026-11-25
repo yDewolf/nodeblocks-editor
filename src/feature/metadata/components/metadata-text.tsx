@@ -17,7 +17,7 @@ export const ParsedMetaText = (props: {
     const resolvedMeta = useResolvedMeta();
 
     const parsedContent = createMemo(() => {
-        const annotatedElements = DocAnnotationHelper.parse(props.text || props.default || "", resolvedMeta, docs.docs_path);
+        const annotatedElements = DocAnnotationHelper.parse(props.text || props.default || "", resolvedMeta, docs.allDocs, docs.docs_path);
         return MarkdownHelper.parse(annotatedElements);
     });
 
