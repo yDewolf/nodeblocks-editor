@@ -100,7 +100,7 @@ export class MetadataController {
 
             const header_meta: MetadataHeader = headerRes ? parse_header(headerRes) : this.store[package_id].header!;
             const node_types: Record<string, NodeTypeMeta> = nodesRes ? parse_node_types(nodesRes, header_meta.tags, header_meta.categories) : this.store[package_id].node_types;
-            const data_types: Record<string, DataTypeMeta> = datatypesRes ? parse_data_types(datatypesRes) : this.store[package_id].node_types;
+            const data_types: Record<string, DataTypeMeta> = datatypesRes ? parse_data_types(datatypesRes) : this.store[package_id].data_types;
             
             const data: MetadataStoreData = {
                 header: header_meta,
